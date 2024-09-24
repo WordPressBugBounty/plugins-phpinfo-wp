@@ -1,0 +1,1 @@
+# plugins-phpinfo-wp

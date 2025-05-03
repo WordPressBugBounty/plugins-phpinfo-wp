@@ -1,9 +1,9 @@
 === phpinfo() WP ===
 Contributors: exeebit
-Tags: phpinfo, server info, php, server configuration, php ini, phpinfo(), php configuration, htaccess, apache
+Tags: phpinfo, server info, htaccess, apache, phpinfo()
 Requires at least: 4.7
-Tested up to: 6.6.1
-Stable tag: 6.0
+Tested up to: 6.8.1
+Stable tag: 6.1
 Requires PHP: 5.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -26,21 +26,21 @@ Added an option to look up some basic information like root directory size, a nu
 == Screenshots ==
 
 1. PHP Info
-2. Extensions
-3. Hyper Text Access
+2. htaccess editor
+3. Extensions
 4. Basic Information
-4. Log
+5. Log
 
 == Installation ==
 
 You can [download](https://downloads.wordpress.org/plugin/phpinfo-wp.zip) and upload the plugin via Admin > Plugins > Add New > Upload Plugin. Or,
-Go to your website's admin panel. Select Plugins > Add New. search for **phpinfo() WP** by [Imran Hossain Sagor](https://github.com/s4gor). Click **Install Now button**. Then simply click **Active**.
+Go to your website's admin panel. Select Plugins > Add New. search for **phpinfo() WP** by [Exeebit](https://exeebit.com/wordpress-plugins/phpinfo-wp). Click **Install Now button**. Then simply click **Active**.
 
 == Frequently Asked Questions ==
 
 = What is the requirements to active this plugin? =
 
-Nothing is needed. But sometimes, hosting providers disable [server setting](http://php.net/manual/en/ini.core.php#ini.disable-functions). In that case, you need to contact with your hosting provider
+Nothing is needed. But sometimes, hosting providers disable [server setting](http://php.net/manual/en/ini.core.php#ini.disable-functions). In that case, you need to contact with your hosting provider.
 See screenshot #1. Make sure site's root directory is writable to set or edit server configuration's directive values. 
 
 = Why my site is showing Internal Server Error 500 after editing .htaccess file? =
@@ -48,6 +48,11 @@ See screenshot #1. Make sure site's root directory is writable to set or edit se
 Relax, nothing has happend. Safe edit feature for editing .htaccess file has been added from version 2.0. In case you are using older version than 2.0. Don't worry. Enter to your hosting site. Go to File Manager. Edit .htaccess file which is located at the root folder of you site's directory. Delete the code which is faulty. Save and site will be ok. 
 
 == Change Log ==
+
+= 6.1 =
+Add blueprint for live preview
+Fix minor bugs
+UI enhancement
 
 = 6.0 =
 Fix CSRF vulnerability issues

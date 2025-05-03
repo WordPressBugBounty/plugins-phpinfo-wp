@@ -15,6 +15,8 @@ function custom_size($path) {
     }
 }
 
+$this->thankyou();
+
 ?>
 
 

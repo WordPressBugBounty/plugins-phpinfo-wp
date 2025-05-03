@@ -176,6 +176,8 @@ if(is_writable($root_dir)) {
     echo '<div id="htaccess-warning" style="font-size: 20px;">need write permissions on root directory. Can\'t perform the action</div>';
 }
 
+$this->thankyou();
+
 ?>
 
 

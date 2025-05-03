@@ -28,5 +28,9 @@ foreach($extensions as $extension) {
 }
 
 echo '</ul>';
+
+$this->thankyou();
+
+
 ?>
 </div>

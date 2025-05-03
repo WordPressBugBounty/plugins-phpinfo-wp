@@ -21,6 +21,8 @@ if(file_exists($phpinfo_log_dir) && !file_exists("$phpinfo_log_dir/log.txt")) {
 	fclose($log_file);
 }
 
+$this->thankyou();
+
 ?>
 
 <div id="phpinfo-log">

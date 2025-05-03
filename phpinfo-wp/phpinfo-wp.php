@@ -4,7 +4,7 @@
 Plugin Name: phpinfo WP
 Plugin URI: http://exeebit.com/wordpress-plugins/phpinfo-wp
 Description: A simple plugin to look up information about PHP and manage PHP configurations and directive values.
-Version: 6.0
+Version: 6.1
 Author: Exeebit
 Author URI: http://exeebit.com
 License: GPLv3
@@ -28,14 +28,13 @@ if(!class_exists( 'Phpinfo_wp' )):
 			add_filter('clean_url', [$this, 'script_async'], 11, 1);
 			add_filter("plugin_row_meta", [$this, "meta"], 10, 2);
 			add_filter( 'plugin_action_links', [$this, 'ads_action_links'], 10, 5 );
-			add_action( 'admin_notices', [$this, 'phpinfowp_notice_view'] );
-			add_action( 'admin_init', [$this, 'phpinfowp_notice_dismiss'] );
 		}
 
 		public function add_admin_pages() {
-		add_menu_page( 'Phpinfo() WP', 'Phpinfo() WP', 
+		add_menu_page( 'phpinfo() WP', 'phpinfo() WP', 
        'manage_options', 'phpinfo-wp', [$this, 'phpinfo_view'], 'dashicons-tickets', 99 );
-    add_submenu_page(
+
+    	add_submenu_page(
         'phpinfo-wp',
         __( '.htaccess editor', 'textdomain' ),
         __( '.htaccess editor', 'textdomain' ),
@@ -90,33 +89,7 @@ if(!class_exists( 'Phpinfo_wp' )):
 			require_once plugin_dir_path( __FILE__ ) . 'views/log.php';
 		}
 
-		public function phpinfowp_notice_view() {
-			$user_id = get_current_user_id();
-			if ( !get_user_meta( $user_id, 'phpinfowp_notice_dismissed' ) ) {
-				?>
-                <div class="notice notice-info" id="phpinfo-wp-notice">
-                    <p style="margin-right: 20px"><?php _e( '<b>Bored of getting update notifications? Do you want to get rid of it? Do you want to disable your site’s update process? Check out my new plugin <a href="https://wordpress.org/plugins/disable-auto-updates" target="_blank">Disable Auto Updates</a> through which you can disable your WordPress website’s theme, core and plugin auto-update along with notifications. It will also disappear the red numbered mark from the plugin’s menu title.</b>', 'phpinfo-wp' ); ?> </p>
-                    <a href="?phpinfowp-notice-dismissed">Dismiss</a>
-                </div>
-				<?php
-			}
-		}
-
-		public function phpinfowp_notice_dismiss() {
-			$user_id = get_current_user_id();
-			if ( isset( $_GET['phpinfowp-notice-dismissed'] ) ) {
-				add_user_meta( $user_id, 'phpinfowp_notice_dismissed', 'true', true );
-				header("Location: " . admin_url( 'admin.php?page=phpinfo-wp' ));
-			}
-		}
-
-		public function phpinfowp_handle_notice() {
-			$user_id = get_current_user_id();
-			delete_user_meta( $user_id, 'phpinfowp_notice_dismissed');
-		}
-
 		public function activate() {
-			$this->phpinfowp_handle_notice();
 			flush_rewrite_rules();
 		}
 
@@ -138,7 +111,7 @@ if(!class_exists( 'Phpinfo_wp' )):
         }
 
         public function footer_notice(){
-            echo '<span id="footer-thankyou">Thank you for using <a href="https://wordpress.org/plugins/phpinfo-wp/">phpinfo() WP</a>. <a href="http://exeebit.com/wordpress-plugins/phpinfo-wp/donate" target="_blank">Buy Me a Coffee <span style="color: red">&#x2764;</span></a></span>';
+            echo '<span id="footer-thankyou">Thank you for using <a href="https://wordpress.org/plugins/phpinfo-wp/">phpinfo() WP</a>. <a href="http://exeebit.com/wordpress-plugins/phpinfo-wp/donate" target="_blank">Buy Me a Coffee</a><span style="color: red"> &#x2764;</span></span>';
         }
 
         public function thankyou() {

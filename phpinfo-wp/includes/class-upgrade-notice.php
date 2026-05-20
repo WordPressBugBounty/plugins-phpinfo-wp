@@ -80,6 +80,25 @@ class Phpinfo_WP_Upgrade_Notice {
     // anyone updating across multiple versions sees their relevant block.
     private static function highlights_for(string $new_version): array {
         $catalog = [
+            '7.0.2' => [
+                'headline' => 'Sidebar flyout fix + host-override detection in Config Grader.',
+                'bullets'  => [
+                    '<strong>Fixed:</strong> the Audit / Tools / Reports hover flyouts in the WordPress sidebar no longer get clipped off the bottom of the screen. The flyout now flips upward automatically when there isn\'t enough room below, and scrolls internally if it would still overflow the viewport.',
+                    '<strong>New:</strong> Config Grader now detects when your host is silently overriding a directive you tried to auto-fix (parent <code>.user.ini</code>, hosting panel PHP options, php.ini lock). A clear red warning lists exactly what was written vs what PHP is actually using, plus what to do about it.',
+                    '<strong>Improved:</strong> auto-fix success notice now explains the 5-minute <code>.user.ini</code> cache so the values don\'t look stuck when they\'re just waiting for PHP to refresh.',
+                ],
+                'cta_url'   => 'https://wordpress.org/plugins/phpinfo-wp/#developers',
+                'cta_label' => 'See full changelog',
+            ],
+            '7.0.1' => [
+                'headline' => 'Quality-of-life fix for Config Grader auto-fix.',
+                'bullets'  => [
+                    '<strong>New:</strong> when the Config Grader auto-fix writes a directive but your host silently overrides it, you\'ll now see a red warning card on the Grader page showing exactly which directives weren\'t honored, what we wrote, and what PHP reports — no more "Applied!" notices for changes that didn\'t actually apply.',
+                    '<strong>Improved:</strong> auto-fix success notice now mentions the 5-minute <code>.user.ini</code> cache delay.',
+                ],
+                'cta_url'   => 'https://wordpress.org/plugins/phpinfo-wp/#developers',
+                'cta_label' => 'See full changelog',
+            ],
             '7.0.0' => [
                 'headline' => 'Major release — full WordPress site-health & server-audit suite, WP 7.0 ready.',
                 'bullets'  => [

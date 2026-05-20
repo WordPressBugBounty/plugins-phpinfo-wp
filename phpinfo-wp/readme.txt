@@ -3,7 +3,7 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 7.0.1
+Stable tag: 7.0.2
 Requires PHP: 7.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -148,6 +148,10 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 7. Audit Report (Pro) — single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.0.2 =
+*   **Fixed**: Sidebar flyout menu (Audit / Tools / Reports hover panels) no longer clips below the viewport when the parent item sits near the bottom of the screen. Flyout now repositions on hover and resize, flips upward when there's no room below, and scrolls internally if it would still overflow.
+*   **Fixed**: Readme short description shortened to fit WordPress.org's 150-character limit.
 
 = 7.0.1 =
 *   **NEW**: Config Grader now detects when a directive was written to `.user.ini`/`.htaccess` but the host is still overriding it (parent `.user.ini`, hosting panel PHP options, php.ini lock). Shows a clear warning table with what was written vs what PHP reports, plus actionable next steps.

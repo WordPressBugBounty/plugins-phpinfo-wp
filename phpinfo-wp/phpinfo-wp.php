@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     7.0.1
+Version:     7.0.2
 Author:      Exeebit
 Author URI:  https://exeebit.com
 License:     GPLv3
@@ -11,7 +11,7 @@ License:     GPLv3
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '7.0.1');
+define('PHPINFOWP_VERSION', '7.0.2');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 
@@ -448,10 +448,10 @@ class Phpinfo_wp {
         }
         .phpinfowp-wpnav-flyout {
             display: none;
-            position: absolute;
-            left: 100%;
-            top: -6px;
+            position: fixed;
             min-width: 210px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
             background: #2c3338;
             border-left: 1px solid #1d2327;
             padding: 6px 0;
@@ -509,6 +509,23 @@ class Phpinfo_wp {
                     a.parentNode.style.display = 'none';
                 }
             });
+            // Reposition a flyout so it never overflows the viewport. Uses
+            // position:fixed coords (set on .phpinfowp-wpnav-flyout). Anchors
+            // to the right edge of the parent <li>; flips upward when there
+            // isn't enough room below.
+            function position(li, flyout) {
+                var liRect = li.getBoundingClientRect();
+                var vh     = window.innerHeight;
+                flyout.style.left = liRect.right + 'px';
+                // Measure natural height by temporarily clearing top + showing
+                var fh = flyout.offsetHeight; // already display:block via :hover
+                var topPreferred = liRect.top - 6; // default: align near top of <li>
+                var maxTop       = vh - fh - 8;    // keep 8px from bottom edge
+                var minTop       = 40;             // keep below WP admin bar
+                var top = Math.max(minTop, Math.min(topPreferred, maxTop));
+                flyout.style.top = top + 'px';
+            }
+
             Object.keys(data).forEach(function(slug) {
                 var grp = data[slug];
                 var anchor = root.querySelector('.wp-submenu a[href*="page=' + slug + '"]');
@@ -533,6 +550,14 @@ class Phpinfo_wp {
                     flyout.appendChild(a);
                 });
                 li.appendChild(flyout);
+
+                // Reposition on hover (and again on window resize while open
+                // so a viewport change doesn't strand the flyout off-screen).
+                li.addEventListener('mouseenter', function() { position(li, flyout); });
+                li.addEventListener('focusin',    function() { position(li, flyout); });
+                window.addEventListener('resize', function() {
+                    if (li.matches(':hover, :focus-within')) position(li, flyout);
+                });
             });
         })();
         </script>

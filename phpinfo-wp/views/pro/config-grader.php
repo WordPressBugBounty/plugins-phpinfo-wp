@@ -81,14 +81,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$result     = Phpinfo_WP_Config_Grader::run();
-$checks     = $result['checks'];
-$score      = $result['score'];
-$grade      = $result['grade'];
-$categories = $result['categories'];
+$result      = Phpinfo_WP_Config_Grader::run();
+$checks      = $result['checks'];
+$cross       = $result['cross'];
+$score       = $result['score'];
+$grade       = $result['grade'];
+$categories  = $result['categories'];
+$ctx         = $result['context'];
+$trend       = $result['trend'];
+$sev_counts  = $result['severity_counts'];
 
-$status_icon = ['pass' => '✓', 'warn' => '⚠', 'fail' => '✗'];
+$status_icon  = ['pass' => '✓', 'warn' => '⚠', 'fail' => '✗'];
 $status_color = ['pass' => '#00a32a', 'warn' => '#996800', 'fail' => '#d63638'];
+
+// Map of host slugs → display names for the context banner
+$host_names = [
+    'kinsta'    => 'Kinsta',     'wpengine'  => 'WP Engine',  'siteground' => 'SiteGround',
+    'cloudways' => 'Cloudways',  'pantheon'  => 'Pantheon',   'flywheel'   => 'Flywheel',
+    'liquidweb' => 'LiquidWeb',  'litespeed' => 'LiteSpeed',
+];
+$plugin_labels = [
+    'woocommerce'    => 'WooCommerce',  'elementor'     => 'Elementor',
+    'wpbakery'       => 'WPBakery',      'divi'          => 'Divi',
+    'avada'          => 'Avada',         'oxygen'        => 'Oxygen',
+    'beaver-builder' => 'Beaver Builder','buddypress'    => 'BuddyPress',
+    'learndash'      => 'LearnDash',     'tutor'         => 'Tutor LMS',
+    'lifterlms'      => 'LifterLMS',     'edd'           => 'Easy Digital Downloads',
+    'wp-all-import'  => 'WP All Import', 'forms-heavy'   => 'forms',
+    'backup'         => 'a backup plugin','wp-rocket'    => 'WP Rocket',
+    'litespeed-cache'=> 'LiteSpeed Cache',
+];
+
+// Severity pill helper (closure)
+$sev_pill = function (string $sev, string $label) {
+    $color = Phpinfo_WP_Config_Grader::severity_color($sev);
+    return sprintf(
+        '<span class="phpinfowp-sev phpinfowp-sev-%s" style="color:%s;border-color:%s">%s</span>',
+        esc_attr($sev), esc_attr($color), esc_attr($color), esc_html($label)
+    );
+};
 
 $target_info     = Phpinfo_WP_Config_Grader_Fixer::detect_target();
 $target_writable = Phpinfo_WP_Config_Grader_Fixer::target_writable();
@@ -176,13 +207,52 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
         </p></div>
     <?php endif; ?>
 
-    <!-- Score card -->
+    <!-- Detected context — what we tuned the recommendations for -->
+    <div class="phpinfowp-cg-context">
+        <div class="phpinfowp-cg-context-label">Recommendations tuned for this site</div>
+        <div class="phpinfowp-cg-context-row">
+            <span class="phpinfowp-cg-chip phpinfowp-cg-chip-php">PHP <?php echo esc_html($ctx['php_full']); ?></span>
+            <?php if ($ctx['is_https']): ?>
+                <span class="phpinfowp-cg-chip">HTTPS</span>
+            <?php endif; ?>
+            <?php if (!$ctx['is_production']): ?>
+                <span class="phpinfowp-cg-chip phpinfowp-cg-chip-dev">Development mode</span>
+            <?php endif; ?>
+            <?php if ($ctx['host'] && isset($host_names[$ctx['host']])): ?>
+                <span class="phpinfowp-cg-chip phpinfowp-cg-chip-host"><?php echo esc_html($host_names[$ctx['host']]); ?> detected</span>
+            <?php endif; ?>
+            <?php if (!empty($ctx['server']) && $ctx['server'] !== 'unknown'): ?>
+                <span class="phpinfowp-cg-chip"><?php echo esc_html(ucfirst($ctx['server'])); ?></span>
+            <?php endif; ?>
+            <?php
+            // Only show meaningful plugin chips
+            foreach ($ctx['plugins'] as $slug => $_) {
+                if (!isset($plugin_labels[$slug])) continue;
+                echo '<span class="phpinfowp-cg-chip phpinfowp-cg-chip-plugin">' . esc_html($plugin_labels[$slug]) . '</span>';
+            }
+            ?>
+        </div>
+    </div>
+
+    <!-- Score card with trend -->
     <div class="phpinfowp-score-card" style="margin-bottom:28px">
         <div class="phpinfowp-grade-circle grade-<?php echo esc_attr(strtolower(str_replace('+', 'plus', $grade))); ?>">
             <?php echo esc_html($grade); ?>
         </div>
         <div class="phpinfowp-score-card-body">
-            <div class="phpinfowp-score-card-value"><?php echo esc_html($score); ?><span>/100</span></div>
+            <div class="phpinfowp-score-card-value">
+                <?php echo esc_html($score); ?><span>/100</span>
+                <?php if (!empty($trend['available'])):
+                    $delta = (int) $trend['delta'];
+                    $cls = $delta > 0 ? 'phpinfowp-trend-up' : ($delta < 0 ? 'phpinfowp-trend-down' : 'phpinfowp-trend-flat');
+                    $arrow = $delta > 0 ? '↑' : ($delta < 0 ? '↓' : '→');
+                ?>
+                <span class="phpinfowp-trend <?php echo $cls; ?>" title="Previous score: <?php echo (int) $trend['previous']; ?>">
+                    <?php echo $arrow; ?> <?php echo $delta > 0 ? '+' . $delta : (string) $delta; ?>
+                    <small>vs last reading</small>
+                </span>
+                <?php endif; ?>
+            </div>
             <div class="phpinfowp-score-card-meta">
                 <?php if ($failing): ?>
                     <span style="color:#d63638"><strong><?php echo count($failing); ?></strong> failing</span> &nbsp;&middot;&nbsp;
@@ -192,9 +262,33 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                 <?php endif; ?>
                 <span style="color:#00a32a"><strong><?php echo count($passing); ?></strong> passing</span>
                 &nbsp;&middot;&nbsp; <?php echo count($checks); ?> checks total
+                <?php if ($sev_counts[Phpinfo_WP_Config_Grader::SEV_CRITICAL] ?? 0): ?>
+                    &nbsp;&middot;&nbsp; <?php echo $sev_pill(Phpinfo_WP_Config_Grader::SEV_CRITICAL, $sev_counts[Phpinfo_WP_Config_Grader::SEV_CRITICAL] . ' critical'); ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>
+
+    <?php if (!empty($cross)): ?>
+    <!-- Cross-directive consistency issues -->
+    <div class="phpinfowp-cg-cross">
+        <h3 class="phpinfowp-cg-cross-heading">
+            <span class="dashicons dashicons-warning" style="color:#dba617"></span>
+            <?php echo count($cross); ?> consistency issue<?php echo count($cross) === 1 ? '' : 's'; ?>
+            <span class="phpinfowp-cg-cross-sub">— directives that contradict each other</span>
+        </h3>
+        <?php foreach ($cross as $x): ?>
+            <div class="phpinfowp-cg-cross-row">
+                <div class="phpinfowp-cg-cross-top">
+                    <strong><?php echo esc_html($x['label']); ?></strong>
+                    <?php echo $sev_pill($x['severity'], $x['severity_label']); ?>
+                </div>
+                <div class="phpinfowp-cg-cross-reason"><?php echo esc_html($x['reason']); ?></div>
+                <div class="phpinfowp-cg-cross-fix"><strong>Fix:</strong> <?php echo esc_html($x['fix']); ?></div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
 
     <!-- Checks by category -->
     <?php foreach ($categories as $cat):
@@ -227,6 +321,9 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                     <div class="phpinfowp-grade-check-body">
                         <div class="phpinfowp-grade-check-key">
                             <code><?php echo esc_html($c['key']); ?></code>
+                            <?php if ($c['status'] !== 'pass'): ?>
+                                <?php echo $sev_pill($c['severity'], $c['severity_label']); ?>
+                            <?php endif; ?>
                             <?php if ($c['status'] !== 'pass' && Phpinfo_WP_Config_Grader_Fixer::can_fix($c['key'])): ?>
                                 <form method="post" style="display:inline-block;margin-left:8px;vertical-align:middle">
                                     <?php wp_nonce_field('phpinfowp_autofix_nonce'); ?>
@@ -249,9 +346,24 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                         <div class="phpinfowp-grade-check-values">
                             <span>Current: <code style="color:<?php echo $color; ?>"><?php echo esc_html($c['value']); ?></code></span>
                             <span style="color:#888">&rarr;</span>
-                            <span>Recommended: <code style="color:#00a32a"><?php echo esc_html($c['good']); ?></code></span>
+                            <span>Recommended: <code style="color:#00a32a"><?php echo esc_html($c['target_label'] ?? $c['good']); ?></code></span>
                         </div>
                         <div class="phpinfowp-grade-check-note"><?php echo esc_html($c['note']); ?></div>
+                        <?php if (!empty($c['live_evidence'])): ?>
+                            <div class="phpinfowp-grade-check-live">
+                                <span class="dashicons dashicons-chart-line" aria-hidden="true"></span>
+                                <strong>Observed:</strong> <?php echo esc_html($c['live_evidence']); ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($c['status'] !== 'pass' && !empty($c['host_fix'])): ?>
+                            <div class="phpinfowp-grade-check-host">
+                                <strong>On <?php echo esc_html($c['host_fix']['panel']); ?>:</strong>
+                                <?php echo esc_html($c['host_fix']['how']); ?>
+                                <?php if (!empty($c['host_fix']['url'])): ?>
+                                    <a href="<?php echo esc_url($c['host_fix']['url']); ?>" target="_blank" rel="noopener">Open panel ↗</a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -265,8 +377,8 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
     </p>
 
     <?php
-        $current_target = file_exists($target_info['file']) ? @file_get_contents($target_info['file']) : '';
-        $has_autofix_block = is_string($current_target) && str_contains($current_target, Phpinfo_WP_Config_Grader_Fixer::MARK_BEGIN);
+        $current_target = @file_exists($target_info['file']) ? @file_get_contents($target_info['file']) : '';
+        $has_autofix_block = is_string($current_target) && str_contains($current_target, 'BEGIN phpinfo-wp-autofix');
     ?>
     <?php if ($has_autofix_block): ?>
         <form method="post" style="margin-top:8px" onsubmit="return confirm('Revert the entire auto-fix block? This removes every value phpinfo() WP added — manual edits to your config file are untouched.')">

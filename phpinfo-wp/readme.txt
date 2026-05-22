@@ -1,10 +1,10 @@
 === phpinfo() WP — Site Health, PHP Compatibility & Server Audit ===
 Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
-Requires at least: 5.0
+Requires at least: 5.9
 Tested up to: 7.0
-Stable tag: 7.0.2
-Requires PHP: 7.4
+Stable tag: 7.0.3
+Requires PHP: 8.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -84,7 +84,8 @@ You can also [download the zip](https://downloads.wordpress.org/plugin/phpinfo-w
 
 = Server requirements =
 
-*   PHP 7.4 or higher (PHP 8.x recommended).
+*   PHP 8.0 or higher (PHP 8.2+ recommended). PHP 7.4 reached end-of-life in November 2022 and is no longer supported.
+*   WordPress 5.9 or higher.
 *   Some PHP functions used by the plugin may be disabled by your host. Contact your host if features show as unavailable.
 *   For .htaccess editing, your site root must be writable.
 
@@ -148,6 +149,21 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 7. Audit Report (Pro) — single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.0.3 =
+*   **NEW**: License page now includes a four-tier comparison table (Free / Single / Unlimited / Lifetime) above the "What Pro unlocks" section so site owners can see exactly what each tier includes.
+*   **NEW**: WP Cron Monitor adds a "Purge hook" action on orphan rows (uses `wp_unschedule_hook()`) so removing an orphan actually sticks. Single-row delete couldn't stop recurring orphans because WP reschedules the next instance on fire — the explainer banner in the view now documents this.
+*   **NEW**: Activity Log row template now surfaces a plain-English description for every entry. Config Grader auto-fix entries used to render as a generic "EVENT" badge — they now show as "AUTO-FIX" with the directive list. New "Auto-fixes" filter pill.
+*   **NEW**: White-label Audit Report now accepts a company logo (Media Library picker, stored as attachment ID + URL) and renders it above the brand name on the report cover.
+*   **NEW**: Plugins-screen retention modal — clicking "Deactivate" on the phpinfo() WP row now shows what features stop working immediately, so site owners don't accidentally remove the safety net. Pro users see both Free and Pro feature lists.
+*   **Updated**: Minimum requirements bumped to PHP 8.0 and WordPress 5.9. The codebase has always used PHP 8 string functions (`str_starts_with`, `str_contains`); the old "PHP 7.4 / WP 5.0" requirement was incorrect and would fatal on activation for that combo. PHP 7.4 reached end-of-life in November 2022.
+*   **UI**: Removed the redundant "✓ Pro active" badge from the Dashboard page (still shown in the admin top bar).
+*   **Fixed**: White-label branding form on the Audit Report page used to stay open after save when "Enable white-label" was checked. It now collapses back after save — the success notice confirms the change instead.
+*   **Fixed**: Print / Save as PDF on the Audit Report page used to produce a blank page in Chrome and Safari. The print CSS was relying on `visibility:hidden` + `position:absolute` which doesn't escape WP's nested layout containers. Rewrote it with explicit `display:none` on the admin chrome, neutralized `#wpwrap` / `#wpcontent` / `#wpbody-content` margins, added `print-color-adjust:exact` so backgrounds actually render, and added `@page` rules for A4 with 14×12 mm margins.
+*   **NEW**: License page Deactivate button now opens a retention modal listing the Pro features that will lock, with a clear "Nothing is deleted" reassurance about what stays on the site.
+*   **NEW**: PHP Error Log page now shows a full diagnostic when no log file is found, instead of a generic warning. Tells you which of `WP_DEBUG` / `WP_DEBUG_LOG` / `WP_DEBUG_DISPLAY` are set, the exact paths the plugin checked and why each failed, plus a host-aware summary (most often the truthful answer is "your site has had no PHP errors recently — that's a good thing").
+*   **MAJOR**: Config Grader overhauled — it's now a context-aware audit instead of a static checklist. Detects WooCommerce, Elementor, LearnDash, BuddyPress, page builders, big-import tools, and the hosting environment (Kinsta, WP Engine, SiteGround, Cloudways, Pantheon, Flywheel, LiquidWeb, LiteSpeed), then tunes recommendations to that workload — a WooCommerce site now sees `memory_limit ≥ 512M` while a plain blog still sees `≥ 256M`, and an Elementor site sees `max_input_vars ≥ 5000`. Added **cross-directive consistency rules** that catch real foot-guns the per-directive checks miss (`post_max_size ≥ upload_max_filesize`, `memory_limit ≥ post_max_size + 64M headroom`, `max_input_time ≤ max_execution_time`). Added **live-data corroboration** — the grader now reads recent error-log signatures and OPcache stats, escalating severity when reality contradicts the static rule (memory_limit "passes" the threshold but the error log shows OOM kills → escalated to Critical; OPcache memory looks fine but `cache_full` is true → escalated). Replaced the weight 1/2/3 scoring with a **Critical / High / Medium / Low severity matrix** rendered as colour-coded pills. Added new directives: `opcache.jit`, `opcache.jit_buffer_size`, `opcache.huge_code_pages`, `realpath_cache_size`, `realpath_cache_ttl`, `date.timezone`, `output_buffering`, `max_file_uploads`. Added **host-aware remediation** — on managed hosts where the user can't edit php.ini, each failing directive now links to the host's PHP-settings panel with explicit "On SiteGround: Site Tools → Devs → PHP Manager →…" instructions. Added **trend tracking** — every Pro page-load records the score in a 30-day rolling history and the grade card now shows "↓ -3 vs last reading" so weekly reports can tell a regression story. The Fix-all button and per-directive auto-fix now use the context-aware recommendations.
+*   **MAJOR**: Audit Report overhauled. The report now opens with an **Overall Site Health score** (one number out of 100, big donut on page 1) — a weighted average across PHP config, security headers, OPcache, SSL, PHP support window, and database health. A **critical-issues banner** at the top promotes things that used to be buried (MariaDB EOL, low OPcache hit rates, expired SSL, world-writable wp-config). A new **"Top 3 actions this week"** section ranks issues by urgency and gives each one a plain-English "Why it matters" + "How to fix" pair. Every metric in the snapshot grid now carries a coloured **✓ OK / ⚠ Warning / ✗ Critical** verdict pill, plus a plain-English caption translating jargon ("Autoload — data WordPress loads on every page request"). Added a new **Site Configuration** section that audits HTTPS, WP_DEBUG_DISPLAY, pending updates (core/plugins/themes), backup-plugin detection (UpdraftPlus / BackWPup / Duplicator / BlogVault / WPvivid / etc.), and file permissions on wp-config.php and .htaccess. Subscores render as a colour-coded bar chart so the strong and weak categories are visible at a glance.
 
 = 7.0.2 =
 *   **Fixed**: Sidebar flyout menu (Audit / Tools / Reports hover panels) no longer clips below the viewport when the parent item sits near the bottom of the screen. Flyout now repositions on hover and resize, flips upward when there's no room below, and scrolls internally if it would still overflow.

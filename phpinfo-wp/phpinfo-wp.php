@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     7.0.2
+Version:     7.0.3
 Author:      Exeebit
 Author URI:  https://exeebit.com
 License:     GPLv3
@@ -11,7 +11,7 @@ License:     GPLv3
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '7.0.2');
+define('PHPINFOWP_VERSION', '7.0.3');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 
@@ -39,6 +39,7 @@ require_once PHPINFOWP_DIR . 'includes/class-config-grader-fixer.php';
 require_once PHPINFOWP_DIR . 'includes/class-abilities.php';
 require_once PHPINFOWP_DIR . 'includes/class-ai-explain.php';
 require_once PHPINFOWP_DIR . 'includes/class-upgrade-notice.php';
+require_once PHPINFOWP_DIR . 'includes/class-deactivate-modal.php';
 
 if (!class_exists('Phpinfo_wp')):
 
@@ -64,6 +65,9 @@ class Phpinfo_wp {
         // hovering Audit/Tools/Reports reveals all their leaf pages. Loaded
         // on every admin page because users hover from anywhere in admin.
         add_action('admin_footer',                [$this, 'render_sidebar_flyouts']);
+        // Leaf-hiding CSS must load early (not in admin_footer) because WP 7.0
+        // View Transitions can skip footer scripts on cross-doc navigations.
+        add_action('admin_enqueue_scripts',       [$this, 'enqueue_sidebar_css']);
         // Topbar (logo + page title + CTA) above every plugin page.
         add_action('in_admin_header',             [$this, 'render_topbar']);
         Phpinfo_WP_Site_Health::register();
@@ -73,6 +77,7 @@ class Phpinfo_wp {
         Phpinfo_WP_Abilities::register();
         Phpinfo_WP_AI_Explain::register();
         Phpinfo_WP_Upgrade_Notice::register();
+        Phpinfo_WP_Deactivate_Modal::register();
 
         // Auto-render the tab bar above every grouped page (priority 5 so
         // it sits at the top of the .wrap before any other admin notices).
@@ -387,6 +392,85 @@ class Phpinfo_wp {
         }
     }
 
+    /**
+     * Inject sidebar leaf-hiding + flyout CSS on every admin page via
+     * wp_add_inline_style. This fires during admin_enqueue_scripts
+     * (not admin_footer) so the CSS is present before the first paint
+     * and survives WP 7.0 View Transition navigations.
+     */
+    public function enqueue_sidebar_css(): void {
+        $groups = Phpinfo_WP_Admin_Nav::groups();
+
+        // Build leaf-hiding selectors for every tab slug.
+        $leaf_css = [];
+        foreach ($groups as $group) {
+            foreach ($group['tabs'] as $slug => $tab) {
+                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href*="page=' . $slug . '"])';
+            }
+        }
+
+        $css = '';
+        if ($leaf_css) {
+            $css .= "@supports selector(:has(*)) {\n";
+            $css .= implode(",\n", $leaf_css);
+            $css .= " { display: none !important; }\n}\n";
+        }
+
+        // Flyout panel base styles (structure + WP 7.0 native colors).
+        $css .= <<<'FLYOUT'
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout { position: relative; }
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout > a { padding-right: 22px; }
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout > a::after {
+    content: "\203A"; position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%); opacity: .55; font-size: 16px; line-height: 1;
+}
+.phpinfowp-wpnav-flyout {
+    display: none; position: fixed; min-width: 210px;
+    max-height: calc(100vh - 40px); overflow-y: auto;
+    background-color: rgb(12.15,12.15,12.15); padding: 6px 0;
+    z-index: 9999; box-shadow: 0 3px 5px rgba(0,0,0,.2);
+}
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout:hover > .phpinfowp-wpnav-flyout,
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout:focus-within > .phpinfowp-wpnav-flyout {
+    display: block;
+}
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a {
+    display: flex !important; align-items: center; justify-content: space-between;
+    gap: 8px; margin: 0; padding: 5px 12px !important;
+    color: rgba(240,246,252,0.7) !important; text-decoration: none !important;
+    font-size: 13px !important; line-height: 1.4 !important; font-weight: 400 !important;
+}
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a:hover,
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a:focus {
+    color: #7b90ff !important; background: none !important;
+    box-shadow: inset 4px 0 0 0 currentColor; transition: box-shadow .1s linear;
+}
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active,
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active:hover,
+#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active:focus {
+    color: #7b90ff !important; background: none !important;
+    box-shadow: inset 4px 0 0 0 currentColor;
+}
+.phpinfowp-wpnav-flyout-pro {
+    display: inline-block; background: #777BB3; color: #fff;
+    font-size: 9px; font-weight: 700; letter-spacing: .4px;
+    padding: 1px 5px; border-radius: 3px;
+}
+body.folded #toplevel_page_phpinfo-wp .phpinfowp-wpnav-flyout { display: none !important; }
+
+#toplevel_page_phpinfo-wp .wp-submenu > li > a:hover,
+#toplevel_page_phpinfo-wp .wp-submenu > li > a:focus,
+#toplevel_page_phpinfo-wp .wp-submenu > li.current > a,
+#toplevel_page_phpinfo-wp .wp-submenu > li.current > a:hover,
+#toplevel_page_phpinfo-wp .wp-submenu > li.current > a:focus {
+    color: #7b90ff !important;
+}
+FLYOUT;
+
+        // Attach to WP's built-in common stylesheet — always loaded.
+        wp_add_inline_style('common', $css);
+    }
+
     public function script_async(string $url): string {
         if (!str_contains($url, '#async')) return $url;
         return str_replace('#async', '', $url) . "' async='async";
@@ -434,64 +518,22 @@ class Phpinfo_wp {
         }
         ?>
         <style id="phpinfowp-wpnav-flyout-css">
-        #toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout { position: relative; }
-        #toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout > a { padding-right: 22px; }
-        #toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout > a::after {
-            content: "›";
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: .55;
-            font-size: 16px;
-            line-height: 1;
+        /* Duplicate of enqueue_sidebar_css — kept as fallback for edge cases
+           where admin_enqueue_scripts didn't fire (e.g. mu-plugin conflicts).
+           The browser deduplicates identical declarations, so no harm. */
+        <?php
+        $leaf_css = [];
+        foreach ($groups as $group) {
+            foreach ($group['tabs'] as $lslug => $ltab) {
+                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href*="page=' . $lslug . '"])';
+            }
         }
-        .phpinfowp-wpnav-flyout {
-            display: none;
-            position: fixed;
-            min-width: 210px;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-            background: #2c3338;
-            border-left: 1px solid #1d2327;
-            padding: 6px 0;
-            z-index: 9999;
-            box-shadow: 4px 4px 12px rgba(0,0,0,.25);
+        if ($leaf_css) {
+            echo "@supports selector(:has(*)) {\n";
+            echo implode(",\n", $leaf_css);
+            echo " { display: none !important; }\n}\n";
         }
-        #toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout:hover > .phpinfowp-wpnav-flyout,
-        #toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout:focus-within > .phpinfowp-wpnav-flyout {
-            display: block;
-        }
-        .phpinfowp-wpnav-flyout a {
-            display: flex !important;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 6px 14px !important;
-            color: #c3c4c7 !important;
-            text-decoration: none;
-            font-size: 13px !important;
-            line-height: 1.4 !important;
-            font-weight: 400 !important;
-        }
-        .phpinfowp-wpnav-flyout a:hover,
-        .phpinfowp-wpnav-flyout a:focus {
-            color: #fff !important;
-            background: #2271b1 !important;
-        }
-        .phpinfowp-wpnav-flyout-pro {
-            display: inline-block;
-            background: #777BB3;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: .4px;
-            padding: 1px 5px;
-            border-radius: 3px;
-        }
-        /* When the WP sidebar is collapsed (folded), the submenu itself is
-           already a flyout — nesting another flyout breaks; suppress. */
-        body.folded #toplevel_page_phpinfo-wp .phpinfowp-wpnav-flyout { display: none !important; }
+        ?>
         </style>
         <script>
         (function() {
@@ -535,9 +577,16 @@ class Phpinfo_wp {
                 li.classList.add('phpinfowp-has-flyout');
                 var flyout = document.createElement('div');
                 flyout.className = 'phpinfowp-wpnav-flyout';
+                var curMatch = location.search.match(/[?&]page=([\w-]+)/);
+                var currentPage = curMatch ? curMatch[1] : '';
                 grp.items.forEach(function(it) {
                     var a = document.createElement('a');
                     a.href = it.url;
+                    var pm = it.url.match(/[?&]page=([\w-]+)/);
+                    if (pm && pm[1] === currentPage) {
+                        a.classList.add('phpinfowp-flyout-active');
+                        li.classList.add('current');
+                    }
                     var label = document.createElement('span');
                     label.textContent = it.label;
                     a.appendChild(label);
@@ -553,10 +602,17 @@ class Phpinfo_wp {
 
                 // Reposition on hover (and again on window resize while open
                 // so a viewport change doesn't strand the flyout off-screen).
-                li.addEventListener('mouseenter', function() { position(li, flyout); });
+                var isHovered = false;
+                li.addEventListener('mouseenter', function() {
+                    isHovered = true;
+                    position(li, flyout);
+                });
+                li.addEventListener('mouseleave', function() {
+                    isHovered = false;
+                });
                 li.addEventListener('focusin',    function() { position(li, flyout); });
                 window.addEventListener('resize', function() {
-                    if (li.matches(':hover, :focus-within')) position(li, flyout);
+                    if (isHovered || li.contains(document.activeElement)) position(li, flyout);
                 });
             });
         })();

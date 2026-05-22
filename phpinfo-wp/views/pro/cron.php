@@ -16,6 +16,13 @@ if (isset($_POST['phpinfowp_cron_delete']) && check_admin_referer('phpinfowp_cro
         $msg = "Event removed from schedule.";
     }
 }
+if (isset($_POST['phpinfowp_cron_purge']) && check_admin_referer('phpinfowp_cron_nonce')) {
+    $hook = sanitize_text_field($_POST['hook'] ?? '');
+    $removed = Phpinfo_WP_Cron_Monitor::purge_hook($hook);
+    $msg = $removed > 0
+        ? sprintf('Purged %d scheduled instance%s of "%s".', $removed, $removed === 1 ? '' : 's', $hook)
+        : "Removed all scheduled instances of \"{$hook}\".";
+}
 
 $events  = Phpinfo_WP_Cron_Monitor::events();
 $summary = Phpinfo_WP_Cron_Monitor::summary();
@@ -59,6 +66,15 @@ $summary = Phpinfo_WP_Cron_Monitor::summary();
             <div class="phpinfowp-cron-stat-label">Due within 60s</div>
         </div>
     </div>
+
+    <?php if ($summary['orphan']): ?>
+        <div class="notice notice-info inline" style="margin:20px 0 0">
+            <p style="margin:8px 0">
+                <strong>Why orphan events come back after you delete them:</strong>
+                "Delete" removes a single instance at one timestamp, but recurring events reschedule the next instance when WP processes cron — even with no callback. Use <strong>Purge hook</strong> on orphan rows to remove every instance of that hook in one shot (<code>wp_unschedule_hook()</code>). If it still reappears, an active plugin is re-registering it on every page load — check that plugin or fully uninstall it.
+            </p>
+        </div>
+    <?php endif; ?>
 
     <?php if (!$events): ?>
         <p style="margin-top:24px">No scheduled events found.</p>
@@ -122,6 +138,15 @@ $summary = Phpinfo_WP_Cron_Monitor::summary();
                             <button type="submit" name="phpinfowp_cron_delete" value="1" class="button button-small"
                                     onclick="return confirm('Remove this scheduled event?')">Delete</button>
                         </form>
+                        <?php if (!$e['has_callback']): ?>
+                            <form method="post" style="display:inline">
+                                <?php wp_nonce_field('phpinfowp_cron_nonce'); ?>
+                                <input type="hidden" name="hook" value="<?php echo esc_attr($e['hook']); ?>">
+                                <button type="submit" name="phpinfowp_cron_purge" value="1" class="button button-small"
+                                        onclick="return confirm('Purge every scheduled instance of \'<?php echo esc_js($e['hook']); ?>\'? This wipes all timestamps and arg variants of this hook.')"
+                                        title="Removes every scheduled instance of this hook (wp_unschedule_hook). Use this if Delete keeps coming back.">Purge hook</button>
+                            </form>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

@@ -140,11 +140,85 @@ $pillars = [
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
-            <form method="post" style="margin-top:14px">
+            <form id="phpinfowp-license-deactivate-form" method="post" style="margin-top:14px">
                 <?php wp_nonce_field('phpinfowp_license_nonce'); ?>
                 <input type="hidden" name="phpinfowp_license_action" value="deactivate">
-                <button type="submit" class="button button-secondary" onclick="return confirm('Deactivate the license on this site?')">Deactivate License</button>
+                <button type="button" class="button button-secondary" id="phpinfowp-license-deactivate-btn">Deactivate License</button>
             </form>
+
+            <!-- License deactivation retention modal. Reuses .phpinfowp-dm CSS
+                 from the Plugins-screen modal (same look). Only renders when
+                 a Pro license is active. -->
+            <div id="phpinfowp-license-dm" class="phpinfowp-dm" aria-hidden="true" role="dialog" aria-labelledby="phpinfowp-license-dm-title">
+                <div class="phpinfowp-dm-backdrop"></div>
+                <div class="phpinfowp-dm-dialog" role="document">
+                    <button type="button" class="phpinfowp-dm-close" aria-label="Close">&times;</button>
+
+                    <div class="phpinfowp-dm-header">
+                        <div style="width:48px;height:48px;border-radius:10px;background:rgba(124,58,237,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                            <span class="dashicons dashicons-shield-alt" style="font-size:26px;width:26px;height:26px;color:#7c3aed"></span>
+                        </div>
+                        <div>
+                            <h2 id="phpinfowp-license-dm-title" class="phpinfowp-dm-title">Deactivate your Pro license?</h2>
+                            <p class="phpinfowp-dm-sub">The plugin keeps running, but every Pro feature below stops the moment you confirm.</p>
+                        </div>
+                    </div>
+
+                    <div class="phpinfowp-dm-body">
+                        <div class="phpinfowp-dm-col phpinfowp-dm-col-pro">
+                            <div class="phpinfowp-dm-col-label">Pro features that will lock</div>
+                            <ul class="phpinfowp-dm-list">
+                                <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>White-label PDF Audit Report</li>
+                                <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>One-click Config Auto-Fix with rollback</li>
+                                <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>Security Headers + SSL Certificate monitors</li>
+                                <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>OPcache Dashboard + PHP Error Log viewer</li>
+                                <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>Database Health + Autoload bloat detection</li>
+                                <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>WP-Cron Monitor + orphan-hook purge</li>
+                                <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>Email Alerts, Weekly Digest, Slack/Discord webhooks</li>
+                                <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>Multi-site (Network) support</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="phpinfowp-dm-warn">
+                        <span class="dashicons dashicons-info-outline" style="color:#0073aa"></span>
+                        <div>
+                            <strong>Nothing is deleted.</strong> Your license key, white-label branding, snapshots, and alert settings stay on this site. Paste your key back in to restore Pro instantly — your license remains valid on Exeebit's servers.
+                        </div>
+                    </div>
+
+                    <div class="phpinfowp-dm-actions">
+                        <button type="button" class="button button-primary button-large phpinfowp-dm-keep">
+                            Keep Pro active
+                        </button>
+                        <button type="button" class="phpinfowp-dm-confirm" id="phpinfowp-license-dm-confirm" style="background:none;border:none;cursor:pointer">
+                            Deactivate anyway →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+            (function () {
+                var modal = document.getElementById('phpinfowp-license-dm');
+                var openBtn  = document.getElementById('phpinfowp-license-deactivate-btn');
+                var confirm  = document.getElementById('phpinfowp-license-dm-confirm');
+                var form     = document.getElementById('phpinfowp-license-deactivate-form');
+                if (!modal || !openBtn || !confirm || !form) return;
+
+                function open()  { modal.classList.add('is-open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; }
+                function close() { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden','true');  document.body.style.overflow = ''; }
+
+                openBtn.addEventListener('click', open);
+                modal.querySelectorAll('.phpinfowp-dm-close, .phpinfowp-dm-keep, .phpinfowp-dm-backdrop').forEach(function (b) {
+                    b.addEventListener('click', close);
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+                });
+                confirm.addEventListener('click', function () { form.submit(); });
+            }());
+            </script>
         <?php else: ?>
             <form method="post" class="phpinfowp-license-form">
                 <?php wp_nonce_field('phpinfowp_license_nonce'); ?>
@@ -163,6 +237,103 @@ $pillars = [
                 </p>
             </form>
         <?php endif; ?>
+    </div>
+
+    <!-- Plan comparison table -->
+    <?php
+    // Cell values: true / false / string. Keep in sync with the frontend
+    // comparison table at exeebit.com/phpinfo-wp.
+    $compare_rows = [
+        // Sites & licensing
+        ['Sites',          '1',                                '1',                  'Unlimited',          'Unlimited'],
+        ['Updates',        'While free version is supported',  '1 year',             '1 year',             'Lifetime'],
+        ['Support',        'Community (WP.org forum)',         'Email',              'Priority email',     'Priority forever'],
+        // Free-tier
+        ['phpinfo() viewer',                  true, true, true, true],
+        ['.htaccess editor',                  true, true, true, true],
+        ['PHP EOL Timeline',                  true, true, true, true],
+        ['Config Grader (summary only)',      true, true, true, true],
+        // Pro depth
+        ['Full Config Grader with fixes',     false, true, true, true],
+        ['PHP Compatibility Scanner',         false, true, true, true],
+        ['Security Headers audit',            false, true, true, true],
+        ['SSL certificate monitor',           false, true, true, true],
+        ['OPcache dashboard',                 false, true, true, true],
+        ['Database health & autoload',        false, true, true, true],
+        ['Error Log viewer',                  false, true, true, true],
+        ['WP-Cron monitor',                   false, true, true, true],
+        ['Mail deliverability check',         false, true, true, true],
+        ['Config Snapshots & diff',           false, true, true, true],
+        // Deliverable & integrations
+        ['White-label PDF audit reports',     false, true,  true, true],
+        ['Email alerts on issues',            false, true,  true, true],
+        ['Weekly health digest',              false, true,  true, true],
+        ['Slack / Discord webhooks',          false, false, true, true],
+        ['Multi-site (Network) support',      false, false, true, true],
+    ];
+
+    $compare_cols = [
+        ['name' => 'Free',         'price' => '$0',   'cadence' => 'WP.org'],
+        ['name' => 'Single Site',  'price' => '$29',  'cadence' => '/year'],
+        ['name' => 'Unlimited',    'price' => '$69',  'cadence' => '/year', 'featured' => true],
+        ['name' => 'Lifetime',     'price' => '$149', 'cadence' => 'once'],
+    ];
+
+    $render_cell = static function ($v) {
+        if ($v === true)  return '<span class="dashicons dashicons-yes-alt" style="color:#7c3aed" aria-label="Included"></span>';
+        if ($v === false) return '<span class="dashicons dashicons-minus" style="color:#c8c8d0" aria-label="Not included"></span>';
+        return '<span style="font-size:12px;color:#3c434a">' . esc_html((string) $v) . '</span>';
+    };
+    ?>
+    <h2 class="phpinfowp-section-heading" style="margin-top:36px">Compare plans</h2>
+    <p style="color:#646970;margin:0 0 14px;max-width:560px">Everything in Free, plus the Pro depth — see exactly what you get at each tier.</p>
+    <div class="phpinfowp-compare-wrap">
+        <table class="phpinfowp-compare">
+            <thead>
+                <tr>
+                    <th scope="col" class="phpinfowp-compare-feat">Feature</th>
+                    <?php foreach ($compare_cols as $col): ?>
+                        <th scope="col" class="<?php echo !empty($col['featured']) ? 'is-featured' : ''; ?>">
+                            <div class="phpinfowp-compare-tier"><?php echo esc_html($col['name']); ?></div>
+                            <div class="phpinfowp-compare-price">
+                                <span class="phpinfowp-compare-amount"><?php echo esc_html($col['price']); ?></span>
+                                <span class="phpinfowp-compare-cadence"><?php echo esc_html($col['cadence']); ?></span>
+                            </div>
+                        </th>
+                    <?php endforeach; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($compare_rows as $row): ?>
+                    <tr>
+                        <th scope="row" class="phpinfowp-compare-feat"><?php echo esc_html($row[0]); ?></th>
+                        <td><?php echo $render_cell($row[1]); ?></td>
+                        <td><?php echo $render_cell($row[2]); ?></td>
+                        <td class="is-featured"><?php echo $render_cell($row[3]); ?></td>
+                        <td><?php echo $render_cell($row[4]); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <?php if (!$is_valid): ?>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button">Get Free</a>
+                    </td>
+                    <td>
+                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button">Get Single</a>
+                    </td>
+                    <td class="is-featured">
+                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary">Get Unlimited</a>
+                    </td>
+                    <td>
+                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button">Get Lifetime</a>
+                    </td>
+                </tr>
+            </tfoot>
+            <?php endif; ?>
+        </table>
     </div>
 
     <!-- 3-pillar features -->

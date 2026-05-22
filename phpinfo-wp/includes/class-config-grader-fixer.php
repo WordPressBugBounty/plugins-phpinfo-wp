@@ -17,33 +17,59 @@ defined('ABSPATH') or die('Unauthorized Access');
  */
 class Phpinfo_WP_Config_Grader_Fixer {
 
-    const MARK_BEGIN = '# BEGIN phpinfo-wp-autofix';
-    const MARK_END   = '# END phpinfo-wp-autofix';
+    // Regex fragments that match either comment style (backward-compatible).
+    const MARK_RE_BEGIN = '[#;] BEGIN phpinfo-wp-autofix';
+    const MARK_RE_END   = '[#;] END phpinfo-wp-autofix';
+
+    private static function mark_begin(string $mode): string {
+        return ($mode === 'htaccess' ? '#' : ';') . ' BEGIN phpinfo-wp-autofix';
+    }
+    private static function mark_end(string $mode): string {
+        return ($mode === 'htaccess' ? '#' : ';') . ' END phpinfo-wp-autofix';
+    }
 
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
     /**
      * Map: ini key → ['value' => string|null, 'requires_php_ini' => bool, 'note' => ?string]
      * value=null means the key cannot be fixed via .htaccess/.user.ini.
+     *
+     * Context-aware: pulls recommended values from the Grader's context so a
+     * WooCommerce site gets memory_limit=512M, a blog gets 256M, an Elementor
+     * site gets max_input_vars=5000, etc.
      */
     public static function fix_map(): array {
         $is_https = is_ssl();
+        $ctx      = class_exists('Phpinfo_WP_Config_Grader') ? Phpinfo_WP_Config_Grader::context() : [];
+        $mem      = Phpinfo_WP_Config_Grader::rec_memory($ctx);
+        $vars     = Phpinfo_WP_Config_Grader::rec_input_vars($ctx);
+        $exec     = Phpinfo_WP_Config_Grader::rec_exec_time($ctx);
+        $upload   = Phpinfo_WP_Config_Grader::rec_upload($ctx);
+
         return [
-            'memory_limit'              => ['value' => '256M', 'requires_php_ini' => false],
-            'max_execution_time'        => ['value' => '60',   'requires_php_ini' => false],
-            'max_input_vars'            => ['value' => '3000', 'requires_php_ini' => false],
-            'upload_max_filesize'       => ['value' => '64M',  'requires_php_ini' => false],
-            'post_max_size'             => ['value' => '64M',  'requires_php_ini' => false],
-            'max_input_time'            => ['value' => '60',   'requires_php_ini' => false],
+            // ── Per-site tuned ──
+            'memory_limit'              => ['value' => $mem['mb']  . 'M',   'requires_php_ini' => false],
+            'max_execution_time'        => ['value' => (string) $exec['s'], 'requires_php_ini' => false],
+            'max_input_vars'            => ['value' => (string) $vars['n'], 'requires_php_ini' => false],
+            'upload_max_filesize'       => ['value' => $upload     . 'M',   'requires_php_ini' => false],
+            'post_max_size'             => ['value' => $upload     . 'M',   'requires_php_ini' => false],
+            'max_input_time'            => ['value' => '60',                'requires_php_ini' => false],
+            'max_file_uploads'          => ['value' => '20',                'requires_php_ini' => false],
 
-            'display_errors'            => ['value' => '0',    'requires_php_ini' => false],
-            'log_errors'                => ['value' => '1',    'requires_php_ini' => false],
-
-            'session.cookie_httponly'   => ['value' => '1',    'requires_php_ini' => false],
-            'session.use_strict_mode'   => ['value' => '1',    'requires_php_ini' => false],
+            // ── Security ──
+            'display_errors'            => ['value' => '0',                 'requires_php_ini' => false],
+            'log_errors'                => ['value' => '1',                 'requires_php_ini' => false],
+            'session.cookie_httponly'   => ['value' => '1',                 'requires_php_ini' => false],
+            'session.use_strict_mode'   => ['value' => '1',                 'requires_php_ini' => false],
             'session.cookie_secure'     => ['value' => $is_https ? '1' : '0', 'requires_php_ini' => false],
 
-            // PHP_INI_SYSTEM — cannot be set per-directory
+            // ── Filesystem & misc (new in 7.0.3) ──
+            'realpath_cache_size'       => ['value' => '4096K',             'requires_php_ini' => false],
+            'realpath_cache_ttl'        => ['value' => '600',               'requires_php_ini' => false],
+            'date.timezone'             => ['value' => date_default_timezone_get() ?: 'UTC', 'requires_php_ini' => false],
+            'output_buffering'          => ['value' => '4096',              'requires_php_ini' => false],
+
+            // ── PHP_INI_SYSTEM — cannot be set per-directory ──
             'expose_php'                => ['value' => null, 'requires_php_ini' => true,
                 'note' => 'expose_php = Off must be set in php.ini and PHP restarted.'],
             'allow_url_include'         => ['value' => null, 'requires_php_ini' => true,
@@ -56,6 +82,12 @@ class Phpinfo_WP_Config_Grader_Fixer {
                 'note' => 'opcache.max_accelerated_files must be set in php.ini.'],
             'opcache.validate_timestamps'   => ['value' => null, 'requires_php_ini' => true,
                 'note' => 'opcache.validate_timestamps must be set in php.ini.'],
+            'opcache.jit'               => ['value' => null, 'requires_php_ini' => true,
+                'note' => 'opcache.jit must be set in php.ini (PHP 8.0+) and PHP restarted.'],
+            'opcache.jit_buffer_size'   => ['value' => null, 'requires_php_ini' => true,
+                'note' => 'opcache.jit_buffer_size must be set in php.ini.'],
+            'opcache.huge_code_pages'   => ['value' => null, 'requires_php_ini' => true,
+                'note' => 'opcache.huge_code_pages must be set in php.ini and requires Linux transparent_hugepage.'],
         ];
     }
 
@@ -75,6 +107,9 @@ class Phpinfo_WP_Config_Grader_Fixer {
         $server_software = strtolower($_SERVER['SERVER_SOFTWARE'] ?? '');
         $is_litespeed    = str_contains($server_software, 'litespeed');
         $mode            = ($sapi === 'apache2handler' && !$is_litespeed) ? 'htaccess' : 'userini';
+        if (!function_exists('get_home_path')) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
         $root            = get_home_path();
         $file            = $root . ($mode === 'htaccess' ? '.htaccess' : '.user.ini');
         return ['mode' => $mode, 'file' => $file, 'root' => $root];
@@ -82,8 +117,8 @@ class Phpinfo_WP_Config_Grader_Fixer {
 
     public static function target_writable(): bool {
         $t = self::detect_target();
-        if (!is_writable($t['root'])) return false;
-        if (file_exists($t['file']) && !is_writable($t['file'])) return false;
+        if (!@is_writable($t['root'])) return false;
+        if (@file_exists($t['file']) && !@is_writable($t['file'])) return false;
         return true;
     }
 
@@ -120,7 +155,7 @@ class Phpinfo_WP_Config_Grader_Fixer {
             return ['ok' => false, 'error' => 'Nothing to write — all selected directives require manual php.ini changes.', 'skipped' => $skipped];
         }
 
-        $current = file_exists($file) ? file_get_contents($file) : '';
+        $current = @file_exists($file) ? @file_get_contents($file) : '';
         // Backup
         $backup_path = $file . '.phpinfowp-autofix.bak';
         @file_put_contents($backup_path, $current);
@@ -167,9 +202,9 @@ class Phpinfo_WP_Config_Grader_Fixer {
     // Returns: [['key', 'expected', 'actual'], ...] — empty if all match.
     public static function detect_overrides(): array {
         $t = self::detect_target();
-        if (!file_exists($t['file'])) return [];
+        if (!@file_exists($t['file'])) return [];
 
-        $managed = self::extract_managed((string) file_get_contents($t['file']), $t['mode']);
+        $managed = self::extract_managed((string) @file_get_contents($t['file']), $t['mode']);
         $out = [];
         foreach ($managed as $key => $expected) {
             $actual = ini_get($key);
@@ -208,10 +243,10 @@ class Phpinfo_WP_Config_Grader_Fixer {
     public static function revert_all(): array {
         if (!self::_pro()) return ['ok' => false, 'error' => 'Pro license required.'];
         $t = self::detect_target();
-        if (!is_writable($t['file'])) return ['ok' => false, 'error' => 'Config file not writable.'];
+        if (!@is_writable($t['file'])) return ['ok' => false, 'error' => 'Config file not writable.'];
 
-        $current = file_exists($t['file']) ? file_get_contents($t['file']) : '';
-        if (!str_contains($current, self::MARK_BEGIN)) {
+        $current = @file_exists($t['file']) ? @file_get_contents($t['file']) : '';
+        if (!preg_match('/' . self::MARK_RE_BEGIN . '/', $current)) {
             return ['ok' => true, 'reverted' => false, 'message' => 'No autofix block to revert.'];
         }
         $base = self::strip_managed_block($current);
@@ -226,7 +261,7 @@ class Phpinfo_WP_Config_Grader_Fixer {
     }
 
     private static function extract_managed(string $content, string $mode): array {
-        if (!preg_match('/' . preg_quote(self::MARK_BEGIN, '/') . '\s*(.*?)\s*' . preg_quote(self::MARK_END, '/') . '/s', $content, $m)) {
+        if (!preg_match('/' . self::MARK_RE_BEGIN . '\s*(.*?)\s*' . self::MARK_RE_END . '/s', $content, $m)) {
             return [];
         }
         $block = $m[1];
@@ -249,20 +284,21 @@ class Phpinfo_WP_Config_Grader_Fixer {
 
     private static function strip_managed_block(string $content): string {
         return preg_replace(
-            '/\n*' . preg_quote(self::MARK_BEGIN, '/') . '.*?' . preg_quote(self::MARK_END, '/') . '\n*/s',
+            '/\n*' . self::MARK_RE_BEGIN . '.*?' . self::MARK_RE_END . '\n*/s',
             "\n",
             $content
         );
     }
 
     private static function render_block(array $pairs, string $mode): string {
-        $lines = [self::MARK_BEGIN, '# Managed by phpinfo() WP — auto-fix. Edit via the Config Grader page.'];
+        $c     = $mode === 'htaccess' ? '#' : ';';
+        $lines = [self::mark_begin($mode), "$c Managed by phpinfo() WP — auto-fix. Edit via the Config Grader page."];
         if ($mode === 'htaccess') {
             foreach ($pairs as $k => $v) $lines[] = "php_value {$k} \"{$v}\"";
         } else {
             foreach ($pairs as $k => $v) $lines[] = "{$k} = {$v}";
         }
-        $lines[] = self::MARK_END;
+        $lines[] = self::mark_end($mode);
         return implode("\n", $lines);
     }
 
@@ -281,7 +317,7 @@ class Phpinfo_WP_Config_Grader_Fixer {
     private static function log_change(string $msg): void {
         $log_dir  = WP_CONTENT_DIR . '/logs/phpinfo-WP';
         $log_file = $log_dir . '/log.txt';
-        if (!file_exists($log_dir)) @wp_mkdir_p($log_dir);
+        if (!@file_exists($log_dir)) @wp_mkdir_p($log_dir);
         $user = wp_get_current_user();
         $line = sprintf("Config %s on %s by %s<br />",
             $msg, current_time('mysql'), $user->user_login ?: 'unknown');

@@ -94,4 +94,15 @@ class Phpinfo_WP_Cron_Monitor {
         if (!self::_pro()) return false;
         return (bool) wp_unschedule_event($ts, $hook);
     }
+
+    // Nuke every scheduled instance of $hook, regardless of timestamp or args.
+    // Single-row delete won't stop recurring orphans because WP reschedules
+    // the next instance on fire — only wp_unschedule_hook() actually removes
+    // the schedule definition. Returns the number of events removed (WP 5.1+),
+    // or 0 if WP returns null on older versions.
+    public static function purge_hook(string $hook): int {
+        if (!self::_pro() || !$hook) return 0;
+        $removed = wp_unschedule_hook($hook);
+        return is_int($removed) ? $removed : 0;
+    }
 }

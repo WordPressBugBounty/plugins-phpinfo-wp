@@ -1081,16 +1081,34 @@ html {
 .phpinfowp-htaccess-preview {
   background: #1e1e2e;
   color: #cdd6f4;
-  font-family: monospace;
-  font-size: 12px;
-  line-height: 1.6;
-  padding: 14px 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  padding: 12px 14px;
   border-radius: 6px;
-  max-height: 400px;
+  max-height: 360px;
+  overflow-x: hidden;
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-all;
   margin: 0;
+}
+
+/* Long file paths in the banner + footer (.user.ini location etc.) must
+   wrap, not push the layout sideways. */
+.phpinfowp-htaccess-page code {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.phpinfowp-htaccess-banner {
+  font-size: 13px;
+  line-height: 1.55;
+}
+.phpinfowp-htaccess-banner code {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: bottom;
 }
 
 /* =========================================================
@@ -1170,7 +1188,8 @@ html {
   gap: 16px;
   height: 56px;
   padding: 0 24px;
-  background: #1d2327;
+  /* Match WP 7.0's main admin menu colour (~#1e1e1e), not the older #1d2327 */
+  background: #1e1e1e;
   color: #fff;
   box-sizing: border-box;
 }
@@ -1596,6 +1615,170 @@ body.phpinfowp-has-sidenav #wpbody-content {
 /* =========================================================
    Config Grader — section + check cards
    ========================================================= */
+
+/* ----- Context banner: what we tuned the recommendations for ----- */
+.phpinfowp-cg-context {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  background: #f6f7fb;
+  border: 1px solid #e0e2ea;
+  border-radius: 8px;
+}
+.phpinfowp-cg-context-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: #50575e;
+  margin-bottom: 8px;
+}
+.phpinfowp-cg-context-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.phpinfowp-cg-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #d0d4dd;
+  color: #1d2327;
+}
+.phpinfowp-cg-chip-php    { background: #efeefd; border-color: #c8c4f3; color: #4a3da0; }
+.phpinfowp-cg-chip-host   { background: #ecf6ff; border-color: #b3d4f7; color: #1a4a8a; }
+.phpinfowp-cg-chip-plugin { background: #fff;    border-color: #d0d4dd; color: #1d2327; }
+.phpinfowp-cg-chip-dev    { background: #fff5d6; border-color: #e9c977; color: #8a6500; }
+
+/* ----- Severity pills (Critical / High / Medium / Low) ----- */
+.phpinfowp-sev {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid;
+  background: #fff;
+  line-height: 1.5;
+}
+.phpinfowp-sev-critical { background: #fbe7e8; }
+.phpinfowp-sev-high     { background: #fff5d6; }
+.phpinfowp-sev-medium   { background: #efeefd; }
+.phpinfowp-sev-low      { background: #f0f0f3; }
+
+/* ----- Trend indicator next to the score ----- */
+.phpinfowp-trend {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-left: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.phpinfowp-trend small { font-size: 10px; font-weight: 500; color: inherit; opacity: .7; }
+.phpinfowp-trend-up   { color: #00a32a; background: #e8f6ec; }
+.phpinfowp-trend-down { color: #d63638; background: #fbe7e8; }
+.phpinfowp-trend-flat { color: #646970; background: #f0f0f3; }
+
+/* ----- Cross-directive consistency issues ----- */
+.phpinfowp-cg-cross {
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  background: #fffbea;
+  border: 1px solid #f4d35e;
+  border-left: 4px solid #dba617;
+  border-radius: 8px;
+}
+.phpinfowp-cg-cross-heading {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6b4d00;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.phpinfowp-cg-cross-sub { font-weight: 400; color: #8a6500; font-size: 13px; }
+.phpinfowp-cg-cross-row {
+  background: #fff;
+  border: 1px solid #f0d995;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 10px;
+}
+.phpinfowp-cg-cross-row:first-of-type { margin-top: 0; }
+.phpinfowp-cg-cross-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.phpinfowp-cg-cross-reason {
+  font-size: 12.5px;
+  color: #3c434a;
+  line-height: 1.5;
+}
+.phpinfowp-cg-cross-fix {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: #1d2327;
+  background: #f0f6ff;
+  border: 1px solid #c8d8f5;
+  border-radius: 4px;
+  padding: 6px 10px;
+}
+
+/* ----- Live evidence chip under a check ----- */
+.phpinfowp-grade-check-live {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #f0f6ff;
+  border: 1px solid #c8d8f5;
+  border-left: 3px solid #2271b1;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #1a3a72;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.phpinfowp-grade-check-live .dashicons {
+  flex-shrink: 0;
+  color: #2271b1;
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+}
+
+/* ----- Host-aware fix hint under a check ----- */
+.phpinfowp-grade-check-host {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #fafafb;
+  border: 1px dashed #c0c4cc;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #3c434a;
+}
+.phpinfowp-grade-check-host a {
+  margin-left: 6px;
+  font-weight: 500;
+}
+
 .phpinfowp-grade-section { margin-bottom: 28px; }
 
 .phpinfowp-grade-section-heading {
@@ -2012,6 +2195,45 @@ body.phpinfowp-has-sidenav #wpbody-content {
   margin-bottom: 24px;
   border-bottom: 2px solid #777BB3;
 }
+.phpinfowp-report-logo {
+  display: block;
+  max-width: 200px;
+  max-height: 80px;
+  margin: 0 auto 14px;
+  object-fit: contain;
+}
+.phpinfowp-logo-picker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.phpinfowp-logo-preview {
+  width: 88px;
+  height: 88px;
+  border: 1px dashed #c8c8d0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafb;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.phpinfowp-logo-preview img {
+  max-width: 80px;
+  max-height: 80px;
+  object-fit: contain;
+}
+.phpinfowp-logo-empty {
+  font-size: 11px;
+  color: #888;
+}
+.phpinfowp-logo-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
 .phpinfowp-report-brand {
   font-size: 12px;
   letter-spacing: 2px;
@@ -2112,17 +2334,390 @@ body.phpinfowp-has-sidenav #wpbody-content {
   text-align: center;
 }
 
+/* ---------- Overall site-health hero (page 1) ---------- */
+.phpinfowp-report-overall {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 28px;
+  align-items: center;
+  padding: 22px 24px;
+  border: 1px solid #e8e8ee;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fafafd 0%, #ffffff 100%);
+  margin-bottom: 22px;
+}
+.phpinfowp-report-overall-donut {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+.phpinfowp-donut { display: block; }
+.phpinfowp-report-overall-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.phpinfowp-report-overall-num-big {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.phpinfowp-report-overall-num-sm {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+.phpinfowp-report-overall-label {
+  font-size: 11px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: #6b6b75;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.phpinfowp-report-overall-verdict {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  margin-bottom: 4px;
+}
+.phpinfowp-report-overall-grade {
+  font-size: 14px;
+  color: #50575e;
+  margin-bottom: 10px;
+}
+.phpinfowp-report-overall-grade strong { font-size: 16px; color: #1d2327; }
+.phpinfowp-report-overall-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.phpinfowp-rc {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+.phpinfowp-rc-crit { color: #8e1414; background: #fbe7e8; border-color: #ecb4b5; }
+.phpinfowp-rc-warn { color: #8a6500; background: #fff5d6; border-color: #e9c977; }
+.phpinfowp-rc-ok   { color: #0a7d2e; background: #e8f6ec; border-color: #a7d8b3; }
+.phpinfowp-report-overall-note {
+  margin: 0;
+  font-size: 13px;
+  color: #50575e;
+  line-height: 1.5;
+}
+@media (max-width: 720px) {
+  .phpinfowp-report-overall { grid-template-columns: 1fr; text-align: center; }
+  .phpinfowp-report-overall-donut { margin: 0 auto; }
+  .phpinfowp-report-overall-counts { justify-content: center; }
+}
+
+/* ---------- Verdict pills (used everywhere) ---------- */
+.phpinfowp-rv {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.phpinfowp-rv-ic { font-size: 10px; line-height: 1; }
+
+/* ---------- Subscore bar chart ---------- */
+.phpinfowp-report-bars-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+}
+@media (max-width: 640px) { .phpinfowp-report-bars-grid { grid-template-columns: 1fr; } }
+.phpinfowp-report-bar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.phpinfowp-report-bar-lbl { font-size: 12px; color: #1d2327; font-weight: 500; }
+.phpinfowp-report-bar-num { font-size: 14px; font-weight: 700; }
+.phpinfowp-report-bar-track {
+  height: 8px;
+  background: #eef0f4;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.phpinfowp-report-bar-fill { height: 100%; border-radius: 6px; transition: width .4s ease; }
+
+/* ---------- Critical issues banner ---------- */
+.phpinfowp-report-critbar {
+  margin: 22px 0;
+  border: 1px solid #ecb4b5;
+  background: #fef5f5;
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.phpinfowp-report-critbar-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.phpinfowp-report-critbar-ic {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d63638;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 700;
+}
+.phpinfowp-report-critbar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #8e1414;
+}
+.phpinfowp-report-critbar-sub {
+  font-size: 12px;
+  color: #6b1a1a;
+  margin-top: 2px;
+}
+.phpinfowp-report-critbar-list {
+  margin: 8px 0 0;
+  padding-left: 22px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #2c2c33;
+}
+.phpinfowp-report-critbar-list li { margin-bottom: 8px; }
+.phpinfowp-report-critbar-list li:last-child { margin-bottom: 0; }
+.phpinfowp-report-critbar-cat {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  color: #6b1a1a;
+  background: #fce9ea;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+.phpinfowp-report-critbar-reason {
+  color: #50575e;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* ---------- Top-N priority action cards ---------- */
+.phpinfowp-report-h-page2 { page-break-before: always; }
+.phpinfowp-report-h-sub {
+  margin: -8px 0 14px;
+  color: #50575e;
+  font-size: 13px;
+}
+.phpinfowp-report-priorities {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.phpinfowp-report-priority {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid #e8e8ee;
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.phpinfowp-report-priority-critical { border-left: 4px solid #d63638; }
+.phpinfowp-report-priority-warning  { border-left: 4px solid #dba617; }
+.phpinfowp-report-priority-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #1d2327;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phpinfowp-report-priority-critical .phpinfowp-report-priority-num { background: #d63638; }
+.phpinfowp-report-priority-warning  .phpinfowp-report-priority-num { background: #dba617; }
+.phpinfowp-report-priority-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.phpinfowp-report-priority-cat {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  color: #6b6b75;
+}
+.phpinfowp-report-priority-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1d2327;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.phpinfowp-report-priority-why,
+.phpinfowp-report-priority-how {
+  font-size: 13px;
+  color: #2c2c33;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.phpinfowp-report-priority-how { color: #1d2327; }
+.phpinfowp-report-priority-why strong,
+.phpinfowp-report-priority-how strong {
+  font-weight: 700;
+  color: #50575e;
+  margin-right: 4px;
+}
+.phpinfowp-report-priority code {
+  background: #f6f7f7;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* ---------- Snapshot stat refinements (verdict + caption) ---------- */
+.phpinfowp-report-stat-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.phpinfowp-report-stat-value-sub {
+  font-size: 13px;
+  color: #888;
+  font-weight: 400;
+  margin-left: 4px;
+}
+.phpinfowp-report-stat-cap {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #ececec;
+  font-size: 11px;
+  color: #6b6b75;
+  line-height: 1.4;
+}
+.phpinfowp-report-inline-cap {
+  font-size: 11px;
+  color: #6b6b75;
+  font-weight: 400;
+}
+
+/* ---------- Print refinements specific to the new report ---------- */
 @media print {
-  body * { visibility: hidden; }
-  .phpinfowp-pro-page, .phpinfowp-pro-page * { visibility: visible; }
-  .phpinfowp-pro-page { position: absolute; left: 0; top: 0; width: 100%; }
-  .no-print, .phpinfowp-report-branding-form { display: none !important; }
-  #adminmenumain, #wpadminbar, #wpfooter, .notice, html.wp-toolbar { display: none !important; }
+  .phpinfowp-report-overall {
+    background: #fff !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .phpinfowp-report-critbar { page-break-inside: avoid; break-inside: avoid; }
+  .phpinfowp-report-priority { page-break-inside: avoid; break-inside: avoid; }
+  /* Don't force the page break before "Top actions" in print — modern browsers
+     handle this gracefully with break-inside above. The forced break was for
+     A4 layout but it can leave a near-empty page 1 on shorter reports. */
+  .phpinfowp-report-h-page2 { page-break-before: auto; }
+}
+
+@media print {
+  /* Hide WP admin chrome + in-page controls. The previous visibility:hidden
+     trick produced blank pages in Chrome/Safari because the report sits
+     inside multiple nested containers (#wpwrap > #wpcontent > #wpbody-content)
+     and position:absolute on an inner element doesn't escape them cleanly. */
+  #wpadminbar, #adminmenuback, #adminmenuwrap, #adminmenumain,
+  #wpfooter, #screen-meta, #screen-meta-links,
+  .update-nag, .notice, .updated, .error,
+  .no-print, .phpinfowp-report-branding-form,
+  .phpinfowp-page-header,
+  .phpinfowp-pro-page > h1,
+  .phpinfowp-pro-page > .phpinfowp-pro-badge,
+  /* Plugin's own chrome — top bar with breadcrumb + Pro badge,
+     and the per-group sidebar nav rendered inside the page body. */
+  .phpinfowp-topbar,
+  .phpinfowp-side-nav,
+  .phpinfowp-sidebar-flyouts {
+    display: none !important;
+  }
+
+  /* Neutralize the admin layout containers so the report flows from the
+     top of the page with no left margin from the admin sidebar.
+     The trailing selector overrides body.phpinfowp-has-sidenav, which adds
+     260px of left padding to make room for the absolutely-positioned plugin
+     side nav — that nav is hidden above, so the gutter must collapse too. */
+  html, body, #wpwrap, #wpcontent, #wpbody, #wpbody-content,
+  body.phpinfowp-page #wpbody-content,
+  body.phpinfowp-has-sidenav #wpbody-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    float: none !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+  }
   html.wp-toolbar { padding-top: 0 !important; }
-  .phpinfowp-report { border: none; box-shadow: none; padding: 0; max-width: 100%; }
-  .phpinfowp-report-grid { page-break-inside: avoid; }
-  .phpinfowp-report-table { page-break-inside: avoid; }
-  .phpinfowp-report-h { page-break-after: avoid; }
+  #wpcontent, #wpbody-content { padding-left: 0 !important; }
+  body {
+    font-size: 11pt;
+    line-height: 1.45;
+    color: #1d2327;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Strip the wrapper card chrome so the report fills the page. */
+  .phpinfowp-pro-page { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+  .phpinfowp-report {
+    background: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  /* Keep things together that look broken if split across pages. */
+  .phpinfowp-report-grid,
+  .phpinfowp-report-stat,
+  .phpinfowp-report-table { page-break-inside: avoid; break-inside: avoid; }
+  .phpinfowp-report-h    { page-break-after: avoid; break-after: avoid-page; }
+  .phpinfowp-report-cover { page-break-after: avoid; }
+
+  /* Force backgrounds and colors to actually print — Chrome strips them
+     by default unless you opt into the exact color profile. */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  a, a:visited { color: inherit !important; text-decoration: none !important; }
+
+  @page { size: A4; margin: 14mm 12mm; }
 }
 
 /* ---------- Config Grader free-tier teaser ---------- */
@@ -2227,6 +2822,216 @@ body.phpinfowp-has-sidenav #wpbody-content {
   top: 4px;
   color: #00a32a;
   font-weight: 700;
+}
+
+/* ---------- Error log diagnostic (empty-state) ---------- */
+.phpinfowp-errlog-diag {
+  background: #fff;
+  border: 1px solid #e0e0e6;
+  border-radius: 10px;
+  padding: 20px 22px;
+  max-width: 820px;
+}
+.phpinfowp-errlog-diag-head { margin-bottom: 4px; }
+.phpinfowp-errlog-diag-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+.phpinfowp-errlog-diag-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.phpinfowp-errlog-diag-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #f1f1f4;
+  vertical-align: top;
+}
+.phpinfowp-errlog-diag-table tr:last-child td { border-bottom: 0; }
+.phpinfowp-errlog-diag-table code {
+  background: #f6f7f7;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+.phpinfowp-errlog-diag-paths code {
+  background: transparent;
+  padding: 0;
+  word-break: break-all;
+}
+
+/* ---------- Plugins-screen deactivate retention modal ---------- */
+.phpinfowp-dm { display: none; position: fixed; inset: 0; z-index: 100000; }
+.phpinfowp-dm.is-open { display: block; }
+.phpinfowp-dm-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(15, 17, 20, .55);
+  backdrop-filter: blur(2px);
+}
+.phpinfowp-dm-dialog {
+  position: relative;
+  max-width: 720px;
+  margin: 6vh auto 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
+  padding: 26px 28px 22px;
+}
+.phpinfowp-dm-close {
+  position: absolute; top: 10px; right: 12px;
+  background: none; border: none; cursor: pointer;
+  font-size: 26px; line-height: 1; color: #888;
+  padding: 4px 8px;
+}
+.phpinfowp-dm-close:hover { color: #1d2327; }
+.phpinfowp-dm-header { display: flex; gap: 14px; align-items: center; margin-bottom: 18px; }
+.phpinfowp-dm-logo { border-radius: 10px; }
+.phpinfowp-dm-title { margin: 0 0 4px; font-size: 20px; color: #1d2327; }
+.phpinfowp-dm-sub { margin: 0; color: #50575e; font-size: 13px; }
+.phpinfowp-dm-body { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
+.phpinfowp-dm-body:has(.phpinfowp-dm-col-pro) { grid-template-columns: 1fr 1fr; }
+@media (max-width: 720px) { .phpinfowp-dm-body { grid-template-columns: 1fr !important; } }
+.phpinfowp-dm-col {
+  border: 1px solid #e8e8ee;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #fafafb;
+}
+.phpinfowp-dm-col-pro { background: rgba(124, 58, 237, 0.045); border-color: rgba(124, 58, 237, 0.18); }
+.phpinfowp-dm-col-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: #6b6b75;
+  margin-bottom: 10px;
+}
+.phpinfowp-dm-col-pro .phpinfowp-dm-col-label { color: #6d28d9; }
+.phpinfowp-dm-list { margin: 0; padding: 0; list-style: none; font-size: 13px; line-height: 1.5; color: #2c2c33; }
+.phpinfowp-dm-list li { display: flex; align-items: flex-start; gap: 6px; padding: 4px 0; }
+.phpinfowp-dm-x {
+  flex-shrink: 0;
+  font-size: 16px; width: 16px; height: 16px;
+  color: #d63638;
+  margin-top: 1px;
+}
+.phpinfowp-dm-warn {
+  display: flex; gap: 10px;
+  background: #fffbea;
+  border: 1px solid #f4d35e;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #4d3700;
+  margin-bottom: 18px;
+}
+.phpinfowp-dm-warn .dashicons { color: #b78900; flex-shrink: 0; }
+.phpinfowp-dm-actions {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.phpinfowp-dm-confirm {
+  color: #888 !important;
+  text-decoration: none;
+  font-size: 13px;
+}
+.phpinfowp-dm-confirm:hover { color: #d63638 !important; }
+.phpinfowp-dm-keep { min-width: 180px; }
+
+/* ---------- License view: plan comparison table ---------- */
+.phpinfowp-compare-wrap {
+  margin: 0 0 8px;
+  overflow-x: auto;
+  border: 1px solid #e0e0e6;
+  border-radius: 10px;
+  background: #fff;
+}
+.phpinfowp-compare {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: #1d2327;
+}
+.phpinfowp-compare thead th {
+  background: #fafafb;
+  border-bottom: 1px solid #e8e8ee;
+  text-align: center;
+  padding: 14px 12px 12px;
+  vertical-align: bottom;
+}
+.phpinfowp-compare thead th.is-featured {
+  background: rgba(124, 58, 237, 0.06);
+}
+.phpinfowp-compare thead th.phpinfowp-compare-feat {
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: #6b6b75;
+}
+.phpinfowp-compare-tier {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: #4a4a55;
+  margin-bottom: 4px;
+}
+.phpinfowp-compare-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+}
+.phpinfowp-compare-amount {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1d2327;
+  line-height: 1;
+}
+.phpinfowp-compare-cadence {
+  font-size: 11px;
+  color: #6b6b75;
+}
+.phpinfowp-compare tbody td,
+.phpinfowp-compare tbody th {
+  padding: 9px 12px;
+  border-bottom: 1px solid #f1f1f4;
+  vertical-align: middle;
+  text-align: center;
+  background: #fff;
+}
+.phpinfowp-compare tbody th.phpinfowp-compare-feat {
+  text-align: left;
+  font-weight: 500;
+  color: #1d2327;
+}
+.phpinfowp-compare tbody td.is-featured {
+  background: rgba(124, 58, 237, 0.025);
+}
+.phpinfowp-compare tbody tr:last-child td,
+.phpinfowp-compare tbody tr:last-child th { border-bottom: 0; }
+.phpinfowp-compare tbody tr:hover td,
+.phpinfowp-compare tbody tr:hover th { background: #fafafb; }
+.phpinfowp-compare tbody tr:hover td.is-featured { background: rgba(124, 58, 237, 0.05); }
+.phpinfowp-compare tfoot td {
+  padding: 14px 12px;
+  text-align: center;
+  background: #fafafb;
+  border-top: 1px solid #e8e8ee;
+}
+.phpinfowp-compare tfoot td.is-featured { background: rgba(124, 58, 237, 0.06); }
+.phpinfowp-compare .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 /* ---------- License view: 3-pillar grid ---------- */

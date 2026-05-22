@@ -32,9 +32,6 @@ $overall_label = match ($overall) {
             <h1>Dashboard</h1>
             <p class="phpinfowp-page-subtitle">A live snapshot of your site's PHP health, configuration, and server posture</p>
         </div>
-        <?php if ($is_pro): ?>
-            <span style="color:#00a32a;font-weight:600">✓ Pro active</span>
-        <?php endif; ?>
     </div>
 
     <!-- Top stat row: Grade · Overall · Memory · PHP version -->

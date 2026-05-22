@@ -1,6 +1,9 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
+if (!function_exists('get_home_path')) {
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+}
 $root_dir    = get_home_path();
 $content_dir = WP_CONTENT_DIR;
 $log_dir     = "$content_dir/logs/phpinfo-WP";
@@ -118,7 +121,7 @@ Phpinfo_wp::thankyou();
   $mode_color  = $mode === 'htaccess' ? '#d63638' : '#00a32a';
   $mode_file   = $mode === 'htaccess' ? '.htaccess' : '.user.ini';
   ?>
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:12px 16px;background:#f6f7f7;border:1px solid #e0e0e0;border-left:4px solid <?php echo $mode_color; ?>;border-radius:4px">
+  <div class="phpinfowp-htaccess-banner" style="margin-bottom:20px;padding:12px 16px;background:#f6f7f7;border:1px solid #e0e0e0;border-left:4px solid <?php echo $mode_color; ?>;border-radius:4px">
     <span style="font-size:13px">
       <strong>Detected server:</strong> <?php echo esc_html($mode_label); ?> &nbsp;&middot;&nbsp;
       <strong>Writing to:</strong> <code><?php echo esc_html($target_file); ?></code>

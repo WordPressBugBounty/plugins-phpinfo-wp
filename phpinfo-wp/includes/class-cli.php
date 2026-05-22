@@ -39,7 +39,9 @@ class Phpinfo_WP_CLI {
         }
         $r = Phpinfo_WP_Config_Grader::run();
         WP_CLI::log("Grade: {$r['grade']}  ({$r['score']}/100)");
-        $failing = array_filter($r['checks'], fn($c) => $c['status'] === 'fail');
+        $failing = array_filter($r['checks'], function ($c) {
+            return $c['status'] === 'fail';
+        });
         if (!$failing) {
             WP_CLI::success('All checks passing.');
             return;

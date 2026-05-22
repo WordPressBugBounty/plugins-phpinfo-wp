@@ -169,11 +169,11 @@ class Phpinfo_WP_Error_Log {
     // Classifies a log line for color-coding
     public static function classify(string $line): string {
         $l = strtolower($line);
-        if (str_contains($l, 'fatal error') || str_contains($l, 'uncaught'))          return 'log-fatal';
-        if (str_contains($l, 'parse error'))                                            return 'log-fatal';
-        if (str_contains($l, 'warning'))                                                return 'log-warning';
-        if (str_contains($l, 'notice') || str_contains($l, 'deprecated'))              return 'log-notice';
-        if (str_contains($l, 'wp_debug') || str_contains($l, '[debug]'))               return 'log-debug';
+        if (strpos($l, 'fatal error') !== false || strpos($l, 'uncaught') !== false)          return 'log-fatal';
+        if (strpos($l, 'parse error') !== false)                                            return 'log-fatal';
+        if (strpos($l, 'warning') !== false)                                                return 'log-warning';
+        if (strpos($l, 'notice') !== false || strpos($l, 'deprecated') !== false)              return 'log-notice';
+        if (strpos($l, 'wp_debug') !== false || strpos($l, '[debug]') !== false)               return 'log-debug';
         return 'log-default';
     }
 }

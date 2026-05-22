@@ -11,7 +11,9 @@ $recommended = [
     'pcre', 'pdo_mysql', 'SimpleXML', 'sodium', 'xml', 'xmlreader', 'zip', 'zlib',
 ];
 
-$missing = array_filter($recommended, fn($e) => !in_array($e, $loaded, true) && !in_array(strtolower($e), array_map('strtolower', $loaded), true));
+$missing = array_filter($recommended, function ($e) use ($loaded) {
+    return !in_array($e, $loaded, true) && !in_array(strtolower($e), array_map('strtolower', $loaded), true);
+});
 sort($missing);
 ?>
 

@@ -21,7 +21,7 @@ $writable    = is_writable($root_dir);
 // Detect which method applies to this server
 $sapi            = php_sapi_name();
 $server_software = strtolower($_SERVER['SERVER_SOFTWARE'] ?? '');
-$is_litespeed    = str_contains($server_software, 'litespeed');
+$is_litespeed    = strpos($server_software, 'litespeed') !== false;
 
 // apache2handler = Apache + mod_php → .htaccess php_value works
 // Everything else (fpm-fcgi, litespeed, cgi, etc.) → .user.ini
@@ -55,7 +55,7 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             $php_lines  = '';
             foreach (explode("\n", $custom_raw) as $line) {
                 $line = trim($line);
-                if ($line !== '' && !str_starts_with($line, '#')) {
+                if ($line !== '' && strncmp($line, '#', strlen('#')) !== 0) {
                     $php_lines .= 'php_value ' . $line . "\n";
                 }
             }
@@ -85,9 +85,9 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             $ini_lines  = '';
             foreach (explode("\n", $custom_raw) as $line) {
                 $line = trim($line);
-                if ($line === '' || str_starts_with($line, ';')) continue;
+                if ($line === '' || strncmp($line, ';', strlen(';')) === 0) continue;
                 // Accept both "key value" and "key = value" formats
-                if (str_contains($line, '=')) {
+                if (strpos($line, '=') !== false) {
                     $ini_lines .= $line . "\n";
                 } else {
                     [$k, $v]    = array_pad(explode(' ', $line, 2), 2, '');

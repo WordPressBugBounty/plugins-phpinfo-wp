@@ -138,6 +138,7 @@ class Phpinfo_WP_Deactivate_Modal {
                 var matchesRow = row && row.getAttribute('data-plugin') === slug;
                 var matchesUrl = href.indexOf(encodeURIComponent(slug)) !== -1;
                 if (!matchesRow && !matchesUrl) return;
+                if (a.closest('.phpinfowp-dm')) return;
                 e.preventDefault();
                 open(href);
             }, true);

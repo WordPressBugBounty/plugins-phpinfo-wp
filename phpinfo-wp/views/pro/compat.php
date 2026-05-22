@@ -70,7 +70,9 @@ $result = Phpinfo_WP_Compat::get_result();
         $sev_color = ['removed' => '#d63638', 'deprecated' => '#dba617'];
         $sev_label = ['removed' => 'REMOVED', 'deprecated' => 'DEPRECATED'];
         $issues = $result['issues'] ?? [];
-        uksort($issues, fn($a, $b) => count($issues[$b]) - count($issues[$a]));
+        uksort($issues, function ($a, $b) use ($issues) {
+            return count($issues[$b]) - count($issues[$a]);
+        });
     ?>
 
         <!-- Score card -->
@@ -111,7 +113,9 @@ $result = Phpinfo_WP_Compat::get_result();
                 [$type, $name] = explode('/', $owner, 2);
                 $type_label = ['plugin' => 'Plugin', 'theme' => 'Theme', 'mu-plugin' => 'Must-Use'][$type] ?? $type;
                 $type_color = ['plugin' => '#777BB3', 'theme' => '#2271b1', 'mu-plugin' => '#996800'][$type] ?? '#666';
-                $removed_count    = count(array_filter($list, fn($i) => $i['severity'] === 'removed'));
+                $removed_count    = count(array_filter($list, function ($i) {
+                    return $i['severity'] === 'removed';
+                }));
                 $deprecated_count = count($list) - $removed_count;
             ?>
                 <details class="phpinfowp-compat-owner">

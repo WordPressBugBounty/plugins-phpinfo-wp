@@ -75,11 +75,17 @@ class Phpinfo_WP_Alerts {
         $site = get_bloginfo('name') . ' (' . get_site_url() . ')';
         $text = "*[phpinfo() WP] {$subject}*\nSite: {$site}\n\n{$body}";
 
-        $payload = match ($s['webhook_type']) {
-            'discord' => ['content' => substr($text, 0, 1900)],
-            'slack'   => ['text'    => $text],
-            default   => ['site' => $site, 'subject' => $subject, 'body' => $body, 'at' => time()],
-        };
+        switch ($s['webhook_type']) {
+            case 'discord':
+                $payload = ['content' => substr($text, 0, 1900)];
+                break;
+            case 'slack':
+                $payload = ['text'    => $text];
+                break;
+            default:
+                $payload = ['site' => $site, 'subject' => $subject, 'body' => $body, 'at' => time()];
+                break;
+        }
 
         $resp = wp_remote_post($url, [
             'timeout' => 10,
@@ -230,7 +236,9 @@ class Phpinfo_WP_Alerts {
         $lines[] = '';
         $lines[] = "CONFIG GRADE";
         $lines[] = "  Score: {$grader['score']}/100 (Grade: {$grader['grade']})";
-        $failing = array_filter($grader['checks'], fn($c) => $c['status'] === 'fail');
+        $failing = array_filter($grader['checks'], function ($c) {
+            return $c['status'] === 'fail';
+        });
         foreach (array_slice($failing, 0, 5) as $f) {
             $lines[] = "  ✗ {$f['key']}: currently {$f['value']} (recommended: {$f['good']})";
         }

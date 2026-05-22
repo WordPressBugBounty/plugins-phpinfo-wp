@@ -51,7 +51,9 @@ class Phpinfo_WP_Cron_Monitor {
             }
         }
 
-        usort($out, fn($a, $b) => $a['timestamp'] <=> $b['timestamp']);
+        usort($out, function ($a, $b) {
+            return $a['timestamp'] <=> $b['timestamp'];
+        });
         return $out;
     }
 

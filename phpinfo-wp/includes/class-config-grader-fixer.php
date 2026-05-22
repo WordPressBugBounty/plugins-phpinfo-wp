@@ -105,7 +105,7 @@ class Phpinfo_WP_Config_Grader_Fixer {
     public static function detect_target(): array {
         $sapi            = php_sapi_name();
         $server_software = strtolower($_SERVER['SERVER_SOFTWARE'] ?? '');
-        $is_litespeed    = str_contains($server_software, 'litespeed');
+        $is_litespeed    = strpos($server_software, 'litespeed') !== false;
         $mode            = ($sapi === 'apache2handler' && !$is_litespeed) ? 'htaccess' : 'userini';
         if (!function_exists('get_home_path')) {
             require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -268,7 +268,7 @@ class Phpinfo_WP_Config_Grader_Fixer {
         $out   = [];
         foreach (explode("\n", $block) as $line) {
             $line = trim($line);
-            if ($line === '' || str_starts_with($line, '#') || str_starts_with($line, ';')) continue;
+            if ($line === '' || strncmp($line, '#', strlen('#')) === 0 || strncmp($line, ';', strlen(';')) === 0) continue;
             if ($mode === 'htaccess') {
                 if (preg_match('/^php_value\s+([^\s]+)\s+(.+)$/', $line, $mm)) {
                     $out[$mm[1]] = trim($mm[2], "\"' ");

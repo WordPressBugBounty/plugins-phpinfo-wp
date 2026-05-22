@@ -6,7 +6,10 @@ class Phpinfo_WP_EOL {
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
     // EOL dates from https://www.php.net/supported-versions.php
-    private static array $eol = [
+    /**
+     * @var mixed[]
+     */
+    private static $eol = [
         '5.6' => '2018-12-31',
         '7.0' => '2019-12-03',
         '7.1' => '2019-12-01',

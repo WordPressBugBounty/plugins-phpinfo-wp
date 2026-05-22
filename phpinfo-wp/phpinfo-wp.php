@@ -3,7 +3,8 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     7.0.3
+Version:     7.0.5
+Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com
 License:     GPLv3
@@ -11,7 +12,7 @@ License:     GPLv3
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '7.0.3');
+define('PHPINFOWP_VERSION', '7.0.5');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 
@@ -201,16 +202,28 @@ class Phpinfo_wp {
         $eol    = Phpinfo_WP_EOL::status();
         $is_pro = Phpinfo_WP_License::is_valid();
 
-        $eol_color = match ($eol['status']) {
-            'eol'     => '#d63638',
-            'warning' => '#dba617',
-            default   => '#00a32a',
-        };
-        $eol_label = match ($eol['status']) {
-            'eol'     => 'END OF LIFE',
-            'warning' => 'EXPIRING SOON',
-            default   => 'SUPPORTED',
-        };
+        switch ($eol['status']) {
+            case 'eol':
+                $eol_color = '#d63638';
+                break;
+            case 'warning':
+                $eol_color = '#dba617';
+                break;
+            default:
+                $eol_color = '#00a32a';
+                break;
+        }
+        switch ($eol['status']) {
+            case 'eol':
+                $eol_label = 'END OF LIFE';
+                break;
+            case 'warning':
+                $eol_label = 'EXPIRING SOON';
+                break;
+            default:
+                $eol_label = 'SUPPORTED';
+                break;
+        }
 
         $mem_used_raw  = memory_get_usage(true);
         $mem_limit_raw = self::_parse_bytes(ini_get('memory_limit'));
@@ -254,11 +267,17 @@ class Phpinfo_wp {
                 : Phpinfo_WP_Config_Grader::summary();
             $grade_score = $grade_summary['score'] ?? 0;
             $grade_letter = $grade_summary['grade'] ?? 'F';
-            $grade_color = match(true) {
-                $grade_score >= 85 => '#00a32a',
-                $grade_score >= 60 => '#dba617',
-                default            => '#d63638',
-            };
+            switch (true) {
+                case $grade_score >= 85:
+                    $grade_color = '#00a32a';
+                    break;
+                case $grade_score >= 60:
+                    $grade_color = '#dba617';
+                    break;
+                default:
+                    $grade_color = '#d63638';
+                    break;
+            }
             ?>
             <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0">
                 <span style="color:#555">Config Grade</span>
@@ -357,24 +376,28 @@ class Phpinfo_wp {
         $val  = trim($val);
         $last = strtolower(substr($val, -1));
         $num  = (int) $val;
-        return match ($last) {
-            'g' => $num * 1073741824,
-            'm' => $num * 1048576,
-            'k' => $num * 1024,
-            default => $num,
-        };
+        switch ($last) {
+            case 'g':
+                return $num * 1073741824;
+            case 'm':
+                return $num * 1048576;
+            case 'k':
+                return $num * 1024;
+            default:
+                return $num;
+        }
     }
 
     // EOL notice — free feature, only on plugin admin pages
     public function eol_admin_notice(): void {
         $page = sanitize_key($_GET['page'] ?? '');
-        if (!str_starts_with($page, 'phpinfo')) return;
+        if (strncmp($page, 'phpinfo', strlen('phpinfo')) !== 0) return;
         Phpinfo_WP_EOL::admin_notice();
     }
 
-    public function enqueue(): void {
+    public function enqueue(string $hook): void {
         $page = sanitize_key($_GET['page'] ?? '');
-        if (!str_starts_with($page, 'phpinfo')) return;
+        if (strncmp($page, 'phpinfo', strlen('phpinfo')) !== 0 && $hook !== 'plugins.php') return;
         // Use filemtime as the cache key so any CSS/JS edit auto-busts browser
         // caches without bumping PHPINFOWP_VERSION. Falls back to plugin version.
         $css_path = PHPINFOWP_DIR . 'css/style.css';
@@ -405,7 +428,8 @@ class Phpinfo_wp {
         $leaf_css = [];
         foreach ($groups as $group) {
             foreach ($group['tabs'] as $slug => $tab) {
-                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href*="page=' . $slug . '"])';
+                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href$="page=' . $slug . '"])';
+                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href*="page=' . $slug . '&"])';
             }
         }
 
@@ -472,12 +496,12 @@ FLYOUT;
     }
 
     public function script_async(string $url): string {
-        if (!str_contains($url, '#async')) return $url;
+        if (strpos($url, '#async') === false) return $url;
         return str_replace('#async', '', $url) . "' async='async";
     }
 
     public function meta(array $links, string $file): array {
-        if (!str_contains($file, 'phpinfo-wp/phpinfo-wp.php')) return $links;
+        if (strpos($file, 'phpinfo-wp/phpinfo-wp.php') === false) return $links;
         if (Phpinfo_WP_License::is_valid()) {
             $links[] = '<span style="color:#00a32a;font-weight:600">&#10003; Pro Active</span>';
         } else {
@@ -525,7 +549,8 @@ FLYOUT;
         $leaf_css = [];
         foreach ($groups as $group) {
             foreach ($group['tabs'] as $lslug => $ltab) {
-                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href*="page=' . $lslug . '"])';
+                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href$="page=' . $lslug . '"])';
+                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href*="page=' . $lslug . '&"])';
             }
         }
         if ($leaf_css) {
@@ -647,7 +672,7 @@ FLYOUT;
     // hidden leaf). Cheap — just inspects $_GET['page'].
     private function is_plugin_page(): bool {
         $page = sanitize_key($_GET['page'] ?? '');
-        return $page === 'phpinfo-wp' || str_starts_with($page, 'phpinfowp-');
+        return $page === 'phpinfo-wp' || strncmp($page, 'phpinfowp-', strlen('phpinfowp-')) === 0;
     }
 
     // Render the dark topbar above every plugin page: logo + plugin name +
@@ -699,8 +724,9 @@ FLYOUT;
     }
 
     public static function thankyou(): void {
-        add_filter('admin_footer_text', fn() =>
-            '<span>Thank you for using <a href="https://wordpress.org/plugins/phpinfo-wp/">phpinfo() WP</a>.</span>'
+        add_filter('admin_footer_text', function () {
+            return '<span>Thank you for using <a href="https://wordpress.org/plugins/phpinfo-wp/">phpinfo() WP</a>.</span>';
+        }
         );
     }
 

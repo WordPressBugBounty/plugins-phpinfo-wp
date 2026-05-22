@@ -12,8 +12,14 @@ defined('ABSPATH') or die('Unauthorized Access');
  */
 class Phpinfo_WP_Admin_Nav {
 
-    private static ?array $cache = null;
-    private static bool $tabs_rendered = false;
+    /**
+     * @var mixed[]|null
+     */
+    private static $cache;
+    /**
+     * @var bool
+     */
+    private static $tabs_rendered = false;
 
     /**
      * Group definitions: each group has a label, a slug for its sidebar
@@ -210,7 +216,7 @@ class Phpinfo_WP_Admin_Nav {
      */
     private static function current_tab_slug(): ?string {
         $page = sanitize_key($_GET['page'] ?? '');
-        if (!$page || !str_starts_with($page, 'phpinfo')) return null;
+        if (!$page || strncmp($page, 'phpinfo', strlen('phpinfo')) !== 0) return null;
         if (self::find($page)) return $page;
         $group_key = self::group_for_slug($page);
         return $group_key ? self::resolve_group_tab($group_key) : null;

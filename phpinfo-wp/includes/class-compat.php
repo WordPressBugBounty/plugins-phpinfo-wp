@@ -169,7 +169,7 @@ class Phpinfo_WP_Compat {
                 foreach ($rules as $rule) {
                     if (preg_match_all($rule['pattern'], $content, $m, PREG_OFFSET_CAPTURE)) {
                         foreach ($m[0] as $hit) {
-                            $line = substr_count(substr($content, 0, $hit[1]), "\n") + 1;
+                            $line = substr_count((string) substr($content, 0, $hit[1]), "\n") + 1;
                             $issues_by_owner[$owner][] = [
                                 'file'     => $rel,
                                 'line'     => $line,
@@ -228,7 +228,7 @@ class Phpinfo_WP_Compat {
         $parts = preg_split('#[\\\\/]+#', $rel);
         if (!$parts) return null;
         $first = $parts[0];
-        if ($first === '' || str_starts_with($first, '.')) return null;
+        if ($first === '' || strncmp($first, '.', strlen('.')) === 0) return null;
         // Single-file plugins/mu-plugins
         if ($type !== 'themes' && count($parts) === 1) {
             return $type . '/' . pathinfo($first, PATHINFO_FILENAME);
@@ -238,7 +238,7 @@ class Phpinfo_WP_Compat {
 
     private static function _snippet(string $content, int $offset, int $len = 60): string {
         $start = max(0, $offset - 10);
-        return substr($content, $start, $len);
+        return (string) substr($content, $start, $len);
     }
 
     /**

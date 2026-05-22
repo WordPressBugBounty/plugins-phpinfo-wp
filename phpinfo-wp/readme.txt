@@ -3,8 +3,8 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.0
-Stable tag: 7.0.3
-Requires PHP: 8.0
+Stable tag: 7.0.5
+Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -84,7 +84,7 @@ You can also [download the zip](https://downloads.wordpress.org/plugin/phpinfo-w
 
 = Server requirements =
 
-*   PHP 8.0 or higher (PHP 8.2+ recommended). PHP 7.4 reached end-of-life in November 2022 and is no longer supported.
+*   PHP 7.3 or higher. PHP 7.4 reached end-of-life in November 2022 and is no longer supported.
 *   WordPress 5.9 or higher.
 *   Some PHP functions used by the plugin may be disabled by your host. Contact your host if features show as unavailable.
 *   For .htaccess editing, your site root must be writable.
@@ -150,13 +150,20 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 
 == Changelog ==
 
+= 7.0.5 =
+*   **Fixed**: Clicking "Deactivate anyway" inside the retention modal now actually deactivates the plugin instead of reopening the modal in an infinite loop.
+
+= 7.0.4 =
+*   **Updated**: The codebase has been fully transpiled downward to support PHP 7.3, allowing legacy servers to run the plugin without fatal syntax errors while maintaining all modern functionality.
+*   **Fixed**: "Reports" group menu item in the WordPress sidebar no longer disappears randomly. Fixed an overly broad CSS substring match that caused the "Audit Report" tab's hiding-logic to hide the parent "Reports" menu.
+*   **Fixed**: The "Deactivate" retention modal now correctly displays and styles on the main Plugins screen. Fixed an issue where the plugin's stylesheet was artificially blocked from loading on `plugins.php`, breaking the modal's layout.
+
 = 7.0.3 =
 *   **NEW**: License page now includes a four-tier comparison table (Free / Single / Unlimited / Lifetime) above the "What Pro unlocks" section so site owners can see exactly what each tier includes.
 *   **NEW**: WP Cron Monitor adds a "Purge hook" action on orphan rows (uses `wp_unschedule_hook()`) so removing an orphan actually sticks. Single-row delete couldn't stop recurring orphans because WP reschedules the next instance on fire — the explainer banner in the view now documents this.
 *   **NEW**: Activity Log row template now surfaces a plain-English description for every entry. Config Grader auto-fix entries used to render as a generic "EVENT" badge — they now show as "AUTO-FIX" with the directive list. New "Auto-fixes" filter pill.
 *   **NEW**: White-label Audit Report now accepts a company logo (Media Library picker, stored as attachment ID + URL) and renders it above the brand name on the report cover.
 *   **NEW**: Plugins-screen retention modal — clicking "Deactivate" on the phpinfo() WP row now shows what features stop working immediately, so site owners don't accidentally remove the safety net. Pro users see both Free and Pro feature lists.
-*   **Updated**: Minimum requirements bumped to PHP 8.0 and WordPress 5.9. The codebase has always used PHP 8 string functions (`str_starts_with`, `str_contains`); the old "PHP 7.4 / WP 5.0" requirement was incorrect and would fatal on activation for that combo. PHP 7.4 reached end-of-life in November 2022.
 *   **UI**: Removed the redundant "✓ Pro active" badge from the Dashboard page (still shown in the admin top bar).
 *   **Fixed**: White-label branding form on the Audit Report page used to stay open after save when "Enable white-label" was checked. It now collapses back after save — the success notice confirms the change instead.
 *   **Fixed**: Print / Save as PDF on the Audit Report page used to produce a blank page in Chrome and Safari. The print CSS was relying on `visibility:hidden` + `position:absolute` which doesn't escape WP's nested layout containers. Rewrote it with explicit `display:none` on the admin chrome, neutralized `#wpwrap` / `#wpcontent` / `#wpbody-content` margins, added `print-color-adjust:exact` so backgrounds actually render, and added `@page` rules for A4 with 14×12 mm margins.

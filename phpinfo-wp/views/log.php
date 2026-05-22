@@ -30,14 +30,14 @@ function phpinfowp_parse_log_entry(string $raw): array {
     // and "Config autofix block reverted" — earlier versions only recognized
     // the .htaccess editor's "backed up / restored / edited" verbs, so every
     // auto-fix row rendered as a generic EVENT.
-    if (str_contains($raw, 'backed up'))                  $action = 'backup';
-    elseif (str_contains($raw, 'restored'))               $action = 'restore';
-    elseif (str_contains($raw, 'autofix applied'))        $action = 'autofix';
-    elseif (str_contains($raw, 'autofix block reverted')) $action = 'autofix-revert';
-    elseif (str_contains($raw, 'edited'))                 $action = 'edit';
+    if (strpos($raw, 'backed up') !== false)                  $action = 'backup';
+    elseif (strpos($raw, 'restored') !== false)               $action = 'restore';
+    elseif (strpos($raw, 'autofix applied') !== false)        $action = 'autofix';
+    elseif (strpos($raw, 'autofix block reverted') !== false) $action = 'autofix-revert';
+    elseif (strpos($raw, 'edited') !== false)                 $action = 'edit';
 
-    if (str_contains($raw, '.user.ini'))                                        $file = '.user.ini';
-    elseif (str_contains($raw, '.htaccess') || str_contains($raw, 'htaccess'))  $file = '.htaccess';
+    if (strpos($raw, '.user.ini') !== false)                                        $file = '.user.ini';
+    elseif (strpos($raw, '.htaccess') !== false || strpos($raw, 'htaccess') !== false)  $file = '.htaccess';
 
     if (preg_match('/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/', $raw, $m)) $dt   = $m[1];
     if (preg_match('/by\s+(\S+)\s*$/', $raw, $m))                       $user = $m[1];
@@ -47,23 +47,34 @@ function phpinfowp_parse_log_entry(string $raw): array {
         $detail = trim($m[1]);
     }
 
-    $description = match ($action) {
-        'edit'           => $file ? "Edited {$file}"                  : 'Edited config',
-        'backup'         => $file ? "Backed up {$file}"               : 'Backed up config',
-        'restore'        => $file ? "Restored {$file} from backup"    : 'Restored from backup',
-        'autofix'        => $detail
-            ? sprintf('Auto-fix applied to %d director%s: %s',
-                substr_count($detail, ',') + 1,
-                substr_count($detail, ',') ? 'ies' : 'y',
-                $detail)
-            : 'Config Grader auto-fix applied',
-        'autofix-revert' => 'Config Grader auto-fix block reverted',
-        // Strip timestamp + user from raw so the fallback is still readable
-        default          => trim(preg_replace([
-            '/\s+on\s+\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+by\s+\S+\s*$/i',
-            '/<br\s*\/?>/i',
-        ], '', $raw)) ?: $raw,
-    };
+    switch ($action) {
+        case 'edit':
+            $description = $file ? "Edited {$file}"                  : 'Edited config';
+            break;
+        case 'backup':
+            $description = $file ? "Backed up {$file}"               : 'Backed up config';
+            break;
+        case 'restore':
+            $description = $file ? "Restored {$file} from backup"    : 'Restored from backup';
+            break;
+        case 'autofix':
+            $description = $detail
+                ? sprintf('Auto-fix applied to %d director%s: %s',
+                    substr_count($detail, ',') + 1,
+                    substr_count($detail, ',') ? 'ies' : 'y',
+                    $detail)
+                : 'Config Grader auto-fix applied';
+            break;
+        case 'autofix-revert':
+            $description = 'Config Grader auto-fix block reverted';
+            break;
+        default:
+            $description = trim(preg_replace([
+                '/\s+on\s+\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s+by\s+\S+\s*$/i',
+                '/<br\s*\/?>/i',
+            ], '', $raw)) ?: $raw;
+            break;
+    }
 
     return compact('action', 'file', 'detail', 'description', 'dt', 'user', 'raw');
 }
@@ -103,7 +114,7 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
     }
     if ($search) {
         $hay = strtolower($e['raw'] . ' ' . $e['description']);
-        if (!str_contains($hay, strtolower($search))) return false;
+        if (strpos($hay, strtolower($search)) === false) return false;
     }
     return true;
 });
@@ -184,14 +195,26 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
     <?php else: ?>
         <div class="phpinfowp-timeline" id="phpinfowp-timeline">
             <?php foreach ($filtered as $e):
-                $action_meta = match ($e['action']) {
-                    'edit'           => ['label' => 'EDIT',     'color' => '#777BB3', 'bg' => '#f3f0ff', 'icon' => 'dashicons-edit'],
-                    'backup'         => ['label' => 'BACKUP',   'color' => '#0073aa', 'bg' => '#e8f4fc', 'icon' => 'dashicons-upload'],
-                    'restore'        => ['label' => 'RESTORE',  'color' => '#dba617', 'bg' => '#fff8e5', 'icon' => 'dashicons-undo'],
-                    'autofix'        => ['label' => 'AUTO-FIX', 'color' => '#7c3aed', 'bg' => '#f5f0ff', 'icon' => 'dashicons-admin-tools'],
-                    'autofix-revert' => ['label' => 'REVERTED', 'color' => '#9b6bf2', 'bg' => '#f5f0ff', 'icon' => 'dashicons-undo'],
-                    default          => ['label' => 'EVENT',    'color' => '#666',    'bg' => '#f6f7f7', 'icon' => 'dashicons-info'],
-                };
+                switch ($e['action']) {
+                    case 'edit':
+                        $action_meta = ['label' => 'EDIT',     'color' => '#777BB3', 'bg' => '#f3f0ff', 'icon' => 'dashicons-edit'];
+                        break;
+                    case 'backup':
+                        $action_meta = ['label' => 'BACKUP',   'color' => '#0073aa', 'bg' => '#e8f4fc', 'icon' => 'dashicons-upload'];
+                        break;
+                    case 'restore':
+                        $action_meta = ['label' => 'RESTORE',  'color' => '#dba617', 'bg' => '#fff8e5', 'icon' => 'dashicons-undo'];
+                        break;
+                    case 'autofix':
+                        $action_meta = ['label' => 'AUTO-FIX', 'color' => '#7c3aed', 'bg' => '#f5f0ff', 'icon' => 'dashicons-admin-tools'];
+                        break;
+                    case 'autofix-revert':
+                        $action_meta = ['label' => 'REVERTED', 'color' => '#9b6bf2', 'bg' => '#f5f0ff', 'icon' => 'dashicons-undo'];
+                        break;
+                    default:
+                        $action_meta = ['label' => 'EVENT',    'color' => '#666',    'bg' => '#f6f7f7', 'icon' => 'dashicons-info'];
+                        break;
+                }
             ?>
                 <div class="phpinfowp-timeline-entry" style="border-left-color:<?php echo $action_meta['color']; ?>"
                      data-raw="<?php echo esc_attr(strtolower($e['raw'] . ' ' . $e['description'])); ?>">

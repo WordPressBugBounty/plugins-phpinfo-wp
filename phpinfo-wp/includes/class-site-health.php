@@ -224,11 +224,15 @@ class Phpinfo_WP_Site_Health {
         $val  = trim($val);
         $last = strtolower(substr($val, -1));
         $num  = (int) $val;
-        return match ($last) {
-            'g' => $num * 1073741824,
-            'm' => $num * 1048576,
-            'k' => $num * 1024,
-            default => $num,
-        };
+        switch ($last) {
+            case 'g':
+                return $num * 1073741824;
+            case 'm':
+                return $num * 1048576;
+            case 'k':
+                return $num * 1024;
+            default:
+                return $num;
+        }
     }
 }

@@ -132,7 +132,9 @@ class Phpinfo_WP_Snapshots {
             }
         }
 
-        usort($changes, fn($a, $b) => strcmp($a['key'], $b['key']));
+        usort($changes, function ($a, $b) {
+            return strcmp($a['key'], $b['key']);
+        });
         return $changes;
     }
 

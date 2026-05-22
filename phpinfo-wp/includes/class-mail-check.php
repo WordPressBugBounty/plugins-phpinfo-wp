@@ -74,7 +74,9 @@ class Phpinfo_WP_Mail_Check {
         if (!function_exists('dns_get_record')) return [];
         $records = @dns_get_record($domain, DNS_MX);
         if (!$records) return [];
-        usort($records, fn($a, $b) => ($a['pri'] ?? 99) <=> ($b['pri'] ?? 99));
+        usort($records, function ($a, $b) {
+            return ($a['pri'] ?? 99) <=> ($b['pri'] ?? 99);
+        });
         $out = [];
         foreach ($records as $r) {
             $out[] = ['priority' => (int)($r['pri'] ?? 0), 'host' => $r['target'] ?? ''];

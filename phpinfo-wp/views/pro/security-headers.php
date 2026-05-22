@@ -42,7 +42,9 @@ $audit = Phpinfo_WP_Security_Headers::get_cached();
                 <div class="phpinfowp-score-card-value"><?php echo esc_html($audit['score']); ?><span>/100</span></div>
                 <div class="phpinfowp-score-card-meta">
                     <?php
-                    $passed  = count(array_filter($audit['results'], fn($r) => $r['present']));
+                    $passed  = count(array_filter($audit['results'], function ($r) {
+    return $r['present'];
+}));
                     $total   = count($audit['results']);
                     $missing = $total - $passed;
                     ?>

@@ -173,28 +173,40 @@ class Phpinfo_WP_SSL {
         if (!self::_pro()) return;
         $domains = array_values(array_filter(array_map('trim', preg_split('/[\r\n]+/', $raw))));
         // Sanitize each as a hostname
-        $clean = array_filter($domains, fn($d) => preg_match('/^[a-z0-9._-]+$/i', $d));
+        $clean = array_filter($domains, function ($d) {
+            return preg_match('/^[a-z0-9._-]+$/i', $d);
+        });
         update_option(self::OPT_DOMAINS, implode("\n", $clean), false);
         self::bust_cache();
     }
 
     public static function status_color(string $status): string {
-        return match ($status) {
-            'expired'  => '#d63638',
-            'critical' => '#d63638',
-            'warning'  => '#dba617',
-            'ok'       => '#00a32a',
-            default    => '#666',
-        };
+        switch ($status) {
+            case 'expired':
+                return '#d63638';
+            case 'critical':
+                return '#d63638';
+            case 'warning':
+                return '#dba617';
+            case 'ok':
+                return '#00a32a';
+            default:
+                return '#666';
+        }
     }
 
     public static function status_label(string $status): string {
-        return match ($status) {
-            'expired'  => 'EXPIRED',
-            'critical' => 'CRITICAL',
-            'warning'  => 'EXPIRING SOON',
-            'ok'       => 'VALID',
-            default    => 'UNKNOWN',
-        };
+        switch ($status) {
+            case 'expired':
+                return 'EXPIRED';
+            case 'critical':
+                return 'CRITICAL';
+            case 'warning':
+                return 'EXPIRING SOON';
+            case 'ok':
+                return 'VALID';
+            default:
+                return 'UNKNOWN';
+        }
     }
 }

@@ -140,9 +140,15 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
     </div>
 
     <?php
-    $failing = array_filter($checks, fn($c) => $c['status'] === 'fail');
-    $warning = array_filter($checks, fn($c) => $c['status'] === 'warn');
-    $passing = array_filter($checks, fn($c) => $c['status'] === 'pass');
+    $failing = array_filter($checks, function ($c) {
+    return $c['status'] === 'fail';
+});
+    $warning = array_filter($checks, function ($c) {
+        return $c['status'] === 'warn';
+    });
+    $passing = array_filter($checks, function ($c) {
+        return $c['status'] === 'pass';
+    });
     ?>
 
     <?php
@@ -292,9 +298,15 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
 
     <!-- Checks by category -->
     <?php foreach ($categories as $cat):
-        $cat_checks = array_filter($checks, fn($c) => $c['category'] === $cat);
-        $cat_fails  = count(array_filter($cat_checks, fn($c) => $c['status'] === 'fail'));
-        $cat_warns  = count(array_filter($cat_checks, fn($c) => $c['status'] === 'warn'));
+        $cat_checks = array_filter($checks, function ($c) use ($cat) {
+            return $c['category'] === $cat;
+        });
+        $cat_fails  = count(array_filter($cat_checks, function ($c) {
+            return $c['status'] === 'fail';
+        }));
+        $cat_warns  = count(array_filter($cat_checks, function ($c) {
+            return $c['status'] === 'warn';
+        }));
     ?>
         <div class="phpinfowp-grade-section">
             <h2 class="phpinfowp-grade-section-heading">
@@ -378,7 +390,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
 
     <?php
         $current_target = @file_exists($target_info['file']) ? @file_get_contents($target_info['file']) : '';
-        $has_autofix_block = is_string($current_target) && str_contains($current_target, 'BEGIN phpinfo-wp-autofix');
+        $has_autofix_block = is_string($current_target) && strpos($current_target, 'BEGIN phpinfo-wp-autofix') !== false;
     ?>
     <?php if ($has_autofix_block): ?>
         <form method="post" style="margin-top:8px" onsubmit="return confirm('Revert the entire auto-fix block? This removes every value phpinfo() WP added — manual edits to your config file are untouched.')">

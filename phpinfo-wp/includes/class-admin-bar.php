@@ -402,11 +402,14 @@ class Phpinfo_WP_Admin_Bar {
     }
 
     private static function color_for(string $level): string {
-        return match ($level) {
-            'critical' => self::COLOR_BAD,
-            'warning'  => self::COLOR_WARN,
-            default    => self::COLOR_GOOD,
-        };
+        switch ($level) {
+            case 'critical':
+                return self::COLOR_BAD;
+            case 'warning':
+                return self::COLOR_WARN;
+            default:
+                return self::COLOR_GOOD;
+        }
     }
 
     private static function parse_bytes(string $val): int {
@@ -414,11 +417,15 @@ class Phpinfo_WP_Admin_Bar {
         if ($val === '' || $val === '-1') return 0;
         $last = strtolower($val[strlen($val) - 1]);
         $num  = (int) $val;
-        return match ($last) {
-            'g' => $num * GB_IN_BYTES,
-            'm' => $num * MB_IN_BYTES,
-            'k' => $num * KB_IN_BYTES,
-            default => $num,
-        };
+        switch ($last) {
+            case 'g':
+                return $num * GB_IN_BYTES;
+            case 'm':
+                return $num * MB_IN_BYTES;
+            case 'k':
+                return $num * KB_IN_BYTES;
+            default:
+                return $num;
+        }
     }
 }

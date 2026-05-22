@@ -114,8 +114,12 @@ class Phpinfo_WP_Report {
         // Compute issues — anything ≥ critical surfaces in the banner;
         // critical + warning together feed the "Top 3 Actions" picker.
         $issues = self::collect_issues($eol, $grader, $headers, $ssl, $opcache, $db, $autoload, $cron, $extras);
-        $criticals  = array_values(array_filter($issues, fn($i) => $i['urgency'] === 'critical'));
-        $warnings   = array_values(array_filter($issues, fn($i) => $i['urgency'] === 'warning'));
+        $criticals  = array_values(array_filter($issues, function ($i) {
+            return $i['urgency'] === 'critical';
+        }));
+        $warnings   = array_values(array_filter($issues, function ($i) {
+            return $i['urgency'] === 'warning';
+        }));
         $priorities = self::prioritize($issues, 3);
 
         return [
@@ -255,8 +259,8 @@ class Phpinfo_WP_Report {
     private static function https_state(): array {
         $siteurl = (string) get_option('siteurl', '');
         $home    = (string) get_option('home', '');
-        $site_https = str_starts_with($siteurl, 'https://');
-        $home_https = str_starts_with($home, 'https://');
+        $site_https = strncmp($siteurl, 'https://', strlen('https://')) === 0;
+        $home_https = strncmp($home, 'https://', strlen('https://')) === 0;
         return [
             'is_https'      => is_ssl(),
             'siteurl_https' => $site_https,
@@ -437,7 +441,9 @@ class Phpinfo_WP_Report {
         // Security headers
         if (!isset($headers['error']) && isset($headers['score'])) {
             $s = (int) $headers['score'];
-            $missing = array_filter($headers['results'] ?? [], fn($h) => !$h['present']);
+            $missing = array_filter($headers['results'] ?? [], function ($h) {
+                return !$h['present'];
+            });
             $n = count($missing);
             if ($s < 50) {
                 $out[] = self::issue('critical', 'Security',
@@ -594,8 +600,12 @@ class Phpinfo_WP_Report {
      * warnings until we reach N.
      */
     private static function prioritize(array $issues, int $n): array {
-        $crit = array_values(array_filter($issues, fn($i) => $i['urgency'] === 'critical'));
-        $warn = array_values(array_filter($issues, fn($i) => $i['urgency'] === 'warning'));
+        $crit = array_values(array_filter($issues, function ($i) {
+            return $i['urgency'] === 'critical';
+        }));
+        $warn = array_values(array_filter($issues, function ($i) {
+            return $i['urgency'] === 'warning';
+        }));
         $out  = array_merge($crit, $warn);
         return array_slice($out, 0, $n);
     }

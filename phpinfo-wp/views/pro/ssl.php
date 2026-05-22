@@ -18,7 +18,9 @@ if (isset($_POST['phpinfowp_ssl_action']) && check_admin_referer('phpinfowp_ssl_
 }
 
 $results    = Phpinfo_WP_SSL::check_all();
-$any_cached = array_filter($results, fn($r) => !empty($r['cached']));
+$any_cached = array_filter($results, function ($r) {
+    return !empty($r['cached']);
+});
 ?>
 
 <div class="phpinfowp-pro-page">

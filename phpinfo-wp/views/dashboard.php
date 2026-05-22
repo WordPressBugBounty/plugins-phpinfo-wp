@@ -13,16 +13,28 @@ $warn         = $bar['warn_count'] ?? 0;
 $overall      = $bar['overall'] ?? 'good';
 $mem          = $bar['memory'] ?? ['peak_bytes' => 0, 'limit_label' => ini_get('memory_limit'), 'pct' => 0];
 
-$overall_color = match ($overall) {
-    'critical' => '#d63638',
-    'warning'  => '#dba617',
-    default    => '#00a32a',
-};
-$overall_label = match ($overall) {
-    'critical' => 'Needs attention',
-    'warning'  => 'Watch list',
-    default    => 'Healthy',
-};
+switch ($overall) {
+    case 'critical':
+        $overall_color = '#d63638';
+        break;
+    case 'warning':
+        $overall_color = '#dba617';
+        break;
+    default:
+        $overall_color = '#00a32a';
+        break;
+}
+switch ($overall) {
+    case 'critical':
+        $overall_label = 'Needs attention';
+        break;
+    case 'warning':
+        $overall_label = 'Watch list';
+        break;
+    default:
+        $overall_label = 'Healthy';
+        break;
+}
 ?>
 
 <div class="phpinfowp-pro-page phpinfowp-dashboard">

@@ -6,7 +6,10 @@ class Phpinfo_WP_Security_Headers {
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
     // Points per header — total 100
-    private static array $headers = [
+    /**
+     * @var mixed[]
+     */
+    private static $headers = [
         'content-security-policy'   => ['label' => 'Content-Security-Policy',   'points' => 30, 'desc' => 'Prevents XSS and data injection attacks by declaring approved content sources.'],
         'strict-transport-security' => ['label' => 'Strict-Transport-Security', 'points' => 25, 'desc' => 'Forces HTTPS connections, preventing protocol downgrade attacks.'],
         'x-frame-options'           => ['label' => 'X-Frame-Options',           'points' => 15, 'desc' => 'Prevents clickjacking by controlling whether the page can be framed.'],

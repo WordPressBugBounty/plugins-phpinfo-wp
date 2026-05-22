@@ -64,7 +64,10 @@ class Phpinfo_WP_Config_Grader {
 
     const OPT_HISTORY = 'phpinfowp_grader_history';
 
-    private static ?array $ctx_cache = null;
+    /**
+     * @var mixed[]|null
+     */
+    private static $ctx_cache;
 
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
@@ -151,10 +154,10 @@ class Phpinfo_WP_Config_Grader {
     /** Server software family. */
     private static function detect_server(): string {
         $sw = strtolower($_SERVER['SERVER_SOFTWARE'] ?? '');
-        if (str_contains($sw, 'litespeed')) return 'litespeed';
-        if (str_contains($sw, 'nginx'))     return 'nginx';
-        if (str_contains($sw, 'apache'))    return 'apache';
-        if (str_contains($sw, 'iis'))       return 'iis';
+        if (strpos($sw, 'litespeed') !== false) return 'litespeed';
+        if (strpos($sw, 'nginx') !== false)     return 'nginx';
+        if (strpos($sw, 'apache') !== false)    return 'apache';
+        if (strpos($sw, 'iis') !== false)       return 'iis';
         return 'unknown';
     }
 
@@ -256,8 +259,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_CRITICAL,
                 'target' => $mem['mb'] . 'M',
                 'target_label' => $mem['mb'] . 'M' . (count($mem['reasons']) ? ' (' . implode(', ', $mem['reasons']) . ')' : ''),
-                'pass' => fn($v, $t) => trim($v) === '-1' || self::bytes($v) >= self::bytes($t),
-                'warn' => fn($v, $t) => trim($v) === '-1' || self::bytes($v) >= self::bytes($t) * 0.5,
+                'pass' => function ($v, $t) {
+                    return trim($v) === '-1' || self::bytes($v) >= self::bytes($t);
+                },
+                'warn' => function ($v, $t) {
+                    return trim($v) === '-1' || self::bytes($v) >= self::bytes($t) * 0.5;
+                },
                 'note' => 'PHP\'s memory ceiling. WordPress baseline is 256M; e-commerce and LMS workloads need 512M+.',
             ],
             [
@@ -265,8 +272,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_HIGH,
                 'target' => (string) $exec['s'],
                 'target_label' => $exec['s'] . ' seconds' . (count($exec['reasons']) ? ' (' . implode(', ', $exec['reasons']) . ')' : ''),
-                'pass' => fn($v, $t) => (int) $v === 0 || (int) $v >= (int) $t,
-                'warn' => fn($v, $t) => (int) $v >= max(30, (int) $t / 2),
+                'pass' => function ($v, $t) {
+                    return (int) $v === 0 || (int) $v >= (int) $t;
+                },
+                'warn' => function ($v, $t) {
+                    return (int) $v >= max(30, (int) $t / 2);
+                },
                 'note' => 'How long a single PHP request may run. Imports, updates, and backups time out below 60s.',
             ],
             [
@@ -274,8 +285,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_HIGH,
                 'target' => (string) $vars['n'],
                 'target_label' => $vars['n'] . ' or more' . (count($vars['reasons']) ? ' (' . implode(', ', $vars['reasons']) . ')' : ''),
-                'pass' => fn($v, $t) => (int) $v >= (int) $t,
-                'warn' => fn($v, $t) => (int) $v >= max(1000, (int) $t / 2),
+                'pass' => function ($v, $t) {
+                    return (int) $v >= (int) $t;
+                },
+                'warn' => function ($v, $t) {
+                    return (int) $v >= max(1000, (int) $t / 2);
+                },
                 'note' => 'Maximum form fields PHP will accept per request. Page builders and big forms silently lose fields below 3000.',
             ],
             [
@@ -283,8 +298,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_MEDIUM,
                 'target' => $upload . 'M',
                 'target_label' => $upload . 'M or more',
-                'pass' => fn($v, $t) => self::bytes($v) >= self::bytes($t),
-                'warn' => fn($v, $t) => self::bytes($v) >= self::bytes($t) * 0.5,
+                'pass' => function ($v, $t) {
+                    return self::bytes($v) >= self::bytes($t);
+                },
+                'warn' => function ($v, $t) {
+                    return self::bytes($v) >= self::bytes($t) * 0.5;
+                },
                 'note' => 'Largest single file PHP will accept. Caps media uploads, plugin zips, theme uploads.',
             ],
             [
@@ -292,8 +311,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_MEDIUM,
                 'target' => $upload . 'M',
                 'target_label' => 'At least equal to upload_max_filesize (' . $upload . 'M)',
-                'pass' => fn($v, $t) => self::bytes($v) >= self::bytes($t),
-                'warn' => fn($v, $t) => self::bytes($v) >= self::bytes($t) * 0.5,
+                'pass' => function ($v, $t) {
+                    return self::bytes($v) >= self::bytes($t);
+                },
+                'warn' => function ($v, $t) {
+                    return self::bytes($v) >= self::bytes($t) * 0.5;
+                },
                 'note' => 'Caps the entire POST body. Must be ≥ upload_max_filesize or large uploads fail.',
             ],
             [
@@ -301,8 +324,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_LOW,
                 'target' => '60',
                 'target_label' => '60 seconds or -1 (unlimited)',
-                'pass' => fn($v, $t) => (int) $v === -1 || (int) $v >= (int) $t,
-                'warn' => fn($v, $t) => (int) $v >= 30,
+                'pass' => function ($v, $t) {
+                    return (int) $v === -1 || (int) $v >= (int) $t;
+                },
+                'warn' => function ($v, $t) {
+                    return (int) $v >= 30;
+                },
                 'note' => 'Time PHP spends parsing the request body. Affects multi-MB uploads on slow links.',
             ],
             [
@@ -310,8 +337,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_LOW,
                 'target' => '20',
                 'target_label' => '20 or more',
-                'pass' => fn($v, $t) => (int) $v >= (int) $t,
-                'warn' => fn($v, $t) => (int) $v >= 10,
+                'pass' => function ($v, $t) {
+                    return (int) $v >= (int) $t;
+                },
+                'warn' => function ($v, $t) {
+                    return (int) $v >= 10;
+                },
                 'note' => 'Max files per single upload form. WordPress gallery uploads need 20+.',
             ],
 
@@ -321,7 +352,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => $ctx['is_production'] ? self::SEV_CRITICAL : self::SEV_LOW,
                 'target' => '0',
                 'target_label' => 'Off (production) — leaks code paths to attackers',
-                'pass' => fn($v) => in_array(strtolower($v), ['0', 'off', ''], true),
+                'pass' => function ($v) {
+                    return in_array(strtolower($v), ['0', 'off', ''], true);
+                },
                 'note' => 'When on, PHP errors print to the response. Stack traces leak credentials, paths, and table prefixes.',
             ],
             [
@@ -329,7 +362,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_MEDIUM,
                 'target' => '0',
                 'target_label' => 'Off — hides X-Powered-By header',
-                'pass' => fn($v) => in_array(strtolower($v), ['0', 'off', ''], true),
+                'pass' => function ($v) {
+                    return in_array(strtolower($v), ['0', 'off', ''], true);
+                },
                 'note' => 'Stops PHP from advertising its version. Slows down version-specific exploit scanning.',
             ],
             [
@@ -337,7 +372,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_CRITICAL,
                 'target' => '0',
                 'target_label' => 'Off — critical RCE vector if enabled',
-                'pass' => fn($v) => in_array(strtolower($v), ['0', 'off', ''], true),
+                'pass' => function ($v) {
+                    return in_array(strtolower($v), ['0', 'off', ''], true);
+                },
                 'note' => 'Lets PHP `include` a remote URL. Single biggest RCE foot-gun in the language.',
             ],
             [
@@ -345,7 +382,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_MEDIUM,
                 'target' => '1',
                 'target_label' => 'On — write errors to file, not to visitors',
-                'pass' => fn($v) => in_array(strtolower($v), ['1', 'on'], true),
+                'pass' => function ($v) {
+                    return in_array(strtolower($v), ['1', 'on'], true);
+                },
                 'note' => 'Errors should be logged silently. Pair with display_errors=Off.',
             ],
             [
@@ -353,7 +392,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_HIGH,
                 'target' => '1',
                 'target_label' => 'On — blocks JS access to session cookies (mitigates XSS)',
-                'pass' => fn($v) => in_array(strtolower($v), ['1', 'on'], true),
+                'pass' => function ($v) {
+                    return in_array(strtolower($v), ['1', 'on'], true);
+                },
                 'note' => 'When On, JavaScript cannot read the session cookie via document.cookie.',
             ],
             [
@@ -361,7 +402,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_HIGH,
                 'target' => '1',
                 'target_label' => 'On — rejects uninitialized session IDs (anti-fixation)',
-                'pass' => fn($v) => in_array(strtolower($v), ['1', 'on'], true),
+                'pass' => function ($v) {
+                    return in_array(strtolower($v), ['1', 'on'], true);
+                },
                 'note' => 'Prevents attackers from forcing a chosen session ID onto a victim before they sign in.',
             ],
             [
@@ -369,7 +412,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => $is_https ? self::SEV_HIGH : self::SEV_LOW,
                 'target' => $is_https ? '1' : '0',
                 'target_label' => $is_https ? 'On — required on HTTPS sites' : 'N/A (site is HTTP)',
-                'pass' => fn($v) => !$is_https || in_array(strtolower($v), ['1', 'on'], true),
+                'pass' => function ($v) use ($is_https) {
+                    return !$is_https || in_array(strtolower($v), ['1', 'on'], true);
+                },
                 'note' => 'Restricts the session cookie to HTTPS transport. Mandatory once your site serves HTTPS.',
             ],
 
@@ -379,7 +424,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_CRITICAL,
                 'target' => '1',
                 'target_label' => 'On — typical 50–80% PHP CPU reduction',
-                'pass' => fn($v) => in_array(strtolower($v), ['1', 'on'], true),
+                'pass' => function ($v) {
+                    return in_array(strtolower($v), ['1', 'on'], true);
+                },
                 'note' => 'Caches compiled PHP bytecode. Without it, WordPress recompiles every file on every request.',
             ],
             [
@@ -387,8 +434,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_HIGH,
                 'target' => '256',
                 'target_label' => '256 MB (medium site) / 512 MB (busy site)',
-                'pass' => fn($v) => (int) $v >= 256,
-                'warn' => fn($v) => (int) $v >= 128,
+                'pass' => function ($v) {
+                    return (int) $v >= 256;
+                },
+                'warn' => function ($v) {
+                    return (int) $v >= 128;
+                },
                 'note' => 'Memory budget for compiled bytecode. WordPress + 30 plugins easily exceeds 128M.',
             ],
             [
@@ -396,8 +447,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_HIGH,
                 'target' => '20000',
                 'target_label' => '20000 (WP + many plugins)',
-                'pass' => fn($v) => (int) $v >= 20000,
-                'warn' => fn($v) => (int) $v >= 4000,
+                'pass' => function ($v) {
+                    return (int) $v >= 20000;
+                },
+                'warn' => function ($v) {
+                    return (int) $v >= 4000;
+                },
                 'note' => 'Limits how many PHP files OPcache can keep in memory. Below 4000 you get cache thrashing.',
             ],
             [
@@ -405,7 +460,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => $ctx['is_production'] ? self::SEV_MEDIUM : self::SEV_LOW,
                 'target' => $ctx['is_production'] ? '0' : '1',
                 'target_label' => $ctx['is_production'] ? 'Off (production) — biggest single perf win' : 'On (development) — sees edits without restart',
-                'pass' => fn($v) => $ctx['is_production'] ? in_array(strtolower($v), ['0', 'off', ''], true) : true,
+                'pass' => function ($v) use ($ctx) {
+                    return $ctx['is_production'] ? in_array(strtolower($v), ['0', 'off', ''], true) : true;
+                },
                 'note' => 'When Off, PHP never checks if source files changed. Massive perf win in prod, frustrating in dev.',
             ],
             [
@@ -414,7 +471,9 @@ class Phpinfo_WP_Config_Grader {
                 'php_min' => '8.0',
                 'target' => 'tracing',
                 'target_label' => 'tracing — PHP 8\'s tracing JIT compiler',
-                'pass' => fn($v) => !in_array(strtolower(trim($v)), ['', 'disable', 'off', '0'], true),
+                'pass' => function ($v) {
+                    return !in_array(strtolower(trim($v)), ['', 'disable', 'off', '0'], true);
+                },
                 'note' => 'PHP 8\'s Just-In-Time compiler. Adds 5–15% on top of OPcache for typical WP loads.',
             ],
             [
@@ -423,8 +482,12 @@ class Phpinfo_WP_Config_Grader {
                 'php_min' => '8.0',
                 'target' => '256M',
                 'target_label' => '256M (JIT memory budget)',
-                'pass' => fn($v) => self::bytes($v) >= 64 * MB_IN_BYTES,
-                'warn' => fn($v) => self::bytes($v) > 0,
+                'pass' => function ($v) {
+                    return self::bytes($v) >= 64 * MB_IN_BYTES;
+                },
+                'warn' => function ($v) {
+                    return self::bytes($v) > 0;
+                },
                 'note' => 'Memory the JIT can use. Zero disables JIT entirely.',
             ],
             [
@@ -432,7 +495,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_LOW,
                 'target' => '1',
                 'target_label' => 'On — reduces TLB pressure on Linux',
-                'pass' => fn($v) => in_array(strtolower($v), ['1', 'on'], true),
+                'pass' => function ($v) {
+                    return in_array(strtolower($v), ['1', 'on'], true);
+                },
                 'note' => 'Maps PHP code into 2MB huge pages. Small but measurable perf win on Linux with transparent_hugepage on.',
             ],
 
@@ -442,8 +507,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_MEDIUM,
                 'target' => '4096K',
                 'target_label' => '4M or more',
-                'pass' => fn($v) => self::bytes($v) >= 4 * MB_IN_BYTES,
-                'warn' => fn($v) => self::bytes($v) >= 1 * MB_IN_BYTES,
+                'pass' => function ($v) {
+                    return self::bytes($v) >= 4 * MB_IN_BYTES;
+                },
+                'warn' => function ($v) {
+                    return self::bytes($v) >= 1 * MB_IN_BYTES;
+                },
                 'note' => 'Caches resolved file paths. WordPress hits the filesystem hard — small cache = slow.',
             ],
             [
@@ -451,8 +520,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_LOW,
                 'target' => '600',
                 'target_label' => '600 seconds or more',
-                'pass' => fn($v) => (int) $v >= 600,
-                'warn' => fn($v) => (int) $v >= 120,
+                'pass' => function ($v) {
+                    return (int) $v >= 600;
+                },
+                'warn' => function ($v) {
+                    return (int) $v >= 120;
+                },
                 'note' => 'How long resolved paths stay cached. 600 (10 min) is standard for production.',
             ],
 
@@ -462,8 +535,12 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_LOW,
                 'target' => '4096',
                 'target_label' => '4096 or higher (4K buffer)',
-                'pass' => fn($v) => strtolower($v) === 'on' || (int) $v >= 4096,
-                'warn' => fn($v) => strtolower($v) === 'on' || (int) $v >= 1024,
+                'pass' => function ($v) {
+                    return strtolower($v) === 'on' || (int) $v >= 4096;
+                },
+                'warn' => function ($v) {
+                    return strtolower($v) === 'on' || (int) $v >= 1024;
+                },
                 'note' => 'Buffers output before sending. Required by some WordPress plugins; "On" works too.',
             ],
             [
@@ -471,7 +548,9 @@ class Phpinfo_WP_Config_Grader {
                 'severity' => self::SEV_LOW,
                 'target' => 'UTC',
                 'target_label' => 'UTC (or your local tz) — must not be empty',
-                'pass' => fn($v) => trim((string) $v) !== '',
+                'pass' => function ($v) {
+                    return trim((string) $v) !== '';
+                },
                 'note' => 'When unset, PHP guesses and logs a warning on every request that uses date functions.',
             ],
         ];
@@ -864,23 +943,33 @@ class Phpinfo_WP_Config_Grader {
     }
 
     public static function severity_label(string $sev): string {
-        return match ($sev) {
-            self::SEV_CRITICAL => 'Critical',
-            self::SEV_HIGH     => 'High',
-            self::SEV_MEDIUM   => 'Medium',
-            self::SEV_LOW      => 'Low',
-            default            => ucfirst($sev),
-        };
+        switch ($sev) {
+            case self::SEV_CRITICAL:
+                return 'Critical';
+            case self::SEV_HIGH:
+                return 'High';
+            case self::SEV_MEDIUM:
+                return 'Medium';
+            case self::SEV_LOW:
+                return 'Low';
+            default:
+                return ucfirst($sev);
+        }
     }
 
     public static function severity_color(string $sev): string {
-        return match ($sev) {
-            self::SEV_CRITICAL => '#d63638',
-            self::SEV_HIGH     => '#dba617',
-            self::SEV_MEDIUM   => '#777BB3',
-            self::SEV_LOW      => '#646970',
-            default            => '#646970',
-        };
+        switch ($sev) {
+            case self::SEV_CRITICAL:
+                return '#d63638';
+            case self::SEV_HIGH:
+                return '#dba617';
+            case self::SEV_MEDIUM:
+                return '#777BB3';
+            case self::SEV_LOW:
+                return '#646970';
+            default:
+                return '#646970';
+        }
     }
 
     // Convert shorthand (256M, 1G) to bytes

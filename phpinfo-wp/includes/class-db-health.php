@@ -4,7 +4,10 @@ defined('ABSPATH') or die('Unauthorized Access');
 class Phpinfo_WP_DB_Health {
 
     // MySQL EOL dates — https://endoflife.date/mysql
-    private static array $mysql_eol = [
+    /**
+     * @var mixed[]
+     */
+    private static $mysql_eol = [
         '5.6'  => '2021-02-28',
         '5.7'  => '2023-10-31',
         '8.0'  => '2026-04-30',
@@ -14,7 +17,10 @@ class Phpinfo_WP_DB_Health {
         '8.4'  => '2032-04-30',
     ];
     // MariaDB EOL dates — https://endoflife.date/mariadb
-    private static array $mariadb_eol = [
+    /**
+     * @var mixed[]
+     */
+    private static $mariadb_eol = [
         '10.3' => '2023-05-25',
         '10.4' => '2024-06-18',
         '10.5' => '2025-06-24',

@@ -456,7 +456,9 @@ $brand_tag  = $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server
         </table>
 
         <!-- Failing config checks -->
-        <?php $failing = array_filter($r['grader']['checks'], fn($c) => $c['status'] === 'fail'); ?>
+        <?php $failing = array_filter($r['grader']['checks'], function ($c) {
+                        return $c['status'] === 'fail';
+                    }); ?>
         <?php if ($failing): ?>
             <h3 class="phpinfowp-report-h">Config issues (<?php echo count($failing); ?>)</h3>
             <table class="phpinfowp-report-table">
@@ -476,7 +478,9 @@ $brand_tag  = $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server
 
         <!-- Missing security headers -->
         <?php if (!isset($r['headers']['error'])):
-            $missing = array_filter($r['headers']['results'], fn($h) => !$h['present']);
+            $missing = array_filter($r['headers']['results'], function ($h) {
+                return !$h['present'];
+            });
         ?>
             <?php if ($missing): ?>
                 <h3 class="phpinfowp-report-h">Missing security headers (<?php echo count($missing); ?>)</h3>

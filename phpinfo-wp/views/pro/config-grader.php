@@ -65,7 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $keys = array_map('sanitize_text_field', $keys);
         $res  = Phpinfo_WP_Config_Grader_Fixer::apply($keys);
         if ($res['ok']) {
-            $fix_notice = 'Wrote ' . count($res['applied']) . ' directive(s) to <code>' . esc_html(basename($res['file'])) . '</code>: ' . esc_html(implode(', ', $res['applied'])) . '. <br><strong>PHP may take up to 5 minutes to pick up the new values</strong> (<code>.user.ini</code> cache). If any directive still shows the old value after 10 minutes, see the override warnings on this page.';
+            $settle = (int) ($res['settle'] ?? 0);
+            $mins   = $settle > 60 ? ceil($settle / 60) . ' minute' . (ceil($settle / 60) === 1.0 ? '' : 's') : $settle . ' seconds';
+            $fix_notice = 'Wrote ' . count($res['applied']) . ' directive(s) to <code>' . esc_html(basename($res['file'])) . '</code>: ' . esc_html(implode(', ', $res['applied'])) . '. '
+                . ($res['mode'] === 'userini'
+                    ? '<br>New values activate once the <code>.user.ini</code> cache clears — about <strong>' . esc_html($mins) . '</strong>. We\'ll automatically re-check for host overrides after that; nothing to do until then.'
+                    : '<br>New values activate on the next page load. We\'ll re-check for host overrides shortly.');
         } else {
             $fix_notice = $res['error'] ?? 'Auto-fix failed.';
             $fix_notice_type = 'error';
@@ -123,8 +128,18 @@ $sev_pill = function (string $sev, string $label) {
 
 $target_info     = Phpinfo_WP_Config_Grader_Fixer::detect_target();
 $target_writable = Phpinfo_WP_Config_Grader_Fixer::target_writable();
+$settle_left     = Phpinfo_WP_Config_Grader_Fixer::settle_remaining();
 $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
 ?>
+
+<?php if ($settle_left > 0): ?>
+    <div class="notice notice-info" style="margin:0 0 16px"><p>
+        <span class="dashicons dashicons-update" style="vertical-align:middle"></span>
+        <strong>Auto-fix applied — values are still propagating.</strong>
+        <code><?php echo esc_html(basename($target_info['file'])); ?></code> changes don't apply to the page that wrote them and are cached briefly by PHP.
+        The override check is paused for about <strong><?php echo esc_html($settle_left > 60 ? ceil($settle_left / 60) . ' more minute(s)' : $settle_left . ' more seconds'); ?></strong>, then runs automatically — reload after that to confirm.
+    </p></div>
+<?php endif; ?>
 
 <?php if ($fix_notice): ?>
     <div class="notice notice-<?php echo esc_attr($fix_notice_type); ?> is-dismissible" style="margin:0 0 16px"><p><?php echo $fix_notice; ?></p></div>

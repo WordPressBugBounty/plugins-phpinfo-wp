@@ -3,12 +3,12 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.0
-Stable tag: 7.0.5
+Stable tag: 7.1.0
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Modern WordPress site health — PHP compatibility scanner, troubleshooting mode, config grader, EOL timeline. Maintained Health Check alternative.
+Modern WordPress site health — PHP compatibility scanner, troubleshooting mode, config grader, EOL timeline. A modern Health Check alternative.
 
 == Description ==
 
@@ -20,7 +20,8 @@ Think of it as **"Health Check & Troubleshooting" — but maintained, modern, an
 
 *   **phpinfo() viewer** — clean, searchable, modern (the original feature, restyled).
 *   **PHP Compatibility Scanner** — scan every plugin and theme for PHP version breakages *before* you upgrade. (Free, no signup. Most "PHP compatibility checker" plugins on WP.org are abandoned or only work in dev environments — this one runs on managed hosts.)
-*   **Troubleshooting Mode** — safely disable plugins *only for your own admin session* to debug conflicts. Time-limited cookie, undo button, auto-restore on logout. **Fixes the "broke my entire site" problem Health Check is famous for.**
+*   **Update Guard — pre-update core audit** — before you update *WordPress itself*, scan every plugin and theme for code that breaks on the new core: removed jQuery APIs (which fail silently on the front end) and deprecated WordPress functions. Get one clear **Safe / Caution / Risky** verdict so you know whether it's safe to click "Update." Free.
+*   **Troubleshooting Mode** — safely disable plugins *only for your own admin session* to debug conflicts. Time-limited cookie, one-click "End and restore" button in the admin bar, auto-restore on logout. Your visitors and other admins keep seeing the live site normally while you debug.
 *   **PHP EOL Timeline** — every PHP version's end-of-life date, current status, days remaining.
 *   **Config Grader summary** — overall A–F grade of your PHP config against WordPress best practices.
 *   **PHP Config editor (.htaccess / .user.ini)** — set or change php.ini directives safely from your dashboard, with automatic backups and a site-health check that aborts a save if your site starts returning HTTP 500.
@@ -36,6 +37,7 @@ Think of it as **"Health Check & Troubleshooting" — but maintained, modern, an
 
 *   **One-click Config Auto-Fix** — every failing Grader check gets a "Fix it" button that writes the recommended value to .htaccess (or your php.ini override) safely, with automatic rollback if anything breaks.
 *   **Pre-update PHP compatibility check** — before you click "Update Plugin," see if the new version requires a PHP version you don't have.
+*   **Update Guard Pro** — an automatic warning right on the WordPress **Updates** screen before every core update, "tested up to" + abandonment scoring pulled from WordPress.org (the biggest predictor of a quiet breakage), AI-written fix explanations for each finding, uncapped scanning, the full per-file/line drill-down, and a continuously-updated rule feed so new WordPress deprecations are detected without waiting for a plugin update.
 *   **Config Snapshots** — weekly automatic snapshots of every php.ini directive, with visual diffs.
 *   **Security Headers Auditor** — grade your HTTP response headers (CSP, HSTS, X-Frame-Options, etc.) with fix suggestions.
 *   **SSL Certificate Monitor** — track expiry for your site and any additional domains.
@@ -117,11 +119,13 @@ No. All checks run inside the admin dashboard only — there's zero impact on yo
 
 = How is this different from Health Check & Troubleshooting? =
 
-Health Check & Troubleshooting was the official WordPress.org plugin for this kind of work, but it's been unmaintained for two years and its "Troubleshooting Mode" has a long-standing bug that leaves users with all their plugins disabled and no way to recover.
+Health Check & Troubleshooting is the official WordPress.org plugin for this kind of work and a solid tool. Its Troubleshooting Mode is site-wide — when enabled, every visitor sees the default theme with your plugins deactivated until you disable the mode (one click in the admin bar).
 
-phpinfo() WP rebuilds the core ideas — phpinfo viewer, server debug info, plugin conflict troubleshooting, PHP compatibility checking — in a maintained, modern plugin. Our Troubleshooting Mode is per-user, time-limited, fully reversible, and includes an explicit "End and restore" button. You can't lock yourself out.
+phpinfo() WP takes a different approach. Our Troubleshooting Mode is per-user: only your current admin session sees deactivated plugins and the default theme. Every other visitor and admin keeps seeing the live site as normal. That's the design choice we made for debugging plugin conflicts on busy production sites (a live WooCommerce store, a high-traffic publisher) where taking the front-end offline isn't an option.
 
-It also adds what Health Check never had: PHP EOL tracking, A–F config grading with one-click fixes (Pro), an admin-bar health scoreboard, SSL/headers monitoring, and a client-ready PDF audit report.
+We also add features Health Check doesn't offer: PHP EOL tracking, A–F config grading with one-click fixes (Pro), an admin-bar health scoreboard, SSL/headers monitoring, and a client-ready PDF audit report.
+
+Use Health Check if you want the official tool with a simple, site-wide debug mode. Use phpinfo() WP if you need a per-user debug session on a live site, plus the broader audit suite.
 
 = How is this different from Query Monitor / WP Umbrella? =
 
@@ -144,11 +148,17 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 2. phpinfo() viewer — clean, searchable, modern.
 3. Config Grader summary — your site's A–F grade across Performance, Security, and OPcache.
 4. PHP EOL Timeline — every PHP version's end-of-life date and days remaining.
-5. Troubleshooting Mode — per-user safe-mode that disables plugins only for your admin session, with a one-click undo.
+5. Troubleshooting Mode — per-user safe-mode that disables plugins only for your admin session, with a one-click "End and restore".
 6. Config Grader full breakdown (Pro) — every failing directive with the exact recommended value and a one-click "Fix this" button.
 7. Audit Report (Pro) — single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.1.0 =
+*   **Fixed (Pro)**: Config Grader auto-fix no longer shows a false "your host is overriding the auto-fix" warning immediately after applying a fix. `.user.ini` changes can't take effect in the same request and are cached by PHP for a few minutes, so the override check now pauses until the values can actually be observed, then runs automatically.
+*   **Fixed (Pro)**: Config Grader no longer offers a one-click fix for `realpath_cache_size` and `realpath_cache_ttl`. These are PHP_INI_SYSTEM directives that can only be set in php.ini — they're now shown as manual steps instead of being written to `.user.ini`/`.htaccess` where PHP silently ignores them.
+*   **NEW (Free)**: Update Guard — a pre-update WordPress core audit. Set the core version you plan to upgrade to and scan every plugin and theme for code that breaks on it: removed jQuery APIs and deprecated WordPress functions. Returns a single Safe / Caution / Risky verdict, with per-plugin findings.
+*   **NEW (Pro)**: Update Guard adds automatic interception on the WordPress Updates screen before every core update, WordPress.org "tested up to" and abandonment scoring, AI-written fix explanations per finding, uncapped scanning, full per-file/line drill-down, and a cloud rule feed that delivers new WordPress deprecation rules without a plugin update.
 
 = 7.0.5 =
 *   **Fixed**: Clicking "Deactivate anyway" inside the retention modal now actually deactivates the plugin instead of reopening the modal in an infinite loop.
@@ -188,7 +198,7 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 *   **NEW (Free)**: Config Grader summary — overall A–F grade visible without Pro.
 *   **NEW (Free)**: Admin bar indicator — PHP version + EOL + memory on every page.
 *   **NEW (Free)**: Dashboard widget — site health at a glance.
-*   **NEW (Free)**: Troubleshooting Mode — per-user safe-mode that disables plugins only for your admin session, with a built-in undo button. Fixes the "Health Check broke my site" problem.
+*   **NEW (Free)**: Troubleshooting Mode — per-user safe-mode that disables plugins only for your admin session, with a built-in "End and restore" button. Your visitors and other admins continue seeing the live site normally while you debug.
 *   **NEW (Free)**: PHP Compatibility Scanner — check plugins and themes before PHP upgrades. Works on managed hosts.
 *   **NEW (Free)**: Pre-update PHP-version warning — flags plugin updates that require a newer PHP than your site runs, on the Plugins screen.
 *   **NEW (Free)**: Admin bar health scoreboard — live grade + most-urgent issue on every admin page.
@@ -236,4 +246,4 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 == Upgrade Notice ==
 
 = 7.0.0 =
-Major release. phpinfo() WP is now a full WordPress site-health and server-audit plugin — a maintained alternative to the abandoned Health Check & Troubleshooting plugin. Free adds Troubleshooting Mode (per-user safe-mode that cannot leave your site broken), PHP Compatibility Scanner that works on managed hosts, pre-update PHP-version warnings, PHP EOL Timeline, Config Grader summary, admin-bar health scoreboard, WordPress 7.0 Abilities API integration for AI assistants, and AI explanations on failing Config Grader checks. Pro adds one-click Config Auto-Fix, security headers, SSL monitor, OPcache dashboard, white-label PDF audit reports, and more.
+Major release. phpinfo() WP is now a full WordPress site-health and server-audit plugin — a modern, actively-maintained take on the Health Check & Troubleshooting workflow. Free adds Troubleshooting Mode (per-user safe-mode that cannot leave your site broken), PHP Compatibility Scanner that works on managed hosts, pre-update PHP-version warnings, PHP EOL Timeline, Config Grader summary, admin-bar health scoreboard, WordPress 7.0 Abilities API integration for AI assistants, and AI explanations on failing Config Grader checks. Pro adds one-click Config Auto-Fix, security headers, SSL monitor, OPcache dashboard, white-label PDF audit reports, and more.

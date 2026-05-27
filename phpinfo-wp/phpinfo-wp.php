@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     7.0.5
+Version:     7.1.0
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com
@@ -12,7 +12,7 @@ License:     GPLv3
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '7.0.5');
+define('PHPINFOWP_VERSION', '7.1.0');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 
@@ -27,6 +27,7 @@ require_once PHPINFOWP_DIR . 'includes/class-alerts.php';
 require_once PHPINFOWP_DIR . 'includes/class-ssl.php';
 require_once PHPINFOWP_DIR . 'includes/class-site-health.php';
 require_once PHPINFOWP_DIR . 'includes/class-compat.php';
+require_once PHPINFOWP_DIR . 'includes/class-update-audit.php';
 require_once PHPINFOWP_DIR . 'includes/class-db-health.php';
 require_once PHPINFOWP_DIR . 'includes/class-cron-monitor.php';
 require_once PHPINFOWP_DIR . 'includes/class-mail-check.php';
@@ -75,6 +76,7 @@ class Phpinfo_wp {
         Phpinfo_WP_Network::register();
         Phpinfo_WP_Safemode::register();
         Phpinfo_WP_Compat::register_update_warnings();
+        Phpinfo_WP_Update_Audit::register();
         Phpinfo_WP_Abilities::register();
         Phpinfo_WP_AI_Explain::register();
         Phpinfo_WP_Upgrade_Notice::register();
@@ -127,6 +129,7 @@ class Phpinfo_wp {
             ['phpinfowp-config-grader',     'Config Grader',     'view_config_grader'],
             ['phpinfowp-eol',               'PHP EOL',           'view_eol'],
             ['phpinfowp-compat',            'PHP Compatibility', 'view_compat'],
+            ['phpinfowp-update-audit',      'Update Guard',      'view_update_audit'],
             ['phpinfowp-security-headers',  'Security Headers',  'view_security_headers'],
             ['phpinfowp-ssl',               'SSL Monitor',       'view_ssl'],
             ['phpinfowp-opcache',           'OPcache',           'view_opcache'],
@@ -180,6 +183,7 @@ class Phpinfo_wp {
     public function view_alerts(): void          { require PHPINFOWP_DIR . 'views/pro/alerts.php'; }
     public function view_ssl(): void             { require PHPINFOWP_DIR . 'views/pro/ssl.php'; }
     public function view_compat(): void          { require PHPINFOWP_DIR . 'views/pro/compat.php'; }
+    public function view_update_audit(): void    { require PHPINFOWP_DIR . 'views/pro/update-audit.php'; }
     public function view_db_health(): void       { require PHPINFOWP_DIR . 'views/pro/db-health.php'; }
     public function view_cron(): void            { require PHPINFOWP_DIR . 'views/pro/cron.php'; }
     public function view_mail(): void            { require PHPINFOWP_DIR . 'views/pro/mail.php'; }

@@ -130,6 +130,7 @@ switch ($overall) {
                 ['slug' => 'phpinfowp-config-grader',    'icon' => 'dashicons-chart-bar',      'title' => 'Config Grader',     'desc' => 'A–F score for your PHP config + one-click fixes',  'pro' => false],
                 ['slug' => 'phpinfowp-eol',              'icon' => 'dashicons-calendar-alt',   'title' => 'PHP EOL Timeline',  'desc' => 'End-of-life dates for every PHP version',          'pro' => false],
                 ['slug' => 'phpinfowp-compat',           'icon' => 'dashicons-search',         'title' => 'PHP Compatibility', 'desc' => 'Scan plugins/themes before a PHP upgrade',         'pro' => false],
+                ['slug' => 'phpinfowp-update-audit',     'icon' => 'dashicons-shield',         'title' => 'Update Guard',      'desc' => 'Predict what breaks before a WordPress core update', 'pro' => false],
                 ['slug' => 'phpinfowp-security-headers', 'icon' => 'dashicons-shield',         'title' => 'Security Headers',  'desc' => 'CSP, HSTS, X-Frame-Options graded',                'pro' => true],
                 ['slug' => 'phpinfowp-ssl',              'icon' => 'dashicons-lock',           'title' => 'SSL Monitor',       'desc' => 'Cert expiry tracking for your site + domains',     'pro' => true],
                 ['slug' => 'phpinfowp-opcache',          'icon' => 'dashicons-performance',    'title' => 'OPcache',           'desc' => 'Hit rate, memory, cached scripts',                 'pro' => true],

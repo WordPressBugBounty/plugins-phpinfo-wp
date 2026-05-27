@@ -37,6 +37,7 @@ class Phpinfo_WP_Admin_Nav {
                     'phpinfowp-config-grader'    => ['label' => 'Config Grader',     'pro' => false, 'icon' => 'dashicons-chart-bar'],
                     'phpinfowp-eol'              => ['label' => 'PHP EOL',           'pro' => false, 'icon' => 'dashicons-calendar-alt'],
                     'phpinfowp-compat'           => ['label' => 'PHP Compatibility', 'pro' => false, 'icon' => 'dashicons-yes-alt'],
+                    'phpinfowp-update-audit'     => ['label' => 'Update Guard',      'pro' => false, 'icon' => 'dashicons-shield'],
                     'phpinfowp-security-headers' => ['label' => 'Security Headers',  'pro' => true,  'icon' => 'dashicons-shield-alt'],
                     'phpinfowp-ssl'              => ['label' => 'SSL Monitor',       'pro' => true,  'icon' => 'dashicons-lock'],
                     'phpinfowp-opcache'          => ['label' => 'OPcache',           'pro' => true,  'icon' => 'dashicons-performance'],

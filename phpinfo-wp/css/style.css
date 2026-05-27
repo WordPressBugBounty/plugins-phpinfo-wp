@@ -1898,6 +1898,19 @@ body.phpinfowp-has-sidenav #wpbody-content {
   padding: 4px 28px 4px 10px;
   min-width: 110px;
 }
+/* Vertically center the dashicon against the button label — inline
+   vertical-align:middle leaves the 20px glyph sitting low, so use flex. */
+.phpinfowp-compat-controls .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.phpinfowp-compat-controls .button .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+}
 .phpinfowp-compat-empty {
   text-align: center;
   padding: 60px 20px;
@@ -3361,3 +3374,33 @@ body.phpinfowp-has-sidenav #wpbody-content {
   font-weight: 500;
   text-align: right;
 }
+
+/* ---- Update Guard (pre-update core audit) ---- */
+.phpinfowp-ua-verdict-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: inline-block; flex: 0 0 auto; margin: 0 2px;
+}
+.phpinfowp-ua-kind {
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  color: #555; background: #eef0f3; border-radius: 3px;
+  padding: 1px 5px; text-transform: uppercase;
+}
+.phpinfowp-ua-new {
+  font-size: 10px; font-weight: 700; letter-spacing: .03em;
+  color: #7a1a1a; background: #fcf0f1; border: 1px solid #f0c6c8;
+  border-radius: 3px; padding: 1px 6px; text-transform: uppercase;
+}
+.phpinfowp-ua-meta {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 8px 0 12px; margin-bottom: 6px;
+  border-bottom: 1px dashed #e2e4e7;
+}
+.phpinfowp-ua-meta-pill {
+  font-size: 12px; color: #50575e;
+  background: #f6f7f7; border: 1px solid #e2e4e7;
+  border-radius: 12px; padding: 2px 10px;
+}
+.phpinfowp-ua-meta-pill.is-bad {
+  color: #7a1a1a; background: #fcf0f1; border-color: #f0c6c8;
+}
+.phpinfowp-ua-meta-pill strong { font-weight: 600; }

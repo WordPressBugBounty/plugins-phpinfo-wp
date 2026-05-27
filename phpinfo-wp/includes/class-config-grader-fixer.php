@@ -21,6 +21,10 @@ class Phpinfo_WP_Config_Grader_Fixer {
     const MARK_RE_BEGIN = '[#;] BEGIN phpinfo-wp-autofix';
     const MARK_RE_END   = '[#;] END phpinfo-wp-autofix';
 
+    // Transient holding the timestamp until which a just-written change is
+    // still "propagating" — see settle_remaining() / detect_overrides().
+    const OPT_SETTLE = 'phpinfowp_autofix_settle_until';
+
     private static function mark_begin(string $mode): string {
         return ($mode === 'htaccess' ? '#' : ';') . ' BEGIN phpinfo-wp-autofix';
     }
@@ -63,11 +67,18 @@ class Phpinfo_WP_Config_Grader_Fixer {
             'session.use_strict_mode'   => ['value' => '1',                 'requires_php_ini' => false],
             'session.cookie_secure'     => ['value' => $is_https ? '1' : '0', 'requires_php_ini' => false],
 
-            // ── Filesystem & misc (new in 7.0.3) ──
-            'realpath_cache_size'       => ['value' => '4096K',             'requires_php_ini' => false],
-            'realpath_cache_ttl'        => ['value' => '600',               'requires_php_ini' => false],
+            // ── Filesystem & misc ──
             'date.timezone'             => ['value' => date_default_timezone_get() ?: 'UTC', 'requires_php_ini' => false],
             'output_buffering'          => ['value' => '4096',              'requires_php_ini' => false],
+
+            // realpath_cache_* are PHP_INI_SYSTEM — settable ONLY in php.ini,
+            // never via .user.ini or .htaccess. Writing them there is silently
+            // ignored, so we surface them as manual instead of "fixing" them
+            // and then flagging our own write as "not taking effect".
+            'realpath_cache_size'       => ['value' => null, 'requires_php_ini' => true,
+                'note' => 'realpath_cache_size must be set in php.ini (PHP_INI_SYSTEM) — it cannot be changed per-directory.'],
+            'realpath_cache_ttl'        => ['value' => null, 'requires_php_ini' => true,
+                'note' => 'realpath_cache_ttl must be set in php.ini (PHP_INI_SYSTEM) — it cannot be changed per-directory.'],
 
             // ── PHP_INI_SYSTEM — cannot be set per-directory ──
             'expose_php'                => ['value' => null, 'requires_php_ini' => true,
@@ -182,11 +193,19 @@ class Phpinfo_WP_Config_Grader_Fixer {
             ];
         }
 
+        // Mark the propagation window. A .user.ini change never affects the
+        // current request and is then cached for user_ini.cache_ttl seconds;
+        // .htaccess applies on the *next* request. Either way, checking
+        // ini_get() right now is guaranteed stale — so we suppress the
+        // override panel until the window passes (see detect_overrides()).
+        self::mark_settle();
+
         // Log to activity log
         self::log_change('autofix applied: ' . implode(', ', array_keys($to_write)));
 
         return [
             'ok'      => true,
+            'settle'  => self::settle_window(),
             'applied' => array_keys($to_write),
             'skipped' => $skipped,
             'mode'    => $mode,
@@ -200,7 +219,38 @@ class Phpinfo_WP_Config_Grader_Fixer {
     // or a host-level lockdown.
     //
     // Returns: [['key', 'expected', 'actual'], ...] — empty if all match.
+    /**
+     * How long after a write the new values can't yet be observed.
+     * .user.ini: the current request never reflects it, and following requests
+     * use the cached parse for user_ini.cache_ttl (default 300s).
+     * .htaccess: applies on the next request — a short gate covers the
+     * same-request post-write render.
+     */
+    public static function settle_window(): int {
+        $t = self::detect_target();
+        if ($t['mode'] === 'userini') {
+            $ttl = (int) ini_get('user_ini.cache_ttl');
+            return ($ttl > 0 ? $ttl : 300) + 15;
+        }
+        return 10;
+    }
+
+    private static function mark_settle(): void {
+        $w = self::settle_window();
+        set_transient(self::OPT_SETTLE, time() + $w, $w + 60);
+    }
+
+    /** Seconds left before a just-applied change can be reliably re-checked. */
+    public static function settle_remaining(): int {
+        $until = (int) get_transient(self::OPT_SETTLE);
+        return $until ? max(0, $until - time()) : 0;
+    }
+
     public static function detect_overrides(): array {
+        // While a write is still propagating, ini_get() is stale by definition —
+        // reporting "not taking effect" here is a false alarm. Stay quiet.
+        if (self::settle_remaining() > 0) return [];
+
         $t = self::detect_target();
         if (!@file_exists($t['file'])) return [];
 
@@ -256,6 +306,7 @@ class Phpinfo_WP_Config_Grader_Fixer {
             @file_put_contents($t['file'], $current);
             return ['ok' => false, 'error' => 'Reverting caused HTTP ' . $verify['code'] . '.'];
         }
+        delete_transient(self::OPT_SETTLE);
         self::log_change('autofix block reverted');
         return ['ok' => true, 'reverted' => true];
     }

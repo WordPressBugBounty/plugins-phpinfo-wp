@@ -50,7 +50,7 @@ $result = Phpinfo_WP_Compat::get_result();
             </select>
         </label>
         <button type="submit" name="phpinfowp_scan" value="1" class="button button-primary">
-            <span class="dashicons dashicons-search" style="vertical-align:middle"></span> Run Scan
+            <span class="dashicons dashicons-search"></span>Run Scan
         </button>
         <?php if ($result): ?>
             <button type="submit" name="phpinfowp_clear" value="1" class="button button-secondary">Clear results</button>

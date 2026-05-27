@@ -88,6 +88,13 @@ class Phpinfo_WP_AI_Explain {
                     'Explain the PHP extension `%s` in the context of a WordPress site. Cover: what it provides, common plugins that need it, and the symptom when it is missing. Use 3–4 short sentences. Plain text, no markdown.',
                     $context
                 );
+            case 'update_break':
+                // $context = API name (e.g. ".live()" or "get_currentuserinfo()"),
+                // $value   = target WordPress version being audited.
+                return sprintf(
+                    'A WordPress plugin or theme calls `%s`, which is flagged when updating to WordPress %s. Explain in 3–4 short sentences: what this API was, why it is deprecated or removed in modern WordPress, the realistic symptom on the site after the update (e.g. JavaScript stops working, PHP notice in the log), and the modern replacement. Plain text, no markdown.',
+                    $context, $value !== '' ? $value : 'a newer version'
+                );
             default:
                 return '';
         }

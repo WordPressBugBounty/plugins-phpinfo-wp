@@ -1,7 +1,19 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'PHP Error Log Viewer',
+        'icon'     => 'dashicons-warning',
+        'tagline'  => 'Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host.',
+        'previews' => [
+            '<strong>[—] PHP Warning:</strong> Undefined variable $foo in /wp-content/…',
+            '<strong>[—] PHP Deprecated:</strong> strpos() expects string …',
+            '<strong>[—] PHP Fatal error:</strong> Allowed memory size exhausted …',
+        ],
+    ]);
+    return;
+}
 
 $message  = '';
 $msg_type = 'success';
@@ -25,7 +37,12 @@ $search = sanitize_text_field($_GET['log_search'] ?? '');
 ?>
 
 <div class="phpinfowp-pro-page">
-    <h1>PHP Error Log <span class="phpinfowp-pro-badge">PRO</span></h1>
+    <div class="phpinfowp-page-header">
+        <div>
+            <h1>PHP Error Log <span class="phpinfowp-pro-badge">PRO</span></h1>
+            <p class="phpinfowp-page-subtitle">Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host.</p>
+        </div>
+    </div>
 
     <?php if ($message): ?>
         <div class="notice notice-<?php echo $msg_type; ?> inline is-dismissible"><p><?php echo esc_html($message); ?></p></div>

@@ -29,19 +29,29 @@ class Phpinfo_WP_Admin_Nav {
         if (self::$cache !== null) return self::$cache;
 
         self::$cache = [
+            'performance' => [
+                'label' => 'Performance',
+                'slug'  => 'phpinfowp-performance',
+                'desc'  => 'Analyze and optimize speed, caching, and database bottlenecks',
+                'tabs'  => [
+                    'phpinfowp-config-grader'    => ['label' => 'Config Grader',     'pro' => false, 'icon' => 'dashicons-chart-bar'],
+                    'phpinfowp-opcache'          => ['label' => 'OPcache',           'pro' => true,  'icon' => 'dashicons-performance'],
+                    'phpinfowp-object-cache'     => ['label' => 'Object Cache',      'pro' => true,  'icon' => 'dashicons-database'],
+                    'phpinfowp-db-health'        => ['label' => 'Database',          'pro' => true,  'icon' => 'dashicons-database'],
+                    'phpinfowp-api-monitor'      => ['label' => 'API Monitor',       'pro' => true,  'icon' => 'dashicons-networking'],
+                ],
+            ],
             'audit' => [
-                'label' => 'Audit',
+                'label' => 'Security & Core',
                 'slug'  => 'phpinfowp-audit',
                 'desc'  => 'Read-only health checks across PHP, config, security, and infrastructure',
                 'tabs'  => [
-                    'phpinfowp-config-grader'    => ['label' => 'Config Grader',     'pro' => false, 'icon' => 'dashicons-chart-bar'],
                     'phpinfowp-eol'              => ['label' => 'PHP EOL',           'pro' => false, 'icon' => 'dashicons-calendar-alt'],
                     'phpinfowp-compat'           => ['label' => 'PHP Compatibility', 'pro' => false, 'icon' => 'dashicons-yes-alt'],
                     'phpinfowp-update-audit'     => ['label' => 'Update Guard',      'pro' => false, 'icon' => 'dashicons-shield'],
+                    'phpinfowp-permissions'      => ['label' => 'Permissions Audit', 'pro' => true,  'icon' => 'dashicons-admin-network'],
                     'phpinfowp-security-headers' => ['label' => 'Security Headers',  'pro' => true,  'icon' => 'dashicons-shield-alt'],
                     'phpinfowp-ssl'              => ['label' => 'SSL Monitor',       'pro' => true,  'icon' => 'dashicons-lock'],
-                    'phpinfowp-opcache'          => ['label' => 'OPcache',           'pro' => true,  'icon' => 'dashicons-performance'],
-                    'phpinfowp-db-health'        => ['label' => 'Database',          'pro' => true,  'icon' => 'dashicons-database'],
                 ],
             ],
             'tools' => [
@@ -51,23 +61,23 @@ class Phpinfo_WP_Admin_Nav {
                 'tabs'  => [
                     'phpinfowp-viewer'     => ['label' => 'phpinfo() Viewer',  'pro' => false, 'icon' => 'dashicons-info'],
                     'phpinfowp-htaccess'   => ['label' => 'PHP Config Editor', 'pro' => false, 'icon' => 'dashicons-editor-code'],
-                    'phpinfowp-extensions' => ['label' => 'Extensions',        'pro' => false, 'icon' => 'dashicons-admin-plugins'],
-                    'phpinfowp-info'       => ['label' => 'Basic Info',        'pro' => false, 'icon' => 'dashicons-clipboard'],
                     'phpinfowp-safemode'   => ['label' => 'Troubleshooting',   'pro' => false, 'icon' => 'dashicons-sos'],
+                    'phpinfowp-info'       => ['label' => 'Basic Info',        'pro' => false, 'icon' => 'dashicons-clipboard'],
+                    'phpinfowp-extensions' => ['label' => 'Extensions',        'pro' => false, 'icon' => 'dashicons-admin-plugins'],
                     'phpinfowp-snapshots'  => ['label' => 'Config Snapshots',  'pro' => true,  'icon' => 'dashicons-camera'],
-                    'phpinfowp-cron'       => ['label' => 'WP-Cron Monitor',   'pro' => true,  'icon' => 'dashicons-clock'],
-                    'phpinfowp-mail'       => ['label' => 'Mail',              'pro' => true,  'icon' => 'dashicons-email-alt'],
-                    'phpinfowp-error-log'  => ['label' => 'Error Log',         'pro' => true,  'icon' => 'dashicons-warning'],
                 ],
             ],
             'reports' => [
-                'label' => 'Reports',
+                'label' => 'Reports & Logs',
                 'slug'  => 'phpinfowp-reports',
-                'desc'  => 'Audit PDFs, change history, and outbound alerts',
+                'desc'  => 'Monitoring tools, logs, and outbound alerts',
                 'tabs'  => [
-                    'phpinfowp-log'    => ['label' => 'Activity Log', 'pro' => false, 'icon' => 'dashicons-list-view'],
-                    'phpinfowp-report' => ['label' => 'Audit Report', 'pro' => true,  'icon' => 'dashicons-media-document'],
-                    'phpinfowp-alerts' => ['label' => 'Alerts',       'pro' => true,  'icon' => 'dashicons-bell'],
+                    'phpinfowp-log'        => ['label' => 'Activity Log',      'pro' => false, 'icon' => 'dashicons-list-view'],
+                    'phpinfowp-report'     => ['label' => 'Audit Report',      'pro' => true,  'icon' => 'dashicons-media-document'],
+                    'phpinfowp-cron'       => ['label' => 'WP-Cron Monitor',   'pro' => true,  'icon' => 'dashicons-clock'],
+                    'phpinfowp-mail'       => ['label' => 'Mail',              'pro' => true,  'icon' => 'dashicons-email-alt'],
+                    'phpinfowp-alerts'     => ['label' => 'Alerts',            'pro' => true,  'icon' => 'dashicons-bell'],
+                    'phpinfowp-error-log'  => ['label' => 'Error Log',         'pro' => true,  'icon' => 'dashicons-warning'],
                 ],
             ],
         ];
@@ -235,7 +245,10 @@ class Phpinfo_WP_Admin_Nav {
             'phpinfowp-security-headers' => 'views/pro/security-headers.php',
             'phpinfowp-ssl'              => 'views/pro/ssl.php',
             'phpinfowp-opcache'          => 'views/pro/opcache.php',
+            'phpinfowp-object-cache'     => 'views/pro/object-cache.php',
             'phpinfowp-db-health'        => 'views/pro/db-health.php',
+            'phpinfowp-api-monitor'      => 'views/pro/api-monitor.php',
+            'phpinfowp-permissions'      => 'views/pro/permissions.php',
             'phpinfowp-htaccess'         => 'views/htaccess.php',
             'phpinfowp-safemode'         => 'views/safemode.php',
             'phpinfowp-viewer'           => 'views/phpinfo.php',

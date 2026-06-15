@@ -2,7 +2,17 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 if (!Phpinfo_WP_License::is_valid()) {
-    require __DIR__ . '/upgrade.php';
+    phpinfowp_render_feature_lock([
+        'feature'  => 'Security Headers Audit',
+        'icon'     => 'dashicons-shield',
+        'tagline'  => 'HTTP response header audit — graded against OWASP recommendations.',
+        'previews' => [
+            'Grade: <strong>—</strong>',
+            'Secure headers: <strong>— / —</strong>',
+            'X-Frame-Options: <strong>—</strong>',
+            'Content-Security-Policy: <strong>—</strong>',
+        ],
+    ]);
     return;
 }
 

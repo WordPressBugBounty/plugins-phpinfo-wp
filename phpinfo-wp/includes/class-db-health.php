@@ -182,4 +182,39 @@ class Phpinfo_WP_DB_Health {
             'tables'  => count($tables),
         ];
     }
+
+    public static function missing_indexes(): array {
+        if (!self::_pro()) return [];
+        global $wpdb;
+        $db = DB_NAME;
+
+        // Find tables with > 500 rows that have ZERO secondary indexes
+        $query = "
+            SELECT t.TABLE_NAME, t.TABLE_ROWS, t.DATA_LENGTH
+            FROM information_schema.TABLES t
+            WHERE t.TABLE_SCHEMA = %s
+              AND t.TABLE_ROWS > 500
+              AND t.TABLE_NAME NOT IN (
+                  SELECT s.TABLE_NAME
+                  FROM information_schema.STATISTICS s
+                  WHERE s.TABLE_SCHEMA = %s AND s.INDEX_NAME != 'PRIMARY'
+              )
+            ORDER BY t.TABLE_ROWS DESC
+        ";
+        
+        return $wpdb->get_results($wpdb->prepare($query, $db, $db), ARRAY_A);
+    }
+
+    public static function check_autoload_index(): bool {
+        if (!self::_pro()) return true;
+        global $wpdb;
+        $has_index = $wpdb->get_var($wpdb->prepare("
+            SELECT COUNT(*)
+            FROM information_schema.STATISTICS
+            WHERE TABLE_SCHEMA = %s
+              AND TABLE_NAME = %s
+              AND INDEX_NAME = 'autoload'
+        ", DB_NAME, $wpdb->options));
+        return (bool) $has_index;
+    }
 }

@@ -122,10 +122,12 @@ class Phpinfo_WP_License {
         delete_option(self::OPT_FAILS);
         delete_option(self::OPT_LOCKED);
 
-        $valid = self::_validate_local($key);
+        // Always ping remote during manual activation to track it in real-time
+        // and enforce site limits immediately.
+        $valid = self::_ping_remote($key);
         if (!$valid) {
-            // Attempt remote as fallback (e.g. clock skew on expiry edge)
-            $valid = self::_ping_remote($key);
+            // Fallback to local check if remote server is unreachable or offline
+            $valid = self::_validate_local($key);
         }
         self::_cache_write($valid);
         return $valid;

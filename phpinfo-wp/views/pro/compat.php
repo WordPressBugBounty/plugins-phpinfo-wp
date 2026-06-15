@@ -99,11 +99,41 @@ $result = Phpinfo_WP_Compat::get_result();
             </div>
         </div>
 
+        <?php 
+        $current_php = phpversion();
+        $is_already_on_target = version_compare($current_php, $result['target'], '>=');
+
+        $total_removed = 0;
+        $total_deprecated = 0;
+        foreach ($issues as $list) {
+            foreach ($list as $issue) {
+                if ($issue['severity'] === 'removed') $total_removed++;
+                else $total_deprecated++;
+            }
+        }
+        ?>
+
         <?php if ($result['total'] === 0): ?>
-            <div class="notice notice-success inline" style="margin:0">
-                <p>No deprecated or removed function calls detected for PHP <?php echo esc_html($result['target']); ?>. You should be safe to upgrade.</p>
+            <div class="notice notice-success inline" style="margin:0 0 24px">
+                <p><strong>Safe to upgrade!</strong> No deprecated or removed function calls were detected for PHP <?php echo esc_html($result['target']); ?>. Your site should continue working normally after the upgrade.</p>
             </div>
         <?php else: ?>
+            <?php if ($is_already_on_target): ?>
+                <div class="notice notice-info inline" style="margin:0 0 24px; border-left-color: #2271b1;">
+                    <p style="font-size: 15px;"><strong>ℹ️ You are already running PHP <?php echo esc_html(explode('-', $current_php)[0]); ?></strong></p>
+                    <p>We found <strong><?php echo $total_removed + $total_deprecated; ?> potential issues</strong> against PHP <?php echo esc_html($result['target']); ?>. However, since your site is currently running fine, these are almost certainly <strong>false positives</strong> (e.g., legacy fallback code that never runs, or function names inside comments). No action is required unless you are experiencing actual errors in your logs.</p>
+                </div>
+            <?php elseif ($total_removed > 0): ?>
+                <div class="notice notice-error inline" style="margin:0 0 24px; border-left-color: #d63638;">
+                    <p style="font-size: 15px;"><strong>🚨 HIGH RISK: Check before upgrading</strong></p>
+                    <p>Your plugins contain <strong><?php echo $total_removed; ?> removed functions</strong>. Removed functions cause <strong>fatal errors</strong> in PHP <?php echo esc_html($result['target']); ?>. Unless these are false positives, your website will likely crash if you upgrade your server right now. Please verify the red items below or update those plugins first.</p>
+                </div>
+            <?php else: ?>
+                <div class="notice notice-warning inline" style="margin:0 0 24px; border-left-color: #dba617;">
+                    <p style="font-size: 15px;"><strong>⚠️ Proceed with Caution</strong></p>
+                    <p>We found <strong><?php echo $total_deprecated; ?> deprecated functions</strong>. If you upgrade to PHP <?php echo esc_html($result['target']); ?>, your site should not crash, but you may see PHP warnings or minor bugs. You should look for updates for the plugins highlighted in yellow below.</p>
+                </div>
+            <?php endif; ?>
 
             <p class="description" style="margin:0 0 16px">
                 Regex-based scan — some matches may be false positives (e.g., function names in comments or strings). Always verify before changing third-party code.

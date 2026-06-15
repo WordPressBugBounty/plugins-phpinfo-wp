@@ -1,7 +1,20 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'SSL Certificate Monitor',
+        'icon'     => 'dashicons-lock',
+        'tagline'  => 'Track certificate expiry for your domain and any additional domains — get alerted before they lapse.',
+        'previews' => [
+            'Issuer: <strong>—</strong>',
+            'Expires: <strong>— days remaining</strong>',
+            'Status: <strong>—</strong>',
+            'Covers: <strong>— domain(s)</strong>',
+        ],
+    ]);
+    return;
+}
 
 $message  = '';
 $msg_type = 'success';
@@ -24,7 +37,12 @@ $any_cached = array_filter($results, function ($r) {
 ?>
 
 <div class="phpinfowp-pro-page">
-    <h1>SSL Certificate Monitor <span class="phpinfowp-pro-badge">PRO</span></h1>
+    <div class="phpinfowp-page-header">
+        <div>
+            <h1>SSL Certificate Monitor <span class="phpinfowp-pro-badge">PRO</span></h1>
+            <p class="phpinfowp-page-subtitle">Monitor SSL validity, expiration dates, and domain name mismatches.</p>
+        </div>
+    </div>
 
     <?php if ($message): ?>
         <div class="notice notice-<?php echo $msg_type; ?> inline is-dismissible">

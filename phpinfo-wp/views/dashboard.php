@@ -2,38 +2,67 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 $is_pro    = Phpinfo_WP_License::is_valid();
-$eol       = Phpinfo_WP_EOL::status();
 $grader    = Phpinfo_WP_Config_Grader::summary();
 $bar       = Phpinfo_WP_Admin_Bar::status();
 
+// Fetch new stats for visual dashboard
+$api_stats = class_exists('Phpinfo_WP_API_Monitor') ? Phpinfo_WP_API_Monitor::get_stats() : [];
+if (!is_array($api_stats)) $api_stats = [];
+$db_stats  = class_exists('Phpinfo_WP_DB_Health') ? Phpinfo_WP_DB_Health::autoload_size() : ['total_kb' => 0];
+if (!is_array($db_stats)) $db_stats = ['total_kb' => 0];
+
 $grade        = $grader['grade'];
 $score        = $grader['score'];
-$crit         = $bar['crit_count'] ?? 0;
-$warn         = $bar['warn_count'] ?? 0;
-$overall      = $bar['overall'] ?? 'good';
 $mem          = $bar['memory'] ?? ['peak_bytes' => 0, 'limit_label' => ini_get('memory_limit'), 'pct' => 0];
 
-switch ($overall) {
-    case 'critical':
-        $overall_color = '#d63638';
-        break;
-    case 'warning':
-        $overall_color = '#dba617';
-        break;
-    default:
-        $overall_color = '#00a32a';
-        break;
+// Calculate Donut Chart (Memory)
+$mem_pct = $mem['pct'];
+$mem_color = $mem_pct > 85 ? '#d63638' : ($mem_pct > 65 ? '#dba617' : '#00a32a');
+$dasharray = $mem_pct . ' ' . (100 - $mem_pct);
+
+// Calculate API Chart
+$slowest_apis = [];
+foreach ($api_stats as $host => $data) {
+    $slowest_apis[$host] = $data['max_time'];
 }
-switch ($overall) {
-    case 'critical':
-        $overall_label = 'Needs attention';
-        break;
-    case 'warning':
-        $overall_label = 'Watch list';
-        break;
-    default:
-        $overall_label = 'Healthy';
-        break;
+arsort($slowest_apis);
+$top_apis = array_slice($slowest_apis, 0, 3, true);
+
+// Calculate DB Autoload Bar
+$db_bytes = $db_stats['bytes'] ?? 0;
+$db_kb = round($db_bytes / 1024, 1);
+// 800KB is danger zone. Max scale is 1200KB.
+$db_pct = min(100, ($db_kb / 1200) * 100);
+$db_color = $db_kb > 800 ? '#d63638' : ($db_kb > 400 ? '#dba617' : '#00a32a');
+
+// Config Grade Bar
+$grade_pct = $score;
+$grade_color = $score < 60 ? '#d63638' : ($score < 80 ? '#dba617' : '#00a32a');
+
+// Fetch the current nav arrays
+$nav_cache = Phpinfo_WP_Admin_Nav::groups();
+
+if (!function_exists('render_dash_grid')) {
+    function render_dash_grid($group_id, $nav_cache, $is_pro) {
+        if (!isset($nav_cache[$group_id])) return;
+        $group = $nav_cache[$group_id];
+        echo '<div class="phpinfowp-dash-section">';
+        echo '<h2 class="phpinfowp-dash-section-title">' . esc_html($group['label']) . '</h2>';
+        echo '<div class="phpinfowp-dash-grid">';
+        foreach ($group['tabs'] as $slug => $tab) {
+            $locked = $tab['pro'] && !$is_pro;
+            echo '<a href="' . esc_url(admin_url('admin.php?page=' . $slug)) . '" class="phpinfowp-dash-card' . ($locked ? ' is-locked' : '') . '">';
+            echo '<span class="dashicons ' . esc_attr($tab['icon']) . '"></span>';
+            echo '<div class="phpinfowp-dash-card-title">';
+            echo esc_html($tab['label']);
+            if ($tab['pro']) {
+                echo '<span class="phpinfowp-dash-card-pro">PRO</span>';
+            }
+            echo '</div>';
+            echo '</a>';
+        }
+        echo '</div></div>';
+    }
 }
 ?>
 
@@ -42,71 +71,102 @@ switch ($overall) {
     <div class="phpinfowp-page-header">
         <div>
             <h1>Dashboard</h1>
-            <p class="phpinfowp-page-subtitle">A live snapshot of your site's PHP health, configuration, and server posture</p>
+            <p class="phpinfowp-page-subtitle">Visual health overview and system shortcuts</p>
         </div>
     </div>
 
-    <!-- Top stat row: Grade · Overall · Memory · PHP version -->
-    <div class="phpinfowp-dash-stats">
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-config-grader')); ?>" class="phpinfowp-dash-stat">
-            <div class="phpinfowp-dash-stat-label">Config Grade</div>
-            <div class="phpinfowp-dash-stat-value grade-<?php echo esc_attr(strtolower(str_replace('+', 'plus', $grade))); ?>">
-                <?php echo esc_html($grade); ?>
-            </div>
-            <div class="phpinfowp-dash-stat-meta"><?php echo (int) $score; ?>/100</div>
-        </a>
+    <!-- VISUAL INSIGHTS WIDGETS -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-bottom:32px;">
 
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-audit')); ?>" class="phpinfowp-dash-stat">
-            <div class="phpinfowp-dash-stat-label">Overall</div>
-            <div class="phpinfowp-dash-stat-value" style="color:<?php echo $overall_color; ?>;font-size:22px;line-height:1.2;padding-top:8px">
-                <?php echo esc_html($overall_label); ?>
+        <!-- 1. Config Grader Gauge -->
+        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-config-grader')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;">Setup Optimization</h3>
+                <div style="font-size:32px; font-weight:300; line-height:1; margin-bottom:8px; color:#1d2327;">
+                    <?php echo (int)$score; ?> <span style="font-size:16px; color:#888;">/ 100</span>
+                </div>
             </div>
-            <div class="phpinfowp-dash-stat-meta">
-                <?php if ($crit || $warn): ?>
-                    <?php if ($crit): ?><strong style="color:#d63638"><?php echo $crit; ?> critical</strong><?php endif; ?>
-                    <?php if ($crit && $warn) echo ' · '; ?>
-                    <?php if ($warn): ?><strong style="color:#dba617"><?php echo $warn; ?> warning<?php echo $warn === 1 ? '' : 's'; ?></strong><?php endif; ?>
-                <?php else: ?>
-                    No active issues
-                <?php endif; ?>
+            <div>
+                <div style="width:100%; height:8px; background:#f0f0f1; border-radius:4px; overflow:hidden; margin-bottom:6px;">
+                    <div style="height:100%; width:<?php echo $grade_pct; ?>%; background:<?php echo $grade_color; ?>; border-radius:4px;"></div>
+                </div>
+                <div style="font-size:12px; color:#777;">
+                    Current Grade: <strong class="grade-<?php echo esc_attr(strtolower(str_replace('+', 'plus', $grade))); ?>"><?php echo esc_html($grade); ?></strong>
+                </div>
             </div>
         </a>
 
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-eol')); ?>" class="phpinfowp-dash-stat">
-            <div class="phpinfowp-dash-stat-label">PHP Version</div>
-            <div class="phpinfowp-dash-stat-value" style="font-size:22px;line-height:1.2;padding-top:8px">
-                <?php echo esc_html(PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION); ?>
+        <!-- 2. Memory Donut Chart -->
+        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-info')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <h3 style="margin:0 0 8px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;">Memory Peak</h3>
+                <div style="font-size:24px; font-weight:300; line-height:1.2; margin-bottom:4px; color:#1d2327;">
+                    <?php echo esc_html(size_format($mem['peak_bytes'] > 0 ? $mem['peak_bytes'] : memory_get_usage(true))); ?>
+                </div>
+                <div style="font-size:12px; color:#777;">
+                    Limit: <?php echo esc_html($mem['limit_label']); ?>
+                </div>
             </div>
-            <div class="phpinfowp-dash-stat-meta">
-                <?php if ($eol['status'] === 'eol'): ?>
-                    <strong style="color:#d63638">EOL <?php echo esc_html($eol['eol']); ?></strong>
-                <?php elseif ($eol['status'] === 'warning'): ?>
-                    <strong style="color:#dba617">EOL <?php echo (int) $eol['days']; ?>d</strong>
-                <?php else: ?>
-                    Supported<?php if (!empty($eol['eol'])): ?> until <?php echo esc_html($eol['eol']); ?><?php endif; ?>
-                <?php endif; ?>
+            <svg width="80" height="80" viewBox="0 0 36 36" style="display:block;">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f0f0f1" stroke-width="4"/>
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="<?php echo $mem_color; ?>" stroke-width="4" stroke-dasharray="<?php echo $dasharray; ?>" />
+                <text x="18" y="20.5" font-family="sans-serif" font-size="9" font-weight="bold" fill="#555" text-anchor="middle"><?php echo $mem_pct; ?>%</text>
+            </svg>
+        </a>
+
+        <!-- 3. DB Autoload Progress -->
+        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-db-health')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;">Autoload Bloat</h3>
+                <div style="font-size:24px; font-weight:300; line-height:1; margin-bottom:8px; color:<?php echo $db_color; ?>;">
+                    <?php echo $db_kb; ?> <span style="font-size:16px; color:#888;">KB</span>
+                </div>
+            </div>
+            <div>
+                <div style="width:100%; height:8px; background:#f0f0f1; border-radius:4px; overflow:hidden; margin-bottom:6px;">
+                    <div style="height:100%; width:<?php echo $db_pct; ?>%; background:<?php echo $db_color; ?>; border-radius:4px;"></div>
+                </div>
+                <div style="font-size:12px; color:#777;">
+                    <?php echo $db_kb > 800 ? 'Danger: High TTFB Impact' : 'Healthy footprint'; ?>
+                </div>
             </div>
         </a>
 
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-info')); ?>" class="phpinfowp-dash-stat">
-            <div class="phpinfowp-dash-stat-label">Memory peak today</div>
-            <div class="phpinfowp-dash-stat-value" style="font-size:22px;line-height:1.2;padding-top:8px">
-                <?php
-                if ($mem['peak_bytes'] > 0) {
-                    echo esc_html(size_format($mem['peak_bytes']));
-                } else {
-                    echo esc_html(size_format(memory_get_usage(true)));
-                }
-                ?>
-            </div>
-            <div class="phpinfowp-dash-stat-meta">of <?php echo esc_html($mem['limit_label']); ?><?php if ($mem['pct'] > 0): ?> · <?php echo (int) $mem['pct']; ?>%<?php endif; ?></div>
+        <!-- 4. API Monitor Bar Chart -->
+        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-api-monitor')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column;">
+            <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;">Slowest External APIs</h3>
+            <?php if (empty($top_apis)): ?>
+                <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#888; font-size:13px; font-style:italic;">
+                    No slow API calls detected
+                </div>
+            <?php else: ?>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:space-around;">
+                    <?php 
+                    $max_t = max(2.0, max($top_apis)); // base scale on 2.0s or highest
+                    foreach($top_apis as $host => $time): 
+                        $w = min(100, ($time / $max_t) * 100);
+                        $c = $time > 2.0 ? '#d63638' : ($time > 1.0 ? '#dba617' : '#00a32a');
+                    ?>
+                        <div style="margin-bottom:6px;">
+                            <div style="display:flex; justify-content:space-between; font-size:11px; color:#555; margin-bottom:2px;">
+                                <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70%;"><?php echo esc_html($host); ?></span>
+                                <strong><?php echo number_format($time, 1); ?>s</strong>
+                            </div>
+                            <div style="width:100%; height:4px; background:#f0f0f1; border-radius:2px;">
+                                <div style="height:100%; width:<?php echo $w; ?>%; background:<?php echo $c; ?>; border-radius:2px;"></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </a>
+
     </div>
 
     <!-- Active issues panel -->
     <?php if (!empty($bar['issues'])): ?>
     <div class="phpinfowp-dash-section">
-        <h2 class="phpinfowp-dash-section-title">Active issues</h2>
+        <h2 class="phpinfowp-dash-section-title">Active Issues</h2>
         <div class="phpinfowp-dash-issues">
             <?php foreach ($bar['issues'] as $issue):
                 $c = $issue['level'] === 'critical' ? '#d63638' : '#dba617';
@@ -121,86 +181,24 @@ switch ($overall) {
     </div>
     <?php endif; ?>
 
-    <!-- Feature shortcuts grid — the "storefront" -->
-    <div class="phpinfowp-dash-section">
-        <h2 class="phpinfowp-dash-section-title">Audit</h2>
-        <div class="phpinfowp-dash-grid">
-            <?php
-            $audit_cards = [
-                ['slug' => 'phpinfowp-config-grader',    'icon' => 'dashicons-chart-bar',      'title' => 'Config Grader',     'desc' => 'A–F score for your PHP config + one-click fixes',  'pro' => false],
-                ['slug' => 'phpinfowp-eol',              'icon' => 'dashicons-calendar-alt',   'title' => 'PHP EOL Timeline',  'desc' => 'End-of-life dates for every PHP version',          'pro' => false],
-                ['slug' => 'phpinfowp-compat',           'icon' => 'dashicons-search',         'title' => 'PHP Compatibility', 'desc' => 'Scan plugins/themes before a PHP upgrade',         'pro' => false],
-                ['slug' => 'phpinfowp-update-audit',     'icon' => 'dashicons-shield',         'title' => 'Update Guard',      'desc' => 'Predict what breaks before a WordPress core update', 'pro' => false],
-                ['slug' => 'phpinfowp-security-headers', 'icon' => 'dashicons-shield',         'title' => 'Security Headers',  'desc' => 'CSP, HSTS, X-Frame-Options graded',                'pro' => true],
-                ['slug' => 'phpinfowp-ssl',              'icon' => 'dashicons-lock',           'title' => 'SSL Monitor',       'desc' => 'Cert expiry tracking for your site + domains',     'pro' => true],
-                ['slug' => 'phpinfowp-opcache',          'icon' => 'dashicons-performance',    'title' => 'OPcache',           'desc' => 'Hit rate, memory, cached scripts',                 'pro' => true],
-                ['slug' => 'phpinfowp-db-health',        'icon' => 'dashicons-database',       'title' => 'Database Health',   'desc' => 'Engine version, EOL, size, autoload bloat',        'pro' => true],
-            ];
-            foreach ($audit_cards as $card):
-                $locked = $card['pro'] && !$is_pro;
-            ?>
-            <a href="<?php echo esc_url(admin_url('admin.php?page=' . $card['slug'])); ?>" class="phpinfowp-dash-card<?php echo $locked ? ' is-locked' : ''; ?>">
-                <span class="dashicons <?php echo $card['icon']; ?>"></span>
-                <div class="phpinfowp-dash-card-title">
-                    <?php echo esc_html($card['title']); ?>
-                    <?php if ($card['pro']): ?><span class="phpinfowp-dash-card-pro">PRO</span><?php endif; ?>
-                </div>
-                <div class="phpinfowp-dash-card-desc"><?php echo esc_html($card['desc']); ?></div>
-            </a>
-            <?php endforeach; ?>
-        </div>
-    </div>
+    <!-- Nav Grids -->
+    <?php 
+    render_dash_grid('performance', $nav_cache, $is_pro);
+    render_dash_grid('audit', $nav_cache, $is_pro);
+    render_dash_grid('tools', $nav_cache, $is_pro);
+    render_dash_grid('reports', $nav_cache, $is_pro);
+    ?>
 
-    <div class="phpinfowp-dash-section">
-        <h2 class="phpinfowp-dash-section-title">Tools</h2>
-        <div class="phpinfowp-dash-grid">
-            <?php
-            $tool_cards = [
-                ['slug' => 'phpinfowp-viewer',     'icon' => 'dashicons-text-page',    'title' => 'phpinfo() Viewer',  'desc' => 'Clean, searchable phpinfo output',                 'pro' => false],
-                ['slug' => 'phpinfowp-htaccess',   'icon' => 'dashicons-edit',         'title' => 'PHP Config Editor', 'desc' => 'Set php.ini directives via .htaccess / .user.ini', 'pro' => false],
-                ['slug' => 'phpinfowp-safemode',   'icon' => 'dashicons-shield-alt',   'title' => 'Troubleshooting',   'desc' => 'Per-user safe-mode that cannot break your site',   'pro' => false],
-                ['slug' => 'phpinfowp-snapshots',  'icon' => 'dashicons-backup',       'title' => 'Config Snapshots',  'desc' => 'Weekly config snapshots with visual diffs',        'pro' => true],
-                ['slug' => 'phpinfowp-cron',       'icon' => 'dashicons-clock',        'title' => 'WP-Cron Monitor',   'desc' => 'Overdue, orphan, and recently-run events',         'pro' => true],
-                ['slug' => 'phpinfowp-error-log',  'icon' => 'dashicons-warning',      'title' => 'Error Log',         'desc' => 'Browse and filter the PHP error log',              'pro' => true],
-                ['slug' => 'phpinfowp-mail',       'icon' => 'dashicons-email',        'title' => 'Mail Deliverability','desc' => 'Send test, SPF/DKIM lookup',                       'pro' => true],
-            ];
-            foreach ($tool_cards as $card):
-                $locked = $card['pro'] && !$is_pro;
-            ?>
-            <a href="<?php echo esc_url(admin_url('admin.php?page=' . $card['slug'])); ?>" class="phpinfowp-dash-card<?php echo $locked ? ' is-locked' : ''; ?>">
-                <span class="dashicons <?php echo $card['icon']; ?>"></span>
-                <div class="phpinfowp-dash-card-title">
-                    <?php echo esc_html($card['title']); ?>
-                    <?php if ($card['pro']): ?><span class="phpinfowp-dash-card-pro">PRO</span><?php endif; ?>
-                </div>
-                <div class="phpinfowp-dash-card-desc"><?php echo esc_html($card['desc']); ?></div>
-            </a>
-            <?php endforeach; ?>
-        </div>
+    <?php if (!$is_pro): ?>
+    <div style="margin-top:24px;padding:14px 16px;background:#f6f7f7;border:1px solid #e5e7ea;border-radius:4px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:13px;color:#555;">
+            🔒 Running <strong>Pro features</strong> in preview mode.
+        </span>
+        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener"
+           style="background:#777BB3;color:#fff;padding:6px 14px;border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;">
+            Unlock full access →
+        </a>
     </div>
-
-    <div class="phpinfowp-dash-section">
-        <h2 class="phpinfowp-dash-section-title">Reports</h2>
-        <div class="phpinfowp-dash-grid">
-            <?php
-            $report_cards = [
-                ['slug' => 'phpinfowp-log',    'icon' => 'dashicons-list-view',    'title' => 'Activity Log',  'desc' => 'Every config change tracked over time',         'pro' => false],
-                ['slug' => 'phpinfowp-report', 'icon' => 'dashicons-media-document','title' => 'Audit Report', 'desc' => 'White-label single-page PDF for clients',       'pro' => true],
-                ['slug' => 'phpinfowp-alerts', 'icon' => 'dashicons-bell',         'title' => 'Alerts',        'desc' => 'Email + Slack/Discord on PHP EOL, SSL, OPcache','pro' => true],
-            ];
-            foreach ($report_cards as $card):
-                $locked = $card['pro'] && !$is_pro;
-            ?>
-            <a href="<?php echo esc_url(admin_url('admin.php?page=' . $card['slug'])); ?>" class="phpinfowp-dash-card<?php echo $locked ? ' is-locked' : ''; ?>">
-                <span class="dashicons <?php echo $card['icon']; ?>"></span>
-                <div class="phpinfowp-dash-card-title">
-                    <?php echo esc_html($card['title']); ?>
-                    <?php if ($card['pro']): ?><span class="phpinfowp-dash-card-pro">PRO</span><?php endif; ?>
-                </div>
-                <div class="phpinfowp-dash-card-desc"><?php echo esc_html($card['desc']); ?></div>
-            </a>
-            <?php endforeach; ?>
-        </div>
-    </div>
+    <?php endif; ?>
 
 </div>

@@ -1,7 +1,20 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'Database Health',
+        'icon'     => 'dashicons-database',
+        'tagline'  => 'MySQL/MariaDB version, EOL status, total database size, and autoload bloat that slows TTFB.',
+        'previews' => [
+            'Engine: <strong>—</strong>',
+            'DB size: <strong>— MB</strong>',
+            'Autoload: <strong>— KB</strong>',
+            'EOL status: <strong>—</strong>',
+        ],
+    ]);
+    return;
+}
 
 if (isset($_POST['phpinfowp_purge_transients']) && check_admin_referer('phpinfowp_db_nonce')) {
     $n = Phpinfo_WP_DB_Health::purge_expired_transients();
@@ -13,6 +26,8 @@ $autoload  = Phpinfo_WP_DB_Health::autoload_size();
 $transients= Phpinfo_WP_DB_Health::transients();
 $tables    = Phpinfo_WP_DB_Health::tables();
 $db_size   = Phpinfo_WP_DB_Health::db_size();
+$missing_idx = Phpinfo_WP_DB_Health::missing_indexes();
+$has_autoload_idx = Phpinfo_WP_DB_Health::check_autoload_index();
 
 $status_color = ['ok' => '#00a32a', 'warning' => '#dba617', 'fail' => '#d63638', 'eol' => '#d63638', 'unknown' => '#888'];
 $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL', 'eol' => 'END OF LIFE', 'unknown' => 'UNKNOWN'];
@@ -22,8 +37,8 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Database Health <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">MySQL/MariaDB version, autoload bloat, transients, and table size</p>
+            <h1>Advanced DB Health & Schema Analyzer <span class="phpinfowp-pro-badge">PRO</span></h1>
+            <p class="phpinfowp-page-subtitle">Analyze MySQL/MariaDB version, structural schema issues, and TTFB-killing autoload bloat.</p>
         </div>
     </div>
 
@@ -109,36 +124,121 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
         </form>
     <?php endif; ?>
 
-    <!-- Top autoload options -->
+    <!-- Autoload Bloat Visualizer -->
     <?php if ($autoload['top']): ?>
-        <h2 class="phpinfowp-section-heading">Top Autoload Options</h2>
-        <p class="description" style="margin:0 0 12px">
-            Options with <code>autoload=yes</code> load on every page request. Large autoloaded values slow the entire admin and front-end.
+        <h2 class="phpinfowp-section-heading" style="margin-top:40px; display:flex; align-items:center; gap:8px;">
+            <span class="dashicons dashicons-database" style="color:#007cba;"></span> Autoload Bloat Visualizer
+        </h2>
+        <p class="description" style="margin:0 0 16px; max-width:800px;">
+            Options with <code>autoload=yes</code> are loaded into PHP RAM on <strong>every single page request</strong>. Massive strings (like old transient data, bloated theme settings, or heavy cron schedules) are silent TTFB killers.
         </p>
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
-                <tr>
-                    <th style="width:60%">Option name</th>
-                    <th style="width:20%">Size</th>
-                    <th style="width:20%">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($autoload['top'] as $opt):
-                    $opt_color = $opt->size > 102400 ? '#d63638' : ($opt->size > 10240 ? '#dba617' : '#555');
-                ?>
+        
+        <?php if ($autoload['bytes'] > 1048576): ?>
+            <div class="notice notice-warning inline" style="margin-bottom:20px; border-left-color:#d63638;">
+                <p><strong>Warning: High Autoload Size!</strong> You are loading <?php echo size_format($autoload['bytes']); ?> of options data on every page load. WordPress recommends keeping this under 1 MB.</p>
+            </div>
+        <?php endif; ?>
+
+        <div style="background:#fff; border:1px solid #ccd0d4; border-radius:4px; overflow:hidden; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
+            <table class="wp-list-table widefat striped" style="border:none; margin:0;">
+                <thead>
                     <tr>
-                        <td><code><?php echo esc_html($opt->option_name); ?></code></td>
-                        <td style="color:<?php echo $opt_color; ?>;font-weight:600"><?php echo size_format((int)$opt->size); ?></td>
-                        <td>
-                            <?php if ($opt->size > 10240): ?>
-                                <span style="font-size:11px;color:#666">Consider <code>autoload=no</code></span>
-                            <?php endif; ?>
-                        </td>
+                        <th style="width:50%; padding-left:16px;">Option Name</th>
+                        <th style="width:25%">Memory Footprint</th>
+                        <th style="width:25%">Recommendation</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($autoload['top'] as $opt):
+                        // Flag anything over 500KB as critical, over 100KB as warning
+                        $is_critical = $opt->size > 512000;
+                        $is_warning = $opt->size > 102400;
+                        $opt_color = $is_critical ? '#d63638' : ($is_warning ? '#dba617' : '#555');
+                    ?>
+                        <tr>
+                            <td style="padding-left:16px;">
+                                <code><?php echo esc_html($opt->option_name); ?></code>
+                                <?php if (strpos($opt->option_name, '_transient_') === 0): ?>
+                                    <span style="display:inline-block; margin-left:8px; padding:1px 6px; background:#e5e5e5; border-radius:3px; font-size:10px; color:#555;">Transient</span>
+                                <?php endif; ?>
+                            </td>
+                            <td style="color:<?php echo $opt_color; ?>; font-weight:600; font-size:14px;">
+                                <?php echo size_format((int)$opt->size); ?>
+                            </td>
+                            <td>
+                                <?php if ($is_critical): ?>
+                                    <span style="color:#d63638; font-weight:600; font-size:12px;">TTFB KILLER</span>
+                                    <div style="font-size:11px; color:#666; margin-top:2px;">Must delete or set autoload=no</div>
+                                <?php elseif ($is_warning): ?>
+                                    <span style="color:#dba617; font-weight:600; font-size:12px;">BLOAT</span>
+                                    <div style="font-size:11px; color:#666; margin-top:2px;">Consider autoload=no</div>
+                                <?php else: ?>
+                                    <span style="color:#00a32a; font-size:12px;">Normal</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+
+    <!-- Missing Index Scanner -->
+    <h2 class="phpinfowp-section-heading" style="margin-top:40px; display:flex; align-items:center; gap:8px;">
+        <span class="dashicons dashicons-search" style="color:#d63638;"></span> Missing Index Scanner
+    </h2>
+    <p class="description" style="margin:0 0 16px; max-width:800px;">
+        Analyzes your database schema to find custom tables (often created by poorly coded plugins) that are missing critical MySQL indexes. Queries against these tables trigger <strong>full table scans</strong>, destroying database performance.
+    </p>
+
+    <?php if (!$has_autoload_idx): ?>
+        <div class="notice notice-error inline" style="margin-bottom:20px;">
+            <p><strong>CRITICAL:</strong> Your <code><?php global $wpdb; echo $wpdb->options; ?></code> table is missing the <code>autoload</code> index! This is a known issue on older WordPress installs and severely impacts performance. You must manually add it via phpMyAdmin or WP-CLI.</p>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!$missing_idx): ?>
+        <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:16px; border-radius:4px; display:flex; align-items:center; gap:12px;">
+            <span class="dashicons dashicons-yes-alt" style="color:#00a32a; font-size:24px; width:24px; height:24px;"></span>
+            <div>
+                <strong style="color:#1b5e20;">Schema Optimized</strong>
+                <p style="margin:4px 0 0; color:#2e7d32; font-size:13px;">No large tables are missing secondary indexes.</p>
+            </div>
+        </div>
+    <?php else: ?>
+        <div style="background:#fff; border:1px solid #ccd0d4; border-radius:4px; overflow:hidden; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
+            <table class="wp-list-table widefat striped" style="border:none; margin:0;">
+                <thead>
+                    <tr>
+                        <th style="width:40%; padding-left:16px;">Table Name</th>
+                        <th style="width:20%">Rows (Approx)</th>
+                        <th style="width:20%">Data Size</th>
+                        <th style="width:20%">Risk Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($missing_idx as $idx):
+                        $rows = (int) $idx['TABLE_ROWS'];
+                        $risk = $rows > 50000 ? 'Critical' : ($rows > 10000 ? 'High' : 'Medium');
+                        $risk_color = $rows > 50000 ? '#d63638' : ($rows > 10000 ? '#dba617' : '#555');
+                    ?>
+                        <tr>
+                            <td style="padding-left:16px;"><code><?php echo esc_html($idx['TABLE_NAME']); ?></code></td>
+                            <td style="font-weight:600;"><?php echo number_format($rows); ?></td>
+                            <td><?php echo size_format($idx['DATA_LENGTH']); ?></td>
+                            <td>
+                                <span style="display:inline-block; background:<?php echo $risk_color; ?>; color:#fff; font-size:11px; font-weight:700; padding:2px 8px; border-radius:12px; letter-spacing:0.3px;">
+                                    <?php echo $risk; ?>
+                                </span>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <p class="description" style="margin-top:12px; font-size:12px;">
+            These tables have > 500 rows but absolutely zero secondary indexes. Consider reporting this to the plugin developer, or creating indexes manually if you know which columns are queried frequently.
+        </p>
     <?php endif; ?>
 
     <!-- All tables -->

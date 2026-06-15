@@ -10,100 +10,47 @@ class Phpinfo_WP_Compat {
 
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
-    // Free vs Pro split: scan engine is FREE (capture market). Pro gates the
-    // pre-update interception, scheduled scans, and email alerts on new issues.
     const FREE_MAX_FILES = 1500;
 
+    // We now use a token-based rule engine.
+    // 'func_exact' maps exact function names to rules.
+    // 'func_prefix' maps prefixes.
+    // 'special' maps other PHP tokens.
     private static function rules(): array {
         return [
-            // ---- Removed in PHP 7.0 ----
-            ['pattern' => '/\bmysql_(connect|query|fetch_array|fetch_assoc|fetch_row|num_rows|real_escape_string|close|select_db|pconnect|free_result|insert_id|error|errno|escape_string|result|fetch_object|num_fields|set_charset|unbuffered_query)\s*\(/i',
-             'name' => 'mysql_*()', 'in' => '5.5', 'out' => '7.0', 'severity' => 'removed',
-             'fix' => 'Use mysqli_* or PDO'],
-            ['pattern' => '/\b(ereg|eregi|ereg_replace|eregi_replace)\s*\(/',
-             'name' => 'ereg_*()', 'in' => '5.3', 'out' => '7.0', 'severity' => 'removed',
-             'fix' => 'Use preg_* equivalents'],
-            ['pattern' => '/\bsplit\s*\(/',
-             'name' => 'split()', 'in' => '5.3', 'out' => '7.0', 'severity' => 'removed',
-             'fix' => 'Use preg_split() or explode()'],
-            ['pattern' => '/\bsql_regcase\s*\(/',
-             'name' => 'sql_regcase()', 'in' => '5.3', 'out' => '7.0', 'severity' => 'removed',
-             'fix' => 'No replacement — build the pattern manually'],
-
-            // ---- Removed in PHP 7.2 ----
-            ['pattern' => '/\bmcrypt_(encrypt|decrypt|create_iv|get_iv_size|get_block_size|get_key_size|module_open|module_close|generic|generic_init|generic_deinit|list_algorithms|list_modes)\s*\(/',
-             'name' => 'mcrypt_*()', 'in' => '7.1', 'out' => '7.2', 'severity' => 'removed',
-             'fix' => 'Use openssl_encrypt/decrypt or sodium_crypto_*'],
-
-            // ---- Removed in PHP 8.0 ----
-            ['pattern' => '/\bcreate_function\s*\(/',
-             'name' => 'create_function()', 'in' => '7.2', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Use anonymous functions (closures)'],
-            ['pattern' => '/\beach\s*\(\s*\$/',
-             'name' => 'each()', 'in' => '7.2', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Use foreach()'],
-            ['pattern' => '/\bget_magic_quotes_(gpc|runtime)\s*\(/',
-             'name' => 'get_magic_quotes_*()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Always returns false in 7.4+; remove the call'],
-            ['pattern' => '/\bmoney_format\s*\(/',
-             'name' => 'money_format()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Use NumberFormatter from the intl extension'],
-            ['pattern' => '/\bimage2wbmp\s*\(/',
-             'name' => 'image2wbmp()', 'in' => '7.3', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Use imagewbmp()'],
-            ['pattern' => '/\bconvert_cyr_string\s*\(/',
-             'name' => 'convert_cyr_string()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Use iconv() or mb_convert_encoding()'],
-            ['pattern' => '/\bhebrevc\s*\(/',
-             'name' => 'hebrevc()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Use hebrev() + nl2br()'],
-            ['pattern' => '/\(\s*real\s*\)\s*\$/',
-             'name' => '(real) cast', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Use (float) instead'],
-            ['pattern' => '/\bis_real\s*\(/',
-             'name' => 'is_real()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Use is_float()'],
-            ['pattern' => '/\brestore_include_path\s*\(\s*\$/',
-             'name' => 'restore_include_path() with args', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed',
-             'fix' => 'Call with no arguments'],
-
-            // ---- Deprecated in PHP 8.1 ----
-            ['pattern' => '/\bstrftime\s*\(/',
-             'name' => 'strftime()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use IntlDateFormatter::format() or date_format()'],
-            ['pattern' => '/\bgmstrftime\s*\(/',
-             'name' => 'gmstrftime()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use IntlDateFormatter with UTC timezone'],
-            ['pattern' => '/\bdate_sun(rise|set)\s*\(/',
-             'name' => 'date_sunrise()/date_sunset()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use date_sun_info()'],
-            ['pattern' => '/\bmhash(_(keygen_s2k|count|get_block_size|get_hash_name))?\s*\(/',
-             'name' => 'mhash_*()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use hash_* functions'],
-
-            // ---- Deprecated in PHP 8.2 ----
-            ['pattern' => '/\butf8_encode\s*\(/',
-             'name' => 'utf8_encode()', 'in' => '8.2', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use mb_convert_encoding($s, "UTF-8", "ISO-8859-1")'],
-            ['pattern' => '/\butf8_decode\s*\(/',
-             'name' => 'utf8_decode()', 'in' => '8.2', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use mb_convert_encoding($s, "ISO-8859-1", "UTF-8")'],
-            ['pattern' => '/"[^"]*\$\{[a-zA-Z_]/',
-             'name' => '${var} string interpolation', 'in' => '8.2', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use {$var} syntax'],
-
-            // ---- Deprecated in PHP 8.3 ----
-            ['pattern' => '/\bget_class\s*\(\s*\)/',
-             'name' => 'get_class() with no args', 'in' => '8.3', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use get_class($this) or self::class'],
-            ['pattern' => '/\bget_parent_class\s*\(\s*\)/',
-             'name' => 'get_parent_class() with no args', 'in' => '8.3', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use get_parent_class($this) or parent::class'],
-
-            // ---- Always-flag risks ----
-            ['pattern' => '/<\?(?!php|=|xml)/',
-             'name' => 'Short open tag <?', 'in' => '7.4', 'out' => null, 'severity' => 'deprecated',
-             'fix' => 'Use <?php — short_open_tag may be off'],
+            'func_exact' => [
+                'split'                => ['name' => 'split()', 'in' => '5.3', 'out' => '7.0', 'severity' => 'removed', 'fix' => 'Use preg_split() or explode()'],
+                'sql_regcase'          => ['name' => 'sql_regcase()', 'in' => '5.3', 'out' => '7.0', 'severity' => 'removed', 'fix' => 'No replacement — build the pattern manually'],
+                'create_function'      => ['name' => 'create_function()', 'in' => '7.2', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Use anonymous functions (closures)'],
+                'each'                 => ['name' => 'each()', 'in' => '7.2', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Use foreach()'],
+                'get_magic_quotes_gpc' => ['name' => 'get_magic_quotes_gpc()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Always returns false in 7.4+; remove the call'],
+                'get_magic_quotes_runtime' => ['name' => 'get_magic_quotes_runtime()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Always returns false in 7.4+; remove the call'],
+                'money_format'         => ['name' => 'money_format()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Use NumberFormatter from the intl extension'],
+                'image2wbmp'           => ['name' => 'image2wbmp()', 'in' => '7.3', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Use imagewbmp()'],
+                'convert_cyr_string'   => ['name' => 'convert_cyr_string()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Use iconv() or mb_convert_encoding()'],
+                'hebrevc'              => ['name' => 'hebrevc()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Use hebrev() + nl2br()'],
+                'is_real'              => ['name' => 'is_real()', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Use is_float()'],
+                'restore_include_path' => ['name' => 'restore_include_path() with args', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Call with no arguments'],
+                'strftime'             => ['name' => 'strftime()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use IntlDateFormatter::format() or date_format()'],
+                'gmstrftime'           => ['name' => 'gmstrftime()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use IntlDateFormatter with UTC timezone'],
+                'date_sunrise'         => ['name' => 'date_sunrise()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use date_sun_info()'],
+                'date_sunset'          => ['name' => 'date_sunset()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use date_sun_info()'],
+                'utf8_encode'          => ['name' => 'utf8_encode()', 'in' => '8.2', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use mb_convert_encoding($s, "UTF-8", "ISO-8859-1")'],
+                'utf8_decode'          => ['name' => 'utf8_decode()', 'in' => '8.2', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use mb_convert_encoding($s, "ISO-8859-1", "UTF-8")'],
+                'get_class'            => ['name' => 'get_class() with no args', 'in' => '8.3', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use get_class($this) or self::class'],
+                'get_parent_class'     => ['name' => 'get_parent_class() with no args', 'in' => '8.3', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use get_parent_class($this) or parent::class'],
+            ],
+            'func_prefix' => [
+                'mysql_'  => ['name' => 'mysql_*()', 'in' => '5.5', 'out' => '7.0', 'severity' => 'removed', 'fix' => 'Use mysqli_* or PDO'],
+                'ereg'    => ['name' => 'ereg_*()', 'in' => '5.3', 'out' => '7.0', 'severity' => 'removed', 'fix' => 'Use preg_* equivalents'], // catches ereg, eregi, ereg_replace
+                'mcrypt_' => ['name' => 'mcrypt_*()', 'in' => '7.1', 'out' => '7.2', 'severity' => 'removed', 'fix' => 'Use openssl_encrypt/decrypt or sodium_crypto_*'],
+                'mhash'   => ['name' => 'mhash_*()', 'in' => '8.1', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use hash_* functions'], // catches mhash, mhash_keygen_s2k
+            ],
+            'special' => [
+                'real_cast'  => ['name' => '(real) cast', 'in' => '7.4', 'out' => '8.0', 'severity' => 'removed', 'fix' => 'Use (float) instead'],
+                'dollar_brace'=>['name' => '${var} string interpolation', 'in' => '8.2', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use {$var} syntax'],
+                'short_open' => ['name' => 'Short open tag <?', 'in' => '7.4', 'out' => null, 'severity' => 'deprecated', 'fix' => 'Use <?php — short_open_tag may be off'],
+            ]
         ];
     }
 
@@ -125,7 +72,6 @@ class Phpinfo_WP_Compat {
         $rules = self::filter_rules($target);
         if (!$rules) return ['error' => 'Target version invalid.'];
 
-        // Free tier scans up to FREE_MAX_FILES; Pro raises the cap to MAX_FILES_PER_RUN.
         $max_files = self::_pro() ? self::MAX_FILES_PER_RUN : self::FREE_MAX_FILES;
 
         $issues_by_owner = [];
@@ -166,21 +112,95 @@ class Phpinfo_WP_Compat {
                 $files_scanned++;
                 $owners_seen[$owner] = true;
 
-                foreach ($rules as $rule) {
-                    if (preg_match_all($rule['pattern'], $content, $m, PREG_OFFSET_CAPTURE)) {
-                        foreach ($m[0] as $hit) {
-                            $line = substr_count((string) substr($content, 0, $hit[1]), "\n") + 1;
-                            $issues_by_owner[$owner][] = [
-                                'file'     => $rel,
-                                'line'     => $line,
-                                'match'    => trim(self::_snippet($content, $hit[1])),
-                                'name'     => $rule['name'],
-                                'fix'      => $rule['fix'],
-                                'severity' => $rule['severity'],
-                                'in'       => $rule['in'],
-                                'out'      => $rule['out'],
-                            ];
+                // Smart Tokenizer Loop
+                try {
+                    $tokens = @token_get_all($content);
+                } catch (Throwable $e) {
+                    continue;
+                }
+                
+                $count = count($tokens);
+                for ($i = 0; $i < $count; $i++) {
+                    $t = $tokens[$i];
+                    if (!is_array($t)) continue;
+                    
+                    $token_id = $t[0];
+                    $text     = $t[1];
+                    $line     = $t[2];
+                    
+                    $match_rule = null;
+                    $snippet = $text;
+
+                    if ($token_id === T_STRING) {
+                        // Function call check
+                        $lower = strtolower($text);
+                        
+                        // Look backwards to ensure it's not a method or function declaration
+                        $prev_is_safe = false;
+                        for ($j = $i - 1; $j >= 0; $j--) {
+                            if (is_array($tokens[$j]) && $tokens[$j][0] === T_WHITESPACE) continue;
+                            if (is_array($tokens[$j])) {
+                                $pt = $tokens[$j][0];
+                                if ($pt === T_OBJECT_OPERATOR || $pt === T_DOUBLE_COLON || $pt === T_FUNCTION || $pt === T_NEW) {
+                                    $prev_is_safe = true;
+                                }
+                            }
+                            break;
                         }
+                        if ($prev_is_safe) continue;
+
+                        // Look forwards to ensure it has opening parentheses
+                        $next_is_paren = false;
+                        for ($j = $i + 1; $j < $count; $j++) {
+                            if (is_array($tokens[$j]) && $tokens[$j][0] === T_WHITESPACE) continue;
+                            if ($tokens[$j] === '(') {
+                                $next_is_paren = true;
+                            }
+                            break;
+                        }
+                        if (!$next_is_paren) continue;
+
+                        if (isset($rules['func_exact'][$lower])) {
+                            $match_rule = $rules['func_exact'][$lower];
+                            $snippet = $text . '()';
+                        } else {
+                            foreach ($rules['func_prefix'] as $prefix => $rule) {
+                                if (strpos($lower, $prefix) === 0) {
+                                    $match_rule = $rule;
+                                    $snippet = $text . '()';
+                                    break;
+                                }
+                            }
+                        }
+
+                    } elseif ($token_id === T_DOUBLE_CAST) {
+                        if (strpos(strtolower($text), 'real') !== false && isset($rules['special']['real_cast'])) {
+                            $match_rule = $rules['special']['real_cast'];
+                            $snippet = '(real)';
+                        }
+                    } elseif ($token_id === T_DOLLAR_OPEN_CURLY_BRACES) {
+                        if (isset($rules['special']['dollar_brace'])) {
+                            $match_rule = $rules['special']['dollar_brace'];
+                            $snippet = '${';
+                        }
+                    } elseif ($token_id === T_OPEN_TAG) {
+                        if (trim($text) === '<?' && isset($rules['special']['short_open'])) {
+                            $match_rule = $rules['special']['short_open'];
+                            $snippet = '<?';
+                        }
+                    }
+
+                    if ($match_rule) {
+                        $issues_by_owner[$owner][] = [
+                            'file'     => $rel,
+                            'line'     => $line,
+                            'match'    => $snippet,
+                            'name'     => $match_rule['name'],
+                            'fix'      => $match_rule['fix'],
+                            'severity' => $match_rule['severity'],
+                            'in'       => $match_rule['in'],
+                            'out'      => $match_rule['out'],
+                        ];
                     }
                 }
             }
@@ -212,16 +232,24 @@ class Phpinfo_WP_Compat {
         $t = (float) $target;
         if ($t < 7.0 || $t > 8.4) return [];
 
-        $rules = [];
-        foreach (self::rules() as $r) {
-            $in  = (float) $r['in'];
-            $out = $r['out'] ? (float) $r['out'] : null;
-            // If removed and target reaches the removal version, include
-            if ($out !== null && $t >= $out) { $rules[] = $r; continue; }
-            // If deprecated and target reaches the deprecation, include
-            if ($r['severity'] === 'deprecated' && $t >= $in) { $rules[] = $r; continue; }
+        $filtered = ['func_exact' => [], 'func_prefix' => [], 'special' => []];
+        $all = self::rules();
+
+        foreach ($all as $category => $rules) {
+            foreach ($rules as $key => $r) {
+                $in  = (float) $r['in'];
+                $out = $r['out'] ? (float) $r['out'] : null;
+                if ($out !== null && $t >= $out) { $filtered[$category][$key] = $r; continue; }
+                if ($r['severity'] === 'deprecated' && $t >= $in) { $filtered[$category][$key] = $r; continue; }
+            }
         }
-        return $rules;
+        
+        // If all sub-arrays are empty, return empty array
+        if (empty($filtered['func_exact']) && empty($filtered['func_prefix']) && empty($filtered['special'])) {
+            return [];
+        }
+        
+        return $filtered;
     }
 
     private static function owner_of(string $type, string $rel): ?string {
@@ -229,24 +257,12 @@ class Phpinfo_WP_Compat {
         if (!$parts) return null;
         $first = $parts[0];
         if ($first === '' || strncmp($first, '.', strlen('.')) === 0) return null;
-        // Single-file plugins/mu-plugins
         if ($type !== 'themes' && count($parts) === 1) {
             return $type . '/' . pathinfo($first, PATHINFO_FILENAME);
         }
         return $type . '/' . $first;
     }
 
-    private static function _snippet(string $content, int $offset, int $len = 60): string {
-        $start = max(0, $offset - 10);
-        return (string) substr($content, $start, $len);
-    }
-
-    /**
-     * Pre-update warning — hooks into the WP plugin update screen so users
-     * see a clear "would break your site" warning before clicking Update.
-     * The information itself is public (WP.org plugin metadata), so we keep
-     * this free. Pro gates the automatic scheduled scanning + email alerts.
-     */
     public static function register_update_warnings(): void {
         add_action('admin_init', function() {
             $updates = get_site_transient('update_plugins');

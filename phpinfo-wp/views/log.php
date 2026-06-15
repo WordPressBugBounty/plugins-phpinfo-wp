@@ -9,10 +9,6 @@ if (!file_exists($log_dir)) wp_mkdir_p($log_dir);
 if (!file_exists($log_file)) file_put_contents($log_file, '');
 
 $notice = '';
-if (isset($_POST['phpinfowp_clear_log']) && check_admin_referer('phpinfowp_clear_log_nonce')) {
-    file_put_contents($log_file, '');
-    $notice = 'Activity log cleared.';
-}
 
 // Parse entries — stored as "message<br />" lines, newest first
 $raw     = file_get_contents($log_file);
@@ -131,13 +127,7 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
                 <strong><?php echo count($parsed); ?></strong> entr<?php echo count($parsed) === 1 ? 'y' : 'ies'; ?>
             </p>
         </div>
-        <?php if ($parsed): ?>
-        <form method="post" onsubmit="return confirm('Clear the entire activity log? This cannot be undone.')">
-            <?php wp_nonce_field('phpinfowp_clear_log_nonce'); ?>
-            <input type="hidden" name="phpinfowp_clear_log" value="1">
-            <button type="submit" class="button button-secondary">Clear Log</button>
-        </form>
-        <?php endif; ?>
+
     </div>
 
     <?php if ($notice): ?>

@@ -100,6 +100,115 @@ class Phpinfo_WP_Mail_Check {
         return null;
     }
 
+    public static function discover_routing_emails(): array {
+        if (!self::_pro()) return [];
+
+        $emails = [];
+        $admin_email = get_option('admin_email');
+
+        // 1. WordPress Admin Email
+        if (is_email($admin_email)) {
+            $emails[] = [
+                'source' => 'WordPress Admin Email',
+                'email'  => $admin_email,
+            ];
+        }
+
+        // 2. Contact Form 7
+        if (post_type_exists('wpcf7_contact_form')) {
+            $cf7_forms = get_posts(['post_type' => 'wpcf7_contact_form', 'numberposts' => -1]);
+            foreach ($cf7_forms as $form) {
+                $mail = get_post_meta($form->ID, '_mail', true);
+                if (is_array($mail) && !empty($mail['recipient'])) {
+                    $recs = explode(',', $mail['recipient']);
+                    foreach ($recs as $rec) {
+                        $rec = trim($rec);
+                        // Try to extract if it's "Name <email@example.com>"
+                        if (preg_match('/<([^>]+)>/', $rec, $m)) {
+                            $rec = $m[1];
+                        }
+                        if (is_email($rec)) {
+                            $emails[] = [
+                                'source' => 'Contact Form 7: ' . $form->post_title,
+                                'email'  => $rec,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. WPForms
+        if (post_type_exists('wpforms')) {
+            $wpf_forms = get_posts(['post_type' => 'wpforms', 'numberposts' => -1]);
+            foreach ($wpf_forms as $form) {
+                $data = json_decode($form->post_content, true);
+                if (isset($data['settings']['notifications'])) {
+                    foreach ($data['settings']['notifications'] as $notif) {
+                        if (!empty($notif['email'])) {
+                            $recs = explode(',', $notif['email']);
+                            foreach ($recs as $rec) {
+                                $rec = trim($rec);
+                                if ($rec === '{admin_email}') {
+                                    $rec = $admin_email;
+                                }
+                                if (is_email($rec)) {
+                                    $emails[] = [
+                                        'source' => 'WPForms: ' . $form->post_title,
+                                        'email'  => $rec,
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Gravity Forms
+        if (class_exists('GFAPI')) {
+            $gf_forms = \GFAPI::get_forms();
+            if (is_array($gf_forms)) {
+                foreach ($gf_forms as $form) {
+                    if (!empty($form['notifications'])) {
+                        foreach ($form['notifications'] as $notif) {
+                            if (!empty($notif['to'])) {
+                                $recs = explode(',', $notif['to']);
+                                foreach ($recs as $rec) {
+                                    $rec = trim($rec);
+                                    if ($rec === '{admin_email}') {
+                                        $rec = $admin_email;
+                                    }
+                                    if (is_email($rec)) {
+                                        $emails[] = [
+                                            'source' => 'Gravity Forms: ' . ($form['title'] ?? 'Form'),
+                                            'email'  => $rec,
+                                        ];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // De-duplicate and check MX
+        $unique = [];
+        foreach ($emails as $e) {
+            $key = strtolower($e['email']) . '|' . $e['source'];
+            if (!isset($unique[$key])) {
+                $parts = explode('@', $e['email']);
+                $domain = $parts[1] ?? '';
+                $mx = $domain ? self::_lookup_mx($domain) : [];
+                $e['mx_ok'] = !empty($mx);
+                $unique[$key] = $e;
+            }
+        }
+
+        return array_values($unique);
+    }
+
     public static function send_test(string $to): array {
         if (!self::_pro()) return ['ok' => false, 'error' => 'Pro license required.'];
         if (!is_email($to)) return ['ok' => false, 'error' => 'Invalid recipient email.'];

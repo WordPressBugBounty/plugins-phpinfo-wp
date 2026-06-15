@@ -1,7 +1,19 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'Config Snapshots',
+        'icon'     => 'dashicons-backup',
+        'tagline'  => 'Weekly automatic snapshots of every PHP directive. Compare any two to see exactly what changed.',
+        'previews' => [
+            'Snapshots stored: <strong>—</strong>',
+            'Last snapshot: <strong>—</strong>',
+            'Changed directives: <strong>—</strong>',
+        ],
+    ]);
+    return;
+}
 
 $message  = '';
 $msg_type = 'success';
@@ -39,8 +51,12 @@ if ($view_snap_id > 0) {
 ?>
 
 <div class="phpinfowp-pro-page">
-    <h1>Config Snapshots <span class="phpinfowp-pro-badge">PRO</span></h1>
-    <p style="color:#666;margin-top:-10px">Track php.ini changes over time. Automatic weekly snapshots run via WP Cron.</p>
+    <div class="phpinfowp-page-header">
+        <div>
+            <h1>Config Snapshots <span class="phpinfowp-pro-badge">PRO</span></h1>
+            <p class="phpinfowp-page-subtitle">Track php.ini changes over time. Automatic weekly snapshots run via WP Cron.</p>
+        </div>
+    </div>
 
     <?php if ($message): ?>
         <div class="notice notice-<?php echo $msg_type; ?> inline is-dismissible"><p><?php echo esc_html($message); ?></p></div>

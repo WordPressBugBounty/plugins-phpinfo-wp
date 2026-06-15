@@ -1,7 +1,19 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'Email Alerts & Webhooks',
+        'icon'     => 'dashicons-bell',
+        'tagline'  => 'Get notified on PHP EOL, config drift, OPcache drops, and SSL expiry via email, Slack, or Discord.',
+        'previews' => [
+            'Email alerts: <strong>Disabled</strong>',
+            'Slack webhook: <strong>—</strong>',
+            'Last alert sent: <strong>—</strong>',
+        ],
+    ]);
+    return;
+}
 
 $message  = '';
 $msg_type = 'success';

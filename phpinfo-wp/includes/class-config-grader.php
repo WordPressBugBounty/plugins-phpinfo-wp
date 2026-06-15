@@ -137,6 +137,74 @@ class Phpinfo_WP_Config_Grader {
         return $detected;
     }
 
+    /**
+     * Determines the single most critical "Application Profile" for the site to display in the UI banner.
+     * Checks installed plugins in order of their impact on server requirements.
+     */
+    public static function dominant_profile(array $ctx): ?array {
+        $p = $ctx['plugins'] ?? [];
+
+        // 1. E-commerce
+        if (!empty($p['woocommerce'])) {
+            return [
+                'id'    => 'woocommerce',
+                'name'  => 'WooCommerce Profile',
+                'icon'  => '🛒',
+                'desc'  => 'E-commerce sites require significantly more memory (512M+) and execution time than standard blogs. Apply this profile to prevent cart abandonment and slow checkouts.',
+            ];
+        }
+        if (!empty($p['edd'])) {
+            return [
+                'id'    => 'edd',
+                'name'  => 'EDD E-commerce Profile',
+                'icon'  => '🛒',
+                'desc'  => 'Easy Digital Downloads requires higher memory ceilings and optimal caching. Apply this profile to ensure stable transactions.',
+            ];
+        }
+
+        // 2. LMS / Courses
+        if (!empty($p['learndash']) || !empty($p['lifterlms']) || !empty($p['tutor'])) {
+            return [
+                'id'    => 'lms',
+                'name'  => 'LMS & Courses Profile',
+                'icon'  => '🎓',
+                'desc'  => 'Learning Management Systems have many concurrent logged-in users tracking progress. Apply this profile to prevent database and memory bottlenecks.',
+            ];
+        }
+
+        // 3. Heavy Imports
+        if (!empty($p['wp-all-import'])) {
+            return [
+                'id'    => 'import',
+                'name'  => 'Heavy Import Profile',
+                'icon'  => '📦',
+                'desc'  => 'Mass data imports require extremely long maximum execution times and memory limits to prevent timing out halfway through.',
+            ];
+        }
+
+        // 4. Page Builders
+        if (!empty($p['elementor']) || !empty($p['wpbakery']) || !empty($p['divi']) || !empty($p['avada']) || !empty($p['oxygen']) || !empty($p['beaver-builder'])) {
+            return [
+                'id'    => 'builder',
+                'name'  => 'Page Builder Profile',
+                'icon'  => '🎨',
+                'desc'  => 'Visual page builders construct pages using thousands of input variables. Apply this profile to prevent layout data from being silently truncated upon saving.',
+            ];
+        }
+
+        // 5. Community
+        if (!empty($p['buddypress'])) {
+            return [
+                'id'    => 'community',
+                'name'  => 'BuddyPress Community Profile',
+                'icon'  => '👥',
+                'desc'  => 'Social and community sites have highly uncacheable, dynamic traffic. Apply this profile to ensure enough memory overhead is available for concurrent users.',
+            ];
+        }
+
+        return null;
+    }
+
     /** Managed-host fingerprint. Returns slug or null. */
     private static function detect_host(): ?string {
         if (defined('KINSTA_CACHE_ZONE'))                              return 'kinsta';
@@ -574,12 +642,6 @@ class Phpinfo_WP_Config_Grader {
      *    'trend' => [...] ]
      */
     public static function run(): array {
-        if (!self::_pro()) {
-            return ['checks' => [], 'cross' => [], 'score' => 0, 'grade' => 'F',
-                    'categories' => [], 'severity_counts' => [],
-                    'context' => self::context(), 'trend' => ['available' => false]];
-        }
-
         $ctx     = self::context();
         $results = [];
         $values  = []; // for cross-checks

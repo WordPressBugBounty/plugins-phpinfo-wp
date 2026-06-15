@@ -1,7 +1,19 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'Audit Report PDF',
+        'icon'     => 'dashicons-media-document',
+        'tagline'  => 'One-click white-label PDF with your logo — A–F grades, fix list, server fingerprint. Hand it to clients.',
+        'previews' => [
+            'Sections: Config · PHP · SSL · Security · DB',
+            'Brand: <strong>Your logo + company name</strong>',
+            'Export: <strong>One click</strong>',
+        ],
+    ]);
+    return;
+}
 
 // Handle branding form save before building report
 if (isset($_POST['phpinfowp_report_branding']) && check_admin_referer('phpinfowp_report_branding')) {
@@ -174,10 +186,14 @@ $brand_tag  = $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server
 
         // Helper to render a verdict pill inline anywhere.
         $verdict_pill = static function (string $v, string $text = '') {
+            $svg_ok       = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:12px;height:12px;display:inline-block;vertical-align:-1px"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>';
+            $svg_warn     = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:12px;height:12px;display:inline-block;vertical-align:-1px"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd"/></svg>';
+            $svg_critical = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:12px;height:12px;display:inline-block;vertical-align:-1px"><path fill-rule="evenodd" d="M4.22 4.22a.75.75 0 011.06 0L10 8.94l4.72-4.72a.75.75 0 111.06 1.06L11.06 10l4.72 4.72a.75.75 0 11-1.06 1.06L10 11.06l-4.72 4.72a.75.75 0 01-1.06-1.06L8.94 10 4.22 5.28a.75.75 0 010-1.06z" clip-rule="evenodd"/></svg>';
+
             $map = [
-                'ok'       => ['ok',       '#0a7d2e', '#e8f6ec', '#a7d8b3', '✓'],
-                'warn'     => ['warn',     '#8a6500', '#fff5d6', '#e9c977', '⚠'],
-                'critical' => ['critical', '#8e1414', '#fbe7e8', '#ecb4b5', '✗'],
+                'ok'       => ['ok',       '#0a7d2e', '#e8f6ec', '#a7d8b3', $svg_ok],
+                'warn'     => ['warn',     '#8a6500', '#fff5d6', '#e9c977', $svg_warn],
+                'critical' => ['critical', '#8e1414', '#fbe7e8', '#ecb4b5', $svg_critical],
             ];
             [$cls, $fg, $bg, $br, $ic] = $map[$v] ?? $map['ok'];
             $label = $text ?: ($v === 'ok' ? 'OK' : ($v === 'warn' ? 'Warning' : 'Critical'));
@@ -273,7 +289,7 @@ $brand_tag  = $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server
         <?php if ($crit_n): ?>
         <div class="phpinfowp-report-critbar">
             <div class="phpinfowp-report-critbar-head">
-                <span class="phpinfowp-report-critbar-ic">✗</span>
+                <span class="phpinfowp-report-critbar-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;display:block"><path fill-rule="evenodd" d="M4.22 4.22a.75.75 0 011.06 0L10 8.94l4.72-4.72a.75.75 0 111.06 1.06L11.06 10l4.72 4.72a.75.75 0 11-1.06 1.06L10 11.06l-4.72 4.72a.75.75 0 01-1.06-1.06L8.94 10 4.22 5.28a.75.75 0 010-1.06z" clip-rule="evenodd"/></svg></span>
                 <div>
                     <div class="phpinfowp-report-critbar-title"><?php echo $crit_n; ?> critical issue<?php echo $crit_n === 1 ? '' : 's'; ?> need immediate attention</div>
                     <div class="phpinfowp-report-critbar-sub">Anything here is impacting security, performance, or breaks within the next 90 days.</div>

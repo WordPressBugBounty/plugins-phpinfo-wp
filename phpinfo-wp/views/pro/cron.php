@@ -1,7 +1,19 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'WP Cron Monitor',
+        'icon'     => 'dashicons-clock',
+        'tagline'  => 'Find overdue cron events, orphan hooks, and recently-run tasks that hint at performance issues.',
+        'previews' => [
+            'Overdue events: <strong>—</strong>',
+            'Next scheduled run: <strong>—</strong>',
+            'Orphan hooks: <strong>—</strong>',
+        ],
+    ]);
+    return;
+}
 
 if (isset($_POST['phpinfowp_cron_run']) && check_admin_referer('phpinfowp_cron_nonce')) {
     $hook = sanitize_text_field($_POST['hook'] ?? '');

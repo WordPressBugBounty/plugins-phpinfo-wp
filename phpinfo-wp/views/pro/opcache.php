@@ -1,7 +1,20 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'OPcache Dashboard',
+        'icon'     => 'dashicons-performance',
+        'tagline'  => 'Hit rate, memory footprint, cached scripts count — and a one-click cache flush button.',
+        'previews' => [
+            'Status: <strong>Enabled</strong>',
+            'Hit rate: <strong>— %</strong>',
+            'Memory used: <strong>— MB / — MB</strong>',
+            'Cached scripts: <strong>—</strong>',
+        ],
+    ]);
+    return;
+}
 
 $message  = '';
 $msg_type = 'success';
@@ -16,7 +29,12 @@ $s = Phpinfo_WP_OPcache::status();
 ?>
 
 <div class="phpinfowp-pro-page">
-    <h1>OPcache Dashboard <span class="phpinfowp-pro-badge">PRO</span></h1>
+    <div class="phpinfowp-page-header">
+        <div>
+            <h1>OPcache Dashboard <span class="phpinfowp-pro-badge">PRO</span></h1>
+            <p class="phpinfowp-page-subtitle">Check OPcache memory usage, hit rates, and list cached scripts.</p>
+        </div>
+    </div>
 
     <?php if ($message): ?>
         <div class="notice notice-<?php echo $msg_type; ?> inline is-dismissible"><p><?php echo esc_html($message); ?></p></div>
@@ -108,11 +126,21 @@ $s = Phpinfo_WP_OPcache::status();
         </table>
 
         <!-- Reset button -->
+        <?php
+        $reset_disabled = !function_exists('opcache_reset') || strpos(ini_get('disable_functions'), 'opcache_reset') !== false;
+        $restrict_api = ini_get('opcache.restrict_api');
+        $is_restricted = $restrict_api && stripos(__FILE__, $restrict_api) !== 0;
+        ?>
         <form method="post" style="margin-top:20px" onsubmit="return confirm('Clear OPcache? PHP will recompile all files on next request.')">
             <?php wp_nonce_field('phpinfowp_opcache_nonce'); ?>
             <input type="hidden" name="phpinfowp_opcache_reset" value="1">
-            <button type="submit" class="button button-secondary">Clear OPcache</button>
+            <button type="submit" class="button button-secondary" <?php if ($reset_disabled || $is_restricted) echo 'disabled'; ?>>Clear OPcache</button>
             <span style="margin-left:8px;font-size:12px;color:#666">Forces recompilation of all cached PHP files.</span>
+            <?php if ($reset_disabled): ?>
+                <p style="color:#d63638;font-size:12px;margin-top:8px">⚠️ <strong>Clear OPcache disabled:</strong> Your host has added <code>opcache_reset</code> to the PHP <code>disable_functions</code> list.</p>
+            <?php elseif ($is_restricted): ?>
+                <p style="color:#d63638;font-size:12px;margin-top:8px">⚠️ <strong>Clear OPcache disabled:</strong> Your host has restricted OPcache API access via <code>opcache.restrict_api</code>.</p>
+            <?php endif; ?>
         </form>
 
     <?php endif; ?>

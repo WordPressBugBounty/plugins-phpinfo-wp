@@ -1,7 +1,19 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) { require __DIR__ . '/upgrade.php'; return; }
+if (!Phpinfo_WP_License::is_valid()) {
+    phpinfowp_render_feature_lock([
+        'feature'  => 'Mail Deliverability Check',
+        'icon'     => 'dashicons-email-alt',
+        'tagline'  => 'Send a test email, verify SPF & DKIM records, and catch delivery problems before clients do.',
+        'previews' => [
+            'SPF record: <strong>—</strong>',
+            'DKIM: <strong>—</strong>',
+            'Test email result: <strong>—</strong>',
+        ],
+    ]);
+    return;
+}
 
 $test_result = null;
 if (isset($_POST['phpinfowp_mail_test']) && check_admin_referer('phpinfowp_mail_nonce')) {
@@ -13,10 +25,9 @@ $audit = Phpinfo_WP_Mail_Check::audit();
 
 $row = function($title, $ok, $value, $warning = null) {
     $color = $ok ? '#00a32a' : '#d63638';
-    $bg    = $ok ? '#f0faf2' : '#fff4f4';
     $dicon = $ok ? 'dashicons-yes-alt' : 'dashicons-dismiss';
     ?>
-    <div class="phpinfowp-sec-row" style="border-left-color:<?php echo $color; ?>;background:<?php echo $bg; ?>">
+    <div class="phpinfowp-sec-row phpinfowp-mail-row" style="border-left-color:<?php echo $color; ?>">
         <div class="phpinfowp-sec-row-icon"><span class="dashicons <?php echo $dicon; ?>" style="color:<?php echo $color; ?>"></span></div>
         <div class="phpinfowp-sec-row-body">
             <div class="phpinfowp-sec-row-title"><strong><?php echo esc_html($title); ?></strong></div>
@@ -66,14 +77,53 @@ $row = function($title, $ok, $value, $warning = null) {
             </div>
         </div>
 
+        <!-- Routing Audit -->
+        <?php $routing_emails = Phpinfo_WP_Mail_Check::discover_routing_emails(); ?>
+        <?php if (!empty($routing_emails)): ?>
+        <h2 class="phpinfowp-section-heading" style="margin-top:24px">Email Routing Audit</h2>
+        <p class="phpinfowp-page-subtitle" style="margin-bottom:16px">Discovered email addresses used for administration and contact forms.</p>
+        <table class="widefat striped">
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Email Address</th>
+                    <th>Domain MX</th>
+                    <th style="width:100px">Test</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($routing_emails as $re): ?>
+                <tr>
+                    <td style="vertical-align:middle;font-weight:600;color:#1d2327"><?php echo esc_html($re['source']); ?></td>
+                    <td style="vertical-align:middle"><code><?php echo esc_html($re['email']); ?></code></td>
+                    <td style="vertical-align:middle">
+                        <?php if ($re['mx_ok']): ?>
+                            <span style="color:#00a32a"><span class="dashicons dashicons-yes-alt" style="vertical-align:middle;margin-right:2px"></span> Valid</span>
+                        <?php else: ?>
+                            <span style="color:#d63638;font-weight:600"><span class="dashicons dashicons-warning" style="vertical-align:middle;margin-right:2px"></span> No MX Records</span>
+                        <?php endif; ?>
+                    </td>
+                    <td style="vertical-align:middle">
+                        <form method="post" style="margin:0">
+                            <?php wp_nonce_field('phpinfowp_mail_nonce'); ?>
+                            <input type="hidden" name="test_to" value="<?php echo esc_attr($re['email']); ?>">
+                            <button type="submit" name="phpinfowp_mail_test" value="1" class="button button-small">Send test</button>
+                        </form>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php endif; ?>
+
         <!-- DNS audit -->
-        <h2 class="phpinfowp-section-heading" style="margin-top:24px">DNS Records</h2>
+        <h2 class="phpinfowp-section-heading" style="margin-top:32px">DNS Records</h2>
         <div class="phpinfowp-sec-rows">
             <?php $row('SPF (Sender Policy Framework)',  $audit['spf']['present'],  $audit['spf']['value'] ?? null,  $audit['spf']['warning'] ?? null); ?>
             <?php $row('DMARC',                          $audit['dmarc']['present'],$audit['dmarc']['value'] ?? null, $audit['dmarc']['warning'] ?? null); ?>
 
             <?php if ($audit['mx']): ?>
-                <div class="phpinfowp-sec-row" style="border-left-color:#00a32a;background:#f0faf2">
+                <div class="phpinfowp-sec-row phpinfowp-mail-row" style="border-left-color:#00a32a">
                     <div class="phpinfowp-sec-row-icon"><span class="dashicons dashicons-yes-alt" style="color:#00a32a"></span></div>
                     <div class="phpinfowp-sec-row-body">
                         <div class="phpinfowp-sec-row-title"><strong>MX records</strong></div>
@@ -83,7 +133,7 @@ $row = function($title, $ok, $value, $warning = null) {
                     </div>
                 </div>
             <?php else: ?>
-                <div class="phpinfowp-sec-row" style="border-left-color:#d63638;background:#fff4f4">
+                <div class="phpinfowp-sec-row phpinfowp-mail-row" style="border-left-color:#d63638">
                     <div class="phpinfowp-sec-row-icon"><span class="dashicons dashicons-dismiss" style="color:#d63638"></span></div>
                     <div class="phpinfowp-sec-row-body">
                         <div class="phpinfowp-sec-row-title"><strong>MX records</strong></div>
@@ -92,7 +142,7 @@ $row = function($title, $ok, $value, $warning = null) {
                 </div>
             <?php endif; ?>
 
-            <div class="phpinfowp-sec-row" style="border-left-color:#888;background:#f9f9f9">
+            <div class="phpinfowp-sec-row phpinfowp-mail-row" style="border-left-color:#888">
                 <div class="phpinfowp-sec-row-icon"><span class="dashicons dashicons-info" style="color:#888"></span></div>
                 <div class="phpinfowp-sec-row-body">
                     <div class="phpinfowp-sec-row-title"><strong>DKIM</strong></div>

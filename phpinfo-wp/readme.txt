@@ -3,61 +3,64 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.0
-Stable tag: 7.1.0
+Stable tag: 7.2.2
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Modern WordPress site health — PHP compatibility scanner, troubleshooting mode, config grader, EOL timeline. A modern Health Check alternative.
+Stop silent site breakages. The ultimate in-admin server audit & per-user troubleshooting tool built for agencies and professional developers.
 
 == Description ==
 
 **phpinfo() WP** is a modern, actively-maintained WordPress site-health and server-audit plugin. It's the in-admin tool freelancers and agencies install on a fresh site to instantly see *what's wrong, what's about to break, and what to fix* — without a SaaS subscription, without external dashboards, and without leaving the WordPress admin.
 
-Think of it as **"Health Check & Troubleshooting" — but maintained, modern, and built for the way WordPress actually works in 2026**: PHP 8.x, SSL everywhere, OPcache by default, agencies running multiple sites. Same diagnostics, plus PHP EOL timeline, A–F config grading, security headers, SSL monitor, and a one-page PDF audit report you can hand to a client.
+Think of it as the official **"Health Check & Troubleshooting"** plugin — but built for production sites. Our Troubleshooting Mode runs completely in a per-user session: visitors and clients see the live site normally while you safely debug and isolate conflicts without any downtime.
 
 = The free version covers what every WordPress site owner actually needs =
 
-*   **phpinfo() viewer** — clean, searchable, modern (the original feature, restyled).
-*   **PHP Compatibility Scanner** — scan every plugin and theme for PHP version breakages *before* you upgrade. (Free, no signup. Most "PHP compatibility checker" plugins on WP.org are abandoned or only work in dev environments — this one runs on managed hosts.)
-*   **Update Guard — pre-update core audit** — before you update *WordPress itself*, scan every plugin and theme for code that breaks on the new core: removed jQuery APIs (which fail silently on the front end) and deprecated WordPress functions. Get one clear **Safe / Caution / Risky** verdict so you know whether it's safe to click "Update." Free.
-*   **Troubleshooting Mode** — safely disable plugins *only for your own admin session* to debug conflicts. Time-limited cookie, one-click "End and restore" button in the admin bar, auto-restore on logout. Your visitors and other admins keep seeing the live site normally while you debug.
-*   **PHP EOL Timeline** — every PHP version's end-of-life date, current status, days remaining.
-*   **Config Grader summary** — overall A–F grade of your PHP config against WordPress best practices.
-*   **PHP Config editor (.htaccess / .user.ini)** — set or change php.ini directives safely from your dashboard, with automatic backups and a site-health check that aborts a save if your site starts returning HTTP 500.
-*   **Admin bar health scoreboard** — live grade + most-urgent issue on every admin page, like PageSpeed for your server.
-*   **Dashboard widget** — site health at a glance the moment you log in.
-*   **Activity log + Extensions + Basic info** — everything the original plugin did, restyled.
-*   **WordPress 7.0 Abilities API** — exposes the audit data as named server abilities (`phpinfowp/get-audit-summary`, `phpinfowp/get-php-version`, `phpinfowp/get-config-grade`, `phpinfowp/get-config-issues`, `phpinfowp/get-directive`, `phpinfowp/list-extensions`) so AI assistants and other plugins on your site can introspect server health through a standard interface instead of scraping screens.
-*   **AI explanations (WP 7.0)** — when the new AI Client is configured, every failing Config Grader check gets an *Explain with AI* button that turns the directive into a plain-English explanation. Uses the core Connectors API for credentials — we never touch your API keys.
+*   **phpinfo() viewer** — Clean, searchable, modern (the original feature, restyled).
+*   **Host-Friendly Compatibility Scanner** — Scan all plugins and themes for PHP version conflicts before upgrading, built to work smoothly even on strict managed hosts.
+*   **Update Guard** — Preview core upgrade stability. Detect deprecated calls and removed APIs to get a clear Safe/Caution/Risky rating before clicking update.
+*   **Zero-Downtime Troubleshooting** — Safely debug theme and plugin conflicts in your own admin session without affecting visitors or live sales.
+*   **PHP EOL Timeline** — Every PHP version's end-of-life date, current status, days remaining.
+*   **Config Grader summary** — Overall A–F grade of your PHP config against WordPress best practices.
+*   **PHP Config editor (.htaccess / .user.ini)** — Set or change php.ini directives safely from your dashboard, with automatic backups and safety rollback.
+*   **Admin bar health scoreboard** — Live grade + most-urgent issue on every admin page, like PageSpeed for your server.
+*   **Dashboard widget** — Site health at a glance the moment you log in.
+*   **Activity log + Extensions + Basic info** — Everything the original plugin did, restyled.
+*   **AI-Ready API (WP 7.0)** — Exposes audit data so AI assistants and plugins can inspect server health through a standard core interface.
+*   **AI Explanations (WP 7.0)** — Instantly explain failing checks in plain English using the core AI Client connection.
 
 = Pro adds the tooling agencies and serious site owners actually need =
 
-**Safeguard** — don't break your site
+**Safeguard** — Don't break your site
 
-*   **One-click Config Auto-Fix** — every failing Grader check gets a "Fix it" button that writes the recommended value to .htaccess (or your php.ini override) safely, with automatic rollback if anything breaks.
-*   **Pre-update PHP compatibility check** — before you click "Update Plugin," see if the new version requires a PHP version you don't have.
-*   **Update Guard Pro** — an automatic warning right on the WordPress **Updates** screen before every core update, "tested up to" + abandonment scoring pulled from WordPress.org (the biggest predictor of a quiet breakage), AI-written fix explanations for each finding, uncapped scanning, the full per-file/line drill-down, and a continuously-updated rule feed so new WordPress deprecations are detected without waiting for a plugin update.
-*   **Config Snapshots** — weekly automatic snapshots of every php.ini directive, with visual diffs.
-*   **Security Headers Auditor** — grade your HTTP response headers (CSP, HSTS, X-Frame-Options, etc.) with fix suggestions.
-*   **SSL Certificate Monitor** — track expiry for your site and any additional domains.
+*   **1-Click Auto-Fix with Rollback** — Fix config issues instantly. Writes optimization rules to .htaccess/.user.ini and auto-reverts if the server hits a 500 error.
+*   **Pre-Update PHP check** — Scan plugin updates before upgrading to verify they don't require a PHP version you don't have.
+*   **Update Guard Pro** — Automatic interception on the WordPress Updates page, tested-up-to alerts, abandonment alerts, AI-written remediation steps, and full line-by-line inspection.
+*   **Config Snapshots** — Weekly automatic snapshots of every php.ini directive, with visual diffs.
+*   **Security Headers Auditor** — Grade your HTTP response headers (CSP, HSTS, X-Frame-Options) with fix suggestions.
+*   **Web Server Snippet Library** — Optimized Nginx/Apache configuration blocks for caching, security, and bad bot blocking, with 1-click injection for Apache/LiteSpeed.
+*   **SSL Certificate Monitor** — Track certificate expiry and domain mismatches to avoid security warnings.
 
-**Insight** — know what is wrong before clients call
+**Insight** — Know what is wrong before clients call
 
-*   **Full Config Grader** — see every failing directive with the exact recommended value and a one-line explanation of why it matters.
-*   **Database Health** — engine version, EOL status, total size, autoload bloat detection.
-*   **OPcache Dashboard** — hit rate, memory usage, cached scripts, one-click clear.
-*   **PHP Error Log Viewer** — browse, search, and clear your PHP error log from the dashboard.
-*   **WP Cron Monitor** — find overdue events, orphan hooks, and recently-run cron tasks.
-*   **Mail Deliverability** — send-test, SPF & DKIM lookup.
+*   **Full Config Grader** — Detailed grading with the exact recommended values and why each directive matters.
+*   **Database Health** — Engine version, EOL status, size, and autoload bloat detection.
+*   **OPcache Dashboard** — Hit rate, memory usage, cached scripts, and one-click OPcache clearing.
+*   **PHP Error Log Viewer** — Browse, search, and clear your PHP error log directly from the dashboard.
+*   **WP Cron Monitor** — Find overdue events, orphan hooks, and recently-run cron tasks.
+*   **Outbound API Latency Tracker** — Pinpoint slow 3rd-party connections (payment gateways, CRMs, webhooks) that bottleneck page load times.
+*   **Mail Deliverability** — Send-test, SPF & DKIM validation.
 
-**Deliver** — look professional to clients
+**Deliver** — Look professional to clients
 
-*   **Audit Report** — single-page, white-label PDF you can print or hand to clients. Custom company name, tagline, footer note, and accent color.
-*   **Email Alerts** — get notified on PHP EOL, config drift, OPcache drops, and SSL expiry.
-*   **Weekly Digest** — full server health summary delivered to your inbox every Monday.
-*   **Slack / Discord / Webhook** integration for real-time alerts.
-*   **Multi-site (Network) support** — dashboard widget on every site.
+*   **Audit Report** — Single-page, white-label PDF with custom branding, layout options, and custom brand colors to hand to clients.
+*   **Email Alerts** — Get notified on PHP EOL, config drift, OPcache drops, and SSL expiry.
+*   **Weekly Digest** — Full server health summary delivered to your inbox every Monday.
+*   **Integrations** — Slack, Discord, and Webhook support for real-time alerts.
+*   **Multi-Site Dashboard** — Network-wide dashboard widget support on every subsite.
+
 
 = Why use this instead of 5 different plugins? =
 
@@ -153,6 +156,23 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 7. Audit Report (Pro) — single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.2.2 =
+*  fixed bugs
+
+= 7.2.1 =
+*   **Fixed (Free)**: Config Grader score and grade are now correctly calculated and visible on the free tier dashboard and summary screens, rather than showing a misleading "F (0/100)".
+*   **NEW (Pro)**: Web Server Snippet Library now displays a "Code is Injected" status indicator on already applied snippets.
+*   **Improved**: Added clear cache callout notifications and messages to the Web Server Snippet Library, prompting you to clear plugin, server, and browser caches to see configuration changes.
+
+= 7.2.0 =
+*   **NEW (Pro)**: Web Server Snippet Library — optimized Nginx and Apache configuration blocks for caching, security, and bad bot blocking. Features 1-click injection for Apache/LiteSpeed.
+*   **NEW (Pro)**: Outbound API Monitor — track slow 3rd-party services (like Stripe or Mailchimp) that silently slow down your page loads.
+*   **NEW (Pro)**: SSL Certificate Monitor — automatically alerts you before your SSL certificates expire so you never lose visitors to a security warning.
+*   **NEW (Pro)**: OPcache Dashboard — easily check and clear your PHP OPcache with one click to keep your site's loading speed optimized.
+*   **Improved (Free)**: PHP Compatibility Scanner upgraded.
+*   **Improved**: Complete dashboard and sidebar menu UI overhaul.
+*   **Improved**: Polished and cleaned up the visual layout of the PHP Config Editor and Troubleshooting Mode pages, making margins, spacing, and text sizes consistent and much easier to read.
 
 = 7.1.0 =
 *   **Fixed (Pro)**: Config Grader auto-fix no longer shows a false "your host is overriding the auto-fix" warning immediately after applying a fix. `.user.ini` changes can't take effect in the same request and are cached by PHP for a few minutes, so the override check now pauses until the values can actually be observed, then runs automatically.

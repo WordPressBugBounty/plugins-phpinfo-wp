@@ -206,22 +206,44 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
     <?php endif; ?>
 
     <?php if ($fixable_keys && $target_writable): ?>
-        <div style="background:linear-gradient(135deg,#f3f7ff,#eaf4ff);border:1px solid #c8d8f5;border-radius:8px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-            <div>
-                <strong style="font-size:14px;color:#1a3a72">⚡ One-click fix available for <?php echo count($fixable_keys); ?> directive<?php echo count($fixable_keys) === 1 ? '' : 's'; ?></strong>
-                <p style="margin:4px 0 0;color:#3a567c;font-size:12px">
-                    Writes recommended values to <code><?php echo esc_html(basename($target_info['file'])); ?></code> with automatic rollback if your site returns HTTP 500.
-                </p>
+        <?php $profile = Phpinfo_WP_Config_Grader::dominant_profile($ctx); ?>
+        <?php if ($profile): ?>
+            <div style="background:linear-gradient(135deg, #1e1e1e, #2a2a2a); border:1px solid #333; border-radius:10px; padding:20px 24px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div style="flex:1; min-width:300px;">
+                    <div style="display:inline-block; font-size:24px; margin-right:12px; vertical-align:middle;"><?php echo esc_html($profile['icon']); ?></div>
+                    <strong style="font-size:18px; color:#fff; vertical-align:middle; letter-spacing:0.3px;"><?php echo esc_html($profile['name']); ?> Detected</strong>
+                    <p style="margin:8px 0 0; color:#aaa; font-size:13.5px; line-height:1.5;">
+                        <?php echo esc_html($profile['desc']); ?><br>
+                        <span style="color:#ddd; margin-top:6px; display:inline-block;">We'll automatically apply the optimal configuration to <code><?php echo esc_html(basename($target_info['file'])); ?></code>.</span>
+                    </p>
+                </div>
+                <form method="post" style="margin:0">
+                    <?php wp_nonce_field('phpinfowp_autofix_nonce'); ?>
+                    <input type="hidden" name="phpinfowp_autofix" value="1">
+                    <?php foreach ($fixable_keys as $k): ?>
+                        <input type="hidden" name="fix_keys[]" value="<?php echo esc_attr($k); ?>">
+                    <?php endforeach; ?>
+                    <button type="submit" class="button button-primary" style="font-size:14px; padding:6px 16px; height:auto; background:#007cba; border-color:#007cba;">1-Click Optimize Server &rarr;</button>
+                </form>
             </div>
-            <form method="post" style="margin:0">
-                <?php wp_nonce_field('phpinfowp_autofix_nonce'); ?>
-                <input type="hidden" name="phpinfowp_autofix" value="1">
-                <?php foreach ($fixable_keys as $k): ?>
-                    <input type="hidden" name="fix_keys[]" value="<?php echo esc_attr($k); ?>">
-                <?php endforeach; ?>
-                <button type="submit" class="button button-primary">Fix all <?php echo count($fixable_keys); ?> →</button>
-            </form>
-        </div>
+        <?php else: ?>
+            <div style="background:linear-gradient(135deg,#f3f7ff,#eaf4ff);border:1px solid #c8d8f5;border-radius:8px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+                <div>
+                    <strong style="font-size:14px;color:#1a3a72">⚡ Optimize Server Profile (<?php echo count($fixable_keys); ?> missing directives)</strong>
+                    <p style="margin:4px 0 0;color:#3a567c;font-size:12px">
+                        Writes our recommended WordPress defaults to <code><?php echo esc_html(basename($target_info['file'])); ?></code> with automatic rollback on errors.
+                    </p>
+                </div>
+                <form method="post" style="margin:0">
+                    <?php wp_nonce_field('phpinfowp_autofix_nonce'); ?>
+                    <input type="hidden" name="phpinfowp_autofix" value="1">
+                    <?php foreach ($fixable_keys as $k): ?>
+                        <input type="hidden" name="fix_keys[]" value="<?php echo esc_attr($k); ?>">
+                    <?php endforeach; ?>
+                    <button type="submit" class="button button-primary">Apply Server Profile &rarr;</button>
+                </form>
+            </div>
+        <?php endif; ?>
     <?php elseif ($fixable_keys && !$target_writable): ?>
         <div class="notice notice-warning inline" style="margin:0 0 18px"><p>
             <strong>Auto-fix unavailable:</strong> Your site root or <code><?php echo esc_html(basename($target_info['file'])); ?></code> is not writable by PHP. Fix permissions, or apply the recommended values manually via the <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-htaccess')); ?>">PHP Config editor</a>.

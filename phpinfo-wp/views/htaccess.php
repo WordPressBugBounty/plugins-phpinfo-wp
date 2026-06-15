@@ -82,6 +82,56 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
                 file_put_contents($log_file, ".htaccess snippet {$snippet_id} added on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
             }
         }
+
+    } elseif (isset($_POST['rollback_snippet'])) {
+        $snippet_id = sanitize_text_field($_POST['rollback_snippet']);
+        if (isset($snippets[$snippet_id]) && $snippet_server === 'apache') {
+            if (!Phpinfo_WP_License::is_valid()) {
+                $notice = 'Snippet rollback requires phpinfo() WP Pro.';
+                $notice_type = 'error';
+            } else {
+                $block_name = strtoupper($snippet_id);
+                $current = file_exists("$root_dir.htaccess") ? file_get_contents("$root_dir.htaccess") : '';
+                $new = preg_replace("/\n?# BEGIN phpinfo-wp-{$block_name}.*?# END phpinfo-wp-{$block_name}\n?/s", "\n", $current);
+                file_put_contents("$root_dir.htaccess", $new);
+                $notice = "Rolled back <strong>{$snippets[$snippet_id]['title']}</strong> — block removed from .htaccess.";
+                file_put_contents($log_file, ".htaccess snippet {$snippet_id} rolled back on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+            }
+        }
+
+    } elseif (isset($_POST['inject_all_snippets'])) {
+        if (!Phpinfo_WP_License::is_valid()) {
+            $notice = 'Snippet injection requires phpinfo() WP Pro.';
+            $notice_type = 'error';
+        } elseif ($snippet_server !== 'apache') {
+            $notice = 'Bulk injection is only available on Apache/LiteSpeed servers.';
+            $notice_type = 'error';
+        } else {
+            $current = file_exists("$root_dir.htaccess") ? file_get_contents("$root_dir.htaccess") : '';
+            foreach ($snippets as $sid => $snip) {
+                $block_name = strtoupper($sid);
+                $current = preg_replace("/\n?# BEGIN phpinfo-wp-{$block_name}.*?# END phpinfo-wp-{$block_name}\n?/s", "\n", $current);
+                $current = rtrim($current) . "\n\n# BEGIN phpinfo-wp-{$block_name}\n" . $snip['apache'] . "\n# END phpinfo-wp-{$block_name}\n";
+            }
+            file_put_contents("$root_dir.htaccess", $current);
+            $notice = "All 4 snippets injected into .htaccess.<br /><span style='display:inline-block; margin-top: 6px; font-size:12.5px; opacity:0.9;'>⚡ <strong>Note:</strong> Clear your cache (plugin, CDN, browser) to see the results!</span>";
+            file_put_contents($log_file, "All .htaccess snippets injected on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+        }
+
+    } elseif (isset($_POST['rollback_all_snippets'])) {
+        if (!Phpinfo_WP_License::is_valid()) {
+            $notice = 'Snippet rollback requires phpinfo() WP Pro.';
+            $notice_type = 'error';
+        } else {
+            $current = file_exists("$root_dir.htaccess") ? file_get_contents("$root_dir.htaccess") : '';
+            foreach ($snippets as $sid => $snip) {
+                $block_name = strtoupper($sid);
+                $current = preg_replace("/\n?# BEGIN phpinfo-wp-{$block_name}.*?# END phpinfo-wp-{$block_name}\n?/s", "\n", $current);
+            }
+            file_put_contents("$root_dir.htaccess", $current);
+            $notice = 'All 4 snippets have been rolled back and removed from .htaccess.';
+            file_put_contents($log_file, "All .htaccess snippets rolled back on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+        }
     } elseif ($mode === 'htaccess') {
 
         if (isset($_POST['backup'])) {
@@ -264,6 +314,24 @@ Phpinfo_wp::thankyou();
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid #313244;
+  }
+  .phpinfowp-ide-footer {
+      background: #181825;
+      padding: 12px 16px;
+      border-top: 1px solid #313244;
+      font-size: 12px;
+      color: #a6adc8 !important;
+      line-height: 1.5;
+  }
+  .phpinfowp-ide-footer strong {
+      color: #cdd6f4 !important;
+  }
+  .phpinfowp-ide-footer code {
+      background: #313244 !important;
+      color: #cdd6f4 !important;
+      border: 1px solid #45475a !important;
+      padding: 2px 4px !important;
+      font-size: 11px !important;
   }
   .phpinfowp-ide-dots {
       display: flex;
@@ -591,20 +659,6 @@ Phpinfo_wp::thankyou();
     <div class="phpinfowp-htaccess-editor-col">
       <h2 class="phpinfowp-section-heading">PHP Directives</h2>
 
-      <?php if ($mode === 'htaccess'): ?>
-        <p class="phpinfowp-section-desc">
-          One directive per line — write the name and value only, without the <code>php_value</code> prefix.
-          We will wrap your configuration inside a <code># BEGIN phpinfo-wp</code> block.<br>
-          <strong>Auto-rollback:</strong> If the site returns HTTP 500 after saving, your original <code>.htaccess</code> will be restored automatically.
-        </p>
-      <?php else: ?>
-        <p class="phpinfowp-section-desc">
-          One directive per line in standard <code>php.ini</code> format: <strong>directive = value</strong>.<br>
-          Shorthands like <strong>directive value</strong> are normalized automatically.
-          Your settings are placed in a <code>; BEGIN phpinfo-wp</code> block inside <code>.user.ini</code>.
-        </p>
-      <?php endif; ?>
-
       <?php
       $placeholder = $mode === 'htaccess'
           ? "upload_max_filesize 64M\npost_max_size 64M\nmax_execution_time 120\nmax_input_vars 3000"
@@ -634,6 +688,17 @@ Phpinfo_wp::thankyou();
             <textarea name="htaccess" id="htaccess-editor" class="phpinfowp-ide-textarea"
                       placeholder="<?php echo esc_attr($placeholder); ?>"
                       spellcheck="false"><?php echo esc_textarea($existing); ?></textarea>
+          </div>
+          <div class="phpinfowp-ide-footer">
+            <?php if ($mode === 'htaccess'): ?>
+              One directive per line &mdash; write the name and value only, without the <code>php_value</code> prefix.
+              We will wrap your configuration inside a <code># BEGIN phpinfo-wp</code> block.<br>
+              <strong>Auto-rollback:</strong> If the site returns HTTP 500 after saving, your original <code>.htaccess</code> will be restored automatically.
+            <?php else: ?>
+              One directive per line in standard <code>php.ini</code> format: <strong>directive = value</strong>.<br>
+              Shorthands like <strong>directive value</strong> are normalized automatically.
+              Your settings are placed in a <code>; BEGIN phpinfo-wp</code> block inside <code>.user.ini</code>.
+            <?php endif; ?>
           </div>
         </div>
 
@@ -681,6 +746,61 @@ Phpinfo_wp::thankyou();
               <strong>Clear Cache:</strong> You must clear your cache (plugin cache, server cache, CDN, and browser cache) after injecting or setting the code manually to see the results!
           </p>
       </div>
+
+      <?php
+      // Pre-calculate which snippets are injected for the bulk bar
+      $preview_for_bulk = file_exists("$root_dir.htaccess") ? file_get_contents("$root_dir.htaccess") : '';
+      $all_injected = true;
+      $none_injected = true;
+      foreach ($snippets as $_sid => $_snip) {
+          $block_check = strtoupper($_sid);
+          if (strpos($preview_for_bulk, "# BEGIN phpinfo-wp-{$block_check}") !== false) {
+              $none_injected = false;
+          } else {
+              $all_injected = false;
+          }
+      }
+      $is_pro_bulk = Phpinfo_WP_License::is_valid();
+      ?>
+
+      <?php if ($snippet_server === 'apache'): ?>
+      <!-- Bulk Action Bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px; padding:14px 18px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+          <div>
+              <p style="margin:0; font-size:13px; font-weight:700; color:#0f172a;">Bulk Actions</p>
+              <p style="margin:2px 0 0; font-size:12px; color:#64748b;">Inject or roll back all 4 snippets at once.</p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <?php if ($is_pro_bulk): ?>
+                  <form method="post" style="margin:0;">
+                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
+                      <button type="submit" name="inject_all_snippets" value="1"
+                          class="phpinfowp-btn phpinfowp-btn-primary"
+                          <?php echo $all_injected ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>
+                          onclick="return confirm('Inject all 4 optimization snippets into .htaccess?')">
+                          <span class="dashicons dashicons-upload" style="font-size:16px; width:16px; height:16px;"></span>
+                          Inject All 4
+                      </button>
+                  </form>
+                  <form method="post" style="margin:0;">
+                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
+                      <button type="submit" name="rollback_all_snippets" value="1"
+                          class="phpinfowp-btn phpinfowp-btn-danger"
+                          <?php echo $none_injected ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>
+                          onclick="return confirm('Remove ALL 4 injected snippets from .htaccess?')">
+                          <span class="dashicons dashicons-undo" style="font-size:16px; width:16px; height:16px;"></span>
+                          Rollback All 4
+                      </button>
+                  </form>
+              <?php else: ?>
+                  <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="background:#4f46e5; border-color:#4338ca;">
+                      <span class="dashicons dashicons-lock" style="font-size:14px; width:14px; height:14px;"></span>
+                      Upgrade to Pro
+                  </a>
+              <?php endif; ?>
+          </div>
+      </div>
+      <?php endif; ?>
 
       <div class="phpinfowp-snippets">
           <?php 
@@ -748,10 +868,20 @@ Phpinfo_wp::thankyou();
                           </button>
                       <?php else: ?>
                           <?php if ($is_injected): ?>
-                              <button type="button" class="phpinfowp-btn" style="background: #ecfdf5; color: #059669; border-color: #a7f3d0; cursor: default;" disabled>
-                                  <span class="dashicons dashicons-yes" style="font-size:16px; width:16px; height:16px;"></span>
-                                  Code is Injected
-                              </button>
+                              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                  <button type="button" class="phpinfowp-btn" style="background: #ecfdf5; color: #059669; border-color: #a7f3d0; cursor: default;" disabled>
+                                      <span class="dashicons dashicons-yes" style="font-size:16px; width:16px; height:16px;"></span>
+                                      Injected
+                                  </button>
+                                  <form method="post" style="margin: 0;">
+                                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
+                                      <button type="submit" name="rollback_snippet" value="<?php echo esc_attr($id); ?>" class="phpinfowp-btn phpinfowp-btn-danger"
+                                          onclick="return confirm('Remove the &quot;<?php echo esc_js($snippet['title']); ?>&quot; block from .htaccess?')">
+                                          <span class="dashicons dashicons-undo" style="font-size:16px; width:16px; height:16px;"></span>
+                                          Rollback
+                                      </button>
+                                  </form>
+                              </div>
                           <?php else: ?>
                               <form method="post" style="margin: 0;">
                                   <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
@@ -772,7 +902,6 @@ Phpinfo_wp::thankyou();
     <!-- Right Column: Live file preview -->
     <div class="phpinfowp-htaccess-preview-col">
       <h2 class="phpinfowp-section-heading">Current <code><?php echo esc_html($mode_file); ?></code></h2>
-      <p class="phpinfowp-section-desc">Active directives on disk.</p>
       
       <!-- Mock IDE Preview Window -->
       <div class="phpinfowp-ide-window">
@@ -798,6 +927,9 @@ Phpinfo_wp::thankyou();
               File does not exist yet — it will be created on first save.
             </div>
           <?php endif; ?>
+        </div>
+        <div class="phpinfowp-ide-footer">
+          Active directives on disk.
         </div>
       </div>
       

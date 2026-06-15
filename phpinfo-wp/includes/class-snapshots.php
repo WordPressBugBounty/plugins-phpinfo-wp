@@ -151,6 +151,9 @@ class Phpinfo_WP_Snapshots {
 
     public static function prune(int $keep = 30): void {
         if (!self::_pro()) return;
+        if (!Phpinfo_WP_License::is_unlimited()) {
+            $keep = 3;
+        }
         global $wpdb;
         $ids = $wpdb->get_col($wpdb->prepare(
             "SELECT id FROM " . self::table() . " ORDER BY created_at DESC LIMIT %d, 9999", $keep

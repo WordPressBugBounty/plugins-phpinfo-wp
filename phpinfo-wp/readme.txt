@@ -3,7 +3,7 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.0
-Stable tag: 7.2.2
+Stable tag: 7.2.3
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -55,10 +55,10 @@ Think of it as the official **"Health Check & Troubleshooting"** plugin — but 
 
 **Deliver** — Look professional to clients
 
-*   **Audit Report** — Single-page, white-label PDF with custom branding, layout options, and custom brand colors to hand to clients.
+*   **Audit Report** — Single-page PDF audit report to hand to clients (fully white-labeled on Unlimited/Lifetime, branded on Single).
 *   **Email Alerts** — Get notified on PHP EOL, config drift, OPcache drops, and SSL expiry.
-*   **Weekly Digest** — Full server health summary delivered to your inbox every Monday.
-*   **Integrations** — Slack, Discord, and Webhook support for real-time alerts.
+*   **Weekly Digest** — Full server health summary delivered to your inbox every Monday (Unlimited/Lifetime).
+*   **Integrations** — Slack, Discord, and Webhook support for real-time alerts (Unlimited/Lifetime).
 *   **Multi-Site Dashboard** — Network-wide dashboard widget support on every subsite.
 
 
@@ -70,9 +70,9 @@ phpinfo() WP gives you **one in-admin plugin** that covers all of it, with a sin
 
 = Pricing =
 
-*   **Single Site** — $29/year
-*   **Unlimited Sites** — $69/year (the popular pick — works on every site you own or manage)
-*   **Lifetime** — $149 once (founders pricing, first 50 buyers)
+*   **Single Site** — $29/year (1 site, essential Pro features, branded PDF, 3 snapshots, 1 API monitor)
+*   **Unlimited Sites** — $69/year (the popular pick — works on every site, fully white-labeled, unlimited snapshots & API monitors)
+*   **Lifetime** — $149 once (founders pricing, first 50 buyers — unlimited sites, fully white-labeled)
 
 14-day money-back guarantee. Instant license delivery. Site-locked license keys.
 
@@ -157,8 +157,13 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 
 == Changelog ==
 
+= 7.2.3 =
+*   **Pro**: Aligned Single Site plan feature restrictions with pricing tier limits. Capped Outbound API Monitors at 1, Config Snapshots at 3, locked Slack/Discord webhooks and Weekly digests, and set PDF audit reports to default branded styling.
+*   **Pro**: Added license grandfathering to ensure existing Single Site license holders retain unlimited access to all features.
+*   **Improved**: Standardized and optimized CSS layout margins and vertical padding on the landing page for visual consistency across desktop and mobile screens.
+
 = 7.2.2 =
-*  fixed bugs
+*   **Fixed**: Minor bug fixes and compatibility refinements.
 
 = 7.2.1 =
 *   **Fixed (Free)**: Config Grader score and grade are now correctly calculated and visible on the free tier dashboard and summary screens, rather than showing a misleading "F (0/100)".

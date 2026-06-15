@@ -49,7 +49,7 @@ class Phpinfo_WP_Whats_New_Notice {
 
         // Only show notices for versions we've written copy for.
         $catalog = [
-            '7.2.2' => [
+            '7.2.3' => [
                 'headline' => 'phpinfo() WP 7.2 is here — Web Server Snippets, API Monitor & more.',
                 'bullets'  => [
                     '<strong>New: Web Server Snippet Library</strong> — optimised Nginx & Apache config blocks for caching, security headers, and blocking bad bots. 1-click injection for Apache.',
@@ -73,6 +73,7 @@ class Phpinfo_WP_Whats_New_Notice {
         .phpinfowp-whats-new-notice {
             margin-left: 0 !important;
             margin-right: 0 !important;
+            margin-bottom: 16px !important;
             border-left-color: #777BB3 !important;
             padding: 10px 16px !important;
             padding-right: 46px !important; /* Make room for absolute X close button */

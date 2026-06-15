@@ -24,8 +24,9 @@ class Phpinfo_WP_Alerts {
     }
 
     public static function save_settings(array $s): void {
-        $url  = esc_url_raw(trim($s['webhook_url'] ?? ''));
-        $type = in_array($s['webhook_type'] ?? '', ['slack', 'discord', 'generic'], true) ? $s['webhook_type'] : 'slack';
+        $is_unlim = Phpinfo_WP_License::is_unlimited();
+        $url  = $is_unlim ? esc_url_raw(trim($s['webhook_url'] ?? '')) : '';
+        $type = ($is_unlim && in_array($s['webhook_type'] ?? '', ['slack', 'discord', 'generic'], true)) ? $s['webhook_type'] : 'slack';
         update_option(self::OPT, [
             'enabled'         => !empty($s['enabled']),
             'emails'          => sanitize_textarea_field($s['emails'] ?? ''),
@@ -33,7 +34,7 @@ class Phpinfo_WP_Alerts {
             'config_change'   => !empty($s['config_change']),
             'opcache_low'     => !empty($s['opcache_low']),
             'opcache_thresh'  => max(0, min(100, (int)($s['opcache_thresh'] ?? 80))),
-            'weekly_digest'   => !empty($s['weekly_digest']),
+            'weekly_digest'   => $is_unlim && !empty($s['weekly_digest']),
             'ssl_expiry'      => !empty($s['ssl_expiry']),
             'ssl_thresh'      => max(1, (int)($s['ssl_thresh'] ?? 30)),
             'webhook_url'     => (strpos($url, 'https://') === 0) ? $url : '',
@@ -202,6 +203,7 @@ class Phpinfo_WP_Alerts {
 
     public static function send_weekly_digest(): void {
         if (!self::_pro()) return;
+        if (!Phpinfo_WP_License::is_unlimited()) return;
         $s = self::get_settings();
         if (!$s['enabled'] || !$s['weekly_digest']) return;
 

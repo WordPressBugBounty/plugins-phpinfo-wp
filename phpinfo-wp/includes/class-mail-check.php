@@ -196,15 +196,27 @@ class Phpinfo_WP_Mail_Check {
         // De-duplicate and check MX
         $unique = [];
         foreach ($emails as $e) {
-            $key = strtolower($e['email']) . '|' . $e['source'];
-            if (!isset($unique[$key])) {
+            $email_lower = strtolower($e['email']);
+            if (!isset($unique[$email_lower])) {
                 $parts = explode('@', $e['email']);
                 $domain = $parts[1] ?? '';
                 $mx = $domain ? self::_lookup_mx($domain) : [];
                 $e['mx_ok'] = !empty($mx);
-                $unique[$key] = $e;
+                $e['sources'] = [$e['source']];
+                $unique[$email_lower] = $e;
+            } else {
+                if (!in_array($e['source'], $unique[$email_lower]['sources'], true)) {
+                    $unique[$email_lower]['sources'][] = $e['source'];
+                }
             }
         }
+
+        // Format the final source string
+        foreach ($unique as $email_lower => &$e) {
+            $e['source'] = implode(', ', $e['sources']);
+            unset($e['sources']);
+        }
+        unset($e);
 
         return array_values($unique);
     }

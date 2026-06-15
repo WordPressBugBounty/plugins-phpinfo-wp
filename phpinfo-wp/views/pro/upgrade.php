@@ -5,22 +5,28 @@ $license_url = admin_url('admin.php?page=phpinfowp-license');
 
 $pillars = [
     [
-        'icon'  => 'dashicons-shield-alt',
+        'icon'  => 'dashicons-shield',
         'name'  => 'Safeguard',
         'tag'   => "Don't break your site.",
-        'items' => ['Scheduled weekly compat scans', 'Config Snapshots & restore', 'Security Headers auditor', 'SSL Monitor (multi-domain)'],
+        'items' => ['Update Guard (Core audit)', 'PHP Compatibility Scanner', 'Config Snapshots & diff', 'Security Headers audit'],
     ],
     [
-        'icon'  => 'dashicons-chart-bar',
-        'name'  => 'Insight',
-        'tag'   => 'Know what is wrong.',
-        'items' => ['Full Config Grader', 'Database Health', 'OPcache Dashboard', 'Error Log Viewer', 'WP Cron Monitor', 'Mail Deliverability'],
+        'icon'  => 'dashicons-performance',
+        'name'  => 'Optimize',
+        'tag'   => 'Performance & Best Practices.',
+        'items' => ['Full Config Grader with fixes', 'Web Server Snippet Library', 'Database health & autoload', 'OPcache dashboard'],
+    ],
+    [
+        'icon'  => 'dashicons-visibility',
+        'name'  => 'Monitor',
+        'tag'   => "Know what's wrong before clients call.",
+        'items' => ['SSL certificate monitor', 'External API Monitor', 'Error Log viewer', 'WP Cron monitor', 'Mail deliverability'],
     ],
     [
         'icon'  => 'dashicons-portfolio',
         'name'  => 'Deliver',
-        'tag'   => 'Look pro to clients.',
-        'items' => ['Audit Report PDF', 'Email Alerts', 'Weekly Digest', 'Slack / Discord webhooks', 'Multi-site dashboard'],
+        'tag'   => 'Look professional to clients.',
+        'items' => ['White-label PDF Audit Report', 'Email alerts on issues', 'Weekly health digest', 'Slack / Discord webhooks', 'Multi-site (Network) support'],
     ],
 ];
 ?>
@@ -57,18 +63,18 @@ $pillars = [
             <div class="phpinfowp-upgrade-price-tier">
                 <div class="phpinfowp-upgrade-price-name">Single</div>
                 <div class="phpinfowp-upgrade-price-value">$29<small>/yr</small></div>
-                <div class="phpinfowp-upgrade-price-sub">1 site &middot; 1 year of updates</div>
+                <div class="phpinfowp-upgrade-price-sub">1 site &middot; Essential features &middot; Branded reports</div>
             </div>
             <div class="phpinfowp-upgrade-price-tier is-featured">
                 <div class="phpinfowp-upgrade-price-name">Unlimited</div>
                 <div class="phpinfowp-upgrade-price-value">$69<small>/yr</small></div>
-                <div class="phpinfowp-upgrade-price-sub">Unlimited sites &middot; 1 year of updates</div>
+                <div class="phpinfowp-upgrade-price-sub">Unlimited sites &middot; White-labeled &middot; Weekly digests</div>
                 <div class="phpinfowp-upgrade-price-best">Best value</div>
             </div>
             <div class="phpinfowp-upgrade-price-tier">
                 <div class="phpinfowp-upgrade-price-name">Lifetime</div>
                 <div class="phpinfowp-upgrade-price-value">$149<small>once</small></div>
-                <div class="phpinfowp-upgrade-price-sub">Unlimited sites &middot; lifetime updates</div>
+                <div class="phpinfowp-upgrade-price-sub">Unlimited sites &middot; Lifetime updates &middot; White-labeled</div>
             </div>
         </div>
 

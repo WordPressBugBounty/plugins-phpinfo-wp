@@ -4050,15 +4050,21 @@ body.phpinfowp-has-sidenav #wpbody-content {
   height: 18px;
 }
 
-/* ---------- License view: 3-pillar grid ---------- */
+/* ---------- License view: 4-pillar grid ---------- */
 .phpinfowp-pillars {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   margin-top: 20px;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
+  .phpinfowp-pillars {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
   .phpinfowp-pillars {
     grid-template-columns: 1fr;
   }
@@ -4066,49 +4072,72 @@ body.phpinfowp-has-sidenav #wpbody-content {
 
 .phpinfowp-pillar {
   background: #fff;
-  border: 1px solid #e2e4e7;
-  border-radius: 10px;
-  padding: 20px 22px;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 24px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.phpinfowp-pillar:hover {
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.06);
 }
 
 .phpinfowp-pillar-header {
   display: flex;
   gap: 14px;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+.phpinfowp-pillar-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f4f4f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .phpinfowp-pillar-header .dashicons {
-  font-size: 28px;
-  width: 28px;
-  height: 28px;
-  color: #777BB3;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #7c3aed;
 }
 
 .phpinfowp-pillar-name {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
-  color: #1d2327;
+  color: #09090b;
+  line-height: 1.3;
 }
 
 .phpinfowp-pillar-tag {
   font-size: 12px;
-  color: #777;
+  color: #71717a;
+  margin-top: 2px;
 }
 
 .phpinfowp-pillar-items {
   margin: 0;
   padding: 0;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .phpinfowp-pillar-items li {
-  padding: 7px 0 7px 22px;
+  padding: 0;
   position: relative;
+  padding-left: 20px;
   font-size: 13px;
-  color: #333;
-  line-height: 1.4;
-  border-bottom: 1px solid #f4f4f6;
+  color: #3f3f46;
+  line-height: 1.45;
+  border-bottom: none;
 }
 
 .phpinfowp-pillar-items li:last-child {
@@ -4116,12 +4145,14 @@ body.phpinfowp-has-sidenav #wpbody-content {
 }
 
 .phpinfowp-pillar-items li::before {
-  content: "✓";
+  content: "";
   position: absolute;
   left: 0;
   top: 7px;
-  color: #00a32a;
-  font-weight: 700;
+  width: 6px;
+  height: 6px;
+  background-color: rgba(167, 139, 250, 0.7);
+  border-radius: 50%;
 }
 
 /* ---------- License view: pricing ---------- */
@@ -4235,65 +4266,97 @@ body.phpinfowp-has-sidenav #wpbody-content {
 /* ---------- Upgrade gate: 3-pillar ---------- */
 .phpinfowp-upgrade-pillars {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   margin: 24px 0 24px;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 1000px) {
+  .phpinfowp-upgrade-pillars {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
   .phpinfowp-upgrade-pillars {
     grid-template-columns: 1fr;
   }
 }
 
 .phpinfowp-upgrade-pillar {
-  background: #fafafc;
-  border: 1px solid #eaeaef;
+  background: #fff;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 24px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.phpinfowp-upgrade-pillar:hover {
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.06);
+}
+
+.phpinfowp-upgrade-pillar-icon {
+  margin-bottom: 14px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
-  padding: 16px 18px;
+  background: #f4f4f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .phpinfowp-upgrade-pillar-icon .dashicons {
-  font-size: 22px;
-  width: 22px;
-  height: 22px;
-  color: #777BB3;
-  margin-bottom: 4px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #7c3aed;
+  margin-bottom: 0;
 }
 
 .phpinfowp-upgrade-pillar-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: #1d2327;
+  color: #09090b;
+  line-height: 1.3;
 }
 
 .phpinfowp-upgrade-pillar-tag {
-  font-size: 11px;
-  color: #888;
-  margin-bottom: 10px;
+  font-size: 12px;
+  color: #71717a;
+  margin-top: 2px;
+  margin-bottom: 16px;
 }
 
 .phpinfowp-upgrade-pillar-items {
   margin: 0;
   padding: 0;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .phpinfowp-upgrade-pillar-items li {
-  padding: 3px 0 3px 16px;
+  padding: 0;
   position: relative;
-  font-size: 12px;
-  color: #444;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #3f3f46;
+  line-height: 1.45;
 }
 
 .phpinfowp-upgrade-pillar-items li::before {
-  content: "✓";
+  content: "";
   position: absolute;
   left: 0;
-  top: 3px;
-  color: #00a32a;
-  font-weight: 700;
-  font-size: 11px;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  background-color: rgba(167, 139, 250, 0.7);
+  border-radius: 50%;
 }
 
 /* Visual break between the three pillars and the three price tiers so users

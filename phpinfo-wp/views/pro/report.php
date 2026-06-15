@@ -34,9 +34,10 @@ wp_enqueue_media();
 
 $r = Phpinfo_WP_Report::build();
 $b = $r['branding'];
-$accent     = $b['enabled'] && $b['accent'] ? esc_attr($b['accent']) : '#777BB3';
-$brand_name = $b['enabled'] && $b['company'] ? esc_html($b['company']) : 'phpinfo() WP';
-$brand_tag  = $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server Health Audit';
+$is_unlimited = Phpinfo_WP_License::is_unlimited();
+$accent     = $is_unlimited && $b['enabled'] && $b['accent'] ? esc_attr($b['accent']) : '#777BB3';
+$brand_name = $is_unlimited && $b['enabled'] && $b['company'] ? esc_html($b['company']) : 'phpinfo() WP';
+$brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server Health Audit';
 ?>
 
 <style>.phpinfowp-report .phpinfowp-report-brand,.phpinfowp-report .phpinfowp-report-h{color:<?php echo $accent; ?> !important}.phpinfowp-report .phpinfowp-report-cover{border-bottom-color:<?php echo $accent; ?> !important}</style>
@@ -63,7 +64,15 @@ $brand_tag  = $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server
          stays hidden after save so it doesn't crowd the report — the
          success notice above confirms the change was applied. -->
     <div id="phpinfowp-report-branding" class="phpinfowp-report-branding-form no-print" style="display:none">
-        <form method="post">
+        <?php if (!Phpinfo_WP_License::is_unlimited()): ?>
+            <div class="phpinfowp-upgrade-banner" style="background:#fcfaff;border:1px solid #e2d9f3;border-radius:8px;padding:24px;text-align:center;margin-bottom:12px">
+                <span class="dashicons dashicons-lock" style="font-size:36px;width:36px;height:36px;color:#7c3aed;margin-bottom:12px"></span>
+                <h3 style="margin:0 0 8px;font-size:18px;color:#2c3338">White-Label Branding is an Unlimited Tier Feature</h3>
+                <p style="margin:0 0 16px;color:#646970;font-size:14px">Upload your own company logo, set a custom accent color, and hide the "phpinfo() WP" branding from client PDF reports.</p>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary button-large" style="background:#7c3aed;border-color:#7c3aed">Upgrade License &rarr;</a>
+            </div>
+        <?php else: ?>
+            <form method="post">
             <?php wp_nonce_field('phpinfowp_report_branding'); ?>
             <input type="hidden" name="phpinfowp_report_branding" value="1">
             <h3>Report Branding</h3>
@@ -119,6 +128,7 @@ $brand_tag  = $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server
             </table>
             <p><button type="submit" class="button button-primary">Save branding</button></p>
         </form>
+        <?php endif; ?>
     </div>
 
     <script>
@@ -226,7 +236,7 @@ $brand_tag  = $b['enabled'] && $b['tagline'] ? esc_html($b['tagline']) : 'Server
 
         <!-- Cover -->
         <div class="phpinfowp-report-cover">
-            <?php if ($b['enabled'] && !empty($b['logo_url'])): ?>
+            <?php if ($is_unlimited && $b['enabled'] && !empty($b['logo_url'])): ?>
                 <img src="<?php echo esc_url($b['logo_url']); ?>" alt="<?php echo esc_attr($brand_name); ?> logo"
                      class="phpinfowp-report-logo">
             <?php endif; ?>

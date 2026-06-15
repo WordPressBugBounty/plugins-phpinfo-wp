@@ -77,23 +77,30 @@ $next_cron = wp_next_scheduled('phpinfowp_weekly_maintenance');
             <tr>
                 <th scope="row"><label for="webhook_url">Webhook URL</label></th>
                 <td>
-                    <input type="url" name="webhook_url" id="webhook_url" value="<?php echo esc_attr($s['webhook_url']); ?>"
-                           class="large-text" placeholder="https://hooks.slack.com/services/... or https://discord.com/api/webhooks/...">
-                    <p class="description" style="margin-top:6px">
-                        <label style="margin-right:14px">
-                            <input type="radio" name="webhook_type" value="slack" <?php checked($s['webhook_type'], 'slack'); ?>>
-                            Slack
-                        </label>
-                        <label style="margin-right:14px">
-                            <input type="radio" name="webhook_type" value="discord" <?php checked($s['webhook_type'], 'discord'); ?>>
-                            Discord
-                        </label>
-                        <label>
-                            <input type="radio" name="webhook_type" value="generic" <?php checked($s['webhook_type'], 'generic'); ?>>
-                            Generic JSON (for Zapier, Make, etc.)
-                        </label>
-                    </p>
-                    <p class="description">HTTPS only. Same alerts as email — delivered to your chat or automation.</p>
+                    <?php if (!Phpinfo_WP_License::is_unlimited()): ?>
+                        <input type="url" disabled class="large-text" placeholder="https://hooks.slack.com/services/... (Requires Unlimited/Lifetime plan)">
+                        <p class="description" style="color:#ba1a1a;font-weight:600;margin-top:6px">
+                            Slack / Discord / Webhook integration requires the Unlimited or Lifetime plan. <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" style="color:#7c3aed;text-decoration:none">Upgrade your plan &rarr;</a>
+                        </p>
+                    <?php else: ?>
+                        <input type="url" name="webhook_url" id="webhook_url" value="<?php echo esc_attr($s['webhook_url']); ?>"
+                               class="large-text" placeholder="https://hooks.slack.com/services/... or https://discord.com/api/webhooks/...">
+                        <p class="description" style="margin-top:6px">
+                            <label style="margin-right:14px">
+                                <input type="radio" name="webhook_type" value="slack" <?php checked($s['webhook_type'], 'slack'); ?>>
+                                Slack
+                            </label>
+                            <label style="margin-right:14px">
+                                <input type="radio" name="webhook_type" value="discord" <?php checked($s['webhook_type'], 'discord'); ?>>
+                                Discord
+                            </label>
+                            <label>
+                                <input type="radio" name="webhook_type" value="generic" <?php checked($s['webhook_type'], 'generic'); ?>>
+                                Generic JSON (for Zapier, Make, etc.)
+                            </label>
+                        </p>
+                        <p class="description">HTTPS only. Same alerts as email — delivered to your chat or automation.</p>
+                    <?php endif; ?>
                 </td>
             </tr>
             <tr>
@@ -121,8 +128,13 @@ $next_cron = wp_next_scheduled('phpinfowp_weekly_maintenance');
                         — <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-ssl')); ?>">Manage monitored domains</a>
                     </label>
                     <label style="display:block;margin-bottom:8px">
-                        <input type="checkbox" name="weekly_digest" value="1" <?php checked($s['weekly_digest']); ?>>
-                        <strong>Weekly digest</strong> — summary every week: PHP, memory, config grade, OPcache, SSL, config changes
+                        <?php if (!Phpinfo_WP_License::is_unlimited()): ?>
+                            <input type="checkbox" disabled>
+                            <span style="color:#646970"><strong>Weekly digest</strong> — summary every week: PHP, memory, config grade, OPcache, SSL, config changes <span style="color:#7c3aed;font-weight:600">(Requires Unlimited/Lifetime plan)</span></span>
+                        <?php else: ?>
+                            <input type="checkbox" name="weekly_digest" value="1" <?php checked($s['weekly_digest']); ?>>
+                            <strong>Weekly digest</strong> — summary every week: PHP, memory, config grade, OPcache, SSL, config changes
+                        <?php endif; ?>
                     </label>
                 </td>
             </tr>

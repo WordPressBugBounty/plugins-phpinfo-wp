@@ -111,6 +111,16 @@ class Phpinfo_WP_License {
         return $valid;
     }
 
+    public static function is_unlimited(): bool {
+        if (!self::is_valid()) return false;
+        $p = self::payload();
+        if (!$p) return false;
+        if (isset($p['iat']) && (int) $p['iat'] < 1781523600) {
+            return true;
+        }
+        return trim((string) ($p['url'] ?? '')) === '*';
+    }
+
     public static function is_locked(): bool {
         return (bool) get_option(self::OPT_LOCKED, false);
     }

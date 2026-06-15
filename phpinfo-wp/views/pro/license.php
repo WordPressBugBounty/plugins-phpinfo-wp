@@ -32,27 +32,37 @@ if (isset($_POST['phpinfowp_license_action']) && check_admin_referer('phpinfowp_
 
 $pillars = [
     [
-        'icon'  => 'dashicons-shield-alt',
+        'icon'  => 'dashicons-shield',
         'name'  => 'Safeguard',
         'tag'   => "Don't break your site.",
         'items' => [
-            'PHP Compatibility Scanner — check every plugin & theme before upgrading',
-            'Config Snapshots — automatic weekly backups of every php.ini directive',
-            'Security Headers Auditor — score and fix your HTTP response headers',
-            'SSL Certificate Monitor — track expiry for your site and extra domains',
+            'Update Guard (Core audit)',
+            'PHP Compatibility Scanner',
+            'Config Snapshots & diff',
+            'Security Headers audit',
         ],
     ],
     [
-        'icon'  => 'dashicons-chart-bar',
-        'name'  => 'Insight',
-        'tag'   => 'Know what is wrong before clients call.',
+        'icon'  => 'dashicons-performance',
+        'name'  => 'Optimize',
+        'tag'   => 'Performance & Best Practices.',
         'items' => [
-            'Config Grader — full breakdown of every failing directive with fixes',
-            'Database Health — engine version, size, autoload bloat, slow tables',
-            'OPcache Dashboard — hit rate, memory, scripts, one-click clear',
-            'PHP Error Log Viewer — browse, search, clear from the dashboard',
-            'WP Cron Monitor — overdue, orphan, and recently-run events',
-            'Mail Deliverability — send-test, SPF/DKIM lookup',
+            'Full Config Grader with fixes',
+            'Web Server Snippet Library',
+            'Database health & autoload',
+            'OPcache dashboard',
+        ],
+    ],
+    [
+        'icon'  => 'dashicons-visibility',
+        'name'  => 'Monitor',
+        'tag'   => "Know what's wrong before clients call.",
+        'items' => [
+            'SSL certificate monitor',
+            'External API Monitor',
+            'Error Log viewer',
+            'WP Cron monitor',
+            'Mail deliverability',
         ],
     ],
     [
@@ -60,11 +70,11 @@ $pillars = [
         'name'  => 'Deliver',
         'tag'   => 'Look professional to clients.',
         'items' => [
-            'Audit Report — single-page health PDF you can print or hand to clients',
-            'Email Alerts — EOL, config drift, SSL expiry, OPcache drops',
-            'Weekly Digest — full health summary delivered to your inbox',
-            'Slack / Discord / Webhook integration for real-time alerts',
-            'Multi-site (Network) support — dashboard widget on each site',
+            'White-label PDF Audit Report',
+            'Email alerts on issues',
+            'Weekly health digest',
+            'Slack / Discord webhooks',
+            'Multi-site (Network) support',
         ],
     ],
 ];
@@ -252,10 +262,12 @@ $pillars = [
         ['phpinfo() viewer',                  true, true, true, true],
         ['.htaccess editor',                  true, true, true, true],
         ['PHP EOL Timeline',                  true, true, true, true],
-        ['Config Grader (summary only)',      true, true, true, true],
+        ['Config Grade & Score',              true, true, true, true],
         // Pro depth
-        ['Full Config Grader with fixes',     false, true, true, true],
-        ['PHP Compatibility Scanner',         false, true, true, true],
+        ['Update Guard (Core pre-update audit)', true, true, true, true],
+        ['PHP Compatibility Scanner',         true, true, true, true],
+        ['Detailed Directives & Fixes',       false, true, true, true],
+        ['Web Server Snippet Library',        false, true, true, true],
         ['Security Headers audit',            false, true, true, true],
         ['SSL certificate monitor',           false, true, true, true],
         ['OPcache dashboard',                 false, true, true, true],
@@ -263,11 +275,12 @@ $pillars = [
         ['Error Log viewer',                  false, true, true, true],
         ['WP-Cron monitor',                   false, true, true, true],
         ['Mail deliverability check',         false, true, true, true],
-        ['Config Snapshots & diff',           false, true, true, true],
         // Deliverable & integrations
-        ['White-label PDF audit reports',     false, true,  true, true],
         ['Email alerts on issues',            false, true,  true, true],
-        ['Weekly health digest',              false, true,  true, true],
+        ['External API Monitor',              false, '1 Endpoint', true, true],
+        ['Config Snapshots & diff',           false, 'Latest 3', true, true],
+        ['PDF Audit Reports',                 false, 'Branded', 'White-label', 'White-label'],
+        ['Weekly health digest',              false, false, true, true],
         ['Slack / Discord webhooks',          false, false, true, true],
         ['Multi-site (Network) support',      false, false, true, true],
     ];
@@ -342,7 +355,9 @@ $pillars = [
         <?php foreach ($pillars as $p): ?>
             <div class="phpinfowp-pillar">
                 <div class="phpinfowp-pillar-header">
-                    <span class="dashicons <?php echo esc_attr($p['icon']); ?>"></span>
+                    <div class="phpinfowp-pillar-icon-box">
+                        <span class="dashicons <?php echo esc_attr($p['icon']); ?>"></span>
+                    </div>
                     <div>
                         <div class="phpinfowp-pillar-name"><?php echo esc_html($p['name']); ?></div>
                         <div class="phpinfowp-pillar-tag"><?php echo esc_html($p['tag']); ?></div>
@@ -365,9 +380,10 @@ $pillars = [
                 <div class="phpinfowp-pricing-name">Single Site</div>
                 <div class="phpinfowp-pricing-price">$29<span>/year</span></div>
                 <ul class="phpinfowp-pricing-list">
-                    <li>All Pro features on 1 site</li>
-                    <li>1 year of updates</li>
-                    <li>Email support</li>
+                    <li>Essential Pro features on 1 site</li>
+                    <li>Standard PDF reports (Branded)</li>
+                    <li>1 API monitor & 3 snapshots</li>
+                    <li>1 year of updates & support</li>
                 </ul>
                 <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-secondary">Get Single</a>
             </div>
@@ -377,9 +393,9 @@ $pillars = [
                 <div class="phpinfowp-pricing-price">$69<span>/year</span></div>
                 <ul class="phpinfowp-pricing-list">
                     <li>All Pro features on unlimited sites</li>
-                    <li>1 year of updates</li>
-                    <li>Priority email support</li>
-                    <li>Multi-site (Network) support</li>
+                    <li>White-labeled PDF reports (Logo)</li>
+                    <li>Weekly digests & Slack/Discord</li>
+                    <li>Priority support & Multi-site</li>
                 </ul>
                 <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary">Get Unlimited</a>
             </div>
@@ -389,8 +405,9 @@ $pillars = [
                 <div class="phpinfowp-pricing-price">$149<span>once</span></div>
                 <ul class="phpinfowp-pricing-list">
                     <li>All Pro features on unlimited sites</li>
-                    <li>Lifetime updates</li>
-                    <li>Priority email support, forever</li>
+                    <li>White-labeled PDF reports (Logo)</li>
+                    <li>Weekly digests & Slack/Discord</li>
+                    <li>Lifetime updates & priority support</li>
                 </ul>
                 <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-secondary">Get Lifetime</a>
             </div>

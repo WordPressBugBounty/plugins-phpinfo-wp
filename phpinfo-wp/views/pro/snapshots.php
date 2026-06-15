@@ -26,9 +26,14 @@ if (isset($_POST['phpinfowp_snap_action']) && check_admin_referer('phpinfowp_sna
     $action = sanitize_text_field($_POST['phpinfowp_snap_action']);
 
     if ($action === 'take') {
-        $label = sanitize_text_field($_POST['snap_label'] ?? '');
-        $id    = Phpinfo_WP_Snapshots::take($label ?: 'Manual snapshot');
-        $message = "Snapshot #$id saved.";
+        if (!Phpinfo_WP_License::is_unlimited() && count(Phpinfo_WP_Snapshots::list(50)) >= 3) {
+            $message = 'Single Site plan limit reached (max 3 snapshots). Delete older snapshots or upgrade to take more.';
+            $msg_type = 'error';
+        } else {
+            $label = sanitize_text_field($_POST['snap_label'] ?? '');
+            $id    = Phpinfo_WP_Snapshots::take($label ?: 'Manual snapshot');
+            $message = "Snapshot #$id saved.";
+        }
     } elseif ($action === 'delete' && !empty($_POST['snap_id'])) {
         Phpinfo_WP_Snapshots::delete((int) $_POST['snap_id']);
         $message = 'Snapshot deleted.';
@@ -67,12 +72,18 @@ if ($view_snap_id > 0) {
         <!-- Take snapshot -->
         <div class="phpinfowp-snap-card">
             <h3 style="margin-top:0">Take Snapshot Now</h3>
-            <form method="post">
-                <?php wp_nonce_field('phpinfowp_snap_nonce'); ?>
-                <input type="hidden" name="phpinfowp_snap_action" value="take">
-                <input type="text" name="snap_label" placeholder="Label (optional)" class="regular-text" style="margin-bottom:8px;display:block">
-                <button type="submit" class="button button-primary">Take Snapshot</button>
-            </form>
+            <?php if (!Phpinfo_WP_License::is_unlimited() && count($snapshots) >= 3): ?>
+                <div style="background:#fff9e6;border:1px solid #ffe599;border-radius:4px;padding:12px;font-size:13px;color:#7f6000;margin-bottom:8px;max-width:280px">
+                    Single Site tier limit reached (3/3 snapshots). Delete older snapshots or <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" style="font-weight:600;color:#7c3aed;text-decoration:none">Upgrade to Unlimited</a> for unlimited snapshot history.
+                </div>
+            <?php else: ?>
+                <form method="post">
+                    <?php wp_nonce_field('phpinfowp_snap_nonce'); ?>
+                    <input type="hidden" name="phpinfowp_snap_action" value="take">
+                    <input type="text" name="snap_label" placeholder="Label (optional)" class="regular-text" style="margin-bottom:8px;display:block">
+                    <button type="submit" class="button button-primary">Take Snapshot</button>
+                </form>
+            <?php endif; ?>
         </div>
 
         <!-- Diff picker -->

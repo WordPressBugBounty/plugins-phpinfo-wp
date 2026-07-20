@@ -55,7 +55,6 @@ class Phpinfo_WP_Report {
     // ─────────────────────────────────────────────────────────────────
 
     public static function build(): array {
-        if (!self::_pro()) return [];
 
         $eol      = Phpinfo_WP_EOL::status();
         $grader   = Phpinfo_WP_Config_Grader::run();

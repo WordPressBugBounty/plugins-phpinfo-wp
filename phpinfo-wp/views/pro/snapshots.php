@@ -58,8 +58,8 @@ if ($view_snap_id > 0) {
 <div class="phpinfowp-pro-page">
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Config Snapshots <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Track php.ini changes over time. Automatic weekly snapshots run via WP Cron.</p>
+            <h1>Config Snapshots <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Track php.ini changes over time. Automatic weekly snapshots run via WP Cron.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -71,17 +71,17 @@ if ($view_snap_id > 0) {
 
         <!-- Take snapshot -->
         <div class="phpinfowp-snap-card">
-            <h3 style="margin-top:0">Take Snapshot Now</h3>
+            <h3 style="margin-top:0"><?php _e('Take Snapshot Now', 'phpinfo-wp'); ?></h3>
             <?php if (!Phpinfo_WP_License::is_unlimited() && count($snapshots) >= 3): ?>
                 <div style="background:#fff9e6;border:1px solid #ffe599;border-radius:4px;padding:12px;font-size:13px;color:#7f6000;margin-bottom:8px;max-width:280px">
-                    Single Site tier limit reached (3/3 snapshots). Delete older snapshots or <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" style="font-weight:600;color:#7c3aed;text-decoration:none">Upgrade to Unlimited</a> for unlimited snapshot history.
+                    Single Site tier limit reached (3/3 snapshots). Delete older snapshots or <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" style="font-weight:600;color:#7c3aed;text-decoration:none"><?php _e('Upgrade to Unlimited', 'phpinfo-wp'); ?></a> for unlimited snapshot history.
                 </div>
             <?php else: ?>
                 <form method="post">
                     <?php wp_nonce_field('phpinfowp_snap_nonce'); ?>
                     <input type="hidden" name="phpinfowp_snap_action" value="take">
-                    <input type="text" name="snap_label" placeholder="Label (optional)" class="regular-text" style="margin-bottom:8px;display:block">
-                    <button type="submit" class="button button-primary">Take Snapshot</button>
+                    <input type="text" name="snap_label" placeholder="<?php echo esc_attr__('Label (optional)', 'phpinfo-wp'); ?>" class="regular-text" style="margin-bottom:8px;display:block">
+                    <button type="submit" class="button button-primary"><?php _e('Take Snapshot', 'phpinfo-wp'); ?></button>
                 </form>
             <?php endif; ?>
         </div>
@@ -89,12 +89,12 @@ if ($view_snap_id > 0) {
         <!-- Diff picker -->
         <?php if (count($snapshots) >= 2): ?>
         <div class="phpinfowp-snap-card">
-            <h3 style="margin-top:0">Compare Two Snapshots</h3>
+            <h3 style="margin-top:0"><?php _e('Compare Two Snapshots', 'phpinfo-wp'); ?></h3>
             <form method="post" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
                 <?php wp_nonce_field('phpinfowp_snap_nonce'); ?>
                 <input type="hidden" name="phpinfowp_snap_action" value="diff">
                 <div>
-                    <label style="display:block;font-size:12px;margin-bottom:3px">From (older)</label>
+                    <label style="display:block;font-size:12px;margin-bottom:3px"><?php _e('From (older)', 'phpinfo-wp'); ?></label>
                     <select name="snap_a" class="phpinfowp-snap-select">
                         <?php foreach ($snapshots as $s): ?>
                             <option value="<?php echo esc_attr($s->id); ?>"><?php echo esc_html("#{$s->id} {$s->label} — {$s->created_at}"); ?></option>
@@ -102,14 +102,14 @@ if ($view_snap_id > 0) {
                     </select>
                 </div>
                 <div>
-                    <label style="display:block;font-size:12px;margin-bottom:3px">To (newer)</label>
+                    <label style="display:block;font-size:12px;margin-bottom:3px"><?php _e('To (newer)', 'phpinfo-wp'); ?></label>
                     <select name="snap_b" class="phpinfowp-snap-select">
                         <?php foreach ($snapshots as $i => $s): ?>
                             <option value="<?php echo esc_attr($s->id); ?>" <?php selected($i, 0); ?>><?php echo esc_html("#{$s->id} {$s->label} — {$s->created_at}"); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <button type="submit" class="button button-secondary" style="margin-bottom:1px">Compare &rarr;</button>
+                <button type="submit" class="button button-secondary" style="margin-bottom:1px"><?php _e('Compare →', 'phpinfo-wp'); ?></button>
             </form>
         </div>
         <?php endif; ?>
@@ -124,10 +124,10 @@ if ($view_snap_id > 0) {
                 &rarr; <em><?php echo esc_html("#{$snap_b->id} {$snap_b->label}"); ?></em>
             </h2>
             <?php if (empty($diff)): ?>
-                <div class="notice notice-success inline"><p>No changes detected between these two snapshots.</p></div>
+                <div class="notice notice-success inline"><p><?php _e('No changes detected between these two snapshots.', 'phpinfo-wp'); ?></p></div>
             <?php else: ?>
                 <table class="wp-list-table widefat fixed striped phpinfowp-diff-table">
-                    <thead><tr><th style="width:120px">Change</th><th>Directive</th><th>Old Value</th><th>New Value</th></tr></thead>
+                    <thead><tr><th style="width:120px"><?php _e('Change', 'phpinfo-wp'); ?></th><th><?php _e('Directive', 'phpinfo-wp'); ?></th><th><?php _e('Old Value', 'phpinfo-wp'); ?></th><th><?php _e('New Value', 'phpinfo-wp'); ?></th></tr></thead>
                     <tbody>
                     <?php foreach ($diff as $item): ?>
                         <tr class="diff-<?php echo esc_attr($item['type']); ?>">
@@ -152,7 +152,7 @@ if ($view_snap_id > 0) {
             </h2>
             <p style="font-size:12px;color:#666;margin-top:-12px"><?php echo esc_html($view_snap->created_at); ?> UTC</p>
             <table class="wp-list-table widefat fixed striped">
-                <thead><tr><th style="width:280px">Directive</th><th>Value</th></tr></thead>
+                <thead><tr><th style="width:280px"><?php _e('Directive', 'phpinfo-wp'); ?></th><th><?php _e('Value', 'phpinfo-wp'); ?></th></tr></thead>
                 <tbody>
                 <?php foreach ($view_snap->snapshot_data as $key => $val): ?>
                     <tr>
@@ -168,10 +168,10 @@ if ($view_snap_id > 0) {
     <!-- Snapshot list -->
     <h2 style="margin-top:32px">Saved Snapshots (<?php echo count($snapshots); ?>)</h2>
     <?php if (empty($snapshots)): ?>
-        <p style="color:#666">No snapshots yet. Take one above — weekly auto-snapshots will accumulate here over time.</p>
+        <p style="color:#666"><?php _e('No snapshots yet. Take one above — weekly auto-snapshots will accumulate here over time.', 'phpinfo-wp'); ?></p>
     <?php else: ?>
         <table class="wp-list-table widefat fixed striped">
-            <thead><tr><th style="width:50px">#</th><th>Label</th><th>Created</th><th style="width:160px">Actions</th></tr></thead>
+            <thead><tr><th style="width:50px">#</th><th><?php _e('Label', 'phpinfo-wp'); ?></th><th><?php _e('Created', 'phpinfo-wp'); ?></th><th style="width:160px"><?php _e('Actions', 'phpinfo-wp'); ?></th></tr></thead>
             <tbody>
             <?php foreach ($snapshots as $s): ?>
                 <tr <?php if ($view_snap_id === (int)$s->id) echo 'style="background:#f0f4ff"'; ?>>
@@ -185,7 +185,7 @@ if ($view_snap_id > 0) {
                             <?php wp_nonce_field('phpinfowp_snap_nonce'); ?>
                             <input type="hidden" name="phpinfowp_snap_action" value="delete">
                             <input type="hidden" name="snap_id" value="<?php echo esc_attr($s->id); ?>">
-                            <button type="submit" class="button button-small">Delete</button>
+                            <button type="submit" class="button button-small"><?php _e('Delete', 'phpinfo-wp'); ?></button>
                         </form>
                     </td>
                 </tr>

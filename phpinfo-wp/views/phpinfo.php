@@ -5,18 +5,18 @@
   <div class="phpinfowp-toolbar">
     <div style="position:relative;flex:1;max-width:420px">
       <input type="text" id="phpinfowp-search"
-             placeholder="Search directives, values, modules… (e.g. memory_limit)"
+             placeholder="<?php echo esc_attr__('Search directives, values, modules… (e.g. memory_limit)', 'phpinfo-wp'); ?>"
              class="regular-text"
              style="width:100%;padding-right:32px"
              autocomplete="off" spellcheck="false">
       <button type="button" id="phpinfowp-search-clear"
               style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:18px;line-height:1;padding:0"
-              title="Clear search">&times;</button>
+              title="<?php echo esc_attr__('Clear search', 'phpinfo-wp'); ?>">&times;</button>
     </div>
     <span id="phpinfowp-search-count" style="font-size:12px;color:#666;white-space:nowrap"></span>
 
-    <select id="phpinfowp-section-jump" style="max-width:240px" title="Jump to section">
-      <option value="">Jump to section…</option>
+    <select id="phpinfowp-section-jump" style="max-width:240px" title="<?php echo esc_attr__('Jump to section', 'phpinfo-wp'); ?>">
+      <option value=""><?php _e('Jump to section…', 'phpinfo-wp'); ?></option>
     </select>
   </div>
 
@@ -38,9 +38,9 @@
     echo $phpinfo_body;
     Phpinfo_wp::thankyou();
     ?>
-    <button id="topButton-phpinfo-WP" title="Go to top" style="display:none">
+    <button id="topButton-phpinfo-WP" title="<?php echo esc_attr__('Go to top', 'phpinfo-wp'); ?>" style="display:none">
       <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../assets/images/top.png'); ?>"
-           alt="Top" id="topButtonImage-phpinfo-WP">
+           alt="<?php echo esc_attr__('Top', 'phpinfo-wp'); ?>" id="topButtonImage-phpinfo-WP">
     </button>
   </div>
 </div>
@@ -84,8 +84,6 @@
   });
 
   // ── Pre-index all data rows ────────────────────────────────────────
-  // phpinfo rows: <tr><td class="e">name</td><td class="v">value</td></tr>
-  // We skip header rows (.h class)
   var allTables = Array.from(container.querySelectorAll('table'));
 
   allTables.forEach(function (table) {
@@ -106,6 +104,10 @@
 
   // ── Search ─────────────────────────────────────────────────────────
   var currentHL = [];
+
+  var langRowsMatched = <?php echo json_encode(__( 'rows matched', 'phpinfo-wp' )); ?>;
+  var langRowMatched = <?php echo json_encode(__( 'row matched', 'phpinfo-wp' )); ?>;
+  var langNoResults = <?php echo json_encode(__( 'No results', 'phpinfo-wp' )); ?>;
 
   function applySearch(q) {
     q = q.trim().toLowerCase();
@@ -155,8 +157,8 @@
     });
 
     countEl.textContent = totalMatches
-      ? totalMatches + ' row' + (totalMatches !== 1 ? 's' : '') + ' matched'
-      : 'No results';
+      ? totalMatches + ' ' + (totalMatches !== 1 ? langRowsMatched : langRowMatched)
+      : langNoResults;
 
     // Scroll first match into view
     if (currentHL[0]) {

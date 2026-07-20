@@ -54,13 +54,13 @@ class Phpinfo_WP_Deactivate_Modal {
                          onerror="this.style.display='none'">
                     <div>
                         <h2 id="phpinfowp-dm-title" class="phpinfowp-dm-title">Before you deactivate phpinfo() WP…</h2>
-                        <p class="phpinfowp-dm-sub">Here's what stops working the moment this plugin goes off:</p>
+                        <p class="phpinfowp-dm-sub"><?php _e('Here\'s what stops working the moment this plugin goes off:', 'phpinfo-wp'); ?></p>
                     </div>
                 </div>
 
                 <div class="phpinfowp-dm-body">
                     <div class="phpinfowp-dm-col">
-                        <div class="phpinfowp-dm-col-label">You'll lose (Free)</div>
+                        <div class="phpinfowp-dm-col-label"><?php _e('You\'ll lose (Free)', 'phpinfo-wp'); ?></div>
                         <ul class="phpinfowp-dm-list">
                             <?php foreach ($free_features as $f): ?>
                                 <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span><?php echo esc_html($f); ?></li>
@@ -69,7 +69,7 @@ class Phpinfo_WP_Deactivate_Modal {
                     </div>
                     <?php if ($is_pro): ?>
                     <div class="phpinfowp-dm-col phpinfowp-dm-col-pro">
-                        <div class="phpinfowp-dm-col-label">You'll also lose (Pro)</div>
+                        <div class="phpinfowp-dm-col-label"><?php _e('You\'ll also lose (Pro)', 'phpinfo-wp'); ?></div>
                         <ul class="phpinfowp-dm-list">
                             <?php foreach ($pro_features as $f): ?>
                                 <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span><?php echo esc_html($f); ?></li>
@@ -82,7 +82,7 @@ class Phpinfo_WP_Deactivate_Modal {
                 <div class="phpinfowp-dm-warn">
                     <span class="dashicons dashicons-warning"></span>
                     <div>
-                        Deactivating <strong>doesn't delete</strong> your settings or logs — you can re-activate any time.
+                        Deactivating <strong><?php _e('doesn\'t delete', 'phpinfo-wp'); ?></strong> your settings or logs — you can re-activate any time.
                         <?php if ($is_pro): ?>
                             Your license stays on this site; Pro features simply pause while the plugin is off.
                         <?php else: ?>
@@ -92,12 +92,8 @@ class Phpinfo_WP_Deactivate_Modal {
                 </div>
 
                 <div class="phpinfowp-dm-actions">
-                    <button type="button" class="button button-primary button-large phpinfowp-dm-keep">
-                        Keep it active
-                    </button>
-                    <a href="#" class="phpinfowp-dm-confirm" data-href="">
-                        Deactivate anyway →
-                    </a>
+                    <button type="button" class="button button-primary button-large phpinfowp-dm-keep"><?php _e('Keep it active', 'phpinfo-wp'); ?></button>
+                    <a href="#" class="phpinfowp-dm-confirm" data-href=""><?php _e('Deactivate anyway →', 'phpinfo-wp'); ?></a>
                 </div>
             </div>
         </div>

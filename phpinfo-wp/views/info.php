@@ -36,7 +36,7 @@ $db_size_raw = $wpdb->get_var($wpdb->prepare(
 $db_size = $db_size_raw ? phpinfowp_fmt_bytes((int)$db_size_raw) : '—';
 
 // cURL
-$curl_ver = function_exists('curl_version') ? (curl_version()['version'] ?? '—') : 'not loaded';
+$curl_ver = function_exists('curl_version') ? (curl_version()['version'] ?? '—') : __('not loaded', 'phpinfo-wp');
 
 // Server
 $server_soft = $_SERVER['SERVER_SOFTWARE'] ?? '—';
@@ -46,8 +46,8 @@ $server_soft = $_SERVER['SERVER_SOFTWARE'] ?? '—';
 
   <div class="phpinfowp-page-header">
     <div>
-      <h1>Server Overview</h1>
-      <p class="phpinfowp-page-subtitle">PHP, WordPress, server, and database environment at a glance</p>
+      <h1><?php _e('Server Overview', 'phpinfo-wp'); ?></h1>
+      <p class="phpinfowp-page-subtitle"><?php _e('PHP, WordPress, server, and database environment at a glance', 'phpinfo-wp'); ?></p>
     </div>
   </div>
 
@@ -55,22 +55,22 @@ $server_soft = $_SERVER['SERVER_SOFTWARE'] ?? '—';
 
     <!-- PHP -->
     <div class="phpinfowp-info-card" style="border-top:3px solid <?php echo $eol_color; ?>">
-      <div class="phpinfowp-info-card-label">PHP Version</div>
+      <div class="phpinfowp-info-card-label"><?php _e('PHP Version', 'phpinfo-wp'); ?></div>
       <div class="phpinfowp-info-card-value"><?php echo esc_html(PHP_VERSION); ?></div>
       <div class="phpinfowp-info-card-sub">
         <span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.4px;background:<?php echo $eol_color; ?>;color:#fff">
           <?php
-          if ($eol['status'] === 'eol')     echo 'END OF LIFE';
-          elseif ($eol['status'] === 'warning') echo 'EOL SOON';
-          else echo 'SUPPORTED';
+          if ($eol['status'] === 'eol')     echo esc_html__('END OF LIFE', 'phpinfo-wp');
+          elseif ($eol['status'] === 'warning') echo esc_html__('EOL SOON', 'phpinfo-wp');
+          else echo esc_html__('SUPPORTED', 'phpinfo-wp');
           ?>
         </span>
         <div style="margin-top:4px;color:<?php echo $eol_color; ?>">
           <?php
-          if ($eol['status'] === 'eol') echo 'Upgrade immediately';
-          elseif ($eol['status'] === 'warning') echo 'EOL in ' . $eol['days'] . 'd — ' . $eol['eol'];
-          elseif ($eol['status'] === 'ok') echo 'Until ' . $eol['eol'];
-          else echo 'EOL date unknown';
+          if ($eol['status'] === 'eol') echo esc_html__('Upgrade immediately', 'phpinfo-wp');
+          elseif ($eol['status'] === 'warning') printf(esc_html__('EOL in %sd — %s', 'phpinfo-wp'), $eol['days'], $eol['eol']);
+          elseif ($eol['status'] === 'ok') printf(esc_html__('Until %s', 'phpinfo-wp'), $eol['eol']);
+          else echo esc_html__('EOL date unknown', 'phpinfo-wp');
           ?>
         </div>
       </div>
@@ -78,20 +78,31 @@ $server_soft = $_SERVER['SERVER_SOFTWARE'] ?? '—';
 
     <!-- WordPress -->
     <div class="phpinfowp-info-card" style="border-top:3px solid #2271b1">
-      <div class="phpinfowp-info-card-label">WordPress</div>
+      <div class="phpinfowp-info-card-label"><?php _e('WordPress', 'phpinfo-wp'); ?></div>
       <div class="phpinfowp-info-card-value"><?php echo esc_html(get_bloginfo('version')); ?></div>
       <div class="phpinfowp-info-card-sub">
-        <?php echo is_multisite() ? 'Multisite network' : 'Single site'; ?><br>
-        <?php echo count(get_option('active_plugins')); ?> active plugins
+        <?php echo is_multisite() ? esc_html__('Multisite network', 'phpinfo-wp') : esc_html__('Single site', 'phpinfo-wp'); ?><br>
+        <?php
+        $active_plugins_count = count(get_option('active_plugins'));
+        printf(
+            _n('%s active plugin', '%s active plugins', $active_plugins_count, 'phpinfo-wp'),
+            number_format_i18n($active_plugins_count)
+        );
+        ?>
       </div>
     </div>
 
     <!-- Memory -->
     <div class="phpinfowp-info-card" style="border-top:3px solid <?php echo $mem_pct > 85 ? '#d63638' : '#777BB3'; ?>">
-      <div class="phpinfowp-info-card-label">Memory Usage</div>
+      <div class="phpinfowp-info-card-label"><?php _e('Memory Usage', 'phpinfo-wp'); ?></div>
       <div class="phpinfowp-info-card-value"><?php echo esc_html(phpinfowp_fmt_bytes($mem_used)); ?></div>
       <div class="phpinfowp-info-card-sub">
-        of <?php echo esc_html($mem_limit); ?> limit (<?php echo $mem_pct; ?>%)
+        <?php printf(
+            /* translators: 1: memory limit, 2: percentage value */
+            __('of %1$s limit (%2$s%%)', 'phpinfo-wp'),
+            esc_html($mem_limit),
+            $mem_pct
+        ); ?>
         <div class="phpinfowp-mini-bar-wrap">
           <div class="phpinfowp-mini-bar" style="width:<?php echo min(100,$mem_pct); ?>%;background:<?php echo $mem_pct > 85 ? '#d63638' : '#777BB3'; ?>"></div>
         </div>
@@ -100,65 +111,84 @@ $server_soft = $_SERVER['SERVER_SOFTWARE'] ?? '—';
 
     <!-- Database -->
     <div class="phpinfowp-info-card" style="border-top:3px solid #00a32a">
-      <div class="phpinfowp-info-card-label">Database</div>
+      <div class="phpinfowp-info-card-label"><?php _e('Database', 'phpinfo-wp'); ?></div>
       <div class="phpinfowp-info-card-value" style="font-size:18px"><?php echo esc_html($db_version); ?></div>
       <div class="phpinfowp-info-card-sub">
         <?php echo esc_html(DB_NAME); ?><br>
-        <?php echo esc_html($db_size); ?> total size
+        <?php printf(esc_html__('%s total size', 'phpinfo-wp'), esc_html($db_size)); ?>
       </div>
     </div>
 
   </div>
 
-  <h2 class="phpinfowp-section-heading">Environment Details</h2>
+  <h2 class="phpinfowp-section-heading"><?php _e('Environment Details', 'phpinfo-wp'); ?></h2>
   <table class="wp-list-table widefat fixed striped phpinfowp-info-table">
     <tbody>
 
-      <tr><th colspan="2" class="phpinfowp-info-section-head">WordPress</th></tr>
-      <tr><td>Site URL</td><td><code><?php echo esc_html(get_site_url()); ?></code></td></tr>
-      <tr><td>Home URL</td><td><code><?php echo esc_html(get_home_url()); ?></code></td></tr>
-      <tr><td>WP Version</td><td><?php echo esc_html(get_bloginfo('version')); ?></td></tr>
-      <tr><td>Active Theme</td><td><?php echo esc_html(wp_get_theme()->get('Name')); ?> <?php echo esc_html(wp_get_theme()->get('Version')); ?></td></tr>
-      <tr><td>Active Plugins</td><td><?php echo count(get_option('active_plugins')); ?> of <?php echo count(get_plugins()); ?> installed</td></tr>
-      <tr><td>Active Themes</td><td><?php echo count(wp_get_themes()); ?> installed</td></tr>
-      <tr><td>Debug Mode</td>
+      <tr><th colspan="2" class="phpinfowp-info-section-head"><?php _e('WordPress', 'phpinfo-wp'); ?></th></tr>
+      <tr><td><?php _e('Site URL', 'phpinfo-wp'); ?></td><td><code><?php echo esc_html(get_site_url()); ?></code></td></tr>
+      <tr><td><?php _e('Home URL', 'phpinfo-wp'); ?></td><td><code><?php echo esc_html(get_home_url()); ?></code></td></tr>
+      <tr><td><?php _e('WP Version', 'phpinfo-wp'); ?></td><td><?php echo esc_html(get_bloginfo('version')); ?></td></tr>
+      <tr><td><?php _e('Active Theme', 'phpinfo-wp'); ?></td><td><?php echo esc_html(wp_get_theme()->get('Name')); ?> <?php echo esc_html(wp_get_theme()->get('Version')); ?></td></tr>
+      <tr><td><?php _e('Active Plugins', 'phpinfo-wp'); ?></td><td>
+        <?php
+        $active_count = count(get_option('active_plugins'));
+        $installed_count = count(get_plugins());
+        printf(
+            /* translators: 1: active plugins count, 2: installed plugins count */
+            __('%1$s of %2$s installed', 'phpinfo-wp'),
+            $active_count,
+            $installed_count
+        );
+        ?>
+      </td></tr>
+      <tr><td><?php _e('Active Themes', 'phpinfo-wp'); ?></td><td>
+        <?php
+        $themes_count = count(wp_get_themes());
+        printf(
+            _n('%s installed', '%s installed', $themes_count, 'phpinfo-wp'),
+            number_format_i18n($themes_count)
+        );
+        ?>
+      </td></tr>
+      <tr><td><?php _e('Debug Mode', 'phpinfo-wp'); ?></td>
           <td><?php if (defined('WP_DEBUG') && WP_DEBUG): ?>
-                <span style="color:#d63638;font-weight:600">ON</span> — disable in production
+                <span style="color:#d63638;font-weight:600"><?php _e('ON', 'phpinfo-wp'); ?></span> — <?php _e('disable in production', 'phpinfo-wp'); ?>
               <?php else: ?>
-                <span style="color:#00a32a">Off</span>
+                <span style="color:#00a32a"><?php _e('Off', 'phpinfo-wp'); ?></span>
               <?php endif; ?></td></tr>
-      <tr><td>Admin Email</td><td><?php echo esc_html(get_option('admin_email')); ?></td></tr>
+      <tr><td><?php _e('Admin Email', 'phpinfo-wp'); ?></td><td><?php echo esc_html(get_option('admin_email')); ?></td></tr>
 
-      <tr><th colspan="2" class="phpinfowp-info-section-head">PHP</th></tr>
-      <tr><td>PHP Version</td><td><?php echo esc_html(PHP_VERSION); ?></td></tr>
-      <tr><td>PHP SAPI</td><td><?php echo esc_html(PHP_SAPI); ?></td></tr>
-      <tr><td>Memory Limit</td><td><?php echo esc_html(ini_get('memory_limit')); ?></td></tr>
-      <tr><td>Max Execution Time</td><td><?php echo esc_html(ini_get('max_execution_time')); ?>s</td></tr>
-      <tr><td>Upload Max Filesize</td><td><?php echo esc_html(ini_get('upload_max_filesize')); ?></td></tr>
-      <tr><td>Post Max Size</td><td><?php echo esc_html(ini_get('post_max_size')); ?></td></tr>
-      <tr><td>Max Input Vars</td><td><?php echo esc_html(ini_get('max_input_vars')); ?></td></tr>
-      <tr><td>Display Errors</td><td><?php echo ini_get('display_errors') ? '<span style="color:#d63638">On</span>' : '<span style="color:#00a32a">Off</span>'; ?></td></tr>
-      <tr><td>cURL Version</td><td><?php echo esc_html($curl_ver); ?></td></tr>
-      <tr><td>Loaded Extensions</td><td><?php echo count(get_loaded_extensions()); ?></td></tr>
+      <tr><th colspan="2" class="phpinfowp-info-section-head"><?php _e('PHP', 'phpinfo-wp'); ?></th></tr>
+      <tr><td><?php _e('PHP Version', 'phpinfo-wp'); ?></td><td><?php echo esc_html(PHP_VERSION); ?></td></tr>
+      <tr><td><?php _e('PHP SAPI', 'phpinfo-wp'); ?></td><td><?php echo esc_html(PHP_SAPI); ?></td></tr>
+      <tr><td><?php _e('Memory Limit', 'phpinfo-wp'); ?></td><td><?php echo esc_html(ini_get('memory_limit')); ?></td></tr>
+      <tr><td><?php _e('Max Execution Time', 'phpinfo-wp'); ?></td><td><?php echo esc_html(ini_get('max_execution_time')); ?>s</td></tr>
+      <tr><td><?php _e('Upload Max Filesize', 'phpinfo-wp'); ?></td><td><?php echo esc_html(ini_get('upload_max_filesize')); ?></td></tr>
+      <tr><td><?php _e('Post Max Size', 'phpinfo-wp'); ?></td><td><?php echo esc_html(ini_get('post_max_size')); ?></td></tr>
+      <tr><td><?php _e('Max Input Vars', 'phpinfo-wp'); ?></td><td><?php echo esc_html(ini_get('max_input_vars')); ?></td></tr>
+      <tr><td><?php _e('Display Errors', 'phpinfo-wp'); ?></td><td><?php echo ini_get('display_errors') ? '<span style="color:#d63638">' . __('On', 'phpinfo-wp') . '</span>' : '<span style="color:#00a32a">' . __('Off', 'phpinfo-wp') . '</span>'; ?></td></tr>
+      <tr><td><?php _e('cURL Version', 'phpinfo-wp'); ?></td><td><?php echo esc_html($curl_ver); ?></td></tr>
+      <tr><td><?php _e('Loaded Extensions', 'phpinfo-wp'); ?></td><td><?php echo count(get_loaded_extensions()); ?></td></tr>
 
-      <tr><th colspan="2" class="phpinfowp-info-section-head">Server</th></tr>
-      <tr><td>Server Software</td><td><?php echo esc_html($server_soft); ?></td></tr>
-      <tr><td>Server Name</td><td><?php echo esc_html($_SERVER['SERVER_NAME'] ?? '—'); ?></td></tr>
-      <tr><td>Document Root</td><td><code><?php echo esc_html($_SERVER['DOCUMENT_ROOT'] ?? ABSPATH); ?></code></td></tr>
-      <tr><td>Operating System</td><td><?php echo esc_html(PHP_OS_FAMILY . ' ' . php_uname('r')); ?></td></tr>
-      <tr><td>Hostname</td><td><?php echo esc_html(gethostname() ?: '—'); ?></td></tr>
+      <tr><th colspan="2" class="phpinfowp-info-section-head"><?php _e('Server', 'phpinfo-wp'); ?></th></tr>
+      <tr><td><?php _e('Server Software', 'phpinfo-wp'); ?></td><td><?php echo esc_html($server_soft); ?></td></tr>
+      <tr><td><?php _e('Server Name', 'phpinfo-wp'); ?></td><td><?php echo esc_html($_SERVER['SERVER_NAME'] ?? '—'); ?></td></tr>
+      <tr><td><?php _e('Document Root', 'phpinfo-wp'); ?></td><td><code><?php echo esc_html($_SERVER['DOCUMENT_ROOT'] ?? ABSPATH); ?></code></td></tr>
+      <tr><td><?php _e('Operating System', 'phpinfo-wp'); ?></td><td><?php echo esc_html(PHP_OS_FAMILY . ' ' . php_uname('r')); ?></td></tr>
+      <tr><td><?php _e('Hostname', 'phpinfo-wp'); ?></td><td><?php echo esc_html(gethostname() ?: '—'); ?></td></tr>
 
-      <tr><th colspan="2" class="phpinfowp-info-section-head">Database</th></tr>
-      <tr><td>MySQL Version</td><td><?php echo esc_html($db_version); ?></td></tr>
-      <tr><td>Database Name</td><td><?php echo esc_html(DB_NAME); ?></td></tr>
-      <tr><td>Database Host</td><td><?php echo esc_html(DB_HOST); ?></td></tr>
-      <tr><td>Table Prefix</td><td><code><?php echo esc_html($wpdb->prefix); ?></code></td></tr>
-      <tr><td>Database Size</td><td><?php echo esc_html($db_size); ?></td></tr>
-      <tr><td>Charset</td><td><?php echo esc_html(DB_CHARSET); ?></td></tr>
+      <tr><th colspan="2" class="phpinfowp-info-section-head"><?php _e('Database', 'phpinfo-wp'); ?></th></tr>
+      <tr><td><?php _e('MySQL Version', 'phpinfo-wp'); ?></td><td><?php echo esc_html($db_version); ?></td></tr>
+      <tr><td><?php _e('Database Name', 'phpinfo-wp'); ?></td><td><?php echo esc_html(DB_NAME); ?></td></tr>
+      <tr><td><?php _e('Database Host', 'phpinfo-wp'); ?></td><td><?php echo esc_html(DB_HOST); ?></td></tr>
+      <tr><td><?php _e('Table Prefix', 'phpinfo-wp'); ?></td><td><code><?php echo esc_html($wpdb->prefix); ?></code></td></tr>
+      <tr><td><?php _e('Database Size', 'phpinfo-wp'); ?></td><td><?php echo esc_html($db_size); ?></td></tr>
+      <tr><td><?php _e('Charset', 'phpinfo-wp'); ?></td><td><?php echo esc_html(DB_CHARSET); ?></td></tr>
 
-      <tr><th colspan="2" class="phpinfowp-info-section-head">Disk</th></tr>
-      <tr><td>Root Directory</td><td><?php echo esc_html(phpinfowp_dirsize_safe(ABSPATH)); ?></td></tr>
-      <tr><td>Uploads Directory</td><td><?php echo esc_html(phpinfowp_dirsize_safe(WP_CONTENT_DIR . '/uploads')); ?></td></tr>
+      <tr><th colspan="2" class="phpinfowp-info-section-head"><?php _e('Disk', 'phpinfo-wp'); ?></th></tr>
+      <tr><td><?php _e('Root Directory', 'phpinfo-wp'); ?></td><td><?php echo esc_html(phpinfowp_dirsize_safe(ABSPATH)); ?></td></tr>
+      <tr><td><?php _e('Uploads Directory', 'phpinfo-wp'); ?></td><td><?php echo esc_html(phpinfowp_dirsize_safe(WP_CONTENT_DIR . '/uploads')); ?></td></tr>
 
     </tbody>
   </table>

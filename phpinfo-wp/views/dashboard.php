@@ -56,7 +56,7 @@ if (!function_exists('render_dash_grid')) {
             echo '<div class="phpinfowp-dash-card-title">';
             echo esc_html($tab['label']);
             if ($tab['pro']) {
-                echo '<span class="phpinfowp-dash-card-pro">PRO</span>';
+                echo '<span class="phpinfowp-dash-card-pro">' . __('PRO', 'phpinfo-wp') . '</span>';
             }
             echo '</div>';
             echo '</a>';
@@ -70,10 +70,24 @@ if (!function_exists('render_dash_grid')) {
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Dashboard</h1>
-            <p class="phpinfowp-page-subtitle">Visual health overview and system shortcuts</p>
+            <h1><?php _e('Dashboard', 'phpinfo-wp'); ?></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Visual health overview and system shortcuts', 'phpinfo-wp'); ?></p>
         </div>
     </div>
+
+    <?php if (!$is_pro): ?>
+        <div class="phpinfowp-price-alert-banner" style="position:relative; background:#fff3cd; border-left:4px solid #ffc107; padding:12px 40px 12px 16px; margin: 0 0 24px; border-radius: 0 4px 4px 0; font-size:13.5px; color:#664d03; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+            <button type="button" onclick="try{localStorage.setItem('phpinfowp_price_alert_dismissed','1')}catch(e){} this.closest('.phpinfowp-price-alert-banner').style.display='none';" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" style="position:absolute; top:6px; right:8px; background:none; border:none; cursor:pointer; color:#664d03; opacity:0.5; font-size:20px; line-height:1; padding:2px 4px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&times;</button>
+            <span>
+                <strong>⏰ <?php _e('Price Increase Alert:', 'phpinfo-wp'); ?></strong> 
+                <?php _e('On August 31st, the Single Site Pro license increases from $29 to $39/year. Upgrade today to secure the current $29/year rate before the price goes up.', 'phpinfo-wp'); ?>
+            </span>
+            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" style="background:#777BB3; color:#fff; padding:6px 14px; border-radius:4px; font-size:12.5px; font-weight:600; text-decoration:none; display:inline-block;">
+                <?php _e('Lock in $29 Now →', 'phpinfo-wp'); ?>
+            </a>
+        </div>
+        <script>if(localStorage.getItem('phpinfowp_price_alert_dismissed')==='1'){document.querySelectorAll('.phpinfowp-price-alert-banner').forEach(function(e){e.style.display='none';});}</script>
+    <?php endif; ?>
 
     <!-- VISUAL INSIGHTS WIDGETS -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-bottom:32px;">
@@ -81,9 +95,13 @@ if (!function_exists('render_dash_grid')) {
         <!-- 1. Config Grader Gauge -->
         <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-config-grader')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
             <div>
-                <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;">Setup Optimization</h3>
+                <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Setup Optimization', 'phpinfo-wp'); ?></h3>
                 <div style="font-size:32px; font-weight:300; line-height:1; margin-bottom:8px; color:#1d2327;">
-                    <?php echo (int)$score; ?> <span style="font-size:16px; color:#888;">/ 100</span>
+                    <?php printf(
+                        /* translators: %s: score value */
+                        __('%s / 100', 'phpinfo-wp'),
+                        (int)$score
+                    ); ?>
                 </div>
             </div>
             <div>
@@ -91,7 +109,7 @@ if (!function_exists('render_dash_grid')) {
                     <div style="height:100%; width:<?php echo $grade_pct; ?>%; background:<?php echo $grade_color; ?>; border-radius:4px;"></div>
                 </div>
                 <div style="font-size:12px; color:#777;">
-                    Current Grade: <strong class="grade-<?php echo esc_attr(strtolower(str_replace('+', 'plus', $grade))); ?>"><?php echo esc_html($grade); ?></strong>
+                    <?php _e('Current Grade:', 'phpinfo-wp'); ?> <strong class="grade-<?php echo esc_attr(strtolower(str_replace('+', 'plus', $grade))); ?>"><?php echo esc_html($grade); ?></strong>
                 </div>
             </div>
         </a>
@@ -99,12 +117,12 @@ if (!function_exists('render_dash_grid')) {
         <!-- 2. Memory Donut Chart -->
         <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-info')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; align-items:center; justify-content:space-between;">
             <div>
-                <h3 style="margin:0 0 8px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;">Memory Peak</h3>
+                <h3 style="margin:0 0 8px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Memory Peak', 'phpinfo-wp'); ?></h3>
                 <div style="font-size:24px; font-weight:300; line-height:1.2; margin-bottom:4px; color:#1d2327;">
                     <?php echo esc_html(size_format($mem['peak_bytes'] > 0 ? $mem['peak_bytes'] : memory_get_usage(true))); ?>
                 </div>
                 <div style="font-size:12px; color:#777;">
-                    Limit: <?php echo esc_html($mem['limit_label']); ?>
+                    <?php _e('Limit:', 'phpinfo-wp'); ?> <?php echo esc_html($mem['limit_label']); ?>
                 </div>
             </div>
             <svg width="80" height="80" viewBox="0 0 36 36" style="display:block;">
@@ -117,7 +135,7 @@ if (!function_exists('render_dash_grid')) {
         <!-- 3. DB Autoload Progress -->
         <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-db-health')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
             <div>
-                <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;">Autoload Bloat</h3>
+                <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Autoload Bloat', 'phpinfo-wp'); ?></h3>
                 <div style="font-size:24px; font-weight:300; line-height:1; margin-bottom:8px; color:<?php echo $db_color; ?>;">
                     <?php echo $db_kb; ?> <span style="font-size:16px; color:#888;">KB</span>
                 </div>
@@ -127,17 +145,17 @@ if (!function_exists('render_dash_grid')) {
                     <div style="height:100%; width:<?php echo $db_pct; ?>%; background:<?php echo $db_color; ?>; border-radius:4px;"></div>
                 </div>
                 <div style="font-size:12px; color:#777;">
-                    <?php echo $db_kb > 800 ? 'Danger: High TTFB Impact' : 'Healthy footprint'; ?>
+                    <?php echo $db_kb > 800 ? __('Danger: High TTFB Impact', 'phpinfo-wp') : __('Healthy footprint', 'phpinfo-wp'); ?>
                 </div>
             </div>
         </a>
 
         <!-- 4. API Monitor Bar Chart -->
         <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-api-monitor')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column;">
-            <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;">Slowest External APIs</h3>
+            <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Slowest External APIs', 'phpinfo-wp'); ?></h3>
             <?php if (empty($top_apis)): ?>
                 <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#888; font-size:13px; font-style:italic;">
-                    No slow API calls detected
+                    <?php _e('No slow API calls detected', 'phpinfo-wp'); ?>
                 </div>
             <?php else: ?>
                 <div style="flex:1; display:flex; flex-direction:column; justify-content:space-around;">
@@ -166,7 +184,7 @@ if (!function_exists('render_dash_grid')) {
     <!-- Active issues panel -->
     <?php if (!empty($bar['issues'])): ?>
     <div class="phpinfowp-dash-section">
-        <h2 class="phpinfowp-dash-section-title">Active Issues</h2>
+        <h2 class="phpinfowp-dash-section-title"><?php _e('Active Issues', 'phpinfo-wp'); ?></h2>
         <div class="phpinfowp-dash-issues">
             <?php foreach ($bar['issues'] as $issue):
                 $c = $issue['level'] === 'critical' ? '#d63638' : '#dba617';
@@ -192,11 +210,11 @@ if (!function_exists('render_dash_grid')) {
     <?php if (!$is_pro): ?>
     <div style="margin-top:24px;padding:14px 16px;background:#f6f7f7;border:1px solid #e5e7ea;border-radius:4px;display:flex;align-items:center;justify-content:space-between;">
         <span style="font-size:13px;color:#555;">
-            🔒 Running <strong>Pro features</strong> in preview mode.
+            <?php _e('🔒 Running <strong>Pro features</strong> in preview mode.', 'phpinfo-wp'); ?>
         </span>
         <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener"
            style="background:#777BB3;color:#fff;padding:6px 14px;border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;">
-            Unlock full access →
+            <?php _e('Unlock full access →', 'phpinfo-wp'); ?>
         </a>
     </div>
     <?php endif; ?>

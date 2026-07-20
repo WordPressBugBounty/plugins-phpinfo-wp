@@ -39,8 +39,8 @@ $search = sanitize_text_field($_GET['log_search'] ?? '');
 <div class="phpinfowp-pro-page">
     <div class="phpinfowp-page-header">
         <div>
-            <h1>PHP Error Log <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host.</p>
+            <h1>PHP Error Log <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -59,12 +59,12 @@ $search = sanitize_text_field($_GET['log_search'] ?? '');
                     <span class="phpinfowp-errlog-diag-pill" style="background:<?php echo $verdict_color; ?>20;color:<?php echo $verdict_color; ?>;border-color:<?php echo $verdict_color; ?>40">
                         <?php echo esc_html($verdict_label); ?>
                     </span>
-                    <h2 style="margin:8px 0 4px;font-size:17px;color:#1d2327">No log file discovered</h2>
+                    <h2 style="margin:8px 0 4px;font-size:17px;color:#1d2327"><?php _e('No log file discovered', 'phpinfo-wp'); ?></h2>
                 </div>
             </div>
             <p style="margin:6px 0 18px;color:#3c434a;line-height:1.5"><?php echo esc_html($diag['summary']); ?></p>
 
-            <h3 style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#646970;margin:0 0 8px">WordPress debug constants</h3>
+            <h3 style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#646970;margin:0 0 8px"><?php _e('WordPress debug constants', 'phpinfo-wp'); ?></h3>
             <table class="phpinfowp-errlog-diag-table">
                 <tr>
                     <td><code>WP_DEBUG</code></td>
@@ -79,11 +79,11 @@ $search = sanitize_text_field($_GET['log_search'] ?? '');
                 <tr>
                     <td><code>WP_DEBUG_DISPLAY</code></td>
                     <td><?php echo $diag['constants']['WP_DEBUG_DISPLAY'] ? '<span style="color:#d63638">✗ on</span>' : '<span style="color:#00a32a">✓ off</span>'; ?></td>
-                    <td>Should be <strong>off</strong> in production — leaking errors to visitors is a security risk.</td>
+                    <td><?php _e('Should be <strong>off</strong> in production — leaking errors to visitors is a security risk.', 'phpinfo-wp'); ?></td>
                 </tr>
             </table>
 
-            <h3 style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#646970;margin:18px 0 8px">Paths checked</h3>
+            <h3 style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#646970;margin:18px 0 8px"><?php _e('Paths checked', 'phpinfo-wp'); ?></h3>
             <table class="phpinfowp-errlog-diag-table phpinfowp-errlog-diag-paths">
                 <?php foreach ($diag['checks'] as $c):
                     $sym = $c['status'] === 'found' ? '✓' : ($c['status'] === 'unreadable' ? '!' : '✗');
@@ -111,25 +111,25 @@ define('WP_DEBUG_DISPLAY', false);
 
         <div class="phpinfowp-log-toolbar">
             <div class="phpinfowp-log-meta">
-                <strong>File:</strong> <code><?php echo esc_html($path); ?></code>
-                &nbsp;&middot;&nbsp; <strong>Size:</strong> <?php echo esc_html($size); ?>
-                &nbsp;&middot;&nbsp; <strong>Showing:</strong> last <?php echo count($lines); ?> lines
+                <strong><?php _e('File:', 'phpinfo-wp'); ?></strong> <code><?php echo esc_html($path); ?></code>
+                &nbsp;&middot;&nbsp; <strong><?php _e('Size:', 'phpinfo-wp'); ?></strong> <?php echo esc_html($size); ?>
+                &nbsp;&middot;&nbsp; <strong><?php _e('Showing:', 'phpinfo-wp'); ?></strong> last <?php echo count($lines); ?> lines
             </div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <input type="text" id="phpinfowp-log-search" placeholder="Filter lines..."
+                <input type="text" id="phpinfowp-log-search" placeholder="<?php echo esc_attr__('Filter lines...', 'phpinfo-wp'); ?>"
                        value="<?php echo esc_attr($search); ?>" class="regular-text"
                        oninput="phpinfowpFilterLog(this.value)">
                 <form method="post" onsubmit="return confirm('Clear the entire log file? This cannot be undone.')">
                     <?php wp_nonce_field('phpinfowp_log_nonce'); ?>
                     <input type="hidden" name="phpinfowp_log_action" value="clear">
-                    <button type="submit" class="button button-secondary">Clear Log</button>
+                    <button type="submit" class="button button-secondary"><?php _e('Clear Log', 'phpinfo-wp'); ?></button>
                 </form>
             </div>
         </div>
 
         <div id="phpinfowp-log-viewer">
             <?php if (empty($lines)): ?>
-                <p style="padding:20px;color:#666;text-align:center">Log is empty — no errors recorded.</p>
+                <p style="padding:20px;color:#666;text-align:center"><?php _e('Log is empty — no errors recorded.', 'phpinfo-wp'); ?></p>
             <?php else: ?>
                 <?php foreach ($lines as $line): ?>
                     <div class="log-line <?php echo esc_attr(Phpinfo_WP_Error_Log::classify($line)); ?>" data-line="<?php echo esc_attr(strtolower($line)); ?>">

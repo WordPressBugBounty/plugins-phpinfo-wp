@@ -572,8 +572,8 @@ Phpinfo_wp::thankyou();
   <!-- Title Header -->
   <div class="phpinfowp-page-header">
       <div>
-          <h1>PHP Config Editor</h1>
-          <p class="phpinfowp-page-subtitle">Configure php.ini directives and web server rules safely from your WordPress dashboard.</p>
+          <h1><?php _e('PHP Config Editor', 'phpinfo-wp'); ?></h1>
+          <p class="phpinfowp-page-subtitle"><?php _e('Configure php.ini directives and web server rules safely from your WordPress dashboard.', 'phpinfo-wp'); ?></p>
       </div>
   </div>
 
@@ -585,7 +585,7 @@ Phpinfo_wp::thankyou();
               <span class="dashicons <?php echo $mode === 'htaccess' ? 'dashicons-admin-generic' : 'dashicons-networking'; ?>" style="font-size:20px; width:20px; height:20px;"></span>
           </div>
           <div class="phpinfowp-env-details">
-              <div class="phpinfowp-env-label">Detected Server</div>
+              <div class="phpinfowp-env-label"><?php _e('Detected Server', 'phpinfo-wp'); ?></div>
               <div class="phpinfowp-env-value">
                   <?php echo esc_html($mode_label); ?>
                   <span class="phpinfowp-badge" style="background: <?php echo $mode_color; ?>15; color: <?php echo $mode_color; ?>; padding: 2px 6px;">
@@ -603,7 +603,7 @@ Phpinfo_wp::thankyou();
               <span class="dashicons dashicons-editor-code" style="font-size:20px; width:20px; height:20px;"></span>
           </div>
           <div class="phpinfowp-env-details">
-              <div class="phpinfowp-env-label">Target Config File</div>
+              <div class="phpinfowp-env-label"><?php _e('Target Config File', 'phpinfo-wp'); ?></div>
               <div class="phpinfowp-env-value" style="font-family: monospace; font-size: 13.5px;"><?php echo esc_html($mode_file); ?></div>
               <div class="phpinfowp-env-sub" style="word-break: break-all; font-family: monospace; font-size: 11px; background: #f8fafc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e2e8f0; margin-top: 4px;">
                   <?php echo esc_html($target_file); ?>
@@ -618,18 +618,18 @@ Phpinfo_wp::thankyou();
                   <span class="dashicons dashicons-clock" style="font-size:20px; width:20px; height:20px;"></span>
               </div>
               <div class="phpinfowp-env-details">
-                  <div class="phpinfowp-env-label">Propagation Time</div>
+                  <div class="phpinfowp-env-label"><?php _e('Propagation Time', 'phpinfo-wp'); ?></div>
                   <div class="phpinfowp-env-value">~<?php echo esc_html($user_ini_ttl); ?> Seconds</div>
-                  <div class="phpinfowp-env-sub">Changes apply after FPM reload (cache TTL).</div>
+                  <div class="phpinfowp-env-sub"><?php _e('Changes apply after FPM reload (cache TTL).', 'phpinfo-wp'); ?></div>
               </div>
           <?php else: ?>
               <div class="phpinfowp-env-icon-box" style="background: #ecfdf5; color: #10b981;">
                   <span class="dashicons dashicons-yes-alt" style="font-size:20px; width:20px; height:20px;"></span>
               </div>
               <div class="phpinfowp-env-details">
-                  <div class="phpinfowp-env-label">Propagation Time</div>
-                  <div class="phpinfowp-env-value">Instant</div>
-                  <div class="phpinfowp-env-sub">Directives are parsed and applied immediately.</div>
+                  <div class="phpinfowp-env-label"><?php _e('Propagation Time', 'phpinfo-wp'); ?></div>
+                  <div class="phpinfowp-env-value"><?php _e('Instant', 'phpinfo-wp'); ?></div>
+                  <div class="phpinfowp-env-sub"><?php _e('Directives are parsed and applied immediately.', 'phpinfo-wp'); ?></div>
               </div>
           <?php endif; ?>
       </div>
@@ -640,7 +640,7 @@ Phpinfo_wp::thankyou();
       <div class="phpinfowp-custom-alert" style="background: #fef2f2; border: 1px solid #fca5a5; border-left: 4px solid #ef4444;">
           <span class="dashicons dashicons-dismiss" style="color: #ef4444; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0;"></span>
           <p style="color: #991b1b;">
-              <strong>Write permission denied.</strong> The directory <code><?php echo esc_html($root_dir); ?></code> is not writable. Settings cannot be saved.
+              <strong><?php _e('Write permission denied.', 'phpinfo-wp'); ?></strong> The directory <code><?php echo esc_html($root_dir); ?></code> is not writable. Settings cannot be saved.
           </p>
       </div>
   <?php elseif ($notice): ?>
@@ -657,7 +657,7 @@ Phpinfo_wp::thankyou();
 
     <!-- Left Column: Editor -->
     <div class="phpinfowp-htaccess-editor-col">
-      <h2 class="phpinfowp-section-heading">PHP Directives</h2>
+      <h2 class="phpinfowp-section-heading"><?php _e('PHP Directives', 'phpinfo-wp'); ?></h2>
 
       <?php
       $placeholder = $mode === 'htaccess'
@@ -682,7 +682,7 @@ Phpinfo_wp::thankyou();
                 </div>
               </div>
             </div>
-            <span class="phpinfowp-badge phpinfowp-badge-neutral">Editor</span>
+            <span class="phpinfowp-badge phpinfowp-badge-neutral"><?php _e('Editor', 'phpinfo-wp'); ?></span>
           </div>
           <div class="phpinfowp-ide-body">
             <textarea name="htaccess" id="htaccess-editor" class="phpinfowp-ide-textarea"
@@ -693,10 +693,10 @@ Phpinfo_wp::thankyou();
             <?php if ($mode === 'htaccess'): ?>
               One directive per line &mdash; write the name and value only, without the <code>php_value</code> prefix.
               We will wrap your configuration inside a <code># BEGIN phpinfo-wp</code> block.<br>
-              <strong>Auto-rollback:</strong> If the site returns HTTP 500 after saving, your original <code>.htaccess</code> will be restored automatically.
+              <strong><?php _e('Auto-rollback:', 'phpinfo-wp'); ?></strong> If the site returns HTTP 500 after saving, your original <code>.htaccess</code> will be restored automatically.
             <?php else: ?>
               One directive per line in standard <code>php.ini</code> format: <strong>directive = value</strong>.<br>
-              Shorthands like <strong>directive value</strong> are normalized automatically.
+              Shorthands like <strong><?php _e('directive value', 'phpinfo-wp'); ?></strong> are normalized automatically.
               Your settings are placed in a <code>; BEGIN phpinfo-wp</code> block inside <code>.user.ini</code>.
             <?php endif; ?>
           </div>
@@ -727,15 +727,21 @@ Phpinfo_wp::thankyou();
 
       <!-- Snippet Library -->
       <hr style="margin: 40px 0 30px; border:0; border-top: 1px solid #e2e8f0;">
-      <h2 class="phpinfowp-section-heading">Web Server Snippet Library</h2>
+      <h2 class="phpinfowp-section-heading"><?php _e('Web Server Snippet Library', 'phpinfo-wp'); ?></h2>
       
       <?php if ($snippet_server === 'nginx'): ?>
           <p class="phpinfowp-section-desc">
-              <strong>Nginx Detected.</strong> Nginx does not parse `.htaccess`. Copy and paste these server-level rules directly into your <code>nginx.conf</code> server block.
+              <strong><?php _e('Nginx Detected.', 'phpinfo-wp'); ?></strong> <?php _e('Nginx does not use <code>.htaccess</code>. Applying these rules requires root access to edit your <code>nginx.conf</code>.', 'phpinfo-wp'); ?>
           </p>
+          <div class="phpinfowp-custom-alert" style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #64748b; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <span class="dashicons dashicons-shield" style="color: #64748b; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;"></span>
+              <p style="color: #334155; font-size: 13px; line-height: 1.5; margin: 0; font-weight: 500;">
+                  <strong><?php _e('No root access?', 'phpinfo-wp'); ?></strong> <?php _e('If you are on managed WordPress hosting, caching is usually handled for you automatically. Otherwise, we highly recommend using a free CDN like <strong>Cloudflare</strong> to handle caching and compression automatically without editing server files.', 'phpinfo-wp'); ?>
+              </p>
+          </div>
       <?php else: ?>
           <p class="phpinfowp-section-desc">
-              <strong>Apache/LiteSpeed Detected.</strong> Click any button below to instantly inject the optimized rules directly into your <code>.htaccess</code> file.
+              <strong><?php _e('Apache/LiteSpeed Detected.', 'phpinfo-wp'); ?></strong> Click any button below to instantly inject the optimized rules directly into your <code>.htaccess</code> file.
           </p>
       <?php endif; ?>
 
@@ -743,7 +749,7 @@ Phpinfo_wp::thankyou();
       <div class="phpinfowp-custom-alert" style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
           <span class="dashicons dashicons-info" style="color: #3b82f6; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;"></span>
           <p style="color: #1e3a8a; font-size: 13px; line-height: 1.5; margin: 0; font-weight: 500;">
-              <strong>Clear Cache:</strong> You must clear your cache (plugin cache, server cache, CDN, and browser cache) after injecting or setting the code manually to see the results!
+              <strong><?php _e('Clear Cache:', 'phpinfo-wp'); ?></strong> You must clear your cache (plugin cache, server cache, CDN, and browser cache) after injecting or setting the code manually to see the results!
           </p>
       </div>
 
@@ -767,8 +773,8 @@ Phpinfo_wp::thankyou();
       <!-- Bulk Action Bar -->
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px; padding:14px 18px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
           <div>
-              <p style="margin:0; font-size:13px; font-weight:700; color:#0f172a;">Bulk Actions</p>
-              <p style="margin:2px 0 0; font-size:12px; color:#64748b;">Inject or roll back all 4 snippets at once.</p>
+              <p style="margin:0; font-size:13px; font-weight:700; color:#0f172a;"><?php _e('Bulk Actions', 'phpinfo-wp'); ?></p>
+              <p style="margin:2px 0 0; font-size:12px; color:#64748b;"><?php _e('Inject or roll back all 4 snippets at once.', 'phpinfo-wp'); ?></p>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
               <?php if ($is_pro_bulk): ?>
@@ -822,7 +828,7 @@ Phpinfo_wp::thankyou();
                       </h3>
                       <div style="display:flex; gap:6px;">
                           <?php if (!$is_pro): ?>
-                              <span class="phpinfowp-badge phpinfowp-badge-pro" style="background:#e0e7ff; color:#4f46e5;">PRO</span>
+                              <span class="phpinfowp-badge phpinfowp-badge-pro" style="background:#e0e7ff; color:#4f46e5;"><?php _e('PRO', 'phpinfo-wp'); ?></span>
                           <?php endif; ?>
                           <span class="phpinfowp-badge phpinfowp-badge-neutral"><?php echo $snippet_server === 'nginx' ? 'Nginx' : 'Apache'; ?></span>
                       </div>
@@ -848,16 +854,14 @@ Phpinfo_wp::thankyou();
                   <?php if (!$is_pro): ?>
                       <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
                           <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.4;">
-                              ⚡ <strong>These settings can make your site up to 2x faster!</strong> Unlock this optimization snippet and boost your performance instantly.
+                              ⚡ <strong><?php _e('These settings can make your site up to 2x faster!', 'phpinfo-wp'); ?></strong> Unlock this optimization snippet and boost your performance instantly.
                           </p>
                           <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 10px;">
                               <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="padding: 6px 12px; font-size: 12.5px; background: #4f46e5; border-color: #4338ca;">
                                   <span class="dashicons dashicons-lock" style="font-size: 14px; width: 14px; height: 14px;"></span>
                                   Upgrade to Pro
                               </a>
-                              <span style="font-size: 11px; color: #64748b; font-style: italic;">
-                                  14-day risk-free refund guarantee
-                              </span>
+                              <span style="font-size: 11px; color: #64748b; font-style: italic;"><?php _e('14-day risk-free refund guarantee', 'phpinfo-wp'); ?></span>
                           </div>
                       </div>
                   <?php else: ?>
@@ -917,20 +921,16 @@ Phpinfo_wp::thankyou();
               </div>
             </div>
           </div>
-          <span class="phpinfowp-badge phpinfowp-badge-pro">Read-Only</span>
+          <span class="phpinfowp-badge phpinfowp-badge-pro"><?php _e('Read-Only', 'phpinfo-wp'); ?></span>
         </div>
         <div class="phpinfowp-ide-body">
           <?php if ($preview): ?>
             <pre class="phpinfowp-ide-preview"><?php echo esc_html($preview); ?></pre>
           <?php else: ?>
-            <div class="phpinfowp-ide-preview" style="display:flex; align-items:center; justify-content:center; color:#585b70; font-style:italic;">
-              File does not exist yet — it will be created on first save.
-            </div>
+            <div class="phpinfowp-ide-preview" style="display:flex; align-items:center; justify-content:center; color:#585b70; font-style:italic;"><?php _e('File does not exist yet — it will be created on first save.', 'phpinfo-wp'); ?></div>
           <?php endif; ?>
         </div>
-        <div class="phpinfowp-ide-footer">
-          Active directives on disk.
-        </div>
+        <div class="phpinfowp-ide-footer"><?php _e('Active directives on disk.', 'phpinfo-wp'); ?></div>
       </div>
       
     </div>

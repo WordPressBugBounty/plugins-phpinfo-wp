@@ -49,12 +49,12 @@ class Phpinfo_WP_Whats_New_Notice {
 
         // Only show notices for versions we've written copy for.
         $catalog = [
-            '7.2.3' => [
-                'headline' => 'phpinfo() WP 7.2 is here — Web Server Snippets, API Monitor & more.',
+            '7.2.4' => [
+                'headline' => 'phpinfo() WP 7.2 is here - Web Server Snippets, API Monitor & more.',
                 'bullets'  => [
-                    '<strong>New: Web Server Snippet Library</strong> — optimised Nginx & Apache config blocks for caching, security headers, and blocking bad bots. 1-click injection for Apache.',
-                    '<strong>New: External API Monitor</strong> — track response times and uptime of 3rd-party services your site depends on.',
-                    '<strong>Improved: Update Guard</strong> — now runs automatically before every core update and scores plugin abandonment risk.',
+                    '<strong>New: Web Server Snippet Library</strong> - optimised Nginx & Apache config blocks for caching, security headers, and blocking bad bots. 1-click injection for Apache.',
+                    '<strong>New: External API Monitor</strong> - track response times and uptime of 3rd-party services your site depends on.',
+                    '<strong>Improved: Update Guard</strong> - now runs automatically before every core update and scores plugin abandonment risk.',
                     '<strong>Pro:</strong> all new features + white-label PDF reports, one-click fixes, SSL/security monitors. <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener"><strong>Upgrade from $29/year →</strong></a>',
                 ],
             ],
@@ -114,9 +114,9 @@ class Phpinfo_WP_Whats_New_Notice {
                 <span style="background:#777BB3; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:3px; letter-spacing:.4px; text-transform:uppercase; flex-shrink: 0; line-height: 1.4;">v<?php echo esc_html(PHPINFOWP_VERSION); ?></span>
                 <p style="font-size:13px; color:#1d2327; line-height:1.45;">
                     <?php if ($is_pro): ?>
-                        🎉 <strong>What's New in Pro 7.2:</strong> Accelerate loading with Web Server Snippets, isolate integrations using External API Monitor, and enjoy auto-Update Guard scans before updates.
+                        🎉 <strong><?php _e('What\'s New in Pro 7.2:', 'phpinfo-wp'); ?></strong> Accelerate loading with Web Server Snippets, isolate integrations using External API Monitor, and enjoy auto-Update Guard scans before updates.
                     <?php else: ?>
-                        🚀 <strong>Boost speed & security with 7.2:</strong> Stop site breaks using auto-Update Guard, load pages faster with 1-click Server Snippets, and detect API latency.
+                        🚀 <strong><?php _e('Boost speed & security with 7.2:', 'phpinfo-wp'); ?></strong> Stop site breaks using auto-Update Guard, load pages faster with 1-click Server Snippets, and detect API latency.
                     <?php endif; ?>
                 </p>
             </div>
@@ -126,9 +126,7 @@ class Phpinfo_WP_Whats_New_Notice {
                         Configure Snippets →
                     </a>
                 <?php else: ?>
-                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn-upgrade-notice">
-                        Get Pro & Unlock →
-                    </a>
+                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn-upgrade-notice"><?php _e('Get Pro & Unlock →', 'phpinfo-wp'); ?></a>
                 <?php endif; ?>
             </div>
         </div>

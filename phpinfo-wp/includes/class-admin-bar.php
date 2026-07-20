@@ -301,10 +301,21 @@ class Phpinfo_WP_Admin_Bar {
         if ($s['overall'] === 'critical') {
             // Show count if multiple criticals, else first label
             $label = $s['crit_count'] > 1
-                ? '! ' . $s['crit_count'] . ' issues'
-                : '! ' . $s['issues'][0]['label'];
+                ? $s['crit_count'] . ' issues'
+                : $s['issues'][0]['label'];
             $extra = $s['warn_count'] > 0 ? ' +' . $s['warn_count'] : '';
-            return '<span style="color:' . $color . ';font-weight:700">' . esc_html($label . $extra) . '</span>';
+
+            $style = '<style>' .
+                '@keyframes phpinfowp-pulse-glow {' .
+                '  0% { transform: scale(0.9); opacity: 0.6; box-shadow: 0 0 0 0 rgba(214, 54, 56, 0.7); }' .
+                '  70% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 0 6px rgba(214, 54, 56, 0); }' .
+                '  100% { transform: scale(0.9); opacity: 0.6; box-shadow: 0 0 0 0 rgba(214, 54, 56, 0); }' .
+                '}' .
+                '</style>';
+
+            $dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#d63638;margin-right:6px;vertical-align:middle;animation:phpinfowp-pulse-glow 1.6s infinite ease-in-out;"></span>';
+
+            return $style . $dot . '<span style="color:' . $color . ';font-weight:700">' . esc_html($label . $extra) . '</span>';
         }
 
         if ($s['overall'] === 'warning') {

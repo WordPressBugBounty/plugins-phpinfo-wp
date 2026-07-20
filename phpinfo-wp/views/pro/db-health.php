@@ -37,8 +37,8 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Advanced DB Health & Schema Analyzer <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Analyze MySQL/MariaDB version, structural schema issues, and TTFB-killing autoload bloat.</p>
+            <h1>Advanced DB Health & Schema Analyzer <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Analyze MySQL/MariaDB version, structural schema issues, and TTFB-killing autoload bloat.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -79,7 +79,7 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
     <div class="phpinfowp-dbh-metrics">
 
         <div class="phpinfowp-dbh-metric">
-            <div class="phpinfowp-dbh-metric-label">Database size</div>
+            <div class="phpinfowp-dbh-metric-label"><?php _e('Database size', 'phpinfo-wp'); ?></div>
             <div class="phpinfowp-dbh-metric-value"><?php echo size_format($db_size['total']); ?></div>
             <div class="phpinfowp-dbh-metric-sub"><?php echo (int)$db_size['tables']; ?> tables</div>
         </div>
@@ -95,7 +95,7 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
         </div>
 
         <div class="phpinfowp-dbh-metric">
-            <div class="phpinfowp-dbh-metric-label">Transients</div>
+            <div class="phpinfowp-dbh-metric-label"><?php _e('Transients', 'phpinfo-wp'); ?></div>
             <div class="phpinfowp-dbh-metric-value"><?php echo (int)$transients['total']; ?></div>
             <div class="phpinfowp-dbh-metric-sub">
                 <?php if ($transients['expired']): ?>
@@ -107,9 +107,9 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
         </div>
 
         <div class="phpinfowp-dbh-metric">
-            <div class="phpinfowp-dbh-metric-label">Overhead</div>
+            <div class="phpinfowp-dbh-metric-label"><?php _e('Overhead', 'phpinfo-wp'); ?></div>
             <div class="phpinfowp-dbh-metric-value"><?php echo size_format($db_size['free']); ?></div>
-            <div class="phpinfowp-dbh-metric-sub">Reclaimable via OPTIMIZE TABLE</div>
+            <div class="phpinfowp-dbh-metric-sub"><?php _e('Reclaimable via OPTIMIZE TABLE', 'phpinfo-wp'); ?></div>
         </div>
 
     </div>
@@ -130,12 +130,12 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
             <span class="dashicons dashicons-database" style="color:#007cba;"></span> Autoload Bloat Visualizer
         </h2>
         <p class="description" style="margin:0 0 16px; max-width:800px;">
-            Options with <code>autoload=yes</code> are loaded into PHP RAM on <strong>every single page request</strong>. Massive strings (like old transient data, bloated theme settings, or heavy cron schedules) are silent TTFB killers.
+            Options with <code>autoload=yes</code> are loaded into PHP RAM on <strong><?php _e('every single page request', 'phpinfo-wp'); ?></strong>. Massive strings (like old transient data, bloated theme settings, or heavy cron schedules) are silent TTFB killers.
         </p>
         
         <?php if ($autoload['bytes'] > 1048576): ?>
             <div class="notice notice-warning inline" style="margin-bottom:20px; border-left-color:#d63638;">
-                <p><strong>Warning: High Autoload Size!</strong> You are loading <?php echo size_format($autoload['bytes']); ?> of options data on every page load. WordPress recommends keeping this under 1 MB.</p>
+                <p><strong><?php _e('Warning: High Autoload Size!', 'phpinfo-wp'); ?></strong> You are loading <?php echo size_format($autoload['bytes']); ?> of options data on every page load. WordPress recommends keeping this under 1 MB.</p>
             </div>
         <?php endif; ?>
 
@@ -143,9 +143,9 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
             <table class="wp-list-table widefat striped" style="border:none; margin:0;">
                 <thead>
                     <tr>
-                        <th style="width:50%; padding-left:16px;">Option Name</th>
-                        <th style="width:25%">Memory Footprint</th>
-                        <th style="width:25%">Recommendation</th>
+                        <th style="width:50%; padding-left:16px;"><?php _e('Option Name', 'phpinfo-wp'); ?></th>
+                        <th style="width:25%"><?php _e('Memory Footprint', 'phpinfo-wp'); ?></th>
+                        <th style="width:25%"><?php _e('Recommendation', 'phpinfo-wp'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -159,7 +159,7 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
                             <td style="padding-left:16px;">
                                 <code><?php echo esc_html($opt->option_name); ?></code>
                                 <?php if (strpos($opt->option_name, '_transient_') === 0): ?>
-                                    <span style="display:inline-block; margin-left:8px; padding:1px 6px; background:#e5e5e5; border-radius:3px; font-size:10px; color:#555;">Transient</span>
+                                    <span style="display:inline-block; margin-left:8px; padding:1px 6px; background:#e5e5e5; border-radius:3px; font-size:10px; color:#555;"><?php _e('Transient', 'phpinfo-wp'); ?></span>
                                 <?php endif; ?>
                             </td>
                             <td style="color:<?php echo $opt_color; ?>; font-weight:600; font-size:14px;">
@@ -167,13 +167,13 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
                             </td>
                             <td>
                                 <?php if ($is_critical): ?>
-                                    <span style="color:#d63638; font-weight:600; font-size:12px;">TTFB KILLER</span>
+                                    <span style="color:#d63638; font-weight:600; font-size:12px;"><?php _e('TTFB KILLER', 'phpinfo-wp'); ?></span>
                                     <div style="font-size:11px; color:#666; margin-top:2px;">Must delete or set autoload=no</div>
                                 <?php elseif ($is_warning): ?>
-                                    <span style="color:#dba617; font-weight:600; font-size:12px;">BLOAT</span>
+                                    <span style="color:#dba617; font-weight:600; font-size:12px;"><?php _e('BLOAT', 'phpinfo-wp'); ?></span>
                                     <div style="font-size:11px; color:#666; margin-top:2px;">Consider autoload=no</div>
                                 <?php else: ?>
-                                    <span style="color:#00a32a; font-size:12px;">Normal</span>
+                                    <span style="color:#00a32a; font-size:12px;"><?php _e('Normal', 'phpinfo-wp'); ?></span>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -187,13 +187,11 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
     <h2 class="phpinfowp-section-heading" style="margin-top:40px; display:flex; align-items:center; gap:8px;">
         <span class="dashicons dashicons-search" style="color:#d63638;"></span> Missing Index Scanner
     </h2>
-    <p class="description" style="margin:0 0 16px; max-width:800px;">
-        Analyzes your database schema to find custom tables (often created by poorly coded plugins) that are missing critical MySQL indexes. Queries against these tables trigger <strong>full table scans</strong>, destroying database performance.
-    </p>
+    <p class="description" style="margin:0 0 16px; max-width:800px;"><?php _e('Analyzes your database schema to find custom tables (often created by poorly coded plugins) that are missing critical MySQL indexes. Queries against these tables trigger <strong>full table scans</strong>, destroying database performance.', 'phpinfo-wp'); ?></p>
 
     <?php if (!$has_autoload_idx): ?>
         <div class="notice notice-error inline" style="margin-bottom:20px;">
-            <p><strong>CRITICAL:</strong> Your <code><?php global $wpdb; echo $wpdb->options; ?></code> table is missing the <code>autoload</code> index! This is a known issue on older WordPress installs and severely impacts performance. You must manually add it via phpMyAdmin or WP-CLI.</p>
+            <p><strong><?php _e('CRITICAL:', 'phpinfo-wp'); ?></strong> Your <code><?php global $wpdb; echo $wpdb->options; ?></code> table is missing the <code>autoload</code> index! This is a known issue on older WordPress installs and severely impacts performance. You must manually add it via phpMyAdmin or WP-CLI.</p>
         </div>
     <?php endif; ?>
 
@@ -201,8 +199,8 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
         <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:16px; border-radius:4px; display:flex; align-items:center; gap:12px;">
             <span class="dashicons dashicons-yes-alt" style="color:#00a32a; font-size:24px; width:24px; height:24px;"></span>
             <div>
-                <strong style="color:#1b5e20;">Schema Optimized</strong>
-                <p style="margin:4px 0 0; color:#2e7d32; font-size:13px;">No large tables are missing secondary indexes.</p>
+                <strong style="color:#1b5e20;"><?php _e('Schema Optimized', 'phpinfo-wp'); ?></strong>
+                <p style="margin:4px 0 0; color:#2e7d32; font-size:13px;"><?php _e('No large tables are missing secondary indexes.', 'phpinfo-wp'); ?></p>
             </div>
         </div>
     <?php else: ?>
@@ -210,10 +208,10 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
             <table class="wp-list-table widefat striped" style="border:none; margin:0;">
                 <thead>
                     <tr>
-                        <th style="width:40%; padding-left:16px;">Table Name</th>
-                        <th style="width:20%">Rows (Approx)</th>
-                        <th style="width:20%">Data Size</th>
-                        <th style="width:20%">Risk Level</th>
+                        <th style="width:40%; padding-left:16px;"><?php _e('Table Name', 'phpinfo-wp'); ?></th>
+                        <th style="width:20%"><?php _e('Rows (Approx)', 'phpinfo-wp'); ?></th>
+                        <th style="width:20%"><?php _e('Data Size', 'phpinfo-wp'); ?></th>
+                        <th style="width:20%"><?php _e('Risk Level', 'phpinfo-wp'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -236,22 +234,20 @@ $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL'
                 </tbody>
             </table>
         </div>
-        <p class="description" style="margin-top:12px; font-size:12px;">
-            These tables have > 500 rows but absolutely zero secondary indexes. Consider reporting this to the plugin developer, or creating indexes manually if you know which columns are queried frequently.
-        </p>
+        <p class="description" style="margin-top:12px; font-size:12px;"><?php _e('These tables have > 500 rows but absolutely zero secondary indexes. Consider reporting this to the plugin developer, or creating indexes manually if you know which columns are queried frequently.', 'phpinfo-wp'); ?></p>
     <?php endif; ?>
 
     <!-- All tables -->
-    <h2 class="phpinfowp-section-heading" style="margin-top:32px">All Tables</h2>
+    <h2 class="phpinfowp-section-heading" style="margin-top:32px"><?php _e('All Tables', 'phpinfo-wp'); ?></h2>
     <table class="wp-list-table widefat fixed striped">
         <thead>
             <tr>
-                <th>Table</th>
-                <th style="width:90px">Rows</th>
-                <th style="width:100px">Data</th>
-                <th style="width:100px">Index</th>
-                <th style="width:110px">Overhead</th>
-                <th style="width:80px">Engine</th>
+                <th><?php _e('Table', 'phpinfo-wp'); ?></th>
+                <th style="width:90px"><?php _e('Rows', 'phpinfo-wp'); ?></th>
+                <th style="width:100px"><?php _e('Data', 'phpinfo-wp'); ?></th>
+                <th style="width:100px"><?php _e('Index', 'phpinfo-wp'); ?></th>
+                <th style="width:110px"><?php _e('Overhead', 'phpinfo-wp'); ?></th>
+                <th style="width:80px"><?php _e('Engine', 'phpinfo-wp'); ?></th>
             </tr>
         </thead>
         <tbody>

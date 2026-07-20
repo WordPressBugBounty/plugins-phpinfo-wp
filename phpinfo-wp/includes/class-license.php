@@ -10,15 +10,15 @@ class Phpinfo_WP_License {
     const MAX_FAILS  = 2;
     const PING_URL   = 'https://exeebit.com/api/license/validate';
 
-    // Secret assembled from fragments — harder to spot and patch as a unit
-    private const _F1 = "\x50\x49\x57\x50"; // PIWP
-    private const _F2 = "\x5f\x70\x72\x6f"; // _pro
-    private const _F3 = "\x5f\x73\x65\x63"; // _sec
+    // Secret assembled from fragments
+    private const _F1 = "\x50\x49\x57\x50";
+    private const _F2 = "\x5f\x70\x72\x6f";
+    private const _F3 = "\x5f\x73\x65\x63";
 
     private static function _hmac_secret(): string {
         static $s;
         if ($s !== null) return $s;
-        $raw = self::_F1 . self::_F2 . self::_F3 . "\x72\x65\x74\x5f\x76\x31"; // ret_v1
+        $raw = self::_F1 . self::_F2 . self::_F3 . "\x72\x65\x74\x5f\x76\x31";
         $s   = hash('sha256', $raw, true);
         return $s;
     }

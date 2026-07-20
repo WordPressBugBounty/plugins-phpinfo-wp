@@ -31,29 +31,29 @@ $has_issues = !empty($dangerous) || !empty($mismatch) || ($wp_config && $wp_conf
 <div class="phpinfowp-pro-page">
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Permissions & Ownership Auditor <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Deep scan of core files, plugins, and themes to detect security risks and auto-update failures.</p>
+            <h1>Permissions & Ownership Auditor <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Deep scan of core files, plugins, and themes to detect security risks and auto-update failures.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
     <!-- Overview Card -->
     <div style="background:#fff; border:1px solid #ccd0d4; padding:24px; border-radius:4px; display:flex; gap:32px; box-shadow:0 1px 1px rgba(0,0,0,0.04); margin-bottom:32px;">
         <div>
-            <div style="font-size:12px; color:#666; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">PHP Execution User</div>
+            <div style="font-size:12px; color:#666; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;"><?php _e('PHP Execution User', 'phpinfo-wp'); ?></div>
             <div style="font-size:24px; font-weight:700; margin-top:4px;"><code><?php echo esc_html($php_user); ?></code></div>
             <div style="font-size:12px; color:#888; margin-top:4px;">UID: <?php echo esc_html($php_uid); ?></div>
         </div>
         <div style="border-left:1px solid #eee; padding-left:32px;">
-            <div style="font-size:12px; color:#666; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">Files Scanned</div>
+            <div style="font-size:12px; color:#666; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;"><?php _e('Files Scanned', 'phpinfo-wp'); ?></div>
             <div style="font-size:24px; font-weight:700; margin-top:4px;"><?php echo number_format($scanned); ?></div>
-            <div style="font-size:12px; color:#888; margin-top:4px;">Capped at 5,000 for safety</div>
+            <div style="font-size:12px; color:#888; margin-top:4px;"><?php _e('Capped at 5,000 for safety', 'phpinfo-wp'); ?></div>
         </div>
         <div style="border-left:1px solid #eee; padding-left:32px;">
-            <div style="font-size:12px; color:#666; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">Status</div>
+            <div style="font-size:12px; color:#666; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;"><?php _e('Status', 'phpinfo-wp'); ?></div>
             <?php if ($has_issues): ?>
-                <div style="font-size:24px; font-weight:700; margin-top:4px; color:#d63638;">Action Required</div>
+                <div style="font-size:24px; font-weight:700; margin-top:4px; color:#d63638;"><?php _e('Action Required', 'phpinfo-wp'); ?></div>
             <?php else: ?>
-                <div style="font-size:24px; font-weight:700; margin-top:4px; color:#00a32a;">Secure</div>
+                <div style="font-size:24px; font-weight:700; margin-top:4px; color:#00a32a;"><?php _e('Secure', 'phpinfo-wp'); ?></div>
             <?php endif; ?>
         </div>
     </div>
@@ -62,8 +62,8 @@ $has_issues = !empty($dangerous) || !empty($mismatch) || ($wp_config && $wp_conf
         <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:24px; border-radius:4px; display:flex; align-items:center; gap:16px;">
             <span class="dashicons dashicons-shield-alt" style="color:#00a32a; font-size:40px; width:40px; height:40px;"></span>
             <div>
-                <strong style="color:#1b5e20; font-size:16px;">Filesystem is Secure</strong>
-                <p style="margin:4px 0 0; color:#2e7d32; font-size:14px;">No dangerous 777 permissions were found, and file ownership matches the PHP process (meaning native plugin updates will work perfectly).</p>
+                <strong style="color:#1b5e20; font-size:16px;"><?php _e('Filesystem is Secure', 'phpinfo-wp'); ?></strong>
+                <p style="margin:4px 0 0; color:#2e7d32; font-size:14px;"><?php _e('No dangerous 777 permissions were found, and file ownership matches the PHP process (meaning native plugin updates will work perfectly).', 'phpinfo-wp'); ?></p>
             </div>
         </div>
     <?php else: ?>
@@ -74,7 +74,7 @@ $has_issues = !empty($dangerous) || !empty($mismatch) || ($wp_config && $wp_conf
         </h2>
         <?php if ($wp_config): ?>
             <table class="wp-list-table widefat striped" style="border:1px solid #ccd0d4; box-shadow:0 1px 1px rgba(0,0,0,0.04); margin-bottom:32px;">
-                <thead><tr><th>File</th><th>Permissions</th><th>Owner</th><th>Status</th></tr></thead>
+                <thead><tr><th><?php _e('File', 'phpinfo-wp'); ?></th><th><?php _e('Permissions', 'phpinfo-wp'); ?></th><th><?php _e('Owner', 'phpinfo-wp'); ?></th><th><?php _e('Status', 'phpinfo-wp'); ?></th></tr></thead>
                 <tbody>
                     <tr>
                         <td><code><?php echo esc_html($wp_config['path']); ?></code></td>
@@ -99,10 +99,10 @@ $has_issues = !empty($dangerous) || !empty($mismatch) || ($wp_config && $wp_conf
             <h2 class="phpinfowp-section-heading" style="display:flex; align-items:center; gap:8px;">
                 <span class="dashicons dashicons-unlock" style="color:#d63638;"></span> Dangerous Permissions Found
             </h2>
-            <p class="description" style="margin-bottom:12px;">These files or folders are world-writable (777 or 666). Any other user on the server can modify them.</p>
+            <p class="description" style="margin-bottom:12px;"><?php _e('These files or folders are world-writable (777 or 666). Any other user on the server can modify them.', 'phpinfo-wp'); ?></p>
             <div style="background:#fff; border:1px solid #ccd0d4; border-radius:4px; max-height:400px; overflow-y:auto; margin-bottom:32px;">
                 <table class="wp-list-table widefat striped" style="border:none; margin:0;">
-                    <thead><tr><th>Path</th><th>Type</th><th>Permissions</th></tr></thead>
+                    <thead><tr><th><?php _e('Path', 'phpinfo-wp'); ?></th><th><?php _e('Type', 'phpinfo-wp'); ?></th><th><?php _e('Permissions', 'phpinfo-wp'); ?></th></tr></thead>
                     <tbody>
                         <?php foreach ($dangerous as $item): ?>
                             <tr>
@@ -124,7 +124,7 @@ $has_issues = !empty($dangerous) || !empty($mismatch) || ($wp_config && $wp_conf
             <p class="description" style="margin-bottom:12px;">These files are owned by a different user than the PHP process (<code><?php echo esc_html($php_user); ?></code>). This usually causes WordPress to ask for FTP credentials when installing plugins.</p>
             <div style="background:#fff; border:1px solid #ccd0d4; border-radius:4px; max-height:400px; overflow-y:auto; margin-bottom:32px;">
                 <table class="wp-list-table widefat striped" style="border:none; margin:0;">
-                    <thead><tr><th>Path</th><th>Current Owner</th><th>Required Owner</th></tr></thead>
+                    <thead><tr><th><?php _e('Path', 'phpinfo-wp'); ?></th><th><?php _e('Current Owner', 'phpinfo-wp'); ?></th><th><?php _e('Required Owner', 'phpinfo-wp'); ?></th></tr></thead>
                     <tbody>
                         <?php foreach ($mismatch as $item): ?>
                             <tr>
@@ -137,7 +137,7 @@ $has_issues = !empty($dangerous) || !empty($mismatch) || ($wp_config && $wp_conf
                 </table>
                 <?php if (count($mismatch) >= 20): ?>
                     <div style="padding:12px 16px; background:#f9f9f9; border-top:1px solid #ddd; font-size:12px; color:#666;">
-                        <em>Showing first 20 examples only. Fixing the root folder recursively will solve the rest.</em>
+                        <em><?php _e('Showing first 20 examples only. Fixing the root folder recursively will solve the rest.', 'phpinfo-wp'); ?></em>
                     </div>
                 <?php endif; ?>
             </div>
@@ -147,23 +147,21 @@ $has_issues = !empty($dangerous) || !empty($mismatch) || ($wp_config && $wp_conf
         <h2 class="phpinfowp-section-heading" style="margin-top:40px; display:flex; align-items:center; gap:8px;">
             <span class="dashicons dashicons-editor-code" style="color:#2271b1;"></span> How to Fix (SSH Commands)
         </h2>
-        <p class="description" style="margin-bottom:16px; max-width:800px;">
-            Log into your server via SSH. Copy and paste the following bash commands to automatically set the correct, secure ownership and permissions for your entire WordPress installation.
-        </p>
+        <p class="description" style="margin-bottom:16px; max-width:800px;"><?php _e('Log into your server via SSH. Copy and paste the following bash commands to automatically set the correct, secure ownership and permissions for your entire WordPress installation.', 'phpinfo-wp'); ?></p>
 
         <div style="background:#1e1e1e; padding:20px; border-radius:6px; font-family:monospace; font-size:13px; line-height:1.6; color:#d4d4d4; overflow-x:auto;">
             <div style="color:#6a9955; margin-bottom:8px;"># 1. Fix Ownership (Allow native WP updates)</div>
-            <div><span style="color:#569cd6;">chown</span> -R <?php echo esc_html($php_user . ':' . $php_user); ?> <?php echo esc_html(ABSPATH); ?></div>
+            <div><span style="color:#569cd6;"><?php _e('chown', 'phpinfo-wp'); ?></span> -R <?php echo esc_html($php_user . ':' . $php_user); ?> <?php echo esc_html(ABSPATH); ?></div>
             
             <div style="color:#6a9955; margin-top:16px; margin-bottom:8px;"># 2. Fix Directory Permissions (755)</div>
-            <div><span style="color:#569cd6;">find</span> <?php echo esc_html(ABSPATH); ?> -type d -exec <span style="color:#569cd6;">chmod</span> 755 {} \;</div>
+            <div><span style="color:#569cd6;"><?php _e('find', 'phpinfo-wp'); ?></span> <?php echo esc_html(ABSPATH); ?> -type d -exec <span style="color:#569cd6;"><?php _e('chmod', 'phpinfo-wp'); ?></span> 755 {} \;</div>
             
             <div style="color:#6a9955; margin-top:16px; margin-bottom:8px;"># 3. Fix File Permissions (644)</div>
-            <div><span style="color:#569cd6;">find</span> <?php echo esc_html(ABSPATH); ?> -type f -exec <span style="color:#569cd6;">chmod</span> 644 {} \;</div>
+            <div><span style="color:#569cd6;"><?php _e('find', 'phpinfo-wp'); ?></span> <?php echo esc_html(ABSPATH); ?> -type f -exec <span style="color:#569cd6;"><?php _e('chmod', 'phpinfo-wp'); ?></span> 644 {} \;</div>
             
             <?php if ($wp_config): ?>
                 <div style="color:#6a9955; margin-top:16px; margin-bottom:8px;"># 4. Lock down wp-config.php (600)</div>
-                <div><span style="color:#569cd6;">chmod</span> 600 <?php echo esc_html($wp_config['path']); ?></div>
+                <div><span style="color:#569cd6;"><?php _e('chmod', 'phpinfo-wp'); ?></span> 600 <?php echo esc_html($wp_config['path']); ?></div>
             <?php endif; ?>
         </div>
     <?php endif; ?>

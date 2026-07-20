@@ -1,0 +1,2469 @@
+# Translation of phpinfo-wp in fr_FR
+# This file is distributed under the same license as the phpinfo-wp package.
+msgid ""
+msgstr ""
+"Project-Id-Version: phpinfo-wp\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-19 19:24+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: AI Translator <support@exeebit.com>\n"
+"Language-Team: fr_FR <support@exeebit.com>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+#: includes/fn-feature-lock.php:59 views/htaccess.php:825
+#: views/dashboard.php:59 views/pro/opcache.php:34
+#: views/pro/security-headers.php:30 views/pro/error-log.php:42
+#: views/pro/mail.php:52 views/pro/object-cache.php:37
+#: views/pro/permissions.php:34 views/pro/snapshots.php:61
+#: views/pro/alerts.php:48 views/pro/upgrade.php:36
+#: views/pro/api-monitor.php:38 views/pro/cron.php:47 views/pro/license.php:87
+#: views/pro/ssl.php:42 views/pro/db-health.php:40 views/pro/report.php:49
+#: views/pro/config-grader.php:152
+msgid "PRO"
+msgstr "PRO"
+
+#: includes/class-abilities.php:27
+msgid "Server Health Audit"
+msgstr "Audit de santé du serveur"
+
+#: includes/class-abilities.php:28
+msgid "Inspect PHP version, server configuration, extensions, and audit grade collected by phpinfo() WP."
+msgstr "Inspectez la version PHP, la configuration du serveur, les extensions et la note d'audit collectées par phpinfo() WP."
+
+#: includes/class-abilities.php:32
+msgid "Get PHP Version & EOL Status"
+msgstr "Obtenir la version PHP et le statut EOL"
+
+#: includes/class-abilities.php:33
+msgid "Returns the running PHP version, its end-of-life date, days remaining, and an ok/warning/eol status flag."
+msgstr "Renvoie la version PHP en cours d'exécution, sa date de fin de vie, les jours restants et un indicateur d'état ok/warning/eol."
+
+#: includes/class-abilities.php:52
+msgid "Get Config Grade"
+msgstr "Obtenir la note de configuration"
+
+#: includes/class-abilities.php:53
+msgid "Returns the overall A–F config grade, numeric score, and counts of passing/warning/failing checks."
+msgstr "Renvoie la note globale de la configuration A à F, le score numérique et le nombre de vérifications réussies/avertissements/échecs."
+
+#: includes/class-abilities.php:73
+msgid "List Failing Config Checks"
+msgstr "Liste des vérifications de configuration ayant échoué"
+
+#: includes/class-abilities.php:74
+msgid "Returns each failing or warning config check with its directive key, current value, recommended value, and severity. Pro-only — free tier returns an empty list."
+msgstr "Renvoie chaque vérification de configuration en échec ou en avertissement avec sa clé de directive, sa valeur actuelle, sa valeur recommandée et sa gravité. Pro uniquement : le niveau gratuit renvoie une liste vide."
+
+#: includes/class-abilities.php:98
+msgid "Get PHP Directive Value"
+msgstr "Obtenir la valeur de la directive PHP"
+
+#: includes/class-abilities.php:99
+msgid "Returns the current value of a named php.ini directive (e.g. memory_limit, upload_max_filesize)."
+msgstr "Renvoie la valeur actuelle d'une directive php.ini nommée (par exemple memory_limit, upload_max_filesize)."
+
+#: includes/class-abilities.php:122
+msgid "List Loaded PHP Extensions"
+msgstr "Liste des extensions PHP chargées"
+
+#: includes/class-abilities.php:123
+msgid "Returns the names of all PHP extensions currently loaded on the server, sorted alphabetically."
+msgstr "Renvoie les noms de toutes les extensions PHP actuellement chargées sur le serveur, triées par ordre alphabétique."
+
+#: includes/class-abilities.php:136
+msgid "Get Server Audit Summary"
+msgstr "Obtenir le résumé de l'audit du serveur"
+
+#: includes/class-abilities.php:137
+msgid "Returns a high-level rollup of server health: PHP version, EOL status, config grade, and counts of issues. The single best ability to call for a \\\"how is my server doing\\\" check."
+msgstr "Renvoie un récapitulatif de haut niveau de l'état du serveur : version PHP, statut EOL, niveau de configuration et nombre de problèmes. La meilleure capacité à demander une vérification de « comment va mon serveur »."
+
+#: includes/class-admin-nav.php:33
+msgid "Performance"
+msgstr "Performances"
+
+#: includes/class-admin-nav.php:35
+msgid "Analyze and optimize speed, caching, and database bottlenecks"
+msgstr "Analyser et optimiser la vitesse, la mise en cache et les goulots d'étranglement des bases de données"
+
+#: includes/class-admin-nav.php:37 views/pro/config-grader.php:16
+msgid "Config Grader"
+msgstr "Évaluateur de configuration"
+
+#: includes/class-admin-nav.php:38
+msgid "OPcache"
+msgstr "OPcache"
+
+#: includes/class-admin-nav.php:39
+msgid "Object Cache"
+msgstr "Cache d'objets"
+
+#: includes/class-admin-nav.php:40 views/info.php:114 views/info.php:181
+#: views/pro/network.php:45 views/pro/report.php:547
+msgid "Database"
+msgstr "Base de données"
+
+#: includes/class-admin-nav.php:41
+msgid "API Monitor"
+msgstr "Moniteur API"
+
+#: includes/class-admin-nav.php:45
+msgid "Security & Core"
+msgstr "Sécurité et noyau"
+
+#: includes/class-admin-nav.php:47
+msgid "Read-only health checks across PHP, config, security, and infrastructure"
+msgstr "Vérifications de l'état en lecture seule sur PHP, la configuration, la sécurité et l'infrastructure"
+
+#: includes/class-admin-nav.php:49
+msgid "PHP EOL"
+msgstr "PHP EOL"
+
+#: includes/class-admin-nav.php:50 views/pro/report.php:586
+msgid "PHP Compatibility"
+msgstr "Compatibilité PHP"
+
+#: includes/class-admin-nav.php:51
+msgid "Update Guard"
+msgstr "Mettre à jour la garde"
+
+#: includes/class-admin-nav.php:52
+msgid "Permissions Audit"
+msgstr "Vérification des autorisations"
+
+#: includes/class-admin-nav.php:53
+msgid "Security Headers"
+msgstr "En-têtes de sécurité"
+
+#: includes/class-admin-nav.php:54
+msgid "SSL Monitor"
+msgstr "Moniteur SSL"
+
+#: includes/class-admin-nav.php:58
+msgid "Page Audit Tools"
+msgstr "Outils d'audit de pages"
+
+#: includes/class-admin-nav.php:60
+msgid "Active operations — edit config, troubleshoot, take snapshots, run diagnostics"
+msgstr "Opérations actives : modifier la configuration, dépanner, prendre des instantanés, exécuter des diagnostics"
+
+#: includes/class-admin-nav.php:62
+msgid "phpinfo() Viewer"
+msgstr "Visionneuse phpinfo()"
+
+#: includes/class-admin-nav.php:63 views/htaccess.php:575
+msgid "PHP Config Editor"
+msgstr "Éditeur de configuration PHP"
+
+#: includes/class-admin-nav.php:64
+msgid "Troubleshooting"
+msgstr "Dépannage"
+
+#: includes/class-admin-nav.php:65
+msgid "Basic Info"
+msgstr "Informations de base"
+
+#: includes/class-admin-nav.php:66
+msgid "Extensions"
+msgstr "Rallonges"
+
+#: includes/class-admin-nav.php:67 views/pro/eol.php:114
+msgid "Config Snapshots"
+msgstr "Instantanés de configuration"
+
+#: includes/class-admin-nav.php:71
+msgid "Reports & Logs"
+msgstr "Rapports et journaux"
+
+#: includes/class-admin-nav.php:73
+msgid "Monitoring tools, logs, and outbound alerts"
+msgstr "Outils de surveillance, journaux et alertes sortantes"
+
+#: includes/class-admin-nav.php:75 views/log.php:121
+msgid "Activity Log"
+msgstr "Journal d'activité"
+
+#: includes/class-admin-nav.php:76 views/pro/eol.php:115
+msgid "Audit Report"
+msgstr "Rapport d'audit"
+
+#: includes/class-admin-nav.php:77
+msgid "WP-Cron Monitor"
+msgstr "Moniteur WP-Cron"
+
+#: includes/class-admin-nav.php:78
+msgid "Mail"
+msgstr "Courrier"
+
+#: includes/class-admin-nav.php:79
+msgid "Alerts"
+msgstr "Alertes"
+
+#: includes/class-admin-nav.php:80
+msgid "Error Log"
+msgstr "Journal des erreurs"
+
+#: includes/class-admin-nav.php:166
+msgid "Unknown group."
+msgstr "Groupe inconnu."
+
+#: includes/class-admin-nav.php:266
+msgid "Unknown view."
+msgstr "Vue inconnue."
+
+#: includes/class-site-health.php:12
+msgid "PHP version end-of-life status"
+msgstr "Statut de fin de vie de la version PHP"
+
+#: includes/class-site-health.php:16
+msgid "PHP error display is disabled in production"
+msgstr "L'affichage des erreurs PHP est désactivé en production"
+
+#: includes/class-site-health.php:20
+msgid "PHP remote file inclusion is disabled"
+msgstr "L'inclusion de fichiers distants PHP est désactivée"
+
+#: includes/class-site-health.php:24
+msgid "PHP version is not exposed in HTTP headers"
+msgstr "La version PHP n'est pas exposée dans les en-têtes HTTP"
+
+#: includes/class-site-health.php:28
+msgid "PHP memory limit is sufficient"
+msgstr "La limite de mémoire PHP est suffisante"
+
+#: includes/class-site-health.php:32
+msgid "OPcache is enabled"
+msgstr "OPcache est activé"
+
+#: includes/class-deactivate-modal.php:57
+msgid "Here's what stops working the moment this plugin goes off:"
+msgstr "Voici ce qui cesse de fonctionner au moment où ce plugin se déclenche :"
+
+#: includes/class-deactivate-modal.php:63
+msgid "You'll lose (Free)"
+msgstr "Vous perdrez (Gratuit)"
+
+#: includes/class-deactivate-modal.php:72
+msgid "You'll also lose (Pro)"
+msgstr "Vous perdrez également (Pro)"
+
+#: includes/class-deactivate-modal.php:85
+msgid "doesn't delete"
+msgstr "ne supprime pas"
+
+#: includes/class-deactivate-modal.php:95
+msgid "Keep it active"
+msgstr "Gardez-le actif"
+
+#: includes/class-deactivate-modal.php:96 views/pro/license.php:202
+msgid "Deactivate anyway →"
+msgstr "Désactiver quand même →"
+
+#: includes/class-whats-new-notice.php:117
+msgid "What's New in Pro 7.2:"
+msgstr "Quoi de neuf dans Pro 7.2 :"
+
+#: includes/class-whats-new-notice.php:119
+msgid "Boost speed & security with 7.2:"
+msgstr "Boostez la vitesse et la sécurité avec la version 7.2 :"
+
+#: includes/class-whats-new-notice.php:129
+msgid "Get Pro & Unlock →"
+msgstr "Devenez Pro et débloquez →"
+
+#: includes/class-ai-explain.php:35
+msgid "Explain with AI"
+msgstr "Expliquez avec l'IA"
+
+#: includes/class-ai-explain.php:36
+msgid "Asking AI…"
+msgstr "Demander à l’IA…"
+
+#: includes/class-ai-explain.php:37
+msgid "AI request failed."
+msgstr "La requête IA a échoué."
+
+#: includes/class-ai-explain.php:45
+msgid "Forbidden."
+msgstr "Interdit."
+
+#: includes/class-ai-explain.php:48
+msgid "AI Client is not available. Requires WordPress 7.0+ with a configured AI connector."
+msgstr "Le client IA n'est pas disponible. Nécessite WordPress 7.0+ avec un connecteur AI configuré."
+
+#: includes/class-ai-explain.php:57
+msgid "Unknown topic."
+msgstr "Sujet inconnu."
+
+#: views/info.php:39
+msgid "not loaded"
+msgstr "pas chargé"
+
+#: views/info.php:49
+msgid "Server Overview"
+msgstr "Présentation du serveur"
+
+#: views/info.php:50
+msgid "PHP, WordPress, server, and database environment at a glance"
+msgstr "Aperçu de l'environnement PHP, WordPress, serveur et base de données"
+
+#: views/info.php:58 views/info.php:163
+msgid "PHP Version"
+msgstr "Version PHP"
+
+#: views/info.php:63 views/pro/eol.php:27
+msgid "END OF LIFE"
+msgstr "FIN DE VIE"
+
+#: views/info.php:64
+msgid "EOL SOON"
+msgstr "BIENTÔT FIN DE VIE"
+
+#: views/info.php:65 views/pro/eol.php:29
+msgid "SUPPORTED"
+msgstr "PRIS EN CHARGE"
+
+#: views/info.php:70
+msgid "Upgrade immediately"
+msgstr "Mettez à niveau immédiatement"
+
+#: views/info.php:71
+#, php-format
+msgid "EOL in %sd — %s"
+msgstr "EOL dans%sd —%s"
+
+#: views/info.php:72
+#, php-format
+msgid "Until %s"
+msgstr "Jusqu'à%s"
+
+#: views/info.php:73
+msgid "EOL date unknown"
+msgstr "Date de fin de vie inconnue"
+
+#: views/info.php:81 views/info.php:128 views/pro/network.php:35
+msgid "WordPress"
+msgstr "WordPress"
+
+#: views/info.php:84
+msgid "Multisite network"
+msgstr "Réseau multisites"
+
+#: views/info.php:84
+msgid "Single site"
+msgstr "Site unique"
+
+#: views/info.php:88
+#, php-format
+msgid "%s active plugin"
+msgstr "%splugin actif"
+
+#: views/info.php:97 views/pro/opcache.php:74 views/pro/object-cache.php:82
+msgid "Memory Usage"
+msgstr "Utilisation de la mémoire"
+
+#: views/info.php:102
+#, php-format
+msgid "of %1$s limit (%2$s%%)"
+msgstr "de la limite%1$s(%2$s%%)"
+
+#: views/info.php:118
+#, php-format
+msgid "%s total size"
+msgstr "%staille totale"
+
+#: views/info.php:124
+msgid "Environment Details"
+msgstr "Détails de l'environnement"
+
+#: views/info.php:129
+msgid "Site URL"
+msgstr "URL du site"
+
+#: views/info.php:130
+msgid "Home URL"
+msgstr "URL d'accueil"
+
+#: views/info.php:131
+msgid "WP Version"
+msgstr "Version WP"
+
+#: views/info.php:132
+msgid "Active Theme"
+msgstr "Thème actif"
+
+#: views/info.php:133
+msgid "Active Plugins"
+msgstr "Plugins actifs"
+
+#: views/info.php:139
+#, php-format
+msgid "%1$s of %2$s installed"
+msgstr "%1$ssur%2$sinstallé"
+
+#: views/info.php:145
+msgid "Active Themes"
+msgstr "Thèmes actifs"
+
+#: views/info.php:149
+#, php-format
+msgid "%s installed"
+msgstr "%sinstallé"
+
+#: views/info.php:154
+msgid "Debug Mode"
+msgstr "Mode débogage"
+
+#: views/info.php:156
+msgid "ON"
+msgstr "ACTIVÉ"
+
+#: views/info.php:156
+msgid "disable in production"
+msgstr "désactiver en production"
+
+#: views/info.php:158 views/info.php:170
+msgid "Off"
+msgstr "Désactivé"
+
+#: views/info.php:160
+msgid "Admin Email"
+msgstr "E-mail de l'administrateur"
+
+#: views/info.php:162 views/pro/network.php:22
+msgid "PHP"
+msgstr "PHP"
+
+#: views/info.php:164
+msgid "PHP SAPI"
+msgstr "PHP-SAPI"
+
+#: views/info.php:165
+msgid "Memory Limit"
+msgstr "Limite de mémoire"
+
+#: views/info.php:166
+msgid "Max Execution Time"
+msgstr "Temps d'exécution maximum"
+
+#: views/info.php:167
+msgid "Upload Max Filesize"
+msgstr "Taille maximale du fichier de téléchargement"
+
+#: views/info.php:168
+msgid "Post Max Size"
+msgstr "Taille maximale du message"
+
+#: views/info.php:169
+msgid "Max Input Vars"
+msgstr "Vars d'entrée maximales"
+
+#: views/info.php:170
+msgid "Display Errors"
+msgstr "Erreurs d'affichage"
+
+#: views/info.php:170
+msgid "On"
+msgstr "Sur"
+
+#: views/info.php:171
+msgid "cURL Version"
+msgstr "Version cURL"
+
+#: views/info.php:172 views/extension.php:63
+msgid "Loaded Extensions"
+msgstr "Extensions chargées"
+
+#: views/info.php:174
+msgid "Server"
+msgstr "Serveur"
+
+#: views/info.php:175
+msgid "Server Software"
+msgstr "Logiciel serveur"
+
+#: views/info.php:176
+msgid "Server Name"
+msgstr "Nom du serveur"
+
+#: views/info.php:177
+msgid "Document Root"
+msgstr "Racine du document"
+
+#: views/info.php:178
+msgid "Operating System"
+msgstr "Système d'exploitation"
+
+#: views/info.php:179
+msgid "Hostname"
+msgstr "Nom d'hôte"
+
+#: views/info.php:182
+msgid "MySQL Version"
+msgstr "Version MySQL"
+
+#: views/info.php:183
+msgid "Database Name"
+msgstr "Nom de la base de données"
+
+#: views/info.php:184
+msgid "Database Host"
+msgstr "Hôte de base de données"
+
+#: views/info.php:185
+msgid "Table Prefix"
+msgstr "Préfixe du tableau"
+
+#: views/info.php:186
+msgid "Database Size"
+msgstr "Taille de la base de données"
+
+#: views/info.php:187
+msgid "Charset"
+msgstr "Jeu de caractères"
+
+#: views/info.php:189
+msgid "Disk"
+msgstr "Disque"
+
+#: views/info.php:190
+msgid "Root Directory"
+msgstr "Répertoire racine"
+
+#: views/info.php:191
+msgid "Uploads Directory"
+msgstr "Répertoire des téléchargements"
+
+#: views/htaccess.php:576
+msgid "Configure php.ini directives and web server rules safely from your WordPress dashboard."
+msgstr "Configurez les directives php.ini et les règles du serveur Web en toute sécurité depuis votre tableau de bord WordPress."
+
+#: views/htaccess.php:588
+msgid "Detected Server"
+msgstr "Serveur détecté"
+
+#: views/htaccess.php:606
+msgid "Target Config File"
+msgstr "Fichier de configuration cible"
+
+#: views/htaccess.php:621 views/htaccess.php:630
+msgid "Propagation Time"
+msgstr "Temps de propagation"
+
+#: views/htaccess.php:623
+msgid "Changes apply after FPM reload (cache TTL)."
+msgstr "Les modifications s'appliquent après le rechargement du FPM (cache TTL)."
+
+#: views/htaccess.php:631
+msgid "Instant"
+msgstr "Instantané"
+
+#: views/htaccess.php:632
+msgid "Directives are parsed and applied immediately."
+msgstr "Les directives sont analysées et appliquées immédiatement."
+
+#: views/htaccess.php:643
+msgid "Write permission denied."
+msgstr "Autorisation d'écriture refusée."
+
+#: views/htaccess.php:660
+msgid "PHP Directives"
+msgstr "Directives PHP"
+
+#: views/htaccess.php:685
+msgid "Editor"
+msgstr "Éditeur"
+
+#: views/htaccess.php:696
+msgid "Auto-rollback:"
+msgstr "Restauration automatique :"
+
+#: views/htaccess.php:699
+msgid "directive value"
+msgstr "valeur directive"
+
+#: views/htaccess.php:730
+msgid "Web Server Snippet Library"
+msgstr "Bibliothèque d'extraits de serveur Web"
+
+#: views/htaccess.php:734
+msgid "Nginx Detected."
+msgstr "Nginx détecté."
+
+#: views/htaccess.php:738
+msgid "Apache/LiteSpeed Detected."
+msgstr "Apache/LiteSpeed ​​détecté."
+
+#: views/htaccess.php:746
+msgid "Clear Cache:"
+msgstr "Vider le cache :"
+
+#: views/htaccess.php:770
+msgid "Bulk Actions"
+msgstr "Actions groupées"
+
+#: views/htaccess.php:771
+msgid "Inject or roll back all 4 snippets at once."
+msgstr "Injectez ou annulez les 4 extraits à la fois."
+
+#: views/htaccess.php:851
+msgid "These settings can make your site up to 2x faster!"
+msgstr "Ces paramètres peuvent rendre votre site jusqu'à 2 fois plus rapide !"
+
+#: views/htaccess.php:858
+msgid "14-day risk-free refund guarantee"
+msgstr "Garantie de remboursement sans risque de 14 jours"
+
+#: views/htaccess.php:918
+msgid "Read-Only"
+msgstr "Lecture seule"
+
+#: views/htaccess.php:924
+msgid "File does not exist yet — it will be created on first save."
+msgstr "Le fichier n'existe pas encore — il sera créé lors de la première sauvegarde."
+
+#: views/htaccess.php:927
+msgid "Active directives on disk."
+msgstr "Directives actives sur le disque."
+
+#: views/dashboard.php:73
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#: views/dashboard.php:74
+msgid "Visual health overview and system shortcuts"
+msgstr "Aperçu visuel de l’état de santé et raccourcis système"
+
+#: views/dashboard.php:84
+msgid "Setup Optimization"
+msgstr "Optimisation de la configuration"
+
+#: views/dashboard.php:88
+#, php-format
+msgid "%s / 100"
+msgstr "%s/ 100"
+
+#: views/dashboard.php:98
+msgid "Current Grade:"
+msgstr "Note actuelle :"
+
+#: views/dashboard.php:106
+msgid "Memory Peak"
+msgstr "Pic de mémoire"
+
+#: views/dashboard.php:111
+msgid "Limit:"
+msgstr "Limite :"
+
+#: views/dashboard.php:124
+msgid "Autoload Bloat"
+msgstr "Ballonnement du chargement automatique"
+
+#: views/dashboard.php:134
+msgid "Danger: High TTFB Impact"
+msgstr "Danger : impact élevé du TTFB"
+
+#: views/dashboard.php:134
+msgid "Healthy footprint"
+msgstr "Empreinte saine"
+
+#: views/dashboard.php:141
+msgid "Slowest External APIs"
+msgstr "API externes les plus lentes"
+
+#: views/dashboard.php:144
+msgid "No slow API calls detected"
+msgstr "Aucun appel API lent détecté"
+
+#: views/dashboard.php:173
+msgid "Active Issues"
+msgstr "Problèmes actifs"
+
+#: views/dashboard.php:199
+msgid "🔒 Running <strong>Pro features</strong> in preview mode."
+msgstr "🔒 Exécution des <strong>Fonctionnalités Pro</strong> en mode aperçu."
+
+#: views/dashboard.php:203
+msgid "Unlock full access →"
+msgstr "Débloquez l'accès complet →"
+
+#: views/pro/opcache.php:35
+msgid "Check OPcache memory usage, hit rates, and list cached scripts."
+msgstr "Vérifiez l'utilisation de la mémoire OPcache, les taux de réussite et répertoriez les scripts mis en cache."
+
+#: views/pro/opcache.php:45
+msgid "OPcache is not available"
+msgstr "OPcache n'est pas disponible"
+
+#: views/pro/opcache.php:49
+msgid "OPcache extension is installed but disabled."
+msgstr "L'extension OPcache est installée mais désactivée."
+
+#: views/pro/opcache.php:60 views/pro/object-cache.php:70
+msgid "Hit Rate"
+msgstr "Taux de réussite"
+
+#: views/pro/opcache.php:87
+msgid "Cached Scripts"
+msgstr "Scripts en cache"
+
+#: views/pro/opcache.php:106
+msgid "Key Directives"
+msgstr "Directives clés"
+
+#: views/pro/opcache.php:108 views/pro/snapshots.php:130
+#: views/pro/snapshots.php:155 views/pro/report.php:491
+#: views/pro/config-grader.php:187
+msgid "Directive"
+msgstr "Directive"
+
+#: views/pro/opcache.php:108 views/pro/snapshots.php:155
+msgid "Value"
+msgstr "Valeur"
+
+#: views/pro/opcache.php:138
+msgid "Forces recompilation of all cached PHP files."
+msgstr "Force la recompilation de tous les fichiers PHP mis en cache."
+
+#: views/pro/opcache.php:140 views/pro/opcache.php:142
+msgid "Clear OPcache disabled:"
+msgstr "Effacer OPcache désactivé :"
+
+#: views/pro/security-headers.php:31
+msgid "HTTP response header audit — graded against OWASP recommendations"
+msgstr "Audit d'en-tête de réponse HTTP – évalué par rapport aux recommandations de l'OWASP"
+
+#: views/pro/security-headers.php:36
+msgid "Re-check headers"
+msgstr "Revérifier les en-têtes"
+
+#: views/pro/security-headers.php:67
+msgid "cached"
+msgstr "mis en cache"
+
+#: views/pro/security-headers.php:100
+msgid "not set"
+msgstr "pas réglé"
+
+#: views/pro/security-headers.php:113
+msgid "OWASP Secure Headers"
+msgstr "En-têtes sécurisés OWASP"
+
+#: views/pro/error-log.php:43
+msgid "Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host."
+msgstr "Parcourez, filtrez et effacez votre journal d'erreurs PHP, sans FTP, SSH ou demander à votre hébergeur."
+
+#: views/pro/error-log.php:62
+msgid "No log file discovered"
+msgstr "Aucun fichier journal découvert"
+
+#: views/pro/error-log.php:67
+msgid "WordPress debug constants"
+msgstr "Constantes de débogage WordPress"
+
+#: views/pro/error-log.php:82
+msgid "Should be <strong>off</strong> in production — leaking errors to visitors is a security risk."
+msgstr "Doit être <strong>éteint</strong> en production : la fuite d'erreurs auprès des visiteurs constitue un risque pour la sécurité."
+
+#: views/pro/error-log.php:86
+msgid "Paths checked"
+msgstr "Chemins vérifiés"
+
+#: views/pro/error-log.php:114
+msgid "File:"
+msgstr "Fichier :"
+
+#: views/pro/error-log.php:115
+msgid "Size:"
+msgstr "Taille :"
+
+#: views/pro/error-log.php:116
+msgid "Showing:"
+msgstr "Montrant :"
+
+#: views/pro/error-log.php:119
+msgid "Filter lines..."
+msgstr "Filtrer les lignes..."
+
+#: views/pro/error-log.php:125
+msgid "Clear Log"
+msgstr "Effacer le journal"
+
+#: views/pro/error-log.php:132
+msgid "Log is empty — no errors recorded."
+msgstr "Le journal est vide — aucune erreur enregistrée."
+
+#: views/pro/mail.php:37
+msgid "not found"
+msgstr "pas trouvé"
+
+#: views/pro/mail.php:53
+msgid "SPF, DKIM, DMARC, and SMTP configuration audit"
+msgstr "Audit de configuration SPF, DKIM, DMARC et SMTP"
+
+#: views/pro/mail.php:58
+msgid "Could not audit mail configuration."
+msgstr "Impossible d'auditer la configuration de la messagerie."
+
+#: views/pro/mail.php:64
+msgid "Sending from"
+msgstr "Envoi depuis"
+
+#: views/pro/mail.php:69
+msgid "Mail method"
+msgstr "Méthode de courrier"
+
+#: views/pro/mail.php:72
+msgid "SMTP plugin active"
+msgstr "Plugin SMTP actif"
+
+#: views/pro/mail.php:74
+msgid "PHP mail()"
+msgstr "Courrier PHP()"
+
+#: views/pro/mail.php:75
+msgid "Consider an SMTP plugin for deliverability"
+msgstr "Envisagez un plugin SMTP pour la délivrabilité"
+
+#: views/pro/mail.php:83
+msgid "Email Routing Audit"
+msgstr "Audit du routage des e-mails"
+
+#: views/pro/mail.php:84
+msgid "Discovered email addresses used for administration and contact forms."
+msgstr "Adresses e-mail découvertes utilisées pour l’administration et les formulaires de contact."
+
+#: views/pro/mail.php:88
+msgid "Source"
+msgstr "Source"
+
+#: views/pro/mail.php:89
+msgid "Email Address"
+msgstr "Adresse e-mail"
+
+#: views/pro/mail.php:90
+msgid "Domain MX"
+msgstr "Domaine MX"
+
+#: views/pro/mail.php:91
+msgid "Test"
+msgstr "Tester"
+
+#: views/pro/mail.php:110
+msgid "Send test"
+msgstr "Envoyer le test"
+
+#: views/pro/mail.php:120
+msgid "DNS Records"
+msgstr "Enregistrements DNS"
+
+#: views/pro/mail.php:129 views/pro/mail.php:139
+msgid "MX records"
+msgstr "Enregistrements MX"
+
+#: views/pro/mail.php:148
+msgid "DKIM"
+msgstr "DKIM"
+
+#: views/pro/mail.php:155 views/pro/alerts.php:145
+msgid "Send Test Email"
+msgstr "Envoyer un e-mail de test"
+
+#: views/pro/mail.php:158
+msgid "recipient@example.com"
+msgstr "destinataire@exemple.com"
+
+#: views/pro/object-cache.php:38
+msgid "Monitor persistent object cache drop-ins, connection speed, and hit/miss ratios."
+msgstr "Surveillez les ajouts de cache d’objets persistants, la vitesse de connexion et les taux de réussite/échec."
+
+#: views/pro/object-cache.php:48
+msgid "Object Caching is not active."
+msgstr "La mise en cache des objets n'est pas active."
+
+#: views/pro/object-cache.php:50
+msgid "Redis"
+msgstr "Rédis"
+
+#: views/pro/object-cache.php:52
+msgid "Memcached"
+msgstr "Memcaché"
+
+#: views/pro/object-cache.php:54
+msgid "Neither Redis nor Memcached PHP extensions are installed. Ask your host to enable one (Redis is recommended)."
+msgstr "Ni les extensions PHP Redis ni Memcached ne sont installées. Demandez à votre hébergeur d'en activer un (Redis est recommandé)."
+
+#: views/pro/object-cache.php:59
+msgid "Object Cache is active, but stats are unavailable."
+msgstr "Le cache d'objets est actif, mais les statistiques ne sont pas disponibles."
+
+#: views/pro/object-cache.php:76
+msgid "Engine:"
+msgstr "Moteur :"
+
+#: views/pro/object-cache.php:105
+msgid "Keys & Evictions"
+msgstr "Clés et expulsions"
+
+#: views/pro/object-cache.php:107
+msgid "Keys in Memory:"
+msgstr "Clés en mémoire :"
+
+#: views/pro/object-cache.php:110
+msgid "Evictions:"
+msgstr "Expulsions :"
+
+#: views/pro/object-cache.php:124
+msgid "Flush Cache"
+msgstr "Vider le cache"
+
+#: views/pro/object-cache.php:125
+msgid "Forces the cache to be entirely rebuilt."
+msgstr "Force la reconstruction complète du cache."
+
+#: views/pro/permissions.php:35
+msgid "Deep scan of core files, plugins, and themes to detect security risks and auto-update failures."
+msgstr "Analyse approfondie des fichiers principaux, des plugins et des thèmes pour détecter les risques de sécurité et les échecs de mise à jour automatique."
+
+#: views/pro/permissions.php:42
+msgid "PHP Execution User"
+msgstr "Utilisateur d'exécution PHP"
+
+#: views/pro/permissions.php:47
+msgid "Files Scanned"
+msgstr "Fichiers analysés"
+
+#: views/pro/permissions.php:49
+msgid "Capped at 5,000 for safety"
+msgstr "Plafonné à 5 000 pour des raisons de sécurité"
+
+#: views/pro/permissions.php:52 views/pro/permissions.php:77
+#: views/pro/eol.php:65 views/pro/cron.php:101 views/pro/report.php:528
+#: views/safemode.php:407
+msgid "Status"
+msgstr "Statut"
+
+#: views/pro/permissions.php:54
+msgid "Action Required"
+msgstr "Action requise"
+
+#: views/pro/permissions.php:56
+msgid "Secure"
+msgstr "Sécurisé"
+
+#: views/pro/permissions.php:65
+msgid "Filesystem is Secure"
+msgstr "Le système de fichiers est sécurisé"
+
+#: views/pro/permissions.php:66
+msgid "No dangerous 777 permissions were found, and file ownership matches the PHP process (meaning native plugin updates will work perfectly)."
+msgstr "Aucune autorisation 777 dangereuse n'a été trouvée et la propriété des fichiers correspond au processus PHP (ce qui signifie que les mises à jour natives des plugins fonctionneront parfaitement)."
+
+#: views/pro/permissions.php:77
+msgid "File"
+msgstr "Fichier"
+
+#: views/pro/permissions.php:77 views/pro/permissions.php:105
+msgid "Permissions"
+msgstr "Autorisations"
+
+#: views/pro/permissions.php:77
+msgid "Owner"
+msgstr "Propriétaire"
+
+#: views/pro/permissions.php:102
+msgid "These files or folders are world-writable (777 or 666). Any other user on the server can modify them."
+msgstr "Ces fichiers ou dossiers sont accessibles en écriture universelle (777 ou 666). Tout autre utilisateur du serveur peut les modifier."
+
+#: views/pro/permissions.php:105 views/pro/permissions.php:127
+msgid "Path"
+msgstr "Chemin"
+
+#: views/pro/permissions.php:105
+msgid "Type"
+msgstr "Tapez"
+
+#: views/pro/permissions.php:127
+msgid "Current Owner"
+msgstr "Propriétaire actuel"
+
+#: views/pro/permissions.php:127
+msgid "Required Owner"
+msgstr "Propriétaire requis"
+
+#: views/pro/permissions.php:140
+msgid "Showing first 20 examples only. Fixing the root folder recursively will solve the rest."
+msgstr "Affichage des 20 premiers exemples uniquement. La correction récursive du dossier racine résoudra le reste."
+
+#: views/pro/permissions.php:150
+msgid "Log into your server via SSH. Copy and paste the following bash commands to automatically set the correct, secure ownership and permissions for your entire WordPress installation."
+msgstr "Connectez-vous à votre serveur via SSH. Copiez et collez les commandes bash suivantes pour définir automatiquement la propriété et les autorisations correctes et sécurisées pour l'ensemble de votre installation WordPress."
+
+#: views/pro/permissions.php:154
+msgid "chown"
+msgstr "chown"
+
+#: views/pro/permissions.php:157 views/pro/permissions.php:160
+msgid "find"
+msgstr "trouver"
+
+#: views/pro/permissions.php:157 views/pro/permissions.php:160
+#: views/pro/permissions.php:164
+msgid "chmod"
+msgstr "chmod"
+
+#: views/pro/snapshots.php:62
+msgid "Track php.ini changes over time. Automatic weekly snapshots run via WP Cron."
+msgstr "Suivez les modifications de php.ini au fil du temps. Instantanés hebdomadaires automatiques exécutés via WP Cron."
+
+#: views/pro/snapshots.php:74
+msgid "Take Snapshot Now"
+msgstr "Prendre un instantané maintenant"
+
+#: views/pro/snapshots.php:77
+msgid "Upgrade to Unlimited"
+msgstr "Mise à niveau vers illimité"
+
+#: views/pro/snapshots.php:83
+msgid "Label (optional)"
+msgstr "Étiquette (facultatif)"
+
+#: views/pro/snapshots.php:84
+msgid "Take Snapshot"
+msgstr "Prendre un instantané"
+
+#: views/pro/snapshots.php:92
+msgid "Compare Two Snapshots"
+msgstr "Comparez deux instantanés"
+
+#: views/pro/snapshots.php:97
+msgid "From (older)"
+msgstr "De (plus ancien)"
+
+#: views/pro/snapshots.php:105
+msgid "To (newer)"
+msgstr "À (plus récent)"
+
+#: views/pro/snapshots.php:112
+msgid "Compare →"
+msgstr "Comparer →"
+
+#: views/pro/snapshots.php:127
+msgid "No changes detected between these two snapshots."
+msgstr "Aucun changement détecté entre ces deux instantanés."
+
+#: views/pro/snapshots.php:130
+msgid "Change"
+msgstr "Changement"
+
+#: views/pro/snapshots.php:130
+msgid "Old Value"
+msgstr "Ancienne valeur"
+
+#: views/pro/snapshots.php:130
+msgid "New Value"
+msgstr "Nouvelle valeur"
+
+#: views/pro/snapshots.php:171
+msgid "No snapshots yet. Take one above — weekly auto-snapshots will accumulate here over time."
+msgstr "Aucun instantané pour l'instant. Prenez-en un ci-dessus : des instantanés automatiques hebdomadaires s’accumuleront ici au fil du temps."
+
+#: views/pro/snapshots.php:174
+msgid "Label"
+msgstr "Étiquette"
+
+#: views/pro/snapshots.php:174
+msgid "Created"
+msgstr "Créé"
+
+#: views/pro/snapshots.php:174 views/pro/cron.php:102
+msgid "Actions"
+msgstr "Actions"
+
+#: views/pro/snapshots.php:188 views/pro/cron.php:151
+msgid "Delete"
+msgstr "Supprimer"
+
+#: views/pro/alerts.php:49
+msgid "Email + Slack/Discord notifications for EOL, config changes, OPcache, and SSL events"
+msgstr "Notifications par e-mail + Slack/Discord pour EOL, modifications de configuration, OPcache et événements SSL"
+
+#: views/pro/alerts.php:62
+msgid "Enable Alerts"
+msgstr "Activer les alertes"
+
+#: views/pro/alerts.php:71
+msgid "Email recipients"
+msgstr "Destinataires des e-mails"
+
+#: views/pro/alerts.php:74
+msgid "One email address per line (or comma-separated). Leave blank to disable email and use webhook only."
+msgstr "Une adresse e-mail par ligne (ou séparée par des virgules). Laissez vide pour désactiver la messagerie électronique et utiliser uniquement le webhook."
+
+#: views/pro/alerts.php:78
+msgid "Webhook URL"
+msgstr "URL du webhook"
+
+#: views/pro/alerts.php:81
+msgid "https://hooks.slack.com/services/... (Requires Unlimited/Lifetime plan)"
+msgstr "https://hooks.slack.com/services/... (nécessite un forfait illimité/à vie)"
+
+#: views/pro/alerts.php:83
+msgid "Upgrade your plan →"
+msgstr "Améliorez votre forfait →"
+
+#: views/pro/alerts.php:87
+msgid "https://hooks.slack.com/services/... or https://discord.com/api/webhooks/..."
+msgstr "https://hooks.slack.com/services/... ou https://discord.com/api/webhooks/..."
+
+#: views/pro/alerts.php:102
+msgid "HTTPS only. Same alerts as email — delivered to your chat or automation."
+msgstr "HTTPS uniquement. Mêmes alertes que par e-mail : envoyées à votre chat ou à votre automatisation."
+
+#: views/pro/alerts.php:107
+msgid "Alert Conditions"
+msgstr "Conditions d'alerte"
+
+#: views/pro/alerts.php:111
+msgid "PHP EOL approaching"
+msgstr "PHP EOL approche"
+
+#: views/pro/alerts.php:115
+msgid "Config changes detected"
+msgstr "Modifications de configuration détectées"
+
+#: views/pro/alerts.php:119
+msgid "OPcache hit rate below"
+msgstr "Taux de réussite d'OPcache ci-dessous"
+
+#: views/pro/alerts.php:125
+msgid "SSL certificate expiring within"
+msgstr "Le certificat SSL expire dans"
+
+#: views/pro/alerts.php:133 views/pro/alerts.php:136
+msgid "Weekly digest"
+msgstr "Résumé hebdomadaire"
+
+#: views/pro/alerts.php:144
+msgid "Save Settings"
+msgstr "Enregistrer les paramètres"
+
+#: views/pro/alerts.php:147
+msgid "Test Webhook"
+msgstr "Tester le webhook"
+
+#: views/pro/alerts.php:153
+msgid "Alert schedule:"
+msgstr "Calendrier des alertes :"
+
+#: views/pro/alerts.php:159
+msgid "WP Cron event not scheduled — deactivate and reactivate the plugin to fix this."
+msgstr "Événement WP Cron non planifié – désactivez et réactivez le plugin pour résoudre ce problème."
+
+#: views/pro/upgrade.php:37
+msgid "Upgrade to phpinfo() WP Pro"
+msgstr "Mise à niveau vers phpinfo() WP Pro"
+
+#: views/pro/upgrade.php:38
+msgid "The WordPress server health audit you can hand to clients."
+msgstr "L'audit de santé du serveur WordPress que vous pouvez remettre aux clients."
+
+#: views/pro/upgrade.php:58
+msgid "Choose your plan"
+msgstr "Choisissez votre forfait"
+
+#: views/pro/upgrade.php:59
+msgid "Every plan unlocks <strong>every feature above</strong> — the only difference is the number of sites and update window."
+msgstr "Chaque plan débloque <strong>toutes les fonctionnalités ci-dessus</strong> — la seule différence est le nombre de sites et la fenêtre de mise à jour."
+
+#: views/pro/upgrade.php:64
+msgid "Single"
+msgstr "Célibataire"
+
+#: views/pro/upgrade.php:66
+msgid "1 site · Essential features · Branded reports"
+msgstr "1 site · Fonctionnalités essentielles · Rapports de marque"
+
+#: views/pro/upgrade.php:69 views/pro/license.php:388
+msgid "Unlimited"
+msgstr "Illimité"
+
+#: views/pro/upgrade.php:71
+msgid "Unlimited sites · White-labeled · Weekly digests"
+msgstr "Sites illimités · En marque blanche · Résumés hebdomadaires"
+
+#: views/pro/upgrade.php:72
+msgid "Best value"
+msgstr "Meilleur rapport qualité-prix"
+
+#: views/pro/upgrade.php:75 views/pro/license.php:400
+msgid "Lifetime"
+msgstr "Durée de vie"
+
+#: views/pro/upgrade.php:77
+msgid "Unlimited sites · Lifetime updates · White-labeled"
+msgstr "Sites illimités · Mises à jour à vie · En marque blanche"
+
+#: views/pro/upgrade.php:90
+msgid "14-day money-back guarantee · Instant delivery · Site-locked license"
+msgstr "Garantie de remboursement de 14 jours · Livraison instantanée · Licence verrouillée sur site"
+
+#: views/pro/api-monitor.php:39
+msgid "Track slow outbound API requests that silently block page loads (last 24 hours)."
+msgstr "Suivez les requêtes API sortantes lentes qui bloquent silencieusement le chargement des pages (dernières 24 heures)."
+
+#: views/pro/api-monitor.php:42
+msgid "Reset Stats"
+msgstr "Réinitialiser les statistiques"
+
+#: views/pro/api-monitor.php:48
+msgid "Monitoring Active."
+msgstr "Surveillance active."
+
+#: views/pro/api-monitor.php:50
+msgid "To test this, you can trigger a plugin update check or wait for normal site traffic to generate API calls."
+msgstr "Pour tester cela, vous pouvez déclencher une vérification de mise à jour du plugin ou attendre que le trafic normal du site génère des appels API."
+
+#: views/pro/api-monitor.php:51 views/pro/api-monitor.php:74
+msgid "Trigger Dummy Slow Request (1.5s)"
+msgstr "Déclencher une demande de lenteur factice (1,5 s)"
+
+#: views/pro/api-monitor.php:57
+msgid "Total Waiting Time"
+msgstr "Temps d'attente total"
+
+#: views/pro/api-monitor.php:65
+msgid "Slowest API Response"
+msgstr "Réponse API la plus lente"
+
+#: views/pro/api-monitor.php:81
+msgid "Domain (Endpoint)"
+msgstr "Domaine (point de terminaison)"
+
+#: views/pro/api-monitor.php:82
+msgid "Requests"
+msgstr "Demandes"
+
+#: views/pro/api-monitor.php:83
+msgid "Avg Time"
+msgstr "Temps moyen"
+
+#: views/pro/api-monitor.php:84
+msgid "Max Time"
+msgstr "Temps maximum"
+
+#: views/pro/api-monitor.php:85
+msgid "Total Time"
+msgstr "Durée totale"
+
+#: views/pro/api-monitor.php:86
+msgid "Errors/Timeouts"
+msgstr "Erreurs/Délai d'attente"
+
+#: views/pro/api-monitor.php:112
+msgid "Any API with a max time over 2.0s should be investigated."
+msgstr "Toute API avec une durée maximale supérieure à 2,0 secondes doit être étudiée."
+
+#: views/pro/eol.php:9
+msgid "End of Life"
+msgstr "Fin de vie"
+
+#: views/pro/eol.php:10
+msgid "EOL < 90 days"
+msgstr "EOL < 90 jours"
+
+#: views/pro/eol.php:11 views/pro/network.php:30
+msgid "Supported"
+msgstr "Pris en charge"
+
+#: views/pro/eol.php:12
+msgid "Unknown"
+msgstr "Inconnu"
+
+#: views/pro/eol.php:20
+msgid "PHP EOL Timeline"
+msgstr "Chronologie PHP EOL"
+
+#: views/pro/eol.php:21
+msgid "End-of-life dates and support status for every PHP version"
+msgstr "Dates de fin de vie et statut de support pour chaque version de PHP"
+
+#: views/pro/eol.php:28
+msgid "EXPIRING SOON"
+msgstr "EXPIRANT BIENTÔT"
+
+#: views/pro/eol.php:30
+msgid "UNKNOWN"
+msgstr "INCONNU"
+
+#: views/pro/eol.php:38
+msgid "Running on"
+msgstr "Courir sur"
+
+#: views/pro/eol.php:39 views/pro/eol.php:73
+#, php-format
+msgid "PHP %s"
+msgstr "PHP%s"
+
+#: views/pro/eol.php:47
+#, php-format
+msgid "Reached end-of-life on <strong>%s</strong>. No security patches are being issued. Contact your host and request a PHP upgrade to 8.2 or newer immediately."
+msgstr "A atteint la fin de vie le <strong>%s</strong>. Aucun correctif de sécurité n'est publié. Contactez votre hébergeur et demandez immédiatement une mise à niveau de PHP vers 8.2 ou plus récent."
+
+#: views/pro/eol.php:49
+#, php-format
+msgid "Reaches end-of-life on <strong>%1$s</strong> — <strong>%2$s days</strong> from now. Plan your PHP upgrade before that date."
+msgstr "Atteint la fin de sa vie utile dans <strong>%1$s</strong> — <strong>%2$sjours</strong> à partir de maintenant. Planifiez votre mise à niveau PHP avant cette date."
+
+#: views/pro/eol.php:51
+#, php-format
+msgid "Actively supported until <strong>%1$s</strong> — <strong>%2$s days</strong> from now. You're good."
+msgstr "Prise en charge active jusqu'à <strong>%1$s</strong> — <strong>%2$sjours</strong> à partir de maintenant. Vous êtes doué."
+
+#: views/pro/eol.php:53
+#, php-format
+msgid "EOL date not found for PHP %s. Check <a href=\\\"https://www.php.net/supported-versions.php\\\" target=\\\"_blank\\\">php.net/supported-versions</a>."
+msgstr "Date EOL introuvable pour PHP%s. Vérifiez <a href=\\\\\"https://www.php.net/supported-versions.php\\\\\" target=\\\\\"_blank\\\\\">php.net/supported-versions</a>."
+
+#: views/pro/eol.php:59
+msgid "Version Lifecycle"
+msgstr "Cycle de vie des versions"
+
+#: views/pro/eol.php:63 views/safemode.php:406
+msgid "Version"
+msgstr "Version"
+
+#: views/pro/eol.php:64
+msgid "EOL Date"
+msgstr "Date de fin de vie"
+
+#: views/pro/eol.php:66
+msgid "Days"
+msgstr "Jours"
+
+#: views/pro/eol.php:75
+msgid "YOU"
+msgstr "VOUS"
+
+#: views/pro/eol.php:86
+#, php-format
+msgid "%s day ago"
+msgstr " il y a%sjour"
+
+#: views/pro/eol.php:88
+#, php-format
+msgid "%s day"
+msgstr "%sjour"
+
+#: views/pro/eol.php:97
+#, php-format
+msgid "Source: %s — updated in each plugin release."
+msgstr "Source :%s— mis à jour dans chaque version du plugin."
+
+#: views/pro/eol.php:108
+#, php-format
+msgid "Plan your PHP %s upgrade with confidence"
+msgstr "Planifiez votre mise à niveau PHP%sen toute confiance"
+
+#: views/pro/eol.php:110
+msgid "Before you upgrade, scan every plugin and theme for compatibility with your target PHP version. Save snapshots, monitor changes, and email yourself a digest."
+msgstr "Avant de procéder à la mise à niveau, analysez chaque plugin et thème pour vérifier sa compatibilité avec votre version PHP cible. Enregistrez des instantanés, surveillez les modifications et envoyez-vous un résumé par courrier électronique."
+
+#: views/pro/eol.php:113 views/pro/compat.php:28
+msgid "PHP Compatibility Scanner"
+msgstr "Scanner de compatibilité PHP"
+
+#: views/pro/eol.php:113
+msgid "find breaking changes across all plugins/themes"
+msgstr "trouver les modifications importantes dans tous les plugins/thèmes"
+
+#: views/pro/eol.php:114
+msgid "diff php.ini before and after the upgrade"
+msgstr "diff php.ini avant et après la mise à niveau"
+
+#: views/pro/eol.php:115
+msgid "single-page PDF for clients or your records"
+msgstr "PDF d'une seule page pour les clients ou vos dossiers"
+
+#: views/pro/eol.php:116
+msgid "Email Alerts"
+msgstr "Alertes par e-mail"
+
+#: views/pro/eol.php:116
+msgid "get warned 90/30/7 days before any PHP EOL"
+msgstr "être averti 90/30/7 jours avant toute EOL PHP"
+
+#: views/pro/eol.php:119
+msgid "Upgrade safely — Get Pro &rarr;"
+msgstr "Effectuez une mise à niveau en toute sécurité – Devenez Pro &rarr;"
+
+#: views/pro/cron.php:48
+msgid "Inspect scheduled events, spot missed crons, and find orphans"
+msgstr "Inspectez les événements programmés, repérez les crons manqués et trouvez les orphelins"
+
+#: views/pro/cron.php:66
+msgid "Scheduled events"
+msgstr "Événements programmés"
+
+#: views/pro/cron.php:70 views/pro/cron.php:131
+msgid "Overdue"
+msgstr "En retard"
+
+#: views/pro/cron.php:74
+msgid "Orphans (no callback)"
+msgstr "Orphelins (pas de rappel)"
+
+#: views/pro/cron.php:78
+msgid "Due within 60s"
+msgstr "À payer dans les 60 s"
+
+#: views/pro/cron.php:85
+msgid "Why orphan events come back after you delete them:"
+msgstr "Pourquoi les événements orphelins reviennent après leur suppression :"
+
+#: views/pro/cron.php:86
+msgid "Purge hook"
+msgstr "Crochet de purge"
+
+#: views/pro/cron.php:92
+msgid "No scheduled events found."
+msgstr "Aucun événement planifié trouvé."
+
+#: views/pro/cron.php:98
+msgid "Hook"
+msgstr "Crochet"
+
+#: views/pro/cron.php:99
+msgid "Next Run"
+msgstr "Prochaine exécution"
+
+#: views/pro/cron.php:100
+msgid "Schedule"
+msgstr "Calendrier"
+
+#: views/pro/cron.php:115
+msgid "orphan"
+msgstr "orphelin"
+
+#: views/pro/cron.php:133
+msgid "Soon"
+msgstr "Bientôt"
+
+#: views/pro/cron.php:135
+msgid "OK"
+msgstr "D'accord"
+
+#: views/pro/cron.php:143
+msgid "Run now"
+msgstr "Courez maintenant"
+
+#: views/pro/license.php:88
+msgid "Activate your license to unlock Pro features on this site"
+msgstr "Activez votre licence pour débloquer les fonctionnalités Pro sur ce site"
+
+#: views/pro/license.php:100
+msgid "License locked."
+msgstr "Licence verrouillée."
+
+#: views/pro/license.php:110
+msgid "Pro license is active"
+msgstr "La licence Pro est active"
+
+#: views/pro/license.php:111
+msgid "All Pro features are unlocked on this site."
+msgstr "Toutes les fonctionnalités Pro sont débloquées sur ce site."
+
+#: views/pro/license.php:116
+msgid "No active license"
+msgstr "Aucune licence active"
+
+#: views/pro/license.php:117
+msgid "Enter a valid license key to unlock Pro features."
+msgstr "Entrez une clé de licence valide pour déverrouiller les fonctionnalités Pro."
+
+#: views/pro/license.php:125
+msgid "License key"
+msgstr "Clé de licence"
+
+#: views/pro/license.php:131
+msgid "Registered to"
+msgstr "Inscrit à"
+
+#: views/pro/license.php:135 views/pro/ssl.php:88 views/pro/report.php:528
+msgid "Expires"
+msgstr "Expire"
+
+#: views/pro/license.php:147
+msgid "Activated"
+msgstr "Activé"
+
+#: views/pro/license.php:156
+msgid "Deactivate License"
+msgstr "Désactiver la licence"
+
+#: views/pro/license.php:172
+msgid "Deactivate your Pro license?"
+msgstr "Désactiver votre licence Pro ?"
+
+#: views/pro/license.php:173
+msgid "The plugin keeps running, but every Pro feature below stops the moment you confirm."
+msgstr "Le plugin continue de fonctionner, mais chaque fonctionnalité Pro ci-dessous s'arrête au moment où vous confirmez."
+
+#: views/pro/license.php:179
+msgid "Pro features that will lock"
+msgstr "Fonctionnalités professionnelles qui se verrouillent"
+
+#: views/pro/license.php:196
+msgid "Nothing is deleted."
+msgstr "Rien n'est supprimé."
+
+#: views/pro/license.php:201
+msgid "Keep Pro active"
+msgstr "Gardez Pro actif"
+
+#: views/pro/license.php:232
+msgid "Enter your license key"
+msgstr "Entrez votre clé de licence"
+
+#: views/pro/license.php:235
+msgid "PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+msgstr "PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+#: views/pro/license.php:238
+msgid "Activate"
+msgstr "Activer"
+
+#: views/pro/license.php:242
+msgid "Get phpinfo() WP Pro →"
+msgstr "Obtenez phpinfo() WP Pro →"
+
+#: views/pro/license.php:297
+msgid "Compare plans"
+msgstr "Comparez les forfaits"
+
+#: views/pro/license.php:298
+msgid "Everything in Free, plus the Pro depth — see exactly what you get at each tier."
+msgstr "Tout en version gratuite, plus la profondeur Pro : voyez exactement ce que vous obtenez à chaque niveau."
+
+#: views/pro/license.php:303
+msgid "Feature"
+msgstr "Caractéristique"
+
+#: views/pro/license.php:331
+msgid "Get Free"
+msgstr "Obtenez gratuitement"
+
+#: views/pro/license.php:334 views/pro/license.php:384
+msgid "Get Single"
+msgstr "Devenez célibataire"
+
+#: views/pro/license.php:337 views/pro/license.php:396
+msgid "Get Unlimited"
+msgstr "Obtenez illimité"
+
+#: views/pro/license.php:340 views/pro/license.php:408
+msgid "Get Lifetime"
+msgstr "Obtenez la durée de vie"
+
+#: views/pro/license.php:349
+msgid "What Pro unlocks"
+msgstr "Ce que Pro débloque"
+
+#: views/pro/license.php:373
+msgid "Pricing"
+msgstr "Tarifs"
+
+#: views/pro/license.php:376
+msgid "Single Site"
+msgstr "Site unique"
+
+#: views/pro/license.php:379
+msgid "Essential Pro features on 1 site"
+msgstr "Fonctionnalités Essential Pro sur 1 site"
+
+#: views/pro/license.php:380
+msgid "Standard PDF reports (Branded)"
+msgstr "Rapports PDF standard (avec marque)"
+
+#: views/pro/license.php:381
+msgid "1 API monitor & 3 snapshots"
+msgstr "1 moniteur API et 3 instantanés"
+
+#: views/pro/license.php:382
+msgid "1 year of updates & support"
+msgstr "1 an de mises à jour et d'assistance"
+
+#: views/pro/license.php:387
+msgid "Most Popular"
+msgstr "Les plus populaires"
+
+#: views/pro/license.php:391 views/pro/license.php:403
+msgid "All Pro features on unlimited sites"
+msgstr "Toutes les fonctionnalités Pro sur des sites illimités"
+
+#: views/pro/license.php:392 views/pro/license.php:404
+msgid "White-labeled PDF reports (Logo)"
+msgstr "Rapports PDF en marque blanche (Logo)"
+
+#: views/pro/license.php:393 views/pro/license.php:405
+msgid "Weekly digests & Slack/Discord"
+msgstr "Résumés hebdomadaires et Slack/Discord"
+
+#: views/pro/license.php:394
+msgid "Priority support & Multi-site"
+msgstr "Support prioritaire & Multi-sites"
+
+#: views/pro/license.php:399
+msgid "Founders &mdash; First 50"
+msgstr "Fondateurs - 50 premiers"
+
+#: views/pro/license.php:401
+msgid "once"
+msgstr "une fois"
+
+#: views/pro/license.php:406
+msgid "Lifetime updates & priority support"
+msgstr "Mises à jour à vie et assistance prioritaire"
+
+#: views/pro/license.php:411
+msgid "14-day money-back guarantee · Instant license delivery · Cancel anytime"
+msgstr "Garantie de remboursement de 14 jours · Livraison instantanée de la licence · Annulez à tout moment"
+
+#: views/pro/ssl.php:43
+msgid "Monitor SSL validity, expiration dates, and domain name mismatches."
+msgstr "Surveillez la validité SSL, les dates d'expiration et les incohérences de noms de domaine."
+
+#: views/pro/ssl.php:59
+msgid "ERROR"
+msgstr "ERREUR"
+
+#: views/pro/ssl.php:79
+msgid "days left"
+msgstr "jours restants"
+
+#: views/pro/ssl.php:89
+msgid "Issued"
+msgstr "Publié"
+
+#: views/pro/ssl.php:90 views/pro/report.php:528
+msgid "Issuer"
+msgstr "Émetteur"
+
+#: views/pro/ssl.php:92
+msgid "CN"
+msgstr "CN"
+
+#: views/pro/ssl.php:96
+msgid "SANs"
+msgstr "SAN"
+
+#: views/pro/ssl.php:115
+msgid "Re-check all certificates"
+msgstr "Revérifiez tous les certificats"
+
+#: views/pro/ssl.php:118
+msgid "Results cached for 6 hours."
+msgstr "Résultats mis en cache pendant 6 heures."
+
+#: views/pro/ssl.php:124
+msgid "Monitor Additional Domains"
+msgstr "Surveiller des domaines supplémentaires"
+
+#: views/pro/ssl.php:133
+msgid "client-a.com&#10;client-b.com&#10;staging.mysite.com"
+msgstr "client-a.com&#10;client-b.com&#10;staging.mysite.com"
+
+#: views/pro/ssl.php:136
+msgid "Save Domains"
+msgstr "Enregistrer les domaines"
+
+#: views/pro/compat.php:36
+msgid "Free scanner:"
+msgstr "Scanner gratuit :"
+
+#: views/pro/compat.php:38 views/pro/update-audit.php:64
+msgid "Get Pro →"
+msgstr "Devenez Pro →"
+
+#: views/pro/compat.php:45
+msgid "Target PHP version:"
+msgstr "Version PHP cible :"
+
+#: views/pro/compat.php:56
+msgid "Clear results"
+msgstr "Des résultats clairs"
+
+#: views/pro/compat.php:65
+msgid "No scan yet"
+msgstr "Pas encore d'analyse"
+
+#: views/pro/compat.php:66
+msgid "Pick a target PHP version above and click \\\"Run Scan\\\" to analyze your installed plugins and themes."
+msgstr "Choisissez une version cible de PHP ci-dessus et cliquez sur « Exécuter l'analyse » pour analyser vos plugins et thèmes installés."
+
+#: views/pro/compat.php:118
+msgid "Safe to upgrade!"
+msgstr "Mise à niveau en toute sécurité !"
+
+#: views/pro/compat.php:124
+msgid "false positives"
+msgstr "faux positifs"
+
+#: views/pro/compat.php:129
+msgid "fatal errors"
+msgstr "erreurs fatales"
+
+#: views/pro/compat.php:138
+msgid "Regex-based scan — some matches may be false positives (e.g., function names in comments or strings). Always verify before changing third-party code."
+msgstr "Analyse basée sur les expressions régulières : certaines correspondances peuvent être des faux positifs (par exemple, les noms de fonctions dans les commentaires ou les chaînes). Vérifiez toujours avant de modifier le code tiers."
+
+#: views/pro/network.php:14
+msgid "phpinfo() WP — Network"
+msgstr "phpinfo() WP — Réseau"
+
+#: views/pro/network.php:15
+msgid "Server-level info applies to all sites in the network. Per-site stats appear below."
+msgstr "Les informations au niveau du serveur s'appliquent à tous les sites du réseau. Les statistiques par site apparaissent ci-dessous."
+
+#: views/pro/network.php:26
+msgid "End of life"
+msgstr "Fin de vie"
+
+#: views/pro/network.php:40
+msgid "Memory"
+msgstr "Mémoire"
+
+#: views/pro/network.php:51
+msgid "Per-site health"
+msgstr "Santé par site"
+
+#: views/pro/network.php:60
+msgid "ID"
+msgstr "pièce d'identité"
+
+#: views/pro/network.php:61
+msgid "Site"
+msgstr "Site"
+
+#: views/pro/network.php:62
+msgid "URL"
+msgstr "URL"
+
+#: views/pro/network.php:63 views/pro/report.php:554
+msgid "Autoload data"
+msgstr "Chargement automatique des données"
+
+#: views/pro/db-health.php:41
+msgid "Analyze MySQL/MariaDB version, structural schema issues, and TTFB-killing autoload bloat."
+msgstr "Analysez la version MySQL/MariaDB, les problèmes de schéma structurel et la surcharge du chargement automatique qui tue le TTFB."
+
+#: views/pro/db-health.php:82
+msgid "Database size"
+msgstr "Taille de la base de données"
+
+#: views/pro/db-health.php:98
+msgid "Transients"
+msgstr "Transitoires"
+
+#: views/pro/db-health.php:110 views/pro/db-health.php:249
+msgid "Overhead"
+msgstr "Frais généraux"
+
+#: views/pro/db-health.php:112
+msgid "Reclaimable via OPTIMIZE TABLE"
+msgstr "Récupérable via OPTIMIZE TABLE"
+
+#: views/pro/db-health.php:133
+msgid "every single page request"
+msgstr "chaque demande de page"
+
+#: views/pro/db-health.php:138
+msgid "Warning: High Autoload Size!"
+msgstr "Attention : taille de chargement automatique élevée !"
+
+#: views/pro/db-health.php:146
+msgid "Option Name"
+msgstr "Nom de l'option"
+
+#: views/pro/db-health.php:147
+msgid "Memory Footprint"
+msgstr "Empreinte mémoire"
+
+#: views/pro/db-health.php:148
+msgid "Recommendation"
+msgstr "Recommandation"
+
+#: views/pro/db-health.php:162
+msgid "Transient"
+msgstr "Transitoire"
+
+#: views/pro/db-health.php:170
+msgid "TTFB KILLER"
+msgstr "TUEUR DE TTFB"
+
+#: views/pro/db-health.php:173
+msgid "BLOAT"
+msgstr "BLOOMEMENT"
+
+#: views/pro/db-health.php:176
+msgid "Normal"
+msgstr "Normale"
+
+#: views/pro/db-health.php:190
+msgid "Analyzes your database schema to find custom tables (often created by poorly coded plugins) that are missing critical MySQL indexes. Queries against these tables trigger <strong>full table scans</strong>, destroying database performance."
+msgstr "Analyse le schéma de votre base de données pour trouver des tables personnalisées (souvent créées par des plugins mal codés) auxquelles manquent des index MySQL critiques. Les requêtes sur ces tables déclenchent des <strong>analyses complètes des tables</strong>, détruisant ainsi les performances de la base de données."
+
+#: views/pro/db-health.php:194
+msgid "CRITICAL:"
+msgstr "CRITIQUE :"
+
+#: views/pro/db-health.php:202
+msgid "Schema Optimized"
+msgstr "Schéma optimisé"
+
+#: views/pro/db-health.php:203
+msgid "No large tables are missing secondary indexes."
+msgstr "Aucune grande table ne manque d'index secondaires."
+
+#: views/pro/db-health.php:211
+msgid "Table Name"
+msgstr "Nom du tableau"
+
+#: views/pro/db-health.php:212
+msgid "Rows (Approx)"
+msgstr "Lignes (environ)"
+
+#: views/pro/db-health.php:213
+msgid "Data Size"
+msgstr "Taille des données"
+
+#: views/pro/db-health.php:214
+msgid "Risk Level"
+msgstr "Niveau de risque"
+
+#: views/pro/db-health.php:237
+msgid "These tables have > 500 rows but absolutely zero secondary indexes. Consider reporting this to the plugin developer, or creating indexes manually if you know which columns are queried frequently."
+msgstr "Ces tables ont > 500 lignes mais absolument aucun index secondaire. Pensez à signaler cela au développeur du plugin ou à créer des index manuellement si vous savez quelles colonnes sont fréquemment interrogées."
+
+#: views/pro/db-health.php:241
+msgid "All Tables"
+msgstr "Tous les tableaux"
+
+#: views/pro/db-health.php:245
+msgid "Table"
+msgstr "Tableau"
+
+#: views/pro/db-health.php:246
+msgid "Rows"
+msgstr "Lignes"
+
+#: views/pro/db-health.php:247
+msgid "Data"
+msgstr "Données"
+
+#: views/pro/db-health.php:248
+msgid "Index"
+msgstr "Indice"
+
+#: views/pro/db-health.php:250 views/pro/report.php:550
+msgid "Engine"
+msgstr "Moteur"
+
+#: views/pro/update-audit.php:40
+msgid "Pre-update core audit"
+msgstr "Audit de base avant la mise à jour"
+
+#: views/pro/update-audit.php:42
+msgid "Update WordPress"
+msgstr "Mettre à jour WordPress"
+
+#: views/pro/update-audit.php:50
+msgid "cloud"
+msgstr "nuage"
+
+#: views/pro/update-audit.php:61
+msgid "Free:"
+msgstr "Gratuit :"
+
+#: views/pro/update-audit.php:62 views/pro/update-audit.php:134
+msgid "Pro"
+msgstr "Pro"
+
+#: views/pro/update-audit.php:71
+msgid "Audit against:"
+msgstr "Audit par rapport à :"
+
+#: views/pro/update-audit.php:74
+msgid "WordPress version"
+msgstr "Version WordPress"
+
+#: views/pro/update-audit.php:80
+msgid "Clear"
+msgstr "Effacer"
+
+#: views/pro/update-audit.php:90
+msgid "No audit yet"
+msgstr "Pas encore d'audit"
+
+#: views/pro/update-audit.php:91
+msgid "Set the WordPress version you plan to upgrade to and click \\\"Run pre-update audit\\\"."
+msgstr "Définissez la version de WordPress vers laquelle vous envisagez de mettre à niveau et cliquez sur « Exécuter un audit de pré-mise à jour »."
+
+#: views/pro/update-audit.php:143
+msgid "jQuery Migrate is currently loaded on your site"
+msgstr "jQuery Migrate est actuellement chargé sur votre site"
+
+#: views/pro/update-audit.php:143
+msgid "deprecated"
+msgstr "obsolète"
+
+#: views/pro/update-audit.php:147
+msgid "jQuery Migrate is not loaded on your site."
+msgstr "jQuery Migrate n'est pas chargé sur votre site."
+
+#: views/pro/update-audit.php:147
+msgid "BREAKS"
+msgstr "PAUSES"
+
+#: views/pro/update-audit.php:153
+msgid "No plugins or themes detected in the scan roots."
+msgstr "Aucun plugin ou thème détecté dans les racines de l'analyse."
+
+#: views/pro/update-audit.php:156
+msgid "Regex-based static analysis — a match in a comment, string, or a plugin's own same-named function can be a false positive. Verify before editing third-party code."
+msgstr "Analyse statique basée sur les expressions régulières : une correspondance dans un commentaire, une chaîne ou la fonction du même nom d'un plugin peut être un faux positif. Vérifiez avant de modifier le code tiers."
+
+#: views/pro/update-audit.php:174
+msgid "metadata risk"
+msgstr "risque de métadonnées"
+
+#: views/pro/update-audit.php:190
+msgid "Not on WordPress.org (premium/custom) — metadata unavailable"
+msgstr "Pas sur WordPress.org (premium/custom) — métadonnées indisponibles"
+
+#: views/pro/update-audit.php:218
+msgid "new on this update"
+msgstr "nouveau sur cette mise à jour"
+
+#: views/pro/update-audit.php:238
+msgid "unlock the full drill-down with Pro →"
+msgstr "débloquez l'exploration complète avec Pro →"
+
+#: views/pro/report.php:50
+msgid "A single-page server health report — print to PDF or share with clients"
+msgstr "Un rapport sur l'état du serveur d'une seule page : imprimez au format PDF ou partagez avec les clients"
+
+#: views/pro/report.php:70
+msgid "White-Label Branding is an Unlimited Tier Feature"
+msgstr "La marque blanche est une fonctionnalité de niveau illimitée"
+
+#: views/pro/report.php:71
+msgid "Upload your own company logo, set a custom accent color, and hide the \\\"phpinfo() WP\\\" branding from client PDF reports."
+msgstr "Téléchargez le logo de votre propre entreprise, définissez une couleur d'accent personnalisée et masquez la marque \\\\\"phpinfo() WP\\\\\" dans les rapports PDF des clients."
+
+#: views/pro/report.php:72
+msgid "Upgrade License →"
+msgstr "Mettre à niveau la licence →"
+
+#: views/pro/report.php:78
+msgid "Report Branding"
+msgstr "Signalement de marque"
+
+#: views/pro/report.php:79
+msgid "Customize the report cover and footer with your own brand. Toggle off to restore the default look."
+msgstr "Personnalisez la couverture et le pied de page du rapport avec votre propre marque. Désactivez-la pour restaurer l'apparence par défaut."
+
+#: views/pro/report.php:82
+msgid "Enable white-label"
+msgstr "Activer la marque blanche"
+
+#: views/pro/report.php:86
+msgid "Company name"
+msgstr "Nom de l'entreprise"
+
+#: views/pro/report.php:87
+msgid "Acme Digital Studio"
+msgstr "Acmé Digital Studio"
+
+#: views/pro/report.php:90
+msgid "Report title"
+msgstr "Titre du rapport"
+
+#: views/pro/report.php:91
+msgid "Quarterly Site Health Audit"
+msgstr "Audit trimestriel de l’état du site"
+
+#: views/pro/report.php:94
+msgid "Footer note"
+msgstr "Note de bas de page"
+
+#: views/pro/report.php:95
+msgid "Prepared by Acme Digital Studio · support@acme.com"
+msgstr "Préparé par Acme Digital Studio · support@acme.com"
+
+#: views/pro/report.php:98
+msgid "Company logo"
+msgstr "Logo de l'entreprise"
+
+#: views/pro/report.php:105 views/pro/report.php:155
+msgid "No logo set"
+msgstr "Aucun logo défini"
+
+#: views/pro/report.php:125
+msgid "Accent color"
+msgstr "Couleur d'accentuation"
+
+#: views/pro/report.php:129
+msgid "Save branding"
+msgstr "Enregistrer la marque"
+
+#: views/pro/report.php:262
+msgid "Overall Site Health"
+msgstr "État de santé global du site"
+
+#: views/pro/report.php:271
+msgid "No critical issues"
+msgstr "Aucun problème critique"
+
+#: views/pro/report.php:273
+msgid "A weighted score across PHP config, security headers, OPcache, SSL, PHP support window, and database health. <strong>Aim for 85+.</strong>"
+msgstr "Un score pondéré sur la configuration PHP, les en-têtes de sécurité, OPcache, SSL, la fenêtre de support PHP et l'état de la base de données. <strong>Visez 85 ans et plus.</strong>"
+
+#: views/pro/report.php:280
+msgid "Subscores"
+msgstr "Sous-scores"
+
+#: views/pro/report.php:305
+msgid "Anything here is impacting security, performance, or breaks within the next 90 days."
+msgstr "Tout ce qui se passe ici a un impact sur la sécurité, les performances ou les pannes dans les 90 prochains jours."
+
+#: views/pro/report.php:323
+msgid "Tackle these in order. Each card explains why it matters and how to fix it."
+msgstr "Abordez-les dans l’ordre. Chaque carte explique pourquoi c'est important et comment y remédier."
+
+#: views/pro/report.php:335
+msgid "Why it matters:"
+msgstr "Pourquoi c'est important :"
+
+#: views/pro/report.php:339
+msgid "How to fix:"
+msgstr "Comment réparer :"
+
+#: views/pro/report.php:347
+msgid "No urgent actions"
+msgstr "Aucune action urgente"
+
+#: views/pro/report.php:348
+msgid "The site is in good shape. Keep an eye on the subscores above and review again next month."
+msgstr "Le site est en bon état. Gardez un œil sur les sous-scores ci-dessus et révisez-les le mois prochain."
+
+#: views/pro/report.php:352
+msgid "Snapshot"
+msgstr "Instantané"
+
+#: views/pro/report.php:414
+msgid "Target 95% +"
+msgstr "Cible 95 % +"
+
+#: views/pro/report.php:422
+msgid "Site configuration"
+msgstr "Configuration du site"
+
+#: views/pro/report.php:426 views/pro/config-grader.php:259
+msgid "HTTPS"
+msgstr "HTTPS"
+
+#: views/pro/report.php:442
+msgid "Pending updates"
+msgstr "Mises à jour en attente"
+
+#: views/pro/report.php:460
+msgid "Backup plugin"
+msgstr "Plugin de sauvegarde"
+
+#: views/pro/report.php:491
+msgid "Current"
+msgstr "Actuel"
+
+#: views/pro/report.php:491
+msgid "Recommended"
+msgstr "Recommandé"
+
+#: views/pro/report.php:491
+msgid "Verdict"
+msgstr "Verdict"
+
+#: views/pro/report.php:526
+msgid "SSL certificates"
+msgstr "Certificats SSL"
+
+#: views/pro/report.php:528
+msgid "Host"
+msgstr "Hôte"
+
+#: views/pro/report.php:551
+msgid "End-of-life"
+msgstr "Fin de vie"
+
+#: views/pro/report.php:552
+msgid "Total size"
+msgstr "Taille totale"
+
+#: views/pro/report.php:571
+msgid "Cron health"
+msgstr "Santé de Cron"
+
+#: views/pro/config-grader.php:17
+msgid "PHP configuration scored against WordPress best practices"
+msgstr "Configuration PHP évaluée par rapport aux meilleures pratiques WordPress"
+
+#: views/pro/config-grader.php:48
+msgid "See every failing directive and how to fix it"
+msgstr "Voir chaque directive défaillante et comment y remédier"
+
+#: views/pro/config-grader.php:49
+msgid "Pro unlocks the full breakdown across Performance, Security, OPcache, and Session categories — with the exact recommended values and one-line explanations."
+msgstr "Pro débloque la répartition complète des catégories Performance, Sécurité, OPcache et Session, avec les valeurs exactes recommandées et des explications en une seule ligne."
+
+#: views/pro/config-grader.php:50
+msgid "Unlock full details — Get Pro →"
+msgstr "Débloquez tous les détails — Devenez Pro →"
+
+#: views/pro/config-grader.php:138
+msgid "Auto-fix applied — values are still propagating."
+msgstr "Correction automatique appliquée : les valeurs se propagent toujours."
+
+#: views/pro/config-grader.php:153
+msgid "PHP configuration scored against WordPress, WooCommerce, and security best practices"
+msgstr "Configuration PHP évaluée par rapport aux meilleures pratiques de WordPress, WooCommerce et de sécurité"
+
+#: views/pro/config-grader.php:188
+msgid "We wrote"
+msgstr "Nous avons écrit"
+
+#: views/pro/config-grader.php:189
+msgid "PHP reports"
+msgstr "Rapports PHP"
+
+#: views/pro/config-grader.php:203
+msgid "What to do:"
+msgstr "Que faire :"
+
+#: views/pro/config-grader.php:226
+msgid "1-Click Optimize Server →"
+msgstr "1-Clic Optimiser le serveur →"
+
+#: views/pro/config-grader.php:243
+msgid "Apply Server Profile →"
+msgstr "Appliquer le profil du serveur →"
+
+#: views/pro/config-grader.php:249
+msgid "Auto-fix unavailable:"
+msgstr "Correction automatique indisponible :"
+
+#: views/pro/config-grader.php:255
+msgid "Recommendations tuned for this site"
+msgstr "Recommandations adaptées à ce site"
+
+#: views/pro/config-grader.php:262
+msgid "Development mode"
+msgstr "Mode développement"
+
+#: views/pro/config-grader.php:330
+msgid "Fix:"
+msgstr "Corriger :"
+
+#: views/pro/config-grader.php:356
+msgid "All good"
+msgstr "Tout va bien"
+
+#: views/pro/config-grader.php:381
+msgid "Fix this →"
+msgstr "Corrigez ceci →"
+
+#: views/pro/config-grader.php:404
+msgid "Observed:"
+msgstr "Observé :"
+
+#: views/pro/config-grader.php:436
+msgid "Revert all auto-fix changes"
+msgstr "Annuler toutes les modifications de correction automatique"
+
+#: views/phpinfo.php:8
+msgid "Search directives, values, modules… (e.g. memory_limit)"
+msgstr "Directives de recherche, valeurs, modules… (par exemple memory_limit)"
+
+#: views/phpinfo.php:14
+msgid "Clear search"
+msgstr "Effacer la recherche"
+
+#: views/phpinfo.php:18
+msgid "Jump to section"
+msgstr "Aller à la section"
+
+#: views/phpinfo.php:19
+msgid "Jump to section…"
+msgstr "Aller à la section…"
+
+#: views/phpinfo.php:41
+msgid "Go to top"
+msgstr "Aller en haut"
+
+#: views/phpinfo.php:43
+msgid "Top"
+msgstr "Haut"
+
+#: views/phpinfo.php:108
+msgid "rows matched"
+msgstr "lignes correspondant"
+
+#: views/phpinfo.php:109
+msgid "row matched"
+msgstr "ligne correspondante"
+
+#: views/phpinfo.php:110
+msgid "No results"
+msgstr "Aucun résultat"
+
+#: views/log.php:43
+#, php-format
+msgid "Edited %s"
+msgstr "Modifié%s"
+
+#: views/log.php:43
+msgid "Edited config"
+msgstr "Configuration modifiée"
+
+#: views/log.php:46
+#, php-format
+msgid "Backed up %s"
+msgstr "Sauvegarder%s"
+
+#: views/log.php:46
+msgid "Backed up config"
+msgstr "Configuration sauvegardée"
+
+#: views/log.php:49
+#, php-format
+msgid "Restored %s from backup"
+msgstr "Restauré%sà partir de la sauvegarde"
+
+#: views/log.php:49
+msgid "Restored from backup"
+msgstr "Restauré à partir d'une sauvegarde"
+
+#: views/log.php:55
+#, php-format
+msgid "Auto-fix applied to %1$d directory: %2$s"
+msgstr "Correction automatique appliquée au répertoire%1$d:%2$s"
+
+#: views/log.php:60
+msgid "Config Grader auto-fix applied"
+msgstr "Correction automatique de Config Grader appliquée"
+
+#: views/log.php:64
+msgid "Config Grader auto-fix block reverted"
+msgstr "Le bloc de correction automatique de Config Grader a été annulé"
+
+#: views/log.php:80
+msgid "just now"
+msgstr "juste maintenant"
+
+#: views/log.php:81
+#, php-format
+msgid "%dm ago"
+msgstr " il y a%dm"
+
+#: views/log.php:82
+#, php-format
+msgid "%dh ago"
+msgstr " il y a%dh"
+
+#: views/log.php:83
+#, php-format
+msgid "%dd ago"
+msgstr " il y a%dj"
+
+#: views/log.php:123
+msgid "Tracks every PHP Config change made through phpinfo() WP"
+msgstr "Suit chaque modification de configuration PHP effectuée via phpinfo() WP"
+
+#: views/log.php:124
+msgid "entry"
+msgstr "entrée"
+
+#: views/log.php:138
+msgid "All"
+msgstr "Tout"
+
+#: views/log.php:139
+msgid "Edits"
+msgstr "Modifications"
+
+#: views/log.php:140
+msgid "Backups"
+msgstr "Sauvegardes"
+
+#: views/log.php:141
+msgid "Restores"
+msgstr "Restaure"
+
+#: views/log.php:142
+msgid "Auto-fixes"
+msgstr "Corrections automatiques"
+
+#: views/log.php:159
+msgid "Search entries…"
+msgstr "Rechercher des entrées…"
+
+#: views/log.php:173
+msgid "No activity recorded yet"
+msgstr "Aucune activité enregistrée pour le moment"
+
+#: views/log.php:176
+#, php-format
+msgid "Use the %s to start tracking changes."
+msgstr "Utilisez le%spour commencer à suivre les modifications."
+
+#: views/log.php:177
+msgid "PHP Config editor"
+msgstr "Éditeur de configuration PHP"
+
+#: views/log.php:184
+msgid "No entries match your filter"
+msgstr "Aucune entrée ne correspond à votre filtre"
+
+#: views/log.php:191
+msgid "EDIT"
+msgstr "MODIFIER"
+
+#: views/log.php:194
+msgid "BACKUP"
+msgstr "SAUVEGARDE"
+
+#: views/log.php:197
+msgid "RESTORE"
+msgstr "RESTAURER"
+
+#: views/log.php:200
+msgid "AUTO-FIX"
+msgstr "AUTO-FIX"
+
+#: views/log.php:203
+msgid "REVERTED"
+msgstr "RETOURNÉ"
+
+#: views/log.php:206
+msgid "EVENT"
+msgstr "ÉVÉNEMENT"
+
+#: views/safemode.php:198
+msgid "Troubleshooting Mode"
+msgstr "Mode de dépannage"
+
+#: views/safemode.php:199
+msgid "Safely disable plugins or revert to a default theme <strong>just for your own admin session</strong> to debug\\n                conflicts. Visitors see the site normally. Everything is reversible — no plugin is ever deactivated in the\\n                database. Session expires automatically; you can also exit any time."
+msgstr "Désactivez les plugins en toute sécurité ou revenez à un thème par défaut <strong>juste pour votre propre session d'administration</strong> afin de déboguer\\n les conflits. Les visiteurs voient le site normalement. Tout est réversible — aucun plugin n'est jamais désactivé dans la\\n base de données. La session expire automatiquement ; vous pouvez également quitter à tout moment."
+
+#: views/safemode.php:242
+msgid "remaining"
+msgstr "restant"
+
+#: views/safemode.php:259
+msgid "Plugins disabled in this session"
+msgstr "Plugins désactivés dans cette session"
+
+#: views/safemode.php:264 views/safemode.php:405
+msgid "Plugin"
+msgstr "Plugin"
+
+#: views/safemode.php:265
+msgid "Status in DB"
+msgstr "Statut dans la base de données"
+
+#: views/safemode.php:333
+msgid "Cookie is bound to your user account, time-limited, and expires automatically."
+msgstr "Le cookie est lié à votre compte utilisateur, est limité dans le temps et expire automatiquement."
+
+#: views/safemode.php:341
+msgid "Every page has an explicit <em>End</em> button. You cannot lock yourself out."
+msgstr "Chaque page possède un bouton <em>Fin</em> explicite. Vous ne pouvez pas vous enfermer."
+
+#: views/safemode.php:349
+msgid "Other visitors are unaffected — they see the live site with all plugins active."
+msgstr "Les autres visiteurs ne sont pas affectés : ils voient le site en direct avec tous les plugins actifs."
+
+#: views/safemode.php:359
+msgid "Request-Level Isolation Recommended"
+msgstr "Isolation au niveau de la demande recommandée"
+
+#: views/safemode.php:381
+msgid "Uninstall Helper"
+msgstr "Aide à la désinstallation"
+
+#: views/safemode.php:391
+msgid "Pick what to disable"
+msgstr "Choisissez ce qu'il faut désactiver"
+
+#: views/safemode.php:427
+msgid "Active"
+msgstr "Actif"
+
+#: views/safemode.php:429
+msgid "Inactive"
+msgstr "Inactif"
+
+#: views/safemode.php:443
+msgid "Revert your session to a default theme to verify if a layout conflict is originating from your current theme."
+msgstr "Rétablissez votre session sur un thème par défaut pour vérifier si un conflit de mise en page provient de votre thème actuel."
+
+#: views/safemode.php:456
+msgid "Select how long you want Troubleshooting Mode to remain active before automatically expiring."
+msgstr "Sélectionnez la durée pendant laquelle vous souhaitez que le mode de dépannage reste actif avant d'expirer automatiquement."
+
+#: views/safemode.php:458
+msgid "15 minutes"
+msgstr "15 minutes"
+
+#: views/safemode.php:459
+msgid "30 minutes"
+msgstr "30 minutes"
+
+#: views/safemode.php:460
+msgid "1 hour (recommended)"
+msgstr "1 heure (recommandé)"
+
+#: views/safemode.php:461
+msgid "2 hours"
+msgstr "2 heures"
+
+#: views/safemode.php:462
+msgid "4 hours (max)"
+msgstr "4 heures (maximum)"
+
+#: views/safemode.php:472
+msgid "Select at least one plugin to enable the button"
+msgstr "Sélectionnez au moins un plugin pour activer le bouton"
+
+#: views/extension.php:24
+msgid "PHP Extensions"
+msgstr "Extensions PHP"
+
+#: views/extension.php:26
+msgid "loaded"
+msgstr "chargé"
+
+#: views/extension.php:28
+msgid "recommended not loaded"
+msgstr "recommandé non chargé"
+
+#: views/extension.php:34
+msgid "Filter extensions…"
+msgstr "Filtrer les extensions…"
+
+#: views/extension.php:47
+msgid "Recommended — Not Loaded"
+msgstr "Recommandé – Non chargé"
+

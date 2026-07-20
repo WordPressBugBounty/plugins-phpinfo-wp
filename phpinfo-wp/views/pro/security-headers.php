@@ -27,13 +27,13 @@ $audit = Phpinfo_WP_Security_Headers::get_cached();
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Security Headers <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">HTTP response header audit — graded against OWASP recommendations</p>
+            <h1>Security Headers <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('HTTP response header audit — graded against OWASP recommendations', 'phpinfo-wp'); ?></p>
         </div>
         <form method="post">
             <?php wp_nonce_field('phpinfowp_sec_nonce'); ?>
             <input type="hidden" name="phpinfowp_recheck" value="1">
-            <button type="submit" class="button button-secondary">Re-check headers</button>
+            <button type="submit" class="button button-secondary"><?php _e('Re-check headers', 'phpinfo-wp'); ?></button>
         </form>
     </div>
 
@@ -64,7 +64,7 @@ $audit = Phpinfo_WP_Security_Headers::get_cached();
                     &nbsp;&middot;&nbsp;
                     <code style="font-size:11px"><?php echo esc_html($audit['url']); ?></code>
                     <?php if (!empty($audit['cached'])): ?>
-                        &nbsp;&middot;&nbsp; <em style="color:#888">cached</em>
+                        &nbsp;&middot;&nbsp; <em style="color:#888"><?php _e('cached', 'phpinfo-wp'); ?></em>
                     <?php endif; ?>
                 </div>
             </div>
@@ -97,7 +97,7 @@ $audit = Phpinfo_WP_Security_Headers::get_cached();
                     <?php if ($row['value']): ?>
                         <code class="phpinfowp-sec-row-value"><?php echo esc_html($row['value']); ?></code>
                     <?php else: ?>
-                        <span class="phpinfowp-sec-row-missing">not set</span>
+                        <span class="phpinfowp-sec-row-missing"><?php _e('not set', 'phpinfo-wp'); ?></span>
                     <?php endif; ?>
                     <?php if ($row['warning']): ?>
                         <div class="phpinfowp-sec-row-note" style="color:<?php echo $present ? '#996800' : '#d63638'; ?>">
@@ -110,7 +110,7 @@ $audit = Phpinfo_WP_Security_Headers::get_cached();
         </div>
 
         <p style="margin-top:16px;font-size:13px;color:#666">
-            <a href="https://owasp.org/www-project-secure-headers/" target="_blank">OWASP Secure Headers</a>
+            <a href="https://owasp.org/www-project-secure-headers/" target="_blank"><?php _e('OWASP Secure Headers', 'phpinfo-wp'); ?></a>
             &nbsp;&middot;&nbsp;
             <a href="<?php echo esc_url('https://securityheaders.com/?q=' . urlencode(get_site_url()) . '&followRedirects=on'); ?>" target="_blank">Verify on SecurityHeaders.com &rarr;</a>
         </p>

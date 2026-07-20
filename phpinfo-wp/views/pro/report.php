@@ -1,19 +1,9 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) {
-    phpinfowp_render_feature_lock([
-        'feature'  => 'Audit Report PDF',
-        'icon'     => 'dashicons-media-document',
-        'tagline'  => 'One-click white-label PDF with your logo — A–F grades, fix list, server fingerprint. Hand it to clients.',
-        'previews' => [
-            'Sections: Config · PHP · SSL · Security · DB',
-            'Brand: <strong>Your logo + company name</strong>',
-            'Export: <strong>One click</strong>',
-        ],
-    ]);
-    return;
-}
+$is_pro          = Phpinfo_WP_License::is_valid();
+$is_unlimited    = Phpinfo_WP_License::is_unlimited();
+$is_free_preview = !$is_pro;
 
 // Handle branding form save before building report
 if (isset($_POST['phpinfowp_report_branding']) && check_admin_referer('phpinfowp_report_branding')) {
@@ -33,6 +23,7 @@ if (isset($_POST['phpinfowp_report_branding']) && check_admin_referer('phpinfowp
 wp_enqueue_media();
 
 $r = Phpinfo_WP_Report::build();
+
 $b = $r['branding'];
 $is_unlimited = Phpinfo_WP_License::is_unlimited();
 $accent     = $is_unlimited && $b['enabled'] && $b['accent'] ? esc_attr($b['accent']) : '#777BB3';
@@ -44,18 +35,47 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
 
 <div class="phpinfowp-pro-page">
 
+    <?php if (isset($_GET['trial_activated']) && $_GET['trial_activated'] == 1): ?>
+        <div class="notice notice-success inline is-dismissible" style="margin:0 0 20px">
+            <p><strong><?php _e('Success!', 'phpinfo-wp'); ?></strong> <?php _e('Your 7-day Pro Trial is now active. All Pro features are unlocked.', 'phpinfo-wp'); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($is_free_preview): ?>
+        <div class="phpinfowp-price-alert-banner" style="position:relative; background:#fff3cd; border-left:4px solid #ffc107; padding:12px 40px 12px 16px; margin: 0 0 24px; border-radius: 0 4px 4px 0; font-size:13.5px; color:#664d03; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+            <button type="button" onclick="try{localStorage.setItem('phpinfowp_price_alert_dismissed','1')}catch(e){} this.closest('.phpinfowp-price-alert-banner').style.display='none';" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" style="position:absolute; top:6px; right:8px; background:none; border:none; cursor:pointer; color:#664d03; opacity:0.5; font-size:20px; line-height:1; padding:2px 4px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&times;</button>
+            <span>
+                <strong>⏰ <?php _e('Price Increase Alert:', 'phpinfo-wp'); ?></strong> 
+                <?php _e('On August 31st, the Single Site Pro license increases from $29 to $39/year. Upgrade today to secure the current $29/year rate before the price goes up.', 'phpinfo-wp'); ?>
+            </span>
+            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" style="background:#777BB3; color:#fff; padding:6px 14px; border-radius:4px; font-size:12.5px; font-weight:600; text-decoration:none; display:inline-block;">
+                <?php _e('Lock in $29 Now →', 'phpinfo-wp'); ?>
+            </a>
+        </div>
+        <script>if(localStorage.getItem('phpinfowp_price_alert_dismissed')==='1'){document.querySelectorAll('.phpinfowp-price-alert-banner').forEach(function(e){e.style.display='none';});}</script>
+    <?php endif; ?>
+
     <div class="phpinfowp-page-header no-print">
         <div>
-            <h1>Audit Report <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">A single-page server health report — print to PDF or share with clients</p>
+            <h1>Audit Report <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('A single-page server health report — print to PDF or share with clients', 'phpinfo-wp'); ?></p>
         </div>
         <div>
-            <button type="button" class="button" onclick="document.getElementById('phpinfowp-report-branding').style.display='block';return false;">
-                <span class="dashicons dashicons-admin-customizer" style="vertical-align:middle"></span> White-label
-            </button>
-            <button type="button" class="button button-primary" onclick="window.print()">
-                <span class="dashicons dashicons-printer" style="vertical-align:middle"></span> Print / Save as PDF
-            </button>
+            <?php if ($is_free_preview): ?>
+                <button type="button" class="button" disabled style="opacity: 0.6; cursor: not-allowed;">
+                    <span class="dashicons dashicons-lock" style="vertical-align:middle"></span> <?php _e('White-label', 'phpinfo-wp'); ?>
+                </button>
+                <button type="button" class="button button-primary" disabled style="opacity: 0.6; cursor: not-allowed;">
+                    <span class="dashicons dashicons-lock" style="vertical-align:middle"></span> <?php _e('Print / Save as PDF', 'phpinfo-wp'); ?>
+                </button>
+            <?php else: ?>
+                <button type="button" class="button" onclick="document.getElementById('phpinfowp-report-branding').style.display='block';return false;">
+                    <span class="dashicons dashicons-admin-customizer" style="vertical-align:middle"></span> <?php _e('White-label', 'phpinfo-wp'); ?>
+                </button>
+                <button type="button" class="button button-primary" onclick="window.print()">
+                    <span class="dashicons dashicons-printer" style="vertical-align:middle"></span> <?php _e('Print / Save as PDF', 'phpinfo-wp'); ?>
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -67,42 +87,42 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
         <?php if (!Phpinfo_WP_License::is_unlimited()): ?>
             <div class="phpinfowp-upgrade-banner" style="background:#fcfaff;border:1px solid #e2d9f3;border-radius:8px;padding:24px;text-align:center;margin-bottom:12px">
                 <span class="dashicons dashicons-lock" style="font-size:36px;width:36px;height:36px;color:#7c3aed;margin-bottom:12px"></span>
-                <h3 style="margin:0 0 8px;font-size:18px;color:#2c3338">White-Label Branding is an Unlimited Tier Feature</h3>
-                <p style="margin:0 0 16px;color:#646970;font-size:14px">Upload your own company logo, set a custom accent color, and hide the "phpinfo() WP" branding from client PDF reports.</p>
-                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary button-large" style="background:#7c3aed;border-color:#7c3aed">Upgrade License &rarr;</a>
+                <h3 style="margin:0 0 8px;font-size:18px;color:#2c3338"><?php _e('White-Label Branding is an Unlimited Tier Feature', 'phpinfo-wp'); ?></h3>
+                <p style="margin:0 0 16px;color:#646970;font-size:14px"><?php _e('Upload your own company logo, set a custom accent color, and hide the "phpinfo() WP" branding from client PDF reports.', 'phpinfo-wp'); ?></p>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary button-large" style="background:#7c3aed;border-color:#7c3aed"><?php _e('Upgrade License →', 'phpinfo-wp'); ?></a>
             </div>
         <?php else: ?>
             <form method="post">
             <?php wp_nonce_field('phpinfowp_report_branding'); ?>
             <input type="hidden" name="phpinfowp_report_branding" value="1">
-            <h3>Report Branding</h3>
-            <p class="description">Customize the report cover and footer with your own brand. Toggle off to restore the default look.</p>
+            <h3><?php _e('Report Branding', 'phpinfo-wp'); ?></h3>
+            <p class="description"><?php _e('Customize the report cover and footer with your own brand. Toggle off to restore the default look.', 'phpinfo-wp'); ?></p>
             <table class="form-table">
                 <tr>
-                    <th><label for="branding_enabled">Enable white-label</label></th>
+                    <th><label for="branding_enabled"><?php _e('Enable white-label', 'phpinfo-wp'); ?></label></th>
                     <td><label><input type="checkbox" id="branding_enabled" name="branding_enabled" value="1" <?php checked($b['enabled']); ?>> Use my branding instead of "phpinfo() WP"</label></td>
                 </tr>
                 <tr>
-                    <th><label for="branding_company">Company name</label></th>
-                    <td><input type="text" id="branding_company" name="branding_company" class="regular-text" value="<?php echo esc_attr($b['company']); ?>" placeholder="Acme Digital Studio"></td>
+                    <th><label for="branding_company"><?php _e('Company name', 'phpinfo-wp'); ?></label></th>
+                    <td><input type="text" id="branding_company" name="branding_company" class="regular-text" value="<?php echo esc_attr($b['company']); ?>" placeholder="<?php echo esc_attr__('Acme Digital Studio', 'phpinfo-wp'); ?>"></td>
                 </tr>
                 <tr>
-                    <th><label for="branding_tagline">Report title</label></th>
-                    <td><input type="text" id="branding_tagline" name="branding_tagline" class="regular-text" value="<?php echo esc_attr($b['tagline']); ?>" placeholder="Quarterly Site Health Audit"></td>
+                    <th><label for="branding_tagline"><?php _e('Report title', 'phpinfo-wp'); ?></label></th>
+                    <td><input type="text" id="branding_tagline" name="branding_tagline" class="regular-text" value="<?php echo esc_attr($b['tagline']); ?>" placeholder="<?php echo esc_attr__('Quarterly Site Health Audit', 'phpinfo-wp'); ?>"></td>
                 </tr>
                 <tr>
-                    <th><label for="branding_footer_note">Footer note</label></th>
-                    <td><textarea id="branding_footer_note" name="branding_footer_note" class="regular-text" rows="2" placeholder="Prepared by Acme Digital Studio · support@acme.com"><?php echo esc_textarea($b['footer_note']); ?></textarea></td>
+                    <th><label for="branding_footer_note"><?php _e('Footer note', 'phpinfo-wp'); ?></label></th>
+                    <td><textarea id="branding_footer_note" name="branding_footer_note" class="regular-text" rows="2" placeholder="<?php echo esc_attr__('Prepared by Acme Digital Studio · support@acme.com', 'phpinfo-wp'); ?>"><?php echo esc_textarea($b['footer_note']); ?></textarea></td>
                 </tr>
                 <tr>
-                    <th><label>Company logo</label></th>
+                    <th><label><?php _e('Company logo', 'phpinfo-wp'); ?></label></th>
                     <td>
                         <div class="phpinfowp-logo-picker" id="phpinfowp-logo-picker">
                             <div class="phpinfowp-logo-preview" id="phpinfowp-logo-preview">
                                 <?php if (!empty($b['logo_url'])): ?>
                                     <img src="<?php echo esc_url($b['logo_url']); ?>" alt="Company logo">
                                 <?php else: ?>
-                                    <span class="phpinfowp-logo-empty">No logo set</span>
+                                    <span class="phpinfowp-logo-empty"><?php _e('No logo set', 'phpinfo-wp'); ?></span>
                                 <?php endif; ?>
                             </div>
                             <div class="phpinfowp-logo-actions">
@@ -122,11 +142,11 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="branding_accent">Accent color</label></th>
+                    <th><label for="branding_accent"><?php _e('Accent color', 'phpinfo-wp'); ?></label></th>
                     <td><input type="color" id="branding_accent" name="branding_accent" value="<?php echo esc_attr($b['accent']); ?>"></td>
                 </tr>
             </table>
-            <p><button type="submit" class="button button-primary">Save branding</button></p>
+            <p><button type="submit" class="button button-primary"><?php _e('Save branding', 'phpinfo-wp'); ?></button></p>
         </form>
         <?php endif; ?>
     </div>
@@ -152,7 +172,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
             urlField.value = url;
             preview.innerHTML = url
                 ? '<img src="' + url + '" alt="Company logo">'
-                : '<span class="phpinfowp-logo-empty">No logo set</span>';
+                : '<span class="phpinfowp-logo-empty"><?php _e('No logo set', 'phpinfo-wp'); ?></span>';
             chooseBtn.textContent = url ? 'Change logo' : 'Upload logo';
             if (removeBtn) removeBtn.style.display = url ? '' : 'none';
         }
@@ -259,7 +279,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                 </div>
             </div>
             <div class="phpinfowp-report-overall-info">
-                <div class="phpinfowp-report-overall-label">Overall Site Health</div>
+                <div class="phpinfowp-report-overall-label"><?php _e('Overall Site Health', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-report-overall-verdict" style="color:<?php echo esc_attr($overall['verdict_color']); ?>"><?php echo esc_html($overall['verdict_label']); ?></div>
                 <div class="phpinfowp-report-overall-grade">Grade <strong><?php echo esc_html($overall['grade']); ?></strong></div>
                 <?php if ($crit_n || $warn_n): ?>
@@ -268,16 +288,16 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                         <?php if ($warn_n): ?><span class="phpinfowp-rc phpinfowp-rc-warn"><?php echo $warn_n; ?> warning<?php echo $warn_n === 1 ? '' : 's'; ?></span><?php endif; ?>
                     </div>
                 <?php else: ?>
-                    <div class="phpinfowp-report-overall-counts"><span class="phpinfowp-rc phpinfowp-rc-ok">No critical issues</span></div>
+                    <div class="phpinfowp-report-overall-counts"><span class="phpinfowp-rc phpinfowp-rc-ok"><?php _e('No critical issues', 'phpinfo-wp'); ?></span></div>
                 <?php endif; ?>
-                <p class="phpinfowp-report-overall-note">A weighted score across PHP config, security headers, OPcache, SSL, PHP support window, and database health. <strong>Aim for 85+.</strong></p>
+                <p class="phpinfowp-report-overall-note"><?php _e('A weighted score across PHP config, security headers, OPcache, SSL, PHP support window, and database health. <strong>Aim for 85+.</strong>', 'phpinfo-wp'); ?></p>
             </div>
         </div>
 
         <!-- Category bar chart -->
         <?php if (!empty($r['bars'])): ?>
         <div class="phpinfowp-report-bars">
-            <h3 class="phpinfowp-report-h">Subscores</h3>
+            <h3 class="phpinfowp-report-h"><?php _e('Subscores', 'phpinfo-wp'); ?></h3>
             <div class="phpinfowp-report-bars-grid">
                 <?php foreach ($r['bars'] as $bar):
                     [$bv, $bvl, $bvc] = Phpinfo_WP_Report::score_to_verdict((int) $bar['score']); ?>
@@ -295,6 +315,95 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
         </div>
         <?php endif; ?>
 
+        <?php if ($is_free_preview): ?>
+            <!-- Free preview: skeleton rows + gradient overlay — no real data sent to browser -->
+            <div style="position:relative; margin-top:24px; overflow:hidden; border-radius:10px;">
+
+                <!-- Skeleton rows mimicking actual report content -->
+                <div style="pointer-events:none; user-select:none;">
+
+                    <!-- Skeleton: critical issues bar -->
+                    <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:16px 20px; margin-bottom:16px; display:flex; align-items:center; gap:14px;">
+                        <div style="width:32px; height:32px; border-radius:50%; background:#fee2e2; flex-shrink:0;"></div>
+                        <div style="flex:1;">
+                            <div style="height:13px; width:55%; background:#fecaca; border-radius:4px; margin-bottom:8px;"></div>
+                            <div style="height:11px; width:80%; background:#fee2e2; border-radius:4px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skeleton: section label -->
+                    <div style="height:11px; width:160px; background:#e2e8f0; border-radius:4px; margin:20px 0 12px; text-transform:uppercase;"></div>
+
+                    <!-- Skeleton: priority card 1 -->
+                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:18px 20px; margin-bottom:10px; display:flex; gap:16px; align-items:flex-start;">
+                        <div style="width:28px; height:28px; border-radius:50%; background:#f1f5f9; flex-shrink:0;"></div>
+                        <div style="flex:1;">
+                            <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
+                                <div style="height:20px; width:68px; background:#fecaca; border-radius:20px;"></div>
+                                <div style="height:12px; width:90px; background:#e2e8f0; border-radius:4px;"></div>
+                            </div>
+                            <div style="height:13px; width:70%; background:#cbd5e1; border-radius:4px; margin-bottom:8px;"></div>
+                            <div style="height:11px; width:95%; background:#e2e8f0; border-radius:4px; margin-bottom:6px;"></div>
+                            <div style="height:11px; width:85%; background:#e2e8f0; border-radius:4px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skeleton: priority card 2 -->
+                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:18px 20px; margin-bottom:10px; display:flex; gap:16px; align-items:flex-start;">
+                        <div style="width:28px; height:28px; border-radius:50%; background:#f1f5f9; flex-shrink:0;"></div>
+                        <div style="flex:1;">
+                            <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
+                                <div style="height:20px; width:60px; background:#fef3c7; border-radius:20px;"></div>
+                                <div style="height:12px; width:110px; background:#e2e8f0; border-radius:4px;"></div>
+                            </div>
+                            <div style="height:13px; width:60%; background:#cbd5e1; border-radius:4px; margin-bottom:8px;"></div>
+                            <div style="height:11px; width:90%; background:#e2e8f0; border-radius:4px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skeleton: priority card 3 -->
+                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:18px 20px; margin-bottom:10px; display:flex; gap:16px; align-items:flex-start;">
+                        <div style="width:28px; height:28px; border-radius:50%; background:#f1f5f9; flex-shrink:0;"></div>
+                        <div style="flex:1;">
+                            <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
+                                <div style="height:20px; width:60px; background:#fef3c7; border-radius:20px;"></div>
+                                <div style="height:12px; width:80px; background:#e2e8f0; border-radius:4px;"></div>
+                            </div>
+                            <div style="height:13px; width:75%; background:#cbd5e1; border-radius:4px; margin-bottom:8px;"></div>
+                            <div style="height:11px; width:88%; background:#e2e8f0; border-radius:4px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skeleton: section divider rows -->
+                    <div style="margin-top:20px; padding-top:16px; border-top:1px solid #e2e8f0;">
+                        <div style="height:11px; width:140px; background:#e2e8f0; border-radius:4px; margin-bottom:14px;"></div>
+                        <div style="display:flex; gap:12px; margin-bottom:10px;">
+                            <div style="height:40px; flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;"></div>
+                            <div style="height:40px; flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;"></div>
+                            <div style="height:40px; flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;"></div>
+                        </div>
+                        <div style="height:11px; width:120px; background:#e2e8f0; border-radius:4px; margin-top:16px; margin-bottom:14px;"></div>
+                        <div style="height:38px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;"></div>
+                    </div>
+                </div>
+
+                <!-- Gradient fade-out overlay -->
+                <div style="position:absolute; bottom:0; left:0; right:0; height:75%; background:linear-gradient(to bottom, rgba(246,249,252,0) 0%, rgba(246,249,252,0.92) 40%, #f6f9fc 100%); pointer-events:none;"></div>
+
+                <!-- Upgrade card floating over skeleton -->
+                <div style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%); width:100%; max-width:520px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:32px 28px; box-shadow:0 8px 24px -6px rgba(0,0,0,0.08); text-align:center;">
+                    <span class="dashicons dashicons-lock" style="font-size:36px; width:36px; height:36px; color:#777BB3; display:inline-block; margin-bottom:12px;"></span>
+                    <h3 style="margin:0 0 8px; font-size:20px; font-weight:600; color:#1d2327;">Full diagnostics locked</h3>
+                    <p style="margin:0 0 6px; font-size:13.5px; color:#475569; line-height:1.6; max-width:400px; margin-left:auto; margin-right:auto;">Unlock critical issues, security headers, SSL, OPcache, database health, and 1-click auto-fixes.</p>
+                    <p style="margin:0 0 22px; font-size:12.5px; color:#94a3b8;">Your overall score above is real - the details explain exactly what to fix.</p>
+                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary button-large" style="background:#777BB3; border-color:#777BB3; height:42px; line-height:40px; font-size:14px; font-weight:600; padding:0 26px; border-radius:6px; text-decoration:none; display:inline-block;">Upgrade to Pro &rarr;</a>
+                </div>
+
+                <!-- Spacer so the floating card has room -->
+                <div style="height:220px;"></div>
+            </div>
+        <?php else: // Pro users get the full detail HTML below ?>
+
         <!-- Critical issues banner -->
         <?php if ($crit_n): ?>
         <div class="phpinfowp-report-critbar">
@@ -302,7 +411,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                 <span class="phpinfowp-report-critbar-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;display:block"><path fill-rule="evenodd" d="M4.22 4.22a.75.75 0 011.06 0L10 8.94l4.72-4.72a.75.75 0 111.06 1.06L11.06 10l4.72 4.72a.75.75 0 11-1.06 1.06L10 11.06l-4.72 4.72a.75.75 0 01-1.06-1.06L8.94 10 4.22 5.28a.75.75 0 010-1.06z" clip-rule="evenodd"/></svg></span>
                 <div>
                     <div class="phpinfowp-report-critbar-title"><?php echo $crit_n; ?> critical issue<?php echo $crit_n === 1 ? '' : 's'; ?> need immediate attention</div>
-                    <div class="phpinfowp-report-critbar-sub">Anything here is impacting security, performance, or breaks within the next 90 days.</div>
+                    <div class="phpinfowp-report-critbar-sub"><?php _e('Anything here is impacting security, performance, or breaks within the next 90 days.', 'phpinfo-wp'); ?></div>
                 </div>
             </div>
             <ul class="phpinfowp-report-critbar-list">
@@ -320,7 +429,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
         <!-- Top 3 actions this week -->
         <?php if (!empty($r['priorities'])): ?>
         <h3 class="phpinfowp-report-h phpinfowp-report-h-page2">Top <?php echo count($r['priorities']); ?> action<?php echo count($r['priorities']) === 1 ? '' : 's'; ?> this week</h3>
-        <p class="phpinfowp-report-h-sub">Tackle these in order. Each card explains why it matters and how to fix it.</p>
+        <p class="phpinfowp-report-h-sub"><?php _e('Tackle these in order. Each card explains why it matters and how to fix it.', 'phpinfo-wp'); ?></p>
         <ol class="phpinfowp-report-priorities">
             <?php foreach ($r['priorities'] as $i => $p): ?>
                 <li class="phpinfowp-report-priority phpinfowp-report-priority-<?php echo esc_attr($p['urgency']); ?>">
@@ -332,11 +441,11 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                         </div>
                         <div class="phpinfowp-report-priority-title"><?php echo esc_html($p['title']); ?></div>
                         <div class="phpinfowp-report-priority-why">
-                            <strong>Why it matters:</strong>
+                            <strong><?php _e('Why it matters:', 'phpinfo-wp'); ?></strong>
                             <?php echo esc_html($p['reason']); ?>
                         </div>
                         <div class="phpinfowp-report-priority-how">
-                            <strong>How to fix:</strong>
+                            <strong><?php _e('How to fix:', 'phpinfo-wp'); ?></strong>
                             <?php echo wp_kses($p['how'], ['code' => [], 'strong' => [], 'em' => []]); ?>
                         </div>
                     </div>
@@ -344,12 +453,12 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
             <?php endforeach; ?>
         </ol>
         <?php else: ?>
-        <h3 class="phpinfowp-report-h">No urgent actions</h3>
-        <p>The site is in good shape. Keep an eye on the subscores above and review again next month.</p>
+        <h3 class="phpinfowp-report-h"><?php _e('No urgent actions', 'phpinfo-wp'); ?></h3>
+        <p><?php _e('The site is in good shape. Keep an eye on the subscores above and review again next month.', 'phpinfo-wp'); ?></p>
         <?php endif; ?>
 
         <!-- Snapshot grid with verdict pills + plain-English captions -->
-        <h3 class="phpinfowp-report-h">Snapshot</h3>
+        <h3 class="phpinfowp-report-h"><?php _e('Snapshot', 'phpinfo-wp'); ?></h3>
         <div class="phpinfowp-report-grid">
             <div class="phpinfowp-report-stat">
                 <div class="phpinfowp-report-stat-label">PHP version <?php echo $verdict_pill($verdict_eol($r['eol'])); ?></div>
@@ -411,7 +520,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
             <div class="phpinfowp-report-stat">
                 <div class="phpinfowp-report-stat-label">OPcache hit rate <?php echo $verdict_pill($verdict_hit($r['opcache']['hit_rate'] ?? 0)); ?></div>
                 <div class="phpinfowp-report-stat-value"><?php echo $r['opcache']['hit_rate'] !== null ? esc_html($r['opcache']['hit_rate']) . '%' : '—'; ?></div>
-                <div class="phpinfowp-report-stat-sub">Target 95% +</div>
+                <div class="phpinfowp-report-stat-sub"><?php _e('Target 95% +', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-report-stat-cap"><?php echo esc_html(Phpinfo_WP_Report::plain_english('opcache_hit')); ?></div>
             </div>
             <?php endif; ?>
@@ -419,11 +528,11 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
 
         <!-- Site configuration (new section) -->
         <?php $ex = $r['extras']; ?>
-        <h3 class="phpinfowp-report-h">Site configuration</h3>
+        <h3 class="phpinfowp-report-h"><?php _e('Site configuration', 'phpinfo-wp'); ?></h3>
         <table class="phpinfowp-report-table">
             <tbody>
                 <tr>
-                    <td style="width:40%">HTTPS</td>
+                    <td style="width:40%"><?php _e('HTTPS', 'phpinfo-wp'); ?></td>
                     <td><?php echo $ex['https']['is_https'] && !$ex['https']['mixed_risk']
                         ? $verdict_pill('ok', 'Fully on HTTPS')
                         : $verdict_pill('warn', $ex['https']['is_https'] ? 'Mixed-content risk' : 'Not on HTTPS'); ?></td>
@@ -439,7 +548,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                     </td>
                 </tr>
                 <tr>
-                    <td>Pending updates</td>
+                    <td><?php _e('Pending updates', 'phpinfo-wp'); ?></td>
                     <td>
                         <?php
                         $u = $ex['updates'];
@@ -457,7 +566,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                     </td>
                 </tr>
                 <tr>
-                    <td>Backup plugin</td>
+                    <td><?php _e('Backup plugin', 'phpinfo-wp'); ?></td>
                     <td>
                         <?php if ($ex['backup']['detected']): ?>
                             <?php echo $verdict_pill('ok', esc_html($ex['backup']['plugin']) . ' detected'); ?>
@@ -488,7 +597,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
         <?php if ($failing): ?>
             <h3 class="phpinfowp-report-h">Config issues (<?php echo count($failing); ?>)</h3>
             <table class="phpinfowp-report-table">
-                <thead><tr><th>Directive</th><th>Current</th><th>Recommended</th><th style="width:90px">Verdict</th></tr></thead>
+                <thead><tr><th><?php _e('Directive', 'phpinfo-wp'); ?></th><th><?php _e('Current', 'phpinfo-wp'); ?></th><th><?php _e('Recommended', 'phpinfo-wp'); ?></th><th style="width:90px"><?php _e('Verdict', 'phpinfo-wp'); ?></th></tr></thead>
                 <tbody>
                     <?php foreach ($failing as $c): ?>
                         <tr>
@@ -523,9 +632,9 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
 
         <!-- SSL summary -->
         <?php if ($r['ssl']): ?>
-            <h3 class="phpinfowp-report-h">SSL certificates</h3>
+            <h3 class="phpinfowp-report-h"><?php _e('SSL certificates', 'phpinfo-wp'); ?></h3>
             <table class="phpinfowp-report-table">
-                <thead><tr><th>Host</th><th>Issuer</th><th>Expires</th><th>Status</th></tr></thead>
+                <thead><tr><th><?php _e('Host', 'phpinfo-wp'); ?></th><th><?php _e('Issuer', 'phpinfo-wp'); ?></th><th><?php _e('Expires', 'phpinfo-wp'); ?></th><th><?php _e('Status', 'phpinfo-wp'); ?></th></tr></thead>
                 <tbody>
                     <?php foreach ($r['ssl'] as $c):
                         if (!empty($c['error'])) continue;
@@ -544,14 +653,14 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
 
         <!-- DB summary -->
         <?php if ($r['db']): ?>
-            <h3 class="phpinfowp-report-h">Database</h3>
+            <h3 class="phpinfowp-report-h"><?php _e('Database', 'phpinfo-wp'); ?></h3>
             <table class="phpinfowp-report-table">
                 <tbody>
-                    <tr><td style="width:40%">Engine</td><td><?php echo esc_html($r['db']['engine'] . ' ' . $r['db']['version']); ?></td></tr>
-                    <tr><td>End-of-life</td><td><?php echo esc_html($r['db']['eol'] ?? '—'); ?></td></tr>
-                    <tr><td>Total size</td><td><?php echo size_format($r['db_size']['total']); ?> across <?php echo (int) $r['db_size']['tables']; ?> tables</td></tr>
+                    <tr><td style="width:40%"><?php _e('Engine', 'phpinfo-wp'); ?></td><td><?php echo esc_html($r['db']['engine'] . ' ' . $r['db']['version']); ?></td></tr>
+                    <tr><td><?php _e('End-of-life', 'phpinfo-wp'); ?></td><td><?php echo esc_html($r['db']['eol'] ?? '—'); ?></td></tr>
+                    <tr><td><?php _e('Total size', 'phpinfo-wp'); ?></td><td><?php echo size_format($r['db_size']['total']); ?> across <?php echo (int) $r['db_size']['tables']; ?> tables</td></tr>
                     <tr>
-                        <td>Autoload data</td>
+                        <td><?php _e('Autoload data', 'phpinfo-wp'); ?></td>
                         <td>
                             <?php
                             $al_bytes = (int) $r['autoload']['bytes'];
@@ -568,7 +677,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
 
         <!-- Cron -->
         <?php if ($r['cron'] && ($r['cron']['overdue'] || $r['cron']['orphan'])): ?>
-            <h3 class="phpinfowp-report-h">Cron health</h3>
+            <h3 class="phpinfowp-report-h"><?php _e('Cron health', 'phpinfo-wp'); ?></h3>
             <ul class="phpinfowp-report-list">
                 <li><?php echo (int) $r['cron']['total']; ?> total scheduled events</li>
                 <?php if ($r['cron']['overdue']): ?>
@@ -583,8 +692,11 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
         <!-- Compat -->
         <?php if ($r['compat'] && !isset($r['compat']['error']) && !empty($r['compat']['total'])): ?>
             <h3 class="phpinfowp-report-h">PHP compatibility (target PHP <?php echo esc_html($r['compat']['target']); ?>)</h3>
-            <p><?php echo $verdict_pill('warn', $r['compat']['total'] . ' issues'); ?> across <?php echo (int) $r['compat']['with_issues']; ?> plugins/themes. Open the <strong>PHP Compatibility</strong> page for the full file list.</p>
+            <p><?php echo $verdict_pill('warn', $r['compat']['total'] . ' issues'); ?> across <?php echo (int) $r['compat']['with_issues']; ?> plugins/themes. Open the <strong><?php _e('PHP Compatibility', 'phpinfo-wp'); ?></strong> page for the full file list.</p>
         <?php endif; ?>
+
+        <?php endif; // end Pro-only detail block ?>
+
 
         <div class="phpinfowp-report-footer">
             <?php if ($b['enabled'] && $b['footer_note']): ?>

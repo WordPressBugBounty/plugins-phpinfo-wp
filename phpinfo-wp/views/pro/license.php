@@ -23,6 +23,8 @@ if (isset($_POST['phpinfowp_license_action']) && check_admin_referer('phpinfowp_
         }
     } elseif ($action === 'deactivate') {
         Phpinfo_WP_License::deactivate();
+        delete_option('phpinfowp_free_trial_expires');
+        delete_option('phpinfowp_free_trial_email');
         $message  = 'License deactivated. Pro features are disabled.';
         $msg_type = 'info';
         $is_valid = false;
@@ -84,8 +86,8 @@ $pillars = [
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1>License <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Activate your license to unlock Pro features on this site</p>
+            <h1>License <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Activate your license to unlock Pro features on this site', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -97,8 +99,22 @@ $pillars = [
 
     <?php if ($is_locked): ?>
         <div class="notice notice-error inline" style="margin:0 0 20px">
-            <p><strong>License locked.</strong> Your license could not be verified for 14+ days. Re-enter your key to unlock, or contact support at <a href="mailto:support@exeebit.com">support@exeebit.com</a>.</p>
+            <p><strong><?php _e('License locked.', 'phpinfo-wp'); ?></strong> Your license could not be verified for 14+ days. Re-enter your key to unlock, or contact support at <a href="mailto:support@exeebit.com">support@exeebit.com</a>.</p>
         </div>
+    <?php endif; ?>
+
+    <?php if (!$is_valid): ?>
+        <div class="phpinfowp-price-alert-banner" style="position:relative; background:#fff3cd; border-left:4px solid #ffc107; padding:12px 40px 12px 16px; margin: 0 0 24px; border-radius: 0 4px 4px 0; font-size:13.5px; color:#664d03; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+            <button type="button" onclick="try{localStorage.setItem('phpinfowp_price_alert_dismissed','1')}catch(e){} this.closest('.phpinfowp-price-alert-banner').style.display='none';" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" style="position:absolute; top:6px; right:8px; background:none; border:none; cursor:pointer; color:#664d03; opacity:0.5; font-size:20px; line-height:1; padding:2px 4px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&times;</button>
+            <span>
+                <strong>⏰ <?php _e('Price Increase Alert:', 'phpinfo-wp'); ?></strong> 
+                <?php _e('On August 31st, the Single Site Pro license increases from $29 to $39/year. Upgrade today to secure the current $29/year rate before the price goes up.', 'phpinfo-wp'); ?>
+            </span>
+            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" style="background:#777BB3; color:#fff; padding:6px 14px; border-radius:4px; font-size:12.5px; font-weight:600; text-decoration:none; display:inline-block;">
+                <?php _e('Lock in $29 Now →', 'phpinfo-wp'); ?>
+            </a>
+        </div>
+        <script>if(localStorage.getItem('phpinfowp_price_alert_dismissed')==='1'){document.querySelectorAll('.phpinfowp-price-alert-banner').forEach(function(e){e.style.display='none';});}</script>
     <?php endif; ?>
 
     <!-- License status card -->
@@ -107,14 +123,14 @@ $pillars = [
             <?php if ($is_valid): ?>
                 <span class="dashicons dashicons-yes-alt" style="color:#00a32a"></span>
                 <div>
-                    <div class="phpinfowp-license-status-title">Pro license is active</div>
-                    <div class="phpinfowp-license-status-sub">All Pro features are unlocked on this site.</div>
+                    <div class="phpinfowp-license-status-title"><?php _e('Pro license is active', 'phpinfo-wp'); ?></div>
+                    <div class="phpinfowp-license-status-sub"><?php _e('All Pro features are unlocked on this site.', 'phpinfo-wp'); ?></div>
                 </div>
             <?php else: ?>
                 <span class="dashicons dashicons-dismiss" style="color:#d63638"></span>
                 <div>
-                    <div class="phpinfowp-license-status-title">No active license</div>
-                    <div class="phpinfowp-license-status-sub">Enter a valid license key to unlock Pro features.</div>
+                    <div class="phpinfowp-license-status-title"><?php _e('No active license', 'phpinfo-wp'); ?></div>
+                    <div class="phpinfowp-license-status-sub"><?php _e('Enter a valid license key to unlock Pro features.', 'phpinfo-wp'); ?></div>
                 </div>
             <?php endif; ?>
         </div>
@@ -122,17 +138,17 @@ $pillars = [
         <?php if ($is_valid): ?>
             <?php $meta = Phpinfo_WP_License::payload(); ?>
             <div class="phpinfowp-license-key-display">
-                <span class="phpinfowp-license-key-label">License key</span>
+                <span class="phpinfowp-license-key-label"><?php _e('License key', 'phpinfo-wp'); ?></span>
                 <code><?php echo esc_html(substr($key, 0, 12) . str_repeat('•', 20)); ?></code>
             </div>
             <?php if ($meta): ?>
                 <div class="phpinfowp-license-meta">
                     <div class="phpinfowp-license-meta-row">
-                        <span class="phpinfowp-license-meta-label">Registered to</span>
+                        <span class="phpinfowp-license-meta-label"><?php _e('Registered to', 'phpinfo-wp'); ?></span>
                         <span class="phpinfowp-license-meta-value"><?php echo esc_html($meta['email']); ?></span>
                     </div>
                     <div class="phpinfowp-license-meta-row">
-                        <span class="phpinfowp-license-meta-label">Expires</span>
+                        <span class="phpinfowp-license-meta-label"><?php _e('Expires', 'phpinfo-wp'); ?></span>
                         <span class="phpinfowp-license-meta-value">
                             <?php echo esc_html($meta['expiry_human']); ?>
                             <?php if (!$meta['is_lifetime']): ?>
@@ -144,7 +160,7 @@ $pillars = [
                     </div>
                     <?php if (!empty($meta['iat'])): ?>
                     <div class="phpinfowp-license-meta-row">
-                        <span class="phpinfowp-license-meta-label">Activated</span>
+                        <span class="phpinfowp-license-meta-label"><?php _e('Activated', 'phpinfo-wp'); ?></span>
                         <span class="phpinfowp-license-meta-value"><?php echo esc_html(date_i18n(get_option('date_format'), $meta['iat'])); ?></span>
                     </div>
                     <?php endif; ?>
@@ -153,7 +169,7 @@ $pillars = [
             <form id="phpinfowp-license-deactivate-form" method="post" style="margin-top:14px">
                 <?php wp_nonce_field('phpinfowp_license_nonce'); ?>
                 <input type="hidden" name="phpinfowp_license_action" value="deactivate">
-                <button type="button" class="button button-secondary" id="phpinfowp-license-deactivate-btn">Deactivate License</button>
+                <button type="button" class="button button-secondary" id="phpinfowp-license-deactivate-btn"><?php _e('Deactivate License', 'phpinfo-wp'); ?></button>
             </form>
 
             <!-- License deactivation retention modal. Reuses .phpinfowp-dm CSS
@@ -169,14 +185,14 @@ $pillars = [
                             <span class="dashicons dashicons-shield-alt" style="font-size:26px;width:26px;height:26px;color:#7c3aed"></span>
                         </div>
                         <div>
-                            <h2 id="phpinfowp-license-dm-title" class="phpinfowp-dm-title">Deactivate your Pro license?</h2>
-                            <p class="phpinfowp-dm-sub">The plugin keeps running, but every Pro feature below stops the moment you confirm.</p>
+                            <h2 id="phpinfowp-license-dm-title" class="phpinfowp-dm-title"><?php _e('Deactivate your Pro license?', 'phpinfo-wp'); ?></h2>
+                            <p class="phpinfowp-dm-sub"><?php _e('The plugin keeps running, but every Pro feature below stops the moment you confirm.', 'phpinfo-wp'); ?></p>
                         </div>
                     </div>
 
                     <div class="phpinfowp-dm-body">
                         <div class="phpinfowp-dm-col phpinfowp-dm-col-pro">
-                            <div class="phpinfowp-dm-col-label">Pro features that will lock</div>
+                            <div class="phpinfowp-dm-col-label"><?php _e('Pro features that will lock', 'phpinfo-wp'); ?></div>
                             <ul class="phpinfowp-dm-list">
                                 <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>White-label PDF Audit Report</li>
                                 <li><span class="dashicons dashicons-no-alt phpinfowp-dm-x"></span>One-click Config Auto-Fix with rollback</li>
@@ -193,17 +209,13 @@ $pillars = [
                     <div class="phpinfowp-dm-warn">
                         <span class="dashicons dashicons-info-outline" style="color:#0073aa"></span>
                         <div>
-                            <strong>Nothing is deleted.</strong> Your license key, white-label branding, snapshots, and alert settings stay on this site. Paste your key back in to restore Pro instantly — your license remains valid on Exeebit's servers.
+                            <strong><?php _e('Nothing is deleted.', 'phpinfo-wp'); ?></strong> Your license key, white-label branding, snapshots, and alert settings stay on this site. Paste your key back in to restore Pro instantly — your license remains valid on Exeebit's servers.
                         </div>
                     </div>
 
                     <div class="phpinfowp-dm-actions">
-                        <button type="button" class="button button-primary button-large phpinfowp-dm-keep">
-                            Keep Pro active
-                        </button>
-                        <button type="button" class="phpinfowp-dm-confirm" id="phpinfowp-license-dm-confirm" style="background:none;border:none;cursor:pointer">
-                            Deactivate anyway →
-                        </button>
+                        <button type="button" class="button button-primary button-large phpinfowp-dm-keep"><?php _e('Keep Pro active', 'phpinfo-wp'); ?></button>
+                        <button type="button" class="phpinfowp-dm-confirm" id="phpinfowp-license-dm-confirm" style="background:none;border:none;cursor:pointer"><?php _e('Deactivate anyway →', 'phpinfo-wp'); ?></button>
                     </div>
                 </div>
             </div>
@@ -233,17 +245,17 @@ $pillars = [
             <form method="post" class="phpinfowp-license-form">
                 <?php wp_nonce_field('phpinfowp_license_nonce'); ?>
                 <input type="hidden" name="phpinfowp_license_action" value="activate">
-                <label for="license_key" class="phpinfowp-license-input-label">Enter your license key</label>
+                <label for="license_key" class="phpinfowp-license-input-label"><?php _e('Enter your license key', 'phpinfo-wp'); ?></label>
                 <div class="phpinfowp-license-input-row">
                     <input type="text" id="license_key" name="license_key"
-                           placeholder="PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                           placeholder="<?php echo esc_attr__('PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'phpinfo-wp'); ?>"
                            autocomplete="off" spellcheck="false"
                            value="<?php echo esc_attr($key); ?>">
-                    <button type="submit" class="button button-primary">Activate</button>
+                    <button type="submit" class="button button-primary"><?php _e('Activate', 'phpinfo-wp'); ?></button>
                 </div>
                 <p class="description" style="margin-top:10px">
                     This site: <strong><?php echo esc_html(get_site_url()); ?></strong><br>
-                    Don't have a license? <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank">Get phpinfo() WP Pro &rarr;</a>
+                    Don't have a license? <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank"><?php _e('Get phpinfo() WP Pro →', 'phpinfo-wp'); ?></a>
                 </p>
             </form>
         <?php endif; ?>
@@ -298,13 +310,13 @@ $pillars = [
         return '<span style="font-size:12px;color:#3c434a">' . esc_html((string) $v) . '</span>';
     };
     ?>
-    <h2 class="phpinfowp-section-heading" style="margin-top:36px">Compare plans</h2>
-    <p style="color:#646970;margin:0 0 14px;max-width:560px">Everything in Free, plus the Pro depth — see exactly what you get at each tier.</p>
+    <h2 class="phpinfowp-section-heading" style="margin-top:36px"><?php _e('Compare plans', 'phpinfo-wp'); ?></h2>
+    <p style="color:#646970;margin:0 0 14px;max-width:560px"><?php _e('Everything in Free, plus the Pro depth — see exactly what you get at each tier.', 'phpinfo-wp'); ?></p>
     <div class="phpinfowp-compare-wrap">
         <table class="phpinfowp-compare">
             <thead>
                 <tr>
-                    <th scope="col" class="phpinfowp-compare-feat">Feature</th>
+                    <th scope="col" class="phpinfowp-compare-feat"><?php _e('Feature', 'phpinfo-wp'); ?></th>
                     <?php foreach ($compare_cols as $col): ?>
                         <th scope="col" class="<?php echo !empty($col['featured']) ? 'is-featured' : ''; ?>">
                             <div class="phpinfowp-compare-tier"><?php echo esc_html($col['name']); ?></div>
@@ -331,17 +343,15 @@ $pillars = [
             <tfoot>
                 <tr>
                     <td></td>
+                    <td></td>
                     <td>
-                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button">Get Free</a>
-                    </td>
-                    <td>
-                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button">Get Single</a>
+                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button"><?php _e('Get Single', 'phpinfo-wp'); ?></a>
                     </td>
                     <td class="is-featured">
-                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary">Get Unlimited</a>
+                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary"><?php _e('Get Unlimited', 'phpinfo-wp'); ?></a>
                     </td>
                     <td>
-                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button">Get Lifetime</a>
+                        <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button"><?php _e('Get Lifetime', 'phpinfo-wp'); ?></a>
                     </td>
                 </tr>
             </tfoot>
@@ -350,7 +360,7 @@ $pillars = [
     </div>
 
     <!-- 3-pillar features -->
-    <h2 class="phpinfowp-section-heading" style="margin-top:36px">What Pro unlocks</h2>
+    <h2 class="phpinfowp-section-heading" style="margin-top:36px"><?php _e('What Pro unlocks', 'phpinfo-wp'); ?></h2>
     <div class="phpinfowp-pillars">
         <?php foreach ($pillars as $p): ?>
             <div class="phpinfowp-pillar">
@@ -374,45 +384,45 @@ $pillars = [
 
     <?php if (!$is_valid): ?>
         <!-- Pricing -->
-        <h2 class="phpinfowp-section-heading" style="margin-top:36px">Pricing</h2>
+        <h2 class="phpinfowp-section-heading" style="margin-top:36px"><?php _e('Pricing', 'phpinfo-wp'); ?></h2>
         <div class="phpinfowp-pricing">
             <div class="phpinfowp-pricing-tier">
-                <div class="phpinfowp-pricing-name">Single Site</div>
+                <div class="phpinfowp-pricing-name"><?php _e('Single Site', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-pricing-price">$29<span>/year</span></div>
                 <ul class="phpinfowp-pricing-list">
-                    <li>Essential Pro features on 1 site</li>
-                    <li>Standard PDF reports (Branded)</li>
-                    <li>1 API monitor & 3 snapshots</li>
-                    <li>1 year of updates & support</li>
+                    <li><?php _e('Essential Pro features on 1 site', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('Standard PDF reports (Branded)', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('1 API monitor & 3 snapshots', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('1 year of updates & support', 'phpinfo-wp'); ?></li>
                 </ul>
-                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-secondary">Get Single</a>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-secondary"><?php _e('Get Single', 'phpinfo-wp'); ?></a>
             </div>
             <div class="phpinfowp-pricing-tier is-featured">
-                <div class="phpinfowp-pricing-flag">Most Popular</div>
-                <div class="phpinfowp-pricing-name">Unlimited</div>
+                <div class="phpinfowp-pricing-flag"><?php _e('Most Popular', 'phpinfo-wp'); ?></div>
+                <div class="phpinfowp-pricing-name"><?php _e('Unlimited', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-pricing-price">$69<span>/year</span></div>
                 <ul class="phpinfowp-pricing-list">
-                    <li>All Pro features on unlimited sites</li>
-                    <li>White-labeled PDF reports (Logo)</li>
-                    <li>Weekly digests & Slack/Discord</li>
-                    <li>Priority support & Multi-site</li>
+                    <li><?php _e('All Pro features on unlimited sites', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('White-labeled PDF reports (Logo)', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('Weekly digests & Slack/Discord', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('Priority support & Multi-site', 'phpinfo-wp'); ?></li>
                 </ul>
-                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary">Get Unlimited</a>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary"><?php _e('Get Unlimited', 'phpinfo-wp'); ?></a>
             </div>
             <div class="phpinfowp-pricing-tier">
-                <div class="phpinfowp-pricing-flag is-warn">Founders &mdash; First 50</div>
-                <div class="phpinfowp-pricing-name">Lifetime</div>
-                <div class="phpinfowp-pricing-price">$149<span>once</span></div>
+                <div class="phpinfowp-pricing-flag is-warn"><?php _e('Founders &mdash; First 50', 'phpinfo-wp'); ?></div>
+                <div class="phpinfowp-pricing-name"><?php _e('Lifetime', 'phpinfo-wp'); ?></div>
+                <div class="phpinfowp-pricing-price">$149<span><?php _e('once', 'phpinfo-wp'); ?></span></div>
                 <ul class="phpinfowp-pricing-list">
-                    <li>All Pro features on unlimited sites</li>
-                    <li>White-labeled PDF reports (Logo)</li>
-                    <li>Weekly digests & Slack/Discord</li>
-                    <li>Lifetime updates & priority support</li>
+                    <li><?php _e('All Pro features on unlimited sites', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('White-labeled PDF reports (Logo)', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('Weekly digests & Slack/Discord', 'phpinfo-wp'); ?></li>
+                    <li><?php _e('Lifetime updates & priority support', 'phpinfo-wp'); ?></li>
                 </ul>
-                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-secondary">Get Lifetime</a>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-secondary"><?php _e('Get Lifetime', 'phpinfo-wp'); ?></a>
             </div>
         </div>
-        <p class="phpinfowp-pricing-foot">14-day money-back guarantee &middot; Instant license delivery &middot; Cancel anytime</p>
+        <p class="phpinfowp-pricing-foot"><?php _e('14-day money-back guarantee · Instant license delivery · Cancel anytime', 'phpinfo-wp'); ?></p>
     <?php endif; ?>
 
 </div>

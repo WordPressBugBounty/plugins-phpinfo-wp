@@ -39,8 +39,8 @@ $any_cached = array_filter($results, function ($r) {
 <div class="phpinfowp-pro-page">
     <div class="phpinfowp-page-header">
         <div>
-            <h1>SSL Certificate Monitor <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Monitor SSL validity, expiration dates, and domain name mismatches.</p>
+            <h1>SSL Certificate Monitor <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Monitor SSL validity, expiration dates, and domain name mismatches.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -56,7 +56,7 @@ $any_cached = array_filter($results, function ($r) {
             <?php if (!empty($cert['error'])): ?>
                 <div class="phpinfowp-ssl-card phpinfowp-ssl-error">
                     <div class="phpinfowp-ssl-card-host"><?php echo esc_html($cert['host'] ?? '—'); ?></div>
-                    <div class="phpinfowp-ssl-card-status" style="color:#d63638">ERROR</div>
+                    <div class="phpinfowp-ssl-card-status" style="color:#d63638"><?php _e('ERROR', 'phpinfo-wp'); ?></div>
                     <div class="phpinfowp-ssl-card-days" style="font-size:13px;color:#d63638">
                         <?php echo esc_html($cert['error']); ?>
                     </div>
@@ -76,7 +76,7 @@ $any_cached = array_filter($results, function ($r) {
                         <?php if ($cert['days'] < 0): ?>
                             Expired <?php echo esc_html(abs($cert['days'])); ?> days ago
                         <?php else: ?>
-                            <?php echo esc_html($cert['days']); ?> <span style="font-size:14px;font-weight:400">days left</span>
+                            <?php echo esc_html($cert['days']); ?> <span style="font-size:14px;font-weight:400"><?php _e('days left', 'phpinfo-wp'); ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="phpinfowp-ssl-card-status">
@@ -85,15 +85,15 @@ $any_cached = array_filter($results, function ($r) {
                         </span>
                     </div>
                     <table class="phpinfowp-ssl-card-meta">
-                        <tr><td>Expires</td><td><?php echo esc_html($cert['expiry']); ?></td></tr>
-                        <tr><td>Issued</td><td><?php echo esc_html($cert['issued']); ?></td></tr>
-                        <tr><td>Issuer</td><td><?php echo esc_html($cert['issuer']); ?></td></tr>
+                        <tr><td><?php _e('Expires', 'phpinfo-wp'); ?></td><td><?php echo esc_html($cert['expiry']); ?></td></tr>
+                        <tr><td><?php _e('Issued', 'phpinfo-wp'); ?></td><td><?php echo esc_html($cert['issued']); ?></td></tr>
+                        <tr><td><?php _e('Issuer', 'phpinfo-wp'); ?></td><td><?php echo esc_html($cert['issuer']); ?></td></tr>
                         <?php if (!empty($cert['cn']) && $cert['cn'] !== $cert['host']): ?>
-                        <tr><td>CN</td><td><?php echo esc_html($cert['cn']); ?></td></tr>
+                        <tr><td><?php _e('CN', 'phpinfo-wp'); ?></td><td><?php echo esc_html($cert['cn']); ?></td></tr>
                         <?php endif; ?>
                         <?php if (!empty($cert['sans'])): ?>
                         <tr>
-                            <td>SANs</td>
+                            <td><?php _e('SANs', 'phpinfo-wp'); ?></td>
                             <td style="font-size:11px;color:#666">
                                 <?php echo esc_html(implode(', ', array_slice($cert['sans'], 0, 6))); ?>
                                 <?php if (count($cert['sans']) > 6): ?>
@@ -112,16 +112,16 @@ $any_cached = array_filter($results, function ($r) {
         <form method="post">
             <?php wp_nonce_field('phpinfowp_ssl_nonce'); ?>
             <input type="hidden" name="phpinfowp_ssl_action" value="recheck">
-            <button type="submit" class="button button-secondary">Re-check all certificates</button>
+            <button type="submit" class="button button-secondary"><?php _e('Re-check all certificates', 'phpinfo-wp'); ?></button>
         </form>
         <?php if ($any_cached): ?>
-            <span style="font-size:12px;color:#666">Results cached for 6 hours.</span>
+            <span style="font-size:12px;color:#666"><?php _e('Results cached for 6 hours.', 'phpinfo-wp'); ?></span>
         <?php endif; ?>
     </div>
 
     <!-- Extra domains -->
     <div style="margin-top:32px;max-width:520px">
-        <h2 style="margin-bottom:8px">Monitor Additional Domains</h2>
+        <h2 style="margin-bottom:8px"><?php _e('Monitor Additional Domains', 'phpinfo-wp'); ?></h2>
         <p style="font-size:13px;color:#555;margin-bottom:12px">
             Add hostnames you want to monitor (one per line). Useful for agencies managing client sites.<br>
             Enter the domain only — no <code>https://</code> or path. Example: <code>client.com</code>
@@ -130,10 +130,10 @@ $any_cached = array_filter($results, function ($r) {
             <?php wp_nonce_field('phpinfowp_ssl_nonce'); ?>
             <input type="hidden" name="phpinfowp_ssl_action" value="save_domains">
             <textarea name="ssl_domains" rows="5" class="large-text" style="font-family:monospace;font-size:13px"
-                      placeholder="client-a.com&#10;client-b.com&#10;staging.mysite.com"><?php
+                      placeholder="<?php echo esc_attr__('client-a.com&#10;client-b.com&#10;staging.mysite.com', 'phpinfo-wp'); ?>"><?php
                 echo esc_textarea(implode("\n", Phpinfo_WP_SSL::get_extra_domains()));
             ?></textarea>
-            <p class="submit"><input type="submit" class="button button-primary" value="Save Domains"></p>
+            <p class="submit"><input type="submit" class="button button-primary" value="<?php echo esc_attr__('Save Domains', 'phpinfo-wp'); ?>"></p>
         </form>
     </div>
 </div>

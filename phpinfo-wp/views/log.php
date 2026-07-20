@@ -22,10 +22,6 @@ function phpinfowp_parse_log_entry(string $raw): array {
     $dt     = '';
     $user   = '';
 
-    // Detect action. Config Grader Auto-Fix writes "Config autofix applied:..."
-    // and "Config autofix block reverted" — earlier versions only recognized
-    // the .htaccess editor's "backed up / restored / edited" verbs, so every
-    // auto-fix row rendered as a generic EVENT.
     if (strpos($raw, 'backed up') !== false)                  $action = 'backup';
     elseif (strpos($raw, 'restored') !== false)               $action = 'restore';
     elseif (strpos($raw, 'autofix applied') !== false)        $action = 'autofix';
@@ -38,31 +34,34 @@ function phpinfowp_parse_log_entry(string $raw): array {
     if (preg_match('/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/', $raw, $m)) $dt   = $m[1];
     if (preg_match('/by\s+(\S+)\s*$/', $raw, $m))                       $user = $m[1];
 
-    // Pull the directive list out of "Config autofix applied: a, b, c on …"
     if ($action === 'autofix' && preg_match('/autofix applied:\s*(.+?)\s+on\s+\d{4}-\d{2}-\d{2}/i', $raw, $m)) {
         $detail = trim($m[1]);
     }
 
     switch ($action) {
         case 'edit':
-            $description = $file ? "Edited {$file}"                  : 'Edited config';
+            $description = $file ? sprintf(__('Edited %s', 'phpinfo-wp'), $file) : __('Edited config', 'phpinfo-wp');
             break;
         case 'backup':
-            $description = $file ? "Backed up {$file}"               : 'Backed up config';
+            $description = $file ? sprintf(__('Backed up %s', 'phpinfo-wp'), $file) : __('Backed up config', 'phpinfo-wp');
             break;
         case 'restore':
-            $description = $file ? "Restored {$file} from backup"    : 'Restored from backup';
+            $description = $file ? sprintf(__('Restored %s from backup', 'phpinfo-wp'), $file) : __('Restored from backup', 'phpinfo-wp');
             break;
         case 'autofix':
-            $description = $detail
-                ? sprintf('Auto-fix applied to %d director%s: %s',
-                    substr_count($detail, ',') + 1,
-                    substr_count($detail, ',') ? 'ies' : 'y',
-                    $detail)
-                : 'Config Grader auto-fix applied';
+            if ($detail) {
+                $dir_count = substr_count($detail, ',') + 1;
+                $description = sprintf(
+                    _n('Auto-fix applied to %1$d directory: %2$s', 'Auto-fix applied to %1$d directories: %2$s', $dir_count, 'phpinfo-wp'),
+                    $dir_count,
+                    $detail
+                );
+            } else {
+                $description = __('Config Grader auto-fix applied', 'phpinfo-wp');
+            }
             break;
         case 'autofix-revert':
-            $description = 'Config Grader auto-fix block reverted';
+            $description = __('Config Grader auto-fix block reverted', 'phpinfo-wp');
             break;
         default:
             $description = trim(preg_replace([
@@ -78,10 +77,10 @@ function phpinfowp_parse_log_entry(string $raw): array {
 function phpinfowp_relative_time(string $dt): string {
     if (!$dt) return '—';
     $diff = time() - (int) strtotime($dt . ' UTC');
-    if ($diff < 60)     return 'just now';
-    if ($diff < 3600)   return round($diff / 60) . 'm ago';
-    if ($diff < 86400)  return round($diff / 3600) . 'h ago';
-    if ($diff < 604800) return round($diff / 86400) . 'd ago';
+    if ($diff < 60)     return __('just now', 'phpinfo-wp');
+    if ($diff < 3600)   return sprintf(__('%dm ago', 'phpinfo-wp'), round($diff / 60));
+    if ($diff < 86400)  return sprintf(__('%dh ago', 'phpinfo-wp'), round($diff / 3600));
+    if ($diff < 604800) return sprintf(__('%dd ago', 'phpinfo-wp'), round($diff / 86400));
     return gmdate('M j, Y', strtotime($dt . ' UTC'));
 }
 
@@ -101,7 +100,6 @@ $search = sanitize_text_field($_GET['log_search'] ?? '');
 
 $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
     if ($filter !== 'all') {
-        // "autofix" pill catches both autofix and autofix-revert
         if ($filter === 'autofix') {
             if ($e['action'] !== 'autofix' && $e['action'] !== 'autofix-revert') return false;
         } elseif ($e['action'] !== $filter) {
@@ -118,16 +116,14 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
 
 <div class="phpinfowp-pro-page phpinfowp-log-page">
 
-    <!-- Header — uses the shared design-system classes for consistent styling across pages -->
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Activity Log</h1>
+            <h1><?php _e('Activity Log', 'phpinfo-wp'); ?></h1>
             <p class="phpinfowp-page-subtitle">
-                Tracks every PHP Config change made through phpinfo() WP &middot;
-                <strong><?php echo count($parsed); ?></strong> entr<?php echo count($parsed) === 1 ? 'y' : 'ies'; ?>
+                <?php _e('Tracks every PHP Config change made through phpinfo() WP', 'phpinfo-wp'); ?> &middot;
+                <strong><?php echo count($parsed); ?></strong> <?php echo _n('entry', 'entries', count($parsed), 'phpinfo-wp'); ?>
             </p>
         </div>
-
     </div>
 
     <?php if ($notice): ?>
@@ -139,11 +135,11 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
         <div class="phpinfowp-log-filters">
             <?php
             $tabs = [
-                'all'     => ['label' => 'All',       'count' => $counts['all']],
-                'edit'    => ['label' => 'Edits',     'count' => $counts['edit']],
-                'backup'  => ['label' => 'Backups',   'count' => $counts['backup']],
-                'restore' => ['label' => 'Restores',  'count' => $counts['restore']],
-                'autofix' => ['label' => 'Auto-fixes','count' => $counts['autofix']],
+                'all'     => ['label' => __('All', 'phpinfo-wp'),       'count' => $counts['all']],
+                'edit'    => ['label' => __('Edits', 'phpinfo-wp'),     'count' => $counts['edit']],
+                'backup'  => ['label' => __('Backups', 'phpinfo-wp'),   'count' => $counts['backup']],
+                'restore' => ['label' => __('Restores', 'phpinfo-wp'),  'count' => $counts['restore']],
+                'autofix' => ['label' => __('Auto-fixes', 'phpinfo-wp'),'count' => $counts['autofix']],
             ];
             foreach ($tabs as $key => $tab):
                 $active = $filter === $key;
@@ -160,7 +156,7 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
         <div style="position:relative">
             <input type="text" id="phpinfowp-log-search-input"
                    value="<?php echo esc_attr($search); ?>"
-                   placeholder="Search entries…"
+                   placeholder="<?php echo esc_attr__('Search entries…', 'phpinfo-wp'); ?>"
                    class="regular-text"
                    style="padding-right:32px"
                    oninput="phpinfowpLogSearch(this.value)">
@@ -174,35 +170,40 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
     <?php if (empty($parsed)): ?>
         <div class="phpinfowp-log-empty">
             <span class="dashicons dashicons-list-view" style="font-size:40px;width:40px;height:40px;color:#c0c0c0"></span>
-            <p style="margin:12px 0 4px;font-size:15px;color:#444">No activity recorded yet</p>
-            <p style="margin:0;font-size:13px;color:#888">Use the <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-htaccess')); ?>">PHP Config editor</a> to start tracking changes.</p>
+            <p style="margin:12px 0 4px;font-size:15px;color:#444"><?php _e('No activity recorded yet', 'phpinfo-wp'); ?></p>
+            <p style="margin:0;font-size:13px;color:#888"><?php
+                printf(
+                    __('Use the %s to start tracking changes.', 'phpinfo-wp'),
+                    '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-htaccess')) . '">' . __('PHP Config editor', 'phpinfo-wp') . '</a>'
+                );
+            ?></p>
         </div>
     <?php elseif (empty($filtered)): ?>
         <div class="phpinfowp-log-empty">
             <span class="dashicons dashicons-search" style="font-size:40px;width:40px;height:40px;color:#c0c0c0"></span>
-            <p style="margin:12px 0 4px;font-size:15px;color:#444">No entries match your filter</p>
+            <p style="margin:12px 0 4px;font-size:15px;color:#444"><?php _e('No entries match your filter', 'phpinfo-wp'); ?></p>
         </div>
     <?php else: ?>
         <div class="phpinfowp-timeline" id="phpinfowp-timeline">
             <?php foreach ($filtered as $e):
                 switch ($e['action']) {
                     case 'edit':
-                        $action_meta = ['label' => 'EDIT',     'color' => '#777BB3', 'bg' => '#f3f0ff', 'icon' => 'dashicons-edit'];
+                        $action_meta = ['label' => __('EDIT', 'phpinfo-wp'),     'color' => '#777BB3', 'bg' => '#f3f0ff', 'icon' => 'dashicons-edit'];
                         break;
                     case 'backup':
-                        $action_meta = ['label' => 'BACKUP',   'color' => '#0073aa', 'bg' => '#e8f4fc', 'icon' => 'dashicons-upload'];
+                        $action_meta = ['label' => __('BACKUP', 'phpinfo-wp'),   'color' => '#0073aa', 'bg' => '#e8f4fc', 'icon' => 'dashicons-upload'];
                         break;
                     case 'restore':
-                        $action_meta = ['label' => 'RESTORE',  'color' => '#dba617', 'bg' => '#fff8e5', 'icon' => 'dashicons-undo'];
+                        $action_meta = ['label' => __('RESTORE', 'phpinfo-wp'),  'color' => '#dba617', 'bg' => '#fff8e5', 'icon' => 'dashicons-undo'];
                         break;
                     case 'autofix':
-                        $action_meta = ['label' => 'AUTO-FIX', 'color' => '#7c3aed', 'bg' => '#f5f0ff', 'icon' => 'dashicons-admin-tools'];
+                        $action_meta = ['label' => __('AUTO-FIX', 'phpinfo-wp'), 'color' => '#7c3aed', 'bg' => '#f5f0ff', 'icon' => 'dashicons-admin-tools'];
                         break;
                     case 'autofix-revert':
-                        $action_meta = ['label' => 'REVERTED', 'color' => '#9b6bf2', 'bg' => '#f5f0ff', 'icon' => 'dashicons-undo'];
+                        $action_meta = ['label' => __('REVERTED', 'phpinfo-wp'), 'color' => '#9b6bf2', 'bg' => '#f5f0ff', 'icon' => 'dashicons-undo'];
                         break;
                     default:
-                        $action_meta = ['label' => 'EVENT',    'color' => '#666',    'bg' => '#f6f7f7', 'icon' => 'dashicons-info'];
+                        $action_meta = ['label' => __('EVENT', 'phpinfo-wp'),    'color' => '#666',    'bg' => '#f6f7f7', 'icon' => 'dashicons-info'];
                         break;
                 }
             ?>
@@ -254,11 +255,9 @@ function phpinfowpLogSearch(q) {
     q = q.toLowerCase().trim();
     document.getElementById('phpinfowp-log-search-clear').style.display = q ? '' : 'none';
     var entries = document.querySelectorAll('#phpinfowp-timeline .phpinfowp-timeline-entry');
-    var visible = 0;
     entries.forEach(function(el) {
         var match = !q || el.dataset.raw.includes(q);
         el.style.display = match ? '' : 'none';
-        if (match) visible++;
     });
 }
 

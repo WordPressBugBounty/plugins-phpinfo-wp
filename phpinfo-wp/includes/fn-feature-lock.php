@@ -56,7 +56,7 @@ function phpinfowp_render_feature_lock(array $args = []): void {
                     font-size:9px;font-weight:700;letter-spacing:.5px;
                     padding:2px 5px;border-radius:3px;
                     line-height:1.5;
-                ">PRO</span>
+                "><?php _e('PRO', 'phpinfo-wp'); ?></span>
             </div>
 
             <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#1d2327;">
@@ -67,21 +67,28 @@ function phpinfowp_render_feature_lock(array $args = []): void {
             </p>
 
             <?php if (!empty($previews)): ?>
-            <!-- Blurred data preview -->
+            <!-- Skeleton data preview -->
             <div style="
                 background:#f6f7f7;
                 border:1px solid #e5e7ea;
                 border-radius:4px;
                 padding:16px 20px;
                 margin-bottom:24px;
-                text-align:left;
-                filter:blur(3px);
                 user-select:none;
                 pointer-events:none;
             " aria-hidden="true">
-                <?php foreach ($previews as $row): ?>
-                <div style="display:flex;justify-content:space-between;font-size:13px;color:#444;padding:4px 0;border-bottom:1px solid #eee;">
-                    <?php echo wp_kses($row, ['strong' => [], 'span' => ['style' => []], 'code' => []]); ?>
+                <?php 
+                $skel_widths = [ ['50%', '20%'], ['65%', '15%'], ['40%', '25%'], ['55%', '20%'] ];
+                $i = 0;
+                $count = count($previews);
+                foreach ($previews as $row): 
+                    $w1 = $skel_widths[$i % 4][0];
+                    $w2 = $skel_widths[$i % 4][1];
+                    $b_bot = (++$i === $count) ? 'none' : '1px solid #eee';
+                ?>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:<?php echo $b_bot; ?>;">
+                    <div style="height:11px; width:<?php echo $w1; ?>; background:#cbd5e1; border-radius:4px;"></div>
+                    <div style="height:11px; width:<?php echo $w2; ?>; background:#cbd5e1; border-radius:4px;"></div>
                 </div>
                 <?php endforeach; ?>
             </div>

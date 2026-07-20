@@ -37,9 +37,9 @@ $verdict_meta = [
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Update Guard <span style="font-size:13px;font-weight:500;color:#888;vertical-align:middle">Pre-update core audit</span></h1>
+            <h1>Update Guard <span style="font-size:13px;font-weight:500;color:#888;vertical-align:middle"><?php _e('Pre-update core audit', 'phpinfo-wp'); ?></span></h1>
             <p class="phpinfowp-page-subtitle">
-                Before you click <strong>Update WordPress</strong>, scan every plugin and theme for code that breaks on the new core —
+                Before you click <strong><?php _e('Update WordPress', 'phpinfo-wp'); ?></strong>, scan every plugin and theme for code that breaks on the new core —
                 removed jQuery APIs, deprecated WordPress functions<?php echo $is_pro ? ', and untested/abandoned listings' : ''; ?>.
                 Currently running WordPress <?php echo esc_html($current); ?><?php echo $avail ? ' · <strong>' . esc_html($avail) . ' available</strong>' : ' · up to date'; ?>.
             </p>
@@ -47,7 +47,7 @@ $verdict_meta = [
             <p style="margin:4px 0 0;font-size:12px;color:#888">
                 <?php if ($rs['source'] === 'cloud'): ?>
                     <span class="dashicons dashicons-cloud" style="font-size:14px;width:14px;height:14px;vertical-align:text-bottom;color:#2271b1"></span>
-                    Ruleset: <strong>cloud</strong> (v<?php echo esc_html($rs['version'] ?: '?'); ?>, updated <?php echo $rs['at'] ? esc_html(human_time_diff($rs['at']) . ' ago') : 'just now'; ?>)
+                    Ruleset: <strong><?php _e('cloud', 'phpinfo-wp'); ?></strong> (v<?php echo esc_html($rs['version'] ?: '?'); ?>, updated <?php echo $rs['at'] ? esc_html(human_time_diff($rs['at']) . ' ago') : 'just now'; ?>)
                 <?php else: ?>
                     Ruleset: built-in<?php if ($is_pro): ?> — cloud rules will load on the next license check<?php endif; ?>
                 <?php endif; ?>
@@ -58,26 +58,26 @@ $verdict_meta = [
     <?php if (!$is_pro): ?>
         <div style="background:linear-gradient(135deg,#f3f7ff,#eaf4ff);border:1px solid #c8d8f5;border-radius:8px;padding:12px 16px;margin:0 0 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
             <span style="font-size:13px;color:#1a3a72">
-                <strong>Free:</strong> code scan (up to <?php echo (int) Phpinfo_WP_Update_Audit::FREE_MAX_FILES; ?> files) + an overall verdict.
-                <strong>Pro</strong> adds WP.org "tested up to" &amp; abandonment scoring, AI fix explanations, uncapped scans, and an automatic warning on the WordPress Updates screen before every core update.
+                <strong><?php _e('Free:', 'phpinfo-wp'); ?></strong> code scan (up to <?php echo (int) Phpinfo_WP_Update_Audit::FREE_MAX_FILES; ?> files) + an overall verdict.
+                <strong><?php _e('Pro', 'phpinfo-wp'); ?></strong> adds WP.org "tested up to" &amp; abandonment scoring, AI fix explanations, uncapped scans, and an automatic warning on the WordPress Updates screen before every core update.
             </span>
-            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary" style="margin-left:auto">Get Pro →</a>
+            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary" style="margin-left:auto"><?php _e('Get Pro →', 'phpinfo-wp'); ?></a>
         </div>
     <?php endif; ?>
 
     <form method="post" class="phpinfowp-compat-controls">
         <?php wp_nonce_field('phpinfowp_ua_nonce'); ?>
         <label>
-            <strong>Audit against:</strong>
+            <strong><?php _e('Audit against:', 'phpinfo-wp'); ?></strong>
             <input type="text" name="target" value="<?php echo esc_attr($target); ?>" size="8"
                    pattern="\d+\.\d+(\.\d+)?" style="width:80px" />
-            <span class="description" style="font-weight:400">WordPress version</span>
+            <span class="description" style="font-weight:400"><?php _e('WordPress version', 'phpinfo-wp'); ?></span>
         </label>
         <button type="submit" name="phpinfowp_ua_scan" value="1" class="button button-primary">
             <span class="dashicons dashicons-shield"></span>Run pre-update audit
         </button>
         <?php if ($result): ?>
-            <button type="submit" name="phpinfowp_ua_clear" value="1" class="button button-secondary">Clear</button>
+            <button type="submit" name="phpinfowp_ua_clear" value="1" class="button button-secondary"><?php _e('Clear', 'phpinfo-wp'); ?></button>
         <?php endif; ?>
     </form>
 
@@ -87,8 +87,8 @@ $verdict_meta = [
     <?php elseif (!$result): ?>
         <div class="phpinfowp-compat-empty">
             <span class="dashicons dashicons-shield"></span>
-            <h3>No audit yet</h3>
-            <p>Set the WordPress version you plan to upgrade to and click "Run pre-update audit".</p>
+            <h3><?php _e('No audit yet', 'phpinfo-wp'); ?></h3>
+            <p><?php _e('Set the WordPress version you plan to upgrade to and click "Run pre-update audit".', 'phpinfo-wp'); ?></p>
             <p style="font-size:12px;color:#888">Scans plugin/theme PHP &amp; JavaScript on your server. Takes 10–90 seconds. Nothing is sent anywhere<?php echo $is_pro ? ' except anonymous slug lookups to WordPress.org for "tested up to" data' : ''; ?>.</p>
         </div>
 
@@ -131,7 +131,7 @@ $verdict_meta = [
 
         <?php if (!$is_pro): ?>
             <div class="notice notice-info inline" style="margin:0 0 16px"><p>
-                This free verdict is based on code analysis only. <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank">Pro</a> also checks each plugin/theme's "tested up to" version and abandonment status on WordPress.org — the biggest predictor of a quiet breakage.
+                This free verdict is based on code analysis only. <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank"><?php _e('Pro', 'phpinfo-wp'); ?></a> also checks each plugin/theme's "tested up to" version and abandonment status on WordPress.org — the biggest predictor of a quiet breakage.
             </p></div>
         <?php endif; ?>
 
@@ -140,22 +140,20 @@ $verdict_meta = [
         if (!empty($result['total_breaks']) || $jqm !== 'unknown'):
             if ($jqm === 'present'): ?>
                 <div class="notice notice-info inline" style="margin:0 0 16px"><p>
-                    <strong>jQuery Migrate is currently loaded on your site</strong>, so the jQuery calls below still work for now — they're flagged as <em>deprecated</em>, not broken. They become hard breaks only if Migrate is removed (it's deprecated and shouldn't be relied on long-term).
+                    <strong><?php _e('jQuery Migrate is currently loaded on your site', 'phpinfo-wp'); ?></strong>, so the jQuery calls below still work for now — they're flagged as <em><?php _e('deprecated', 'phpinfo-wp'); ?></em>, not broken. They become hard breaks only if Migrate is removed (it's deprecated and shouldn't be relied on long-term).
                 </p></div>
             <?php elseif ($jqm === 'absent'): ?>
                 <div class="notice notice-error inline" style="margin:0 0 16px"><p>
-                    <strong>jQuery Migrate is not loaded on your site.</strong> The jQuery calls below (marked <strong>BREAKS</strong>) will fail silently on the front end on WordPress 5.7+.
+                    <strong><?php _e('jQuery Migrate is not loaded on your site.', 'phpinfo-wp'); ?></strong> The jQuery calls below (marked <strong><?php _e('BREAKS', 'phpinfo-wp'); ?></strong>) will fail silently on the front end on WordPress 5.7+.
                 </p></div>
             <?php endif;
         endif; ?>
 
         <?php if (empty($owners)): ?>
-            <div class="notice notice-success inline" style="margin:0"><p>No plugins or themes detected in the scan roots.</p></div>
+            <div class="notice notice-success inline" style="margin:0"><p><?php _e('No plugins or themes detected in the scan roots.', 'phpinfo-wp'); ?></p></div>
         <?php else: ?>
 
-            <p class="description" style="margin:0 0 16px">
-                Regex-based static analysis — a match in a comment, string, or a plugin's own same-named function can be a false positive. Verify before editing third-party code.
-            </p>
+            <p class="description" style="margin:0 0 16px"><?php _e('Regex-based static analysis — a match in a comment, string, or a plugin\'s own same-named function can be a false positive. Verify before editing third-party code.', 'phpinfo-wp'); ?></p>
 
             <?php foreach ($owners as $owner => $o):
                 [$type, $name] = array_pad(explode('/', $owner, 2), 2, $owner);
@@ -173,7 +171,7 @@ $verdict_meta = [
                         <span class="phpinfowp-compat-owner-counts">
                             <?php if ($o['breaks']): ?><span style="color:#d63638"><strong><?php echo (int) $o['breaks']; ?></strong> breaks</span><?php endif; ?>
                             <?php if ($o['depr']): ?><?php if ($o['breaks']) echo '&middot;'; ?><span style="color:#dba617"><strong><?php echo (int) $o['depr']; ?></strong> deprecated</span><?php endif; ?>
-                            <?php if (!$o['breaks'] && !$o['depr'] && $ov !== 'safe'): ?><span style="color:#dba617">metadata risk</span><?php endif; ?>
+                            <?php if (!$o['breaks'] && !$o['depr'] && $ov !== 'safe'): ?><span style="color:#dba617"><?php _e('metadata risk', 'phpinfo-wp'); ?></span><?php endif; ?>
                         </span>
                     </summary>
                     <div class="phpinfowp-compat-issues">
@@ -189,7 +187,7 @@ $verdict_meta = [
                                     <?php endif; ?>
                                     <?php if (!empty($meta['abandoned'])): ?><span class="phpinfowp-ua-meta-pill is-bad">⚠ Looks abandoned</span><?php endif; ?>
                                 <?php else: ?>
-                                    <span class="phpinfowp-ua-meta-pill">Not on WordPress.org (premium/custom) — metadata unavailable</span>
+                                    <span class="phpinfowp-ua-meta-pill"><?php _e('Not on WordPress.org (premium/custom) — metadata unavailable', 'phpinfo-wp'); ?></span>
                                 <?php endif; ?>
                                 <?php if (!empty($meta['php_blocks'])): ?>
                                     <span class="phpinfowp-ua-meta-pill is-bad">Requires PHP <?php echo esc_html($meta['requires_php']); ?> (you run <?php echo esc_html(PHP_VERSION); ?>)</span>
@@ -217,7 +215,7 @@ $verdict_meta = [
                                     <?php if ($is_pro): ?>
                                         <span class="phpinfowp-compat-where"><?php echo esc_html($issue['file']); ?>:<?php echo (int) $issue['line']; ?></span>
                                     <?php endif; ?>
-                                    <?php if (!empty($issue['new_now'])): ?><span class="phpinfowp-ua-new">new on this update</span><?php endif; ?>
+                                    <?php if (!empty($issue['new_now'])): ?><span class="phpinfowp-ua-new"><?php _e('new on this update', 'phpinfo-wp'); ?></span><?php endif; ?>
                                 </div>
                                 <div class="phpinfowp-compat-issue-meta">
                                     <?php echo $issue['severity'] === 'breaks' ? 'Removed from jQuery as of WordPress' : 'Deprecated since WordPress'; ?>
@@ -237,7 +235,7 @@ $verdict_meta = [
                             <div class="phpinfowp-compat-issue" style="border-left-color:#c8d8f5;background:#f7faff">
                                 <div class="phpinfowp-compat-issue-meta">
                                     + <?php echo count($issues) - 3; ?> more finding<?php echo (count($issues) - 3) !== 1 ? 's' : ''; ?> with exact file &amp; line —
-                                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank">unlock the full drill-down with Pro →</a>
+                                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank"><?php _e('unlock the full drill-down with Pro →', 'phpinfo-wp'); ?></a>
                                 </div>
                             </div>
                         <?php endif; ?>

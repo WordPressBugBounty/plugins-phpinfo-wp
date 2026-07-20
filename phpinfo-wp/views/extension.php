@@ -21,17 +21,17 @@ sort($missing);
 
   <div class="phpinfowp-page-header">
     <div>
-      <h1>PHP Extensions</h1>
+      <h1><?php _e('PHP Extensions', 'phpinfo-wp'); ?></h1>
       <p class="phpinfowp-page-subtitle">
-        <strong><?php echo count($loaded); ?></strong> loaded
+        <strong><?php echo count($loaded); ?></strong> <?php _e('loaded', 'phpinfo-wp'); ?>
         <?php if ($missing): ?>&nbsp;&middot;&nbsp;
-          <strong style="color:#d63638"><?php echo count($missing); ?></strong> recommended not loaded
+          <strong style="color:#d63638"><?php echo count($missing); ?></strong> <?php _e('recommended not loaded', 'phpinfo-wp'); ?>
         <?php endif; ?>
         &nbsp;&middot;&nbsp; PHP <?php echo esc_html(PHP_VERSION); ?>
       </p>
     </div>
     <div style="position:relative">
-      <input type="text" id="phpinfowp-ext-search" placeholder="Filter extensions…"
+      <input type="text" id="phpinfowp-ext-search" placeholder="<?php echo esc_attr__('Filter extensions…', 'phpinfo-wp'); ?>"
              class="regular-text" autocomplete="off" oninput="phpinfowpExtFilter(this.value)"
              style="padding-right:30px">
       <button type="button" onclick="document.getElementById('phpinfowp-ext-search').value='';phpinfowpExtFilter('')"
@@ -44,7 +44,7 @@ sort($missing);
   <div class="phpinfowp-ext-section" id="phpinfowp-missing-section">
     <h3 class="phpinfowp-ext-heading phpinfowp-ext-heading-missing">
       <span class="dashicons dashicons-warning" style="color:#d63638;vertical-align:middle;margin-right:4px"></span>
-      Recommended — Not Loaded <span class="phpinfowp-ext-heading-count"><?php echo count($missing); ?></span>
+      <?php _e('Recommended — Not Loaded', 'phpinfo-wp'); ?> <span class="phpinfowp-ext-heading-count"><?php echo count($missing); ?></span>
     </h3>
     <div class="phpinfowp-ext-grid" id="phpinfowp-missing-grid">
       <?php foreach ($missing as $ext): ?>
@@ -60,7 +60,7 @@ sort($missing);
   <div class="phpinfowp-ext-section">
     <h3 class="phpinfowp-ext-heading phpinfowp-ext-heading-loaded">
       <span class="dashicons dashicons-yes-alt" style="color:#00a32a;vertical-align:middle;margin-right:4px"></span>
-      Loaded Extensions <span class="phpinfowp-ext-heading-count"><?php echo count($loaded); ?></span>
+      <?php _e('Loaded Extensions', 'phpinfo-wp'); ?> <span class="phpinfowp-ext-heading-count"><?php echo count($loaded); ?></span>
     </h3>
     <div class="phpinfowp-ext-grid" id="phpinfowp-loaded-grid">
       <?php foreach ($loaded as $ext):

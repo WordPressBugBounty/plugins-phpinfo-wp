@@ -3,16 +3,19 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     7.2.3
+Version:     7.2.4
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com/phpinfo-wp
 License:     GPLv3
+License URI:  https://www.gnu.org/licenses/gpl-3.0.html
+Text Domain: phpinfo-wp
+Domain Path: /languages
 */
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '7.2.3');
+define('PHPINFOWP_VERSION', '7.2.4');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 
@@ -97,6 +100,35 @@ class Phpinfo_wp {
         if (is_admin()) {
             register_shutdown_function(['Phpinfo_WP_Admin_Bar', 'record_memory_peak']);
         }
+        add_action('init', [$this, 'load_textdomain']);
+        add_action('admin_init', [$this, 'admin_init_migrations']);
+        add_action('in_plugin_update_message-' . plugin_basename(__FILE__), [$this, 'show_update_notice'], 10, 2);
+    }
+
+    public function load_textdomain(): void {
+        load_plugin_textdomain('phpinfo-wp', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    }
+
+    public function admin_init_migrations(): void {
+        $b = get_option('phpinfowp_report_branding');
+        if (is_array($b) && isset($b['tagline']) && $b['tagline'] === 'Yearly Report') {
+            $b['tagline'] = 'Server Health Audit';
+            update_option('phpinfowp_report_branding', $b);
+        }
+    }
+
+    public function show_update_notice(array $plugin_data, object $response): void {
+        echo '<div style="margin-top: 10px; padding: 12px 14px; background: #f6f9fc; border-left: 4px solid #777BB3; font-size: 13px; color: #2c3338; border-radius: 0 4px 4px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">';
+        echo '<p style="margin: 0 0 6px; font-weight: 600; color: #1d2327;">';
+        echo '✨ ' . esc_html__('What you are unlocking in this version:', 'phpinfo-wp');
+        echo '</p>';
+        echo '<p style="margin: 0 0 8px; color: #475569; line-height: 1.4;">';
+        echo esc_html__('Includes new translation packs (German, French, Spanish, Italian, Dutch) and optimized PHP server lifecycle audits.', 'phpinfo-wp');
+        echo '</p>';
+        echo '<p style="margin: 0; font-size: 12px; color: #64748b; font-style: italic;">';
+        echo esc_html__('💡 Note: Since this is a system diagnostics tool, standard backup practices are always recommended before upgrading.', 'phpinfo-wp');
+        echo '</p>';
+        echo '</div>';
     }
 
     public function add_admin_pages(): void {
@@ -128,6 +160,9 @@ class Phpinfo_wp {
 
         add_submenu_page('phpinfo-wp', 'License', 'License',
             'manage_options', 'phpinfowp-license', [$this, 'view_license']);
+
+        add_submenu_page('phpinfo-wp', 'Support', 'Support',
+            'manage_options', 'phpinfowp-support', [$this, 'view_support']);
 
         // Hidden registrations — these slugs work as direct URLs (admin bar,
         // dashboard widget, admin notices) but never appear in the sidebar.
@@ -207,6 +242,7 @@ class Phpinfo_wp {
     public function view_license(): void         { require PHPINFOWP_DIR . 'views/pro/license.php'; }
     public function view_api_monitor(): void     { require PHPINFOWP_DIR . 'views/pro/api-monitor.php'; }
     public function view_permissions(): void     { require PHPINFOWP_DIR . 'views/pro/permissions.php'; }
+    public function view_support(): void         { require PHPINFOWP_DIR . 'views/pro/support.php'; }
 
     public function admin_bar_indicator(WP_Admin_Bar $bar): void {
         Phpinfo_WP_Admin_Bar::render($bar);
@@ -591,6 +627,9 @@ FLYOUT;
             // The leaf pages are registered as real submenus (so WP highlights the
             // toplevel natively) — we just suppress them in the sidebar list.
             var visible = ['phpinfo-wp','phpinfowp-performance','phpinfowp-audit','phpinfowp-tools','phpinfowp-reports','phpinfowp-license'];
+            <?php if ($is_pro): ?>
+            visible.push('phpinfowp-support');
+            <?php endif; ?>
             root.querySelectorAll('.wp-submenu li > a').forEach(function(a) {
                 var m = (a.getAttribute('href') || '').match(/[?&]page=([\w-]+)/);
                 if (!m) return;

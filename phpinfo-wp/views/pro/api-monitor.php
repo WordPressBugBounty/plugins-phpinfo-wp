@@ -35,26 +35,26 @@ foreach ($stats as $host => $data) {
 <div class="phpinfowp-pro-page">
     <div class="phpinfowp-page-header" style="display:flex; justify-content:space-between; align-items:center;">
         <div>
-            <h1>API Monitor <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Track slow outbound API requests that silently block page loads (last 24 hours).</p>
+            <h1>API Monitor <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Track slow outbound API requests that silently block page loads (last 24 hours).', 'phpinfo-wp'); ?></p>
         </div>
         <?php if ($stats): ?>
-            <button id="phpinfowp-clear-api-stats" class="button button-secondary">Reset Stats</button>
+            <button id="phpinfowp-clear-api-stats" class="button button-secondary"><?php _e('Reset Stats', 'phpinfo-wp'); ?></button>
         <?php endif; ?>
     </div>
 
     <?php if (!$stats): ?>
         <div class="notice notice-info inline">
-            <p><strong>Monitoring Active.</strong> We are now tracking outbound HTTP requests. No external API calls have been made yet.</p>
+            <p><strong><?php _e('Monitoring Active.', 'phpinfo-wp'); ?></strong> We are now tracking outbound HTTP requests. No external API calls have been made yet.</p>
         </div>
-        <p>To test this, you can trigger a plugin update check or wait for normal site traffic to generate API calls.</p>
-        <button id="phpinfowp-test-api" class="button button-primary">Trigger Dummy Slow Request (1.5s)</button>
+        <p><?php _e('To test this, you can trigger a plugin update check or wait for normal site traffic to generate API calls.', 'phpinfo-wp'); ?></p>
+        <button id="phpinfowp-test-api" class="button button-primary"><?php _e('Trigger Dummy Slow Request (1.5s)', 'phpinfo-wp'); ?></button>
     <?php else: ?>
 
         <!-- Summary Cards -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin-bottom:24px;">
             <div style="background:#fff; border:1px solid #ccd0d4; border-left:4px solid #007cba; padding:16px; border-radius:4px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
-                <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;">Total Waiting Time</div>
+                <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;"><?php _e('Total Waiting Time', 'phpinfo-wp'); ?></div>
                 <div style="font-size:28px; font-weight:300; color:#1d2327;">
                     <?php echo number_format($total_time, 2); ?>s
                 </div>
@@ -62,7 +62,7 @@ foreach ($stats as $host => $data) {
             </div>
 
             <div style="background:#fff; border:1px solid #ccd0d4; border-left:4px solid <?php echo $slowest_max > 2.0 ? '#d63638' : '#dba617'; ?>; padding:16px; border-radius:4px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
-                <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;">Slowest API Response</div>
+                <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;"><?php _e('Slowest API Response', 'phpinfo-wp'); ?></div>
                 <div style="font-size:28px; font-weight:300; color:#1d2327;">
                     <?php echo number_format($slowest_max, 2); ?>s
                 </div>
@@ -71,19 +71,19 @@ foreach ($stats as $host => $data) {
         </div>
         
         <div style="margin-bottom:16px;">
-            <button id="phpinfowp-test-api" class="button button-secondary">Trigger Dummy Slow Request (1.5s)</button>
+            <button id="phpinfowp-test-api" class="button button-secondary"><?php _e('Trigger Dummy Slow Request (1.5s)', 'phpinfo-wp'); ?></button>
         </div>
 
         <!-- Details Table -->
         <table class="wp-list-table widefat fixed striped">
             <thead>
                 <tr>
-                    <th scope="col" style="width:30%;">Domain (Endpoint)</th>
-                    <th scope="col">Requests</th>
-                    <th scope="col">Avg Time</th>
-                    <th scope="col">Max Time</th>
-                    <th scope="col">Total Time</th>
-                    <th scope="col">Errors/Timeouts</th>
+                    <th scope="col" style="width:30%;"><?php _e('Domain (Endpoint)', 'phpinfo-wp'); ?></th>
+                    <th scope="col"><?php _e('Requests', 'phpinfo-wp'); ?></th>
+                    <th scope="col"><?php _e('Avg Time', 'phpinfo-wp'); ?></th>
+                    <th scope="col"><?php _e('Max Time', 'phpinfo-wp'); ?></th>
+                    <th scope="col"><?php _e('Total Time', 'phpinfo-wp'); ?></th>
+                    <th scope="col"><?php _e('Errors/Timeouts', 'phpinfo-wp'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -109,7 +109,7 @@ foreach ($stats as $host => $data) {
         <p class="description" style="margin-top:12px;">
             This table tracks all external HTTP requests made via <code>wp_remote_get</code>, <code>wp_remote_post</code>, and the core HTTP API. 
             Because PHP is synchronous, a 3-second API call blocks your WordPress page load for 3 entire seconds. 
-            <strong>Any API with a max time over 2.0s should be investigated.</strong>
+            <strong><?php _e('Any API with a max time over 2.0s should be investigated.', 'phpinfo-wp'); ?></strong>
         </p>
 
     <?php endif; ?>

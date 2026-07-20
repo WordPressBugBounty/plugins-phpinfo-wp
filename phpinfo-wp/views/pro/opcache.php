@@ -31,8 +31,8 @@ $s = Phpinfo_WP_OPcache::status();
 <div class="phpinfowp-pro-page">
     <div class="phpinfowp-page-header">
         <div>
-            <h1>OPcache Dashboard <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Check OPcache memory usage, hit rates, and list cached scripts.</p>
+            <h1>OPcache Dashboard <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Check OPcache memory usage, hit rates, and list cached scripts.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -42,11 +42,11 @@ $s = Phpinfo_WP_OPcache::status();
 
     <?php if (!Phpinfo_WP_OPcache::is_available()): ?>
         <div class="notice notice-warning inline">
-            <p><strong>OPcache is not available</strong> on this server. Ask your host to enable the <code>opcache</code> PHP extension — it's free and can cut PHP CPU usage by 50–80%.</p>
+            <p><strong><?php _e('OPcache is not available', 'phpinfo-wp'); ?></strong> on this server. Ask your host to enable the <code>opcache</code> PHP extension — it's free and can cut PHP CPU usage by 50–80%.</p>
         </div>
     <?php elseif (!$s || !$s['enabled']): ?>
         <div class="notice notice-warning inline">
-            <p><strong>OPcache extension is installed but disabled.</strong> Enable it in <code>php.ini</code>: <code>opcache.enable=1</code></p>
+            <p><strong><?php _e('OPcache extension is installed but disabled.', 'phpinfo-wp'); ?></strong> Enable it in <code>php.ini</code>: <code>opcache.enable=1</code></p>
         </div>
     <?php else: ?>
 
@@ -57,7 +57,7 @@ $s = Phpinfo_WP_OPcache::status();
                     <?php echo $s['hit_rate'] !== null ? esc_html($s['hit_rate']) . '%' : 'N/A'; ?>
                 </div>
                 <div>
-                    <h3 style="margin:0 0 4px">Hit Rate</h3>
+                    <h3 style="margin:0 0 4px"><?php _e('Hit Rate', 'phpinfo-wp'); ?></h3>
                     <p style="margin:0;color:#666;font-size:13px">
                         <?php echo number_format($s['hits']); ?> hits /
                         <?php echo number_format($s['misses']); ?> misses
@@ -71,7 +71,7 @@ $s = Phpinfo_WP_OPcache::status();
             </div>
 
             <div class="phpinfowp-opcache-card">
-                <h3 style="margin-top:0">Memory Usage</h3>
+                <h3 style="margin-top:0"><?php _e('Memory Usage', 'phpinfo-wp'); ?></h3>
                 <div class="phpinfowp-progress-bar-wrap">
                     <div class="phpinfowp-progress-bar" style="width:<?php echo min(100, $s['memory_pct']); ?>%;background:<?php echo $s['memory_pct'] > 85 ? '#d63638' : '#777BB3'; ?>"></div>
                 </div>
@@ -84,7 +84,7 @@ $s = Phpinfo_WP_OPcache::status();
             </div>
 
             <div class="phpinfowp-opcache-card">
-                <h3 style="margin-top:0">Cached Scripts</h3>
+                <h3 style="margin-top:0"><?php _e('Cached Scripts', 'phpinfo-wp'); ?></h3>
                 <div class="phpinfowp-progress-bar-wrap">
                     <?php $script_pct = $s['max_scripts'] > 0 ? round($s['cached_scripts'] / $s['max_scripts'] * 100, 1) : 0; ?>
                     <div class="phpinfowp-progress-bar" style="width:<?php echo min(100, $script_pct); ?>%;background:<?php echo $script_pct > 90 ? '#d63638' : '#00a32a'; ?>"></div>
@@ -103,9 +103,9 @@ $s = Phpinfo_WP_OPcache::status();
         </div>
 
         <!-- Key directives -->
-        <h2 style="margin-top:28px">Key Directives</h2>
+        <h2 style="margin-top:28px"><?php _e('Key Directives', 'phpinfo-wp'); ?></h2>
         <table class="wp-list-table widefat fixed striped" style="max-width:700px">
-            <thead><tr><th>Directive</th><th>Value</th></tr></thead>
+            <thead><tr><th><?php _e('Directive', 'phpinfo-wp'); ?></th><th><?php _e('Value', 'phpinfo-wp'); ?></th></tr></thead>
             <tbody>
             <?php
             $show = [
@@ -135,11 +135,11 @@ $s = Phpinfo_WP_OPcache::status();
             <?php wp_nonce_field('phpinfowp_opcache_nonce'); ?>
             <input type="hidden" name="phpinfowp_opcache_reset" value="1">
             <button type="submit" class="button button-secondary" <?php if ($reset_disabled || $is_restricted) echo 'disabled'; ?>>Clear OPcache</button>
-            <span style="margin-left:8px;font-size:12px;color:#666">Forces recompilation of all cached PHP files.</span>
+            <span style="margin-left:8px;font-size:12px;color:#666"><?php _e('Forces recompilation of all cached PHP files.', 'phpinfo-wp'); ?></span>
             <?php if ($reset_disabled): ?>
-                <p style="color:#d63638;font-size:12px;margin-top:8px">⚠️ <strong>Clear OPcache disabled:</strong> Your host has added <code>opcache_reset</code> to the PHP <code>disable_functions</code> list.</p>
+                <p style="color:#d63638;font-size:12px;margin-top:8px">⚠️ <strong><?php _e('Clear OPcache disabled:', 'phpinfo-wp'); ?></strong> Your host has added <code>opcache_reset</code> to the PHP <code>disable_functions</code> list.</p>
             <?php elseif ($is_restricted): ?>
-                <p style="color:#d63638;font-size:12px;margin-top:8px">⚠️ <strong>Clear OPcache disabled:</strong> Your host has restricted OPcache API access via <code>opcache.restrict_api</code>.</p>
+                <p style="color:#d63638;font-size:12px;margin-top:8px">⚠️ <strong><?php _e('Clear OPcache disabled:', 'phpinfo-wp'); ?></strong> Your host has restricted OPcache API access via <code>opcache.restrict_api</code>.</p>
             <?php endif; ?>
         </form>
 

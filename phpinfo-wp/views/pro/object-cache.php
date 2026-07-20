@@ -34,8 +34,8 @@ $s = Phpinfo_WP_Object_Cache::status();
 <div class="phpinfowp-pro-page">
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Object Cache Diagnostics <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">Monitor persistent object cache drop-ins, connection speed, and hit/miss ratios.</p>
+            <h1>Object Cache Diagnostics <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Monitor persistent object cache drop-ins, connection speed, and hit/miss ratios.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -45,18 +45,18 @@ $s = Phpinfo_WP_Object_Cache::status();
 
     <?php if (!$has_dropin): ?>
         <div class="notice notice-warning inline">
-            <p><strong>Object Caching is not active.</strong> The <code>wp-content/object-cache.php</code> drop-in is missing.</p>
+            <p><strong><?php _e('Object Caching is not active.', 'phpinfo-wp'); ?></strong> The <code>wp-content/object-cache.php</code> drop-in is missing.</p>
             <?php if ($has_redis): ?>
-                <p>💡 However, the <strong>Redis</strong> PHP extension is installed on your server! You should install a plugin like <a href="<?php echo esc_url(admin_url('plugin-install.php?tab=search&type=term&s=redis+object+cache')); ?>">Redis Object Cache</a> to instantly speed up database queries.</p>
+                <p>💡 However, the <strong><?php _e('Redis', 'phpinfo-wp'); ?></strong> PHP extension is installed on your server! You should install a plugin like <a href="<?php echo esc_url(admin_url('plugin-install.php?tab=search&type=term&s=redis+object+cache')); ?>">Redis Object Cache</a> to instantly speed up database queries.</p>
             <?php elseif ($has_memcached): ?>
-                <p>💡 However, the <strong>Memcached</strong> PHP extension is installed on your server! You can use it to speed up database queries.</p>
+                <p>💡 However, the <strong><?php _e('Memcached', 'phpinfo-wp'); ?></strong> PHP extension is installed on your server! You can use it to speed up database queries.</p>
             <?php else: ?>
-                <p>Neither Redis nor Memcached PHP extensions are installed. Ask your host to enable one (Redis is recommended).</p>
+                <p><?php _e('Neither Redis nor Memcached PHP extensions are installed. Ask your host to enable one (Redis is recommended).', 'phpinfo-wp'); ?></p>
             <?php endif; ?>
         </div>
     <?php elseif (!$s): ?>
         <div class="notice notice-warning inline">
-            <p><strong>Object Cache is active, but stats are unavailable.</strong> The drop-in might not expose connection details or metrics.</p>
+            <p><strong><?php _e('Object Cache is active, but stats are unavailable.', 'phpinfo-wp'); ?></strong> The drop-in might not expose connection details or metrics.</p>
         </div>
     <?php else: ?>
 
@@ -67,19 +67,19 @@ $s = Phpinfo_WP_Object_Cache::status();
                     <?php echo $s['hit_rate'] !== null ? esc_html($s['hit_rate']) . '%' : 'N/A'; ?>
                 </div>
                 <div>
-                    <h3 style="margin:0 0 4px">Hit Rate</h3>
+                    <h3 style="margin:0 0 4px"><?php _e('Hit Rate', 'phpinfo-wp'); ?></h3>
                     <p style="margin:0;color:#666;font-size:13px">
                         <?php echo number_format($s['hits']); ?> hits /
                         <?php echo number_format($s['misses']); ?> misses
                     </p>
                     <p style="margin:6px 0 0;font-size:13px;color:#444">
-                        <strong>Engine:</strong> <?php echo esc_html(ucfirst($s['type'])); ?>
+                        <strong><?php _e('Engine:', 'phpinfo-wp'); ?></strong> <?php echo esc_html(ucfirst($s['type'])); ?>
                     </p>
                 </div>
             </div>
 
             <div class="phpinfowp-opcache-card">
-                <h3 style="margin-top:0">Memory Usage</h3>
+                <h3 style="margin-top:0"><?php _e('Memory Usage', 'phpinfo-wp'); ?></h3>
                 <?php if ($s['memory_total'] > 0): ?>
                 <div class="phpinfowp-progress-bar-wrap">
                     <div class="phpinfowp-progress-bar" style="width:<?php echo min(100, $s['memory_pct']); ?>%;background:<?php echo $s['memory_pct'] > 85 ? '#d63638' : '#777BB3'; ?>"></div>
@@ -102,12 +102,12 @@ $s = Phpinfo_WP_Object_Cache::status();
             </div>
 
             <div class="phpinfowp-opcache-card">
-                <h3 style="margin-top:0">Keys & Evictions</h3>
+                <h3 style="margin-top:0"><?php _e('Keys & Evictions', 'phpinfo-wp'); ?></h3>
                 <p style="margin:6px 0 0;font-size:13px;color:#444">
-                    <strong>Keys in Memory:</strong> <?php echo number_format($s['keys']); ?>
+                    <strong><?php _e('Keys in Memory:', 'phpinfo-wp'); ?></strong> <?php echo number_format($s['keys']); ?>
                 </p>
                 <p style="margin:6px 0 0;font-size:13px;color:#444">
-                    <strong>Evictions:</strong> <?php echo number_format($s['evictions']); ?>
+                    <strong><?php _e('Evictions:', 'phpinfo-wp'); ?></strong> <?php echo number_format($s['evictions']); ?>
                 </p>
                 <?php if ($s['evictions'] > 0): ?>
                     <p style="margin:6px 0 0;font-size:12px;color:#d63638">
@@ -121,8 +121,8 @@ $s = Phpinfo_WP_Object_Cache::status();
         <form method="post" style="margin-top:20px" onsubmit="return confirm('Clear Object Cache? This will flush all database queries from memory.')">
             <?php wp_nonce_field('phpinfowp_objectcache_nonce'); ?>
             <input type="hidden" name="phpinfowp_objectcache_reset" value="1">
-            <button type="submit" class="button button-secondary">Flush Cache</button>
-            <span style="margin-left:8px;font-size:12px;color:#666">Forces the cache to be entirely rebuilt.</span>
+            <button type="submit" class="button button-secondary"><?php _e('Flush Cache', 'phpinfo-wp'); ?></button>
+            <span style="margin-left:8px;font-size:12px;color:#666"><?php _e('Forces the cache to be entirely rebuilt.', 'phpinfo-wp'); ?></span>
         </form>
 
     <?php endif; ?>

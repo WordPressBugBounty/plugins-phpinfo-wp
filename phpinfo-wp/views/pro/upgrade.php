@@ -33,9 +33,9 @@ $pillars = [
 <div class="phpinfowp-upgrade-gate">
     <div class="phpinfowp-upgrade-inner">
 
-        <div class="phpinfowp-upgrade-badge">PRO</div>
-        <h2 class="phpinfowp-upgrade-title">Upgrade to phpinfo() WP Pro</h2>
-        <p class="phpinfowp-upgrade-subtitle">The WordPress server health audit you can hand to clients.</p>
+        <div class="phpinfowp-upgrade-badge"><?php _e('PRO', 'phpinfo-wp'); ?></div>
+        <h2 class="phpinfowp-upgrade-title"><?php _e('Upgrade to phpinfo() WP Pro', 'phpinfo-wp'); ?></h2>
+        <p class="phpinfowp-upgrade-subtitle"><?php _e('The WordPress server health audit you can hand to clients.', 'phpinfo-wp'); ?></p>
 
         <div class="phpinfowp-upgrade-pillars">
             <?php foreach ($pillars as $p): ?>
@@ -55,26 +55,26 @@ $pillars = [
         </div>
 
         <div class="phpinfowp-upgrade-plans-header">
-            <h3 class="phpinfowp-upgrade-plans-title">Choose your plan</h3>
-            <p class="phpinfowp-upgrade-plans-note">Every plan unlocks <strong>every feature above</strong> — the only difference is the number of sites and update window.</p>
+            <h3 class="phpinfowp-upgrade-plans-title"><?php _e('Choose your plan', 'phpinfo-wp'); ?></h3>
+            <p class="phpinfowp-upgrade-plans-note"><?php _e('Every plan unlocks <strong>every feature above</strong> — the only difference is the number of sites and update window.', 'phpinfo-wp'); ?></p>
         </div>
 
         <div class="phpinfowp-upgrade-pricing">
             <div class="phpinfowp-upgrade-price-tier">
-                <div class="phpinfowp-upgrade-price-name">Single</div>
+                <div class="phpinfowp-upgrade-price-name"><?php _e('Single', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-upgrade-price-value">$29<small>/yr</small></div>
-                <div class="phpinfowp-upgrade-price-sub">1 site &middot; Essential features &middot; Branded reports</div>
+                <div class="phpinfowp-upgrade-price-sub"><?php _e('1 site · Essential features · Branded reports', 'phpinfo-wp'); ?></div>
             </div>
             <div class="phpinfowp-upgrade-price-tier is-featured">
-                <div class="phpinfowp-upgrade-price-name">Unlimited</div>
+                <div class="phpinfowp-upgrade-price-name"><?php _e('Unlimited', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-upgrade-price-value">$69<small>/yr</small></div>
-                <div class="phpinfowp-upgrade-price-sub">Unlimited sites &middot; White-labeled &middot; Weekly digests</div>
-                <div class="phpinfowp-upgrade-price-best">Best value</div>
+                <div class="phpinfowp-upgrade-price-sub"><?php _e('Unlimited sites · White-labeled · Weekly digests', 'phpinfo-wp'); ?></div>
+                <div class="phpinfowp-upgrade-price-best"><?php _e('Best value', 'phpinfo-wp'); ?></div>
             </div>
             <div class="phpinfowp-upgrade-price-tier">
-                <div class="phpinfowp-upgrade-price-name">Lifetime</div>
+                <div class="phpinfowp-upgrade-price-name"><?php _e('Lifetime', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-upgrade-price-value">$149<small>once</small></div>
-                <div class="phpinfowp-upgrade-price-sub">Unlimited sites &middot; Lifetime updates &middot; White-labeled</div>
+                <div class="phpinfowp-upgrade-price-sub"><?php _e('Unlimited sites · Lifetime updates · White-labeled', 'phpinfo-wp'); ?></div>
             </div>
         </div>
 
@@ -87,8 +87,6 @@ $pillars = [
             </a>
         </div>
 
-        <p class="phpinfowp-upgrade-footer">
-            14-day money-back guarantee &middot; Instant delivery &middot; Site-locked license
-        </p>
+        <p class="phpinfowp-upgrade-footer"><?php _e('14-day money-back guarantee · Instant delivery · Site-locked license', 'phpinfo-wp'); ?></p>
     </div>
 </div>

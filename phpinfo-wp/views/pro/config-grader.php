@@ -13,8 +13,8 @@ if (!$is_pro) {
 
         <div class="phpinfowp-page-header">
             <div>
-                <h1>Config Grader</h1>
-                <p class="phpinfowp-page-subtitle">PHP configuration scored against WordPress best practices</p>
+                <h1><?php _e('Config Grader', 'phpinfo-wp'); ?></h1>
+                <p class="phpinfowp-page-subtitle"><?php _e('PHP configuration scored against WordPress best practices', 'phpinfo-wp'); ?></p>
             </div>
         </div>
 
@@ -38,16 +38,28 @@ if (!$is_pro) {
         </div>
 
         <div class="phpinfowp-grader-teaser">
-            <div class="phpinfowp-grader-teaser-blur" aria-hidden="true">
-                <div class="phpinfowp-teaser-row"><span class="dashicons dashicons-dismiss" style="color:#d63638"></span> <code>memory_limit</code> — Current: <code>128M</code> → Recommended: <code>256M or higher</code></div>
-                <div class="phpinfowp-teaser-row"><span class="dashicons dashicons-warning" style="color:#dba617"></span> <code>max_input_vars</code> — Current: <code>1000</code> → Recommended: <code>3000 or more</code></div>
-                <div class="phpinfowp-teaser-row"><span class="dashicons dashicons-dismiss" style="color:#d63638"></span> <code>display_errors</code> — Current: <code>On</code> → Recommended: <code>Off</code></div>
-                <div class="phpinfowp-teaser-row"><span class="dashicons dashicons-dismiss" style="color:#d63638"></span> <code>opcache.enable</code> — Current: <code>Off</code> → Recommended: <code>On</code></div>
+            <div class="phpinfowp-grader-teaser-skeleton" aria-hidden="true" style="padding: 18px 22px; pointer-events: none; user-select: none;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;border-bottom:1px solid #f0f0f0;padding-bottom:12px;">
+                    <div style="width:16px;height:16px;border-radius:50%;background:#fee2e2;flex-shrink:0;"></div>
+                    <div style="height:11px;width:35%;background:#cbd5e1;border-radius:4px;"></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;border-bottom:1px solid #f0f0f0;padding-bottom:12px;">
+                    <div style="width:16px;height:16px;border-radius:50%;background:#fef3c7;flex-shrink:0;"></div>
+                    <div style="height:11px;width:45%;background:#cbd5e1;border-radius:4px;"></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;border-bottom:1px solid #f0f0f0;padding-bottom:12px;">
+                    <div style="width:16px;height:16px;border-radius:50%;background:#fee2e2;flex-shrink:0;"></div>
+                    <div style="height:11px;width:30%;background:#cbd5e1;border-radius:4px;"></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:16px;height:16px;border-radius:50%;background:#fee2e2;flex-shrink:0;"></div>
+                    <div style="height:11px;width:40%;background:#cbd5e1;border-radius:4px;"></div>
+                </div>
             </div>
             <div class="phpinfowp-grader-teaser-cta">
-                <h3>See every failing directive and how to fix it</h3>
-                <p>Pro unlocks the full breakdown across Performance, Security, OPcache, and Session categories — with the exact recommended values and one-line explanations.</p>
-                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="phpinfowp-upgrade-cta">Unlock full details — Get Pro &rarr;</a>
+                <h3><?php _e('See every failing directive and how to fix it', 'phpinfo-wp'); ?></h3>
+                <p><?php _e('Pro unlocks the full breakdown across Performance, Security, OPcache, and Session categories — with the exact recommended values and one-line explanations.', 'phpinfo-wp'); ?></p>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="phpinfowp-upgrade-cta"><?php _e('Unlock full details — Get Pro →', 'phpinfo-wp'); ?></a>
             </div>
         </div>
 
@@ -135,7 +147,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
 <?php if ($settle_left > 0): ?>
     <div class="notice notice-info" style="margin:0 0 16px"><p>
         <span class="dashicons dashicons-update" style="vertical-align:middle"></span>
-        <strong>Auto-fix applied — values are still propagating.</strong>
+        <strong><?php _e('Auto-fix applied — values are still propagating.', 'phpinfo-wp'); ?></strong>
         <code><?php echo esc_html(basename($target_info['file'])); ?></code> changes don't apply to the page that wrote them and are cached briefly by PHP.
         The override check is paused for about <strong><?php echo esc_html($settle_left > 60 ? ceil($settle_left / 60) . ' more minute(s)' : $settle_left . ' more seconds'); ?></strong>, then runs automatically — reload after that to confirm.
     </p></div>
@@ -149,8 +161,8 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Config Grader <span class="phpinfowp-pro-badge">PRO</span></h1>
-            <p class="phpinfowp-page-subtitle">PHP configuration scored against WordPress, WooCommerce, and security best practices</p>
+            <h1>Config Grader <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('PHP configuration scored against WordPress, WooCommerce, and security best practices', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -184,9 +196,9 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
             <table style="width:100%;border-collapse:collapse;font-size:12.5px">
                 <thead>
                     <tr style="text-align:left;color:#777;border-bottom:1px solid #f0c8c8">
-                        <th style="padding:4px 6px;font-weight:600">Directive</th>
-                        <th style="padding:4px 6px;font-weight:600">We wrote</th>
-                        <th style="padding:4px 6px;font-weight:600">PHP reports</th>
+                        <th style="padding:4px 6px;font-weight:600"><?php _e('Directive', 'phpinfo-wp'); ?></th>
+                        <th style="padding:4px 6px;font-weight:600"><?php _e('We wrote', 'phpinfo-wp'); ?></th>
+                        <th style="padding:4px 6px;font-weight:600"><?php _e('PHP reports', 'phpinfo-wp'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -200,7 +212,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                 </tbody>
             </table>
             <p style="margin:10px 0 0;color:#666;font-size:12px">
-                <strong>What to do:</strong> set these directives via your hosting control panel's PHP options (cPanel "MultiPHP INI Editor", Hostinger "PHP Configuration", etc.), or ask host support to raise the limit. Then revert the auto-fix block to keep your config file clean.
+                <strong><?php _e('What to do:', 'phpinfo-wp'); ?></strong> set these directives via your hosting control panel's PHP options (cPanel "MultiPHP INI Editor", Hostinger "PHP Configuration", etc.), or ask host support to raise the limit. Then revert the auto-fix block to keep your config file clean.
             </p>
         </div>
     <?php endif; ?>
@@ -223,7 +235,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                     <?php foreach ($fixable_keys as $k): ?>
                         <input type="hidden" name="fix_keys[]" value="<?php echo esc_attr($k); ?>">
                     <?php endforeach; ?>
-                    <button type="submit" class="button button-primary" style="font-size:14px; padding:6px 16px; height:auto; background:#007cba; border-color:#007cba;">1-Click Optimize Server &rarr;</button>
+                    <button type="submit" class="button button-primary" style="font-size:14px; padding:6px 16px; height:auto; background:#007cba; border-color:#007cba;"><?php _e('1-Click Optimize Server →', 'phpinfo-wp'); ?></button>
                 </form>
             </div>
         <?php else: ?>
@@ -240,26 +252,26 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                     <?php foreach ($fixable_keys as $k): ?>
                         <input type="hidden" name="fix_keys[]" value="<?php echo esc_attr($k); ?>">
                     <?php endforeach; ?>
-                    <button type="submit" class="button button-primary">Apply Server Profile &rarr;</button>
+                    <button type="submit" class="button button-primary"><?php _e('Apply Server Profile →', 'phpinfo-wp'); ?></button>
                 </form>
             </div>
         <?php endif; ?>
     <?php elseif ($fixable_keys && !$target_writable): ?>
         <div class="notice notice-warning inline" style="margin:0 0 18px"><p>
-            <strong>Auto-fix unavailable:</strong> Your site root or <code><?php echo esc_html(basename($target_info['file'])); ?></code> is not writable by PHP. Fix permissions, or apply the recommended values manually via the <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-htaccess')); ?>">PHP Config editor</a>.
+            <strong><?php _e('Auto-fix unavailable:', 'phpinfo-wp'); ?></strong> Your site root or <code><?php echo esc_html(basename($target_info['file'])); ?></code> is not writable by PHP. Fix permissions, or apply the recommended values manually via the <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-htaccess')); ?>">PHP Config editor</a>.
         </p></div>
     <?php endif; ?>
 
     <!-- Detected context — what we tuned the recommendations for -->
     <div class="phpinfowp-cg-context">
-        <div class="phpinfowp-cg-context-label">Recommendations tuned for this site</div>
+        <div class="phpinfowp-cg-context-label"><?php _e('Recommendations tuned for this site', 'phpinfo-wp'); ?></div>
         <div class="phpinfowp-cg-context-row">
             <span class="phpinfowp-cg-chip phpinfowp-cg-chip-php">PHP <?php echo esc_html($ctx['php_full']); ?></span>
             <?php if ($ctx['is_https']): ?>
-                <span class="phpinfowp-cg-chip">HTTPS</span>
+                <span class="phpinfowp-cg-chip"><?php _e('HTTPS', 'phpinfo-wp'); ?></span>
             <?php endif; ?>
             <?php if (!$ctx['is_production']): ?>
-                <span class="phpinfowp-cg-chip phpinfowp-cg-chip-dev">Development mode</span>
+                <span class="phpinfowp-cg-chip phpinfowp-cg-chip-dev"><?php _e('Development mode', 'phpinfo-wp'); ?></span>
             <?php endif; ?>
             <?php if ($ctx['host'] && isset($host_names[$ctx['host']])): ?>
                 <span class="phpinfowp-cg-chip phpinfowp-cg-chip-host"><?php echo esc_html($host_names[$ctx['host']]); ?> detected</span>
@@ -327,7 +339,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                     <?php echo $sev_pill($x['severity'], $x['severity_label']); ?>
                 </div>
                 <div class="phpinfowp-cg-cross-reason"><?php echo esc_html($x['reason']); ?></div>
-                <div class="phpinfowp-cg-cross-fix"><strong>Fix:</strong> <?php echo esc_html($x['fix']); ?></div>
+                <div class="phpinfowp-cg-cross-fix"><strong><?php _e('Fix:', 'phpinfo-wp'); ?></strong> <?php echo esc_html($x['fix']); ?></div>
             </div>
         <?php endforeach; ?>
     </div>
@@ -353,7 +365,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                 <?php elseif ($cat_warns): ?>
                     <span class="phpinfowp-grade-section-badge" style="background:#dba617"><?php echo $cat_warns; ?> warnings</span>
                 <?php else: ?>
-                    <span class="phpinfowp-grade-section-badge" style="background:#00a32a">All good</span>
+                    <span class="phpinfowp-grade-section-badge" style="background:#00a32a"><?php _e('All good', 'phpinfo-wp'); ?></span>
                 <?php endif; ?>
             </h2>
 
@@ -374,12 +386,13 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                                 <?php echo $sev_pill($c['severity'], $c['severity_label']); ?>
                             <?php endif; ?>
                             <?php if ($c['status'] !== 'pass' && Phpinfo_WP_Config_Grader_Fixer::can_fix($c['key'])): ?>
-                                <form method="post" style="display:inline-block;margin-left:8px;vertical-align:middle">
-                                    <?php wp_nonce_field('phpinfowp_autofix_nonce'); ?>
-                                    <input type="hidden" name="phpinfowp_autofix" value="1">
-                                    <input type="hidden" name="fix_keys[]" value="<?php echo esc_attr($c['key']); ?>">
-                                    <button type="submit" class="button button-small">Fix this →</button>
-                                </form>
+                                <button type="button" class="button button-small phpinfowp-trigger-autofix"
+                                        style="margin-left:8px;vertical-align:middle"
+                                        data-key="<?php echo esc_attr($c['key']); ?>"
+                                        data-current="<?php echo esc_attr($c['value']); ?>"
+                                        data-recommended="<?php echo esc_attr($c['target_label'] ?? $c['good']); ?>">
+                                    <?php _e('Fix this →', 'phpinfo-wp'); ?>
+                                </button>
                             <?php elseif ($c['status'] !== 'pass' && ($note = Phpinfo_WP_Config_Grader_Fixer::manual_note($c['key']))): ?>
                                 <span style="margin-left:8px;font-size:11px;color:#888;font-style:italic">manual fix only · <?php echo esc_html($note); ?></span>
                             <?php endif; ?>
@@ -401,7 +414,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                         <?php if (!empty($c['live_evidence'])): ?>
                             <div class="phpinfowp-grade-check-live">
                                 <span class="dashicons dashicons-chart-line" aria-hidden="true"></span>
-                                <strong>Observed:</strong> <?php echo esc_html($c['live_evidence']); ?>
+                                <strong><?php _e('Observed:', 'phpinfo-wp'); ?></strong> <?php echo esc_html($c['live_evidence']); ?>
                             </div>
                         <?php endif; ?>
                         <?php if ($c['status'] !== 'pass' && !empty($c['host_fix'])): ?>
@@ -433,7 +446,134 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
         <form method="post" style="margin-top:8px" onsubmit="return confirm('Revert the entire auto-fix block? This removes every value phpinfo() WP added — manual edits to your config file are untouched.')">
             <?php wp_nonce_field('phpinfowp_autofix_revert_nonce'); ?>
             <input type="hidden" name="phpinfowp_autofix_revert" value="1">
-            <button type="submit" class="button-link" style="color:#a00;font-size:12px">Revert all auto-fix changes</button>
+            <button type="submit" class="button-link" style="color:#a00;font-size:12px"><?php _e('Revert all auto-fix changes', 'phpinfo-wp'); ?></button>
         </form>
     <?php endif; ?>
 </div>
+
+<!-- Contextual Auto-Fix Modal -->
+<div id="phpinfowp-autofix-modal" class="phpinfowp-modal" role="dialog" aria-modal="true" aria-labelledby="phpinfowp-modal-title-el">
+    <div class="phpinfowp-modal-content">
+        <div class="phpinfowp-modal-header">
+            <div style="width:36px;height:36px;border-radius:8px;background:rgba(119, 123, 179, 0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <span class="dashicons dashicons-admin-tools" style="font-size:20px;width:20px;height:20px;color:#777BB3"></span>
+            </div>
+            <h2 id="phpinfowp-modal-title-el" class="phpinfowp-modal-title"><?php _e('Confirm Auto-Fix', 'phpinfo-wp'); ?></h2>
+        </div>
+        <div class="phpinfowp-modal-body">
+            <p><?php _e('You are about to automatically tune the following configuration directive:', 'phpinfo-wp'); ?></p>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:12px 14px; margin: 14px 0; font-family:monospace; font-size:13px;">
+                <div style="margin-bottom:6px;"><strong>Directive:</strong> <code id="phpinfowp-modal-key" style="color:#2c3338;"></code></div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span>Current: <code id="phpinfowp-modal-current" style="color:#d63638;"></code></span>
+                    <span style="color:#94a3b8;">&rarr;</span>
+                    <span>New Value: <code id="phpinfowp-modal-recommended" style="color:#00a32a;"></code></span>
+                </div>
+            </div>
+            <p>
+                <?php printf(
+                    __('This action will write an override rule directly to your %s file.', 'phpinfo-wp'),
+                    '<code>' . esc_html(basename($target_info['file'])) . '</code>'
+                ); ?>
+            </p>
+            <p style="font-size:12px; color:#64748b; font-style:italic; margin-top:10px; line-height:1.4;">
+                💡 <?php _e('Note: We wrap all auto-fix rules inside a custom section. You can revert this entire block of changes at any time using the revert button below the checks list.', 'phpinfo-wp'); ?>
+            </p>
+        </div>
+        <div class="phpinfowp-modal-footer">
+            <form method="post" id="phpinfowp-autofix-form">
+                <?php wp_nonce_field('phpinfowp_autofix_nonce'); ?>
+                <input type="hidden" name="phpinfowp_autofix" value="1">
+                <input type="hidden" name="fix_keys[]" id="phpinfowp-modal-input-key" value="">
+                <button type="button" class="button phpinfowp-modal-close-btn" style="margin-right:4px;"><?php _e('Cancel', 'phpinfo-wp'); ?></button>
+                <button type="submit" class="button button-primary" style="background:#777BB3; border-color:#777BB3;"><?php _e('Apply Auto-Fix', 'phpinfo-wp'); ?></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.phpinfowp-modal {
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.phpinfowp-modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border: 1px solid #e2e8f0;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.phpinfowp-modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+.phpinfowp-modal.is-open .phpinfowp-modal-content {
+    transform: scale(1);
+}
+.phpinfowp-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.phpinfowp-modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d2327;
+}
+.phpinfowp-modal-body {
+    font-size: 13.5px;
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+.phpinfowp-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+</style>
+
+<script>
+jQuery(document).ready(function($) {
+    var $modal = $('#phpinfowp-autofix-modal');
+    
+    $(document).on('click', '.phpinfowp-trigger-autofix', function(e) {
+        e.preventDefault();
+        var key = $(this).data('key');
+        var current = $(this).data('current');
+        var recommended = $(this).data('recommended');
+        
+        $('#phpinfowp-modal-key').text(key);
+        $('#phpinfowp-modal-current').text(current);
+        $('#phpinfowp-modal-recommended').text(recommended);
+        $('#phpinfowp-modal-input-key').val(key);
+        
+        $modal.addClass('is-open');
+    });
+    
+    $(document).on('click', '.phpinfowp-modal-close-btn, .phpinfowp-modal', function(e) {
+        if ($(e.target).hasClass('phpinfowp-modal') || $(e.target).hasClass('phpinfowp-modal-close-btn')) {
+            $modal.removeClass('is-open');
+        }
+    });
+});
+</script>

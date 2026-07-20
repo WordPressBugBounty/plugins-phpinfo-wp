@@ -69,20 +69,50 @@ class Phpinfo_WP_Update_Audit {
      * synthesise the next major so the user can dry-run a future jump. An
      * explicit, validated ?target overrides both.
      */
-    public static function default_target(): string {
-        $avail = self::available_core_update();
-        if ($avail) return $avail;
-        return self::next_major(self::current_wp());
+    /**
+     * Retrieve the actual latest stable WordPress version from the local core update transient.
+     */
+    public static function latest_real_wp(): string {
+        $u = get_site_transient('update_core');
+        if (is_object($u) && !empty($u->updates) && is_array($u->updates)) {
+            foreach ($u->updates as $upd) {
+                if (!empty($upd->current)) {
+                    return (string) $upd->current;
+                }
+            }
+        }
+        return self::current_wp();
+    }
+
+    private static function major_minor(string $v): string {
+        if (preg_match('/^(\d+\.\d+)/', $v, $m)) {
+            return $m[1];
+        }
+        return $v;
     }
 
     private static function next_major(string $v): string {
+        $v = self::major_minor($v);
         if (preg_match('/^(\d+)\.(\d+)/', $v, $m)) {
             $maj = (int) $m[1]; $min = (int) $m[2];
-            // WP rolls 6.9 -> 7.0; otherwise bump the minor.
             if ($min >= 9) return ($maj + 1) . '.0';
             return $maj . '.' . ($min + 1);
         }
         return $v;
+    }
+
+    public static function default_target(): string {
+        $avail = self::available_core_update();
+        if ($avail) return self::major_minor($avail);
+        
+        $latest_real = self::latest_real_wp();
+        $current     = self::current_wp();
+        
+        if (version_compare($current, $latest_real, '<')) {
+            return self::major_minor($latest_real);
+        }
+        
+        return self::next_major($latest_real);
     }
 
     // -------------------------------------------------------------------------

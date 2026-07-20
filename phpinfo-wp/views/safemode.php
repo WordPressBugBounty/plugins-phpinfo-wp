@@ -34,6 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['safemode']) && $_GET['safemode'] === 'started') $notice = 'Troubleshooting Mode engaged — only your admin session sees plugins disabled. The site is normal for other visitors.';
 if (isset($_GET['safemode']) && $_GET['safemode'] === 'stopped') $notice = 'Troubleshooting Mode ended. All plugins restored.';
 
+$is_pro = Phpinfo_WP_License::is_valid();
+$show_success_modal = isset($_GET['safemode']) && $_GET['safemode'] === 'stopped' && !$is_pro;
+if ($show_success_modal) {
+    $notice = '';
+}
+
 $session     = Phpinfo_WP_Safemode::current_session();
 $is_active   = $session !== null;
 $mu_present  = Phpinfo_WP_Safemode::mu_plugin_installed();
@@ -195,12 +201,10 @@ $active_plugins = (array) get_option('active_plugins', []);
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1>Troubleshooting Mode</h1>
-            <p class="phpinfowp-page-subtitle">
-                Safely disable plugins or revert to a default theme <strong>just for your own admin session</strong> to debug
+            <h1><?php _e('Troubleshooting Mode', 'phpinfo-wp'); ?></h1>
+            <p class="phpinfowp-page-subtitle"><?php _e('Safely disable plugins or revert to a default theme <strong>just for your own admin session</strong> to debug
                 conflicts. Visitors see the site normally. Everything is reversible — no plugin is ever deactivated in the
-                database. Session expires automatically; you can also exit any time.
-            </p>
+                database. Session expires automatically; you can also exit any time.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
 
@@ -241,7 +245,7 @@ $active_plugins = (array) get_option('active_plugins', []);
                          style="font-size: 26px; font-weight: 800; color: #854d0e; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: -0.5px;">
                         <?php printf('%d:%02d', $mins, $secs); ?>
                     </div>
-                    <div style="font-size: 10px; color: #a16207; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">remaining</div>
+                    <div style="font-size: 10px; color: #a16207; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;"><?php _e('remaining', 'phpinfo-wp'); ?></div>
                 </div>
             </div>
 
@@ -258,13 +262,13 @@ $active_plugins = (array) get_option('active_plugins', []);
             </form>
         </div>
 
-        <h2 class="phpinfowp-section-heading">Plugins disabled in this session</h2>
+        <h2 class="phpinfowp-section-heading"><?php _e('Plugins disabled in this session', 'phpinfo-wp'); ?></h2>
         
         <table class="phpinfowp-table" style="max-width:780px">
             <thead>
                 <tr>
-                    <th>Plugin</th>
-                    <th style="width:200px">Status in DB</th>
+                    <th><?php _e('Plugin', 'phpinfo-wp'); ?></th>
+                    <th style="width:200px"><?php _e('Status in DB', 'phpinfo-wp'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -332,9 +336,7 @@ $active_plugins = (array) get_option('active_plugins', []);
                         <span class="dashicons dashicons-lock" style="color:#3b82f6; font-size:16px; width:16px; height:16px;"></span>
                         Session Bound
                     </div>
-                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;">
-                        Cookie is bound to your user account, time-limited, and expires automatically.
-                    </div>
+                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;"><?php _e('Cookie is bound to your user account, time-limited, and expires automatically.', 'phpinfo-wp'); ?></div>
                 </div>
                 <!-- Item 3 -->
                 <div class="phpinfowp-diff-item" style="border:1px solid #f1f5f9; background:#f8fafc; border-radius:8px; padding:16px; transition: all 0.2s ease;">
@@ -342,9 +344,7 @@ $active_plugins = (array) get_option('active_plugins', []);
                         <span class="dashicons dashicons-dismiss" style="color:#ef4444; font-size:16px; width:16px; height:16px;"></span>
                         No Lockouts
                     </div>
-                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;">
-                        Every page has an explicit <em>End</em> button. You cannot lock yourself out.
-                    </div>
+                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;"><?php _e('Every page has an explicit <em>End</em> button. You cannot lock yourself out.', 'phpinfo-wp'); ?></div>
                 </div>
                 <!-- Item 4 -->
                 <div class="phpinfowp-diff-item" style="border:1px solid #f1f5f9; background:#f8fafc; border-radius:8px; padding:16px; transition: all 0.2s ease;">
@@ -352,9 +352,7 @@ $active_plugins = (array) get_option('active_plugins', []);
                         <span class="dashicons dashicons-groups" style="color:#8b5cf6; font-size:16px; width:16px; height:16px;"></span>
                         Zero Visitor Impact
                     </div>
-                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;">
-                        Other visitors are unaffected — they see the live site with all plugins active.
-                    </div>
+                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;"><?php _e('Other visitors are unaffected — they see the live site with all plugins active.', 'phpinfo-wp'); ?></div>
                 </div>
             </div>
         </div>
@@ -364,7 +362,7 @@ $active_plugins = (array) get_option('active_plugins', []);
             <div class="phpinfowp-custom-alert" style="background:#eff6ff; border:1px solid #bfdbfe; border-left:4px solid #3b82f6; border-radius:8px; padding:16px 20px; margin-bottom:24px; display:flex; gap:12px; align-items:flex-start;">
                 <span class="dashicons dashicons-info-outline" style="color:#3b82f6; font-size:20px; width:20px; height:20px; flex-shrink:0; margin-top:2px;"></span>
                 <div>
-                    <strong style="color:#1e3a8a; font-size:13.5px; display:block; margin-bottom:4px;">Request-Level Isolation Recommended</strong>
+                    <strong style="color:#1e3a8a; font-size:13.5px; display:block; margin-bottom:4px;"><?php _e('Request-Level Isolation Recommended', 'phpinfo-wp'); ?></strong>
                     <p style="margin:0; font-size:13px; color:#1e40af; line-height:1.5;">
                         The optional <code>mu-plugin</code> helper isn't installed yet. Without it, disabled plugins are only hidden in the <em>admin panel and AJAX requests</em>, but will run normally on frontend pages. 
                         Engaging Troubleshooting Mode will attempt to install it automatically; if your directory is write-protected, it will fallback to admin-only isolation.
@@ -386,9 +384,7 @@ $active_plugins = (array) get_option('active_plugins', []);
                     <?php wp_nonce_field('phpinfowp_safemode_remove_mu_nonce'); ?>
                     <input type="hidden" name="phpinfowp_safemode_remove_mu" value="1">
                     <button type="submit" class="phpinfowp-btn phpinfowp-btn-danger" style="padding:4px 10px; font-size:11.5px; border-radius:4px;"
-                            onclick="return confirm('Remove the helper mu-plugin? Troubleshooting Mode will fallback to admin-only isolation.')">
-                        Uninstall Helper
-                    </button>
+                            onclick="return confirm('Remove the helper mu-plugin? Troubleshooting Mode will fallback to admin-only isolation.')"><?php _e('Uninstall Helper', 'phpinfo-wp'); ?></button>
                 </form>
             </div>
         <?php endif; ?>
@@ -398,7 +394,7 @@ $active_plugins = (array) get_option('active_plugins', []);
             <?php wp_nonce_field('phpinfowp_safemode_start_nonce'); ?>
             <input type="hidden" name="phpinfowp_safemode_start" value="1">
 
-            <h2 class="phpinfowp-section-heading">Pick what to disable</h2>
+            <h2 class="phpinfowp-section-heading"><?php _e('Pick what to disable', 'phpinfo-wp'); ?></h2>
 
             <div style="margin:8px 0 16px">
                 <label style="display:flex;align-items:center;gap:8px;font-weight:600; font-size:13px; color:#1e293b; cursor:pointer;">
@@ -412,9 +408,9 @@ $active_plugins = (array) get_option('active_plugins', []);
                 <thead>
                     <tr>
                         <th style="width:40px"></th>
-                        <th>Plugin</th>
-                        <th style="width:140px">Version</th>
-                        <th style="width:120px">Status</th>
+                        <th><?php _e('Plugin', 'phpinfo-wp'); ?></th>
+                        <th style="width:140px"><?php _e('Version', 'phpinfo-wp'); ?></th>
+                        <th style="width:120px"><?php _e('Status', 'phpinfo-wp'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -434,9 +430,9 @@ $active_plugins = (array) get_option('active_plugins', []);
                             <td style="font-family:monospace; font-size:12px; color:#475569;"><?php echo esc_html($info['Version']); ?></td>
                             <td>
                                 <?php if ($is_active): ?>
-                                    <span class="phpinfowp-badge phpinfowp-badge-success" style="padding: 2px 6px;">Active</span>
+                                    <span class="phpinfowp-badge phpinfowp-badge-success" style="padding: 2px 6px;"><?php _e('Active', 'phpinfo-wp'); ?></span>
                                 <?php else: ?>
-                                    <span class="phpinfowp-badge phpinfowp-badge-neutral" style="padding: 2px 6px;">Inactive</span>
+                                    <span class="phpinfowp-badge phpinfowp-badge-neutral" style="padding: 2px 6px;"><?php _e('Inactive', 'phpinfo-wp'); ?></span>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -450,7 +446,7 @@ $active_plugins = (array) get_option('active_plugins', []);
                     <span class="dashicons dashicons-admin-appearance" style="color:#777BB3; font-size:18px; width:18px; height:18px;"></span>
                     Theme Isolation
                 </h2>
-                <p style="margin:0 0 12px; font-size:12.5px; color:#64748b; line-height:1.4;">Revert your session to a default theme to verify if a layout conflict is originating from your current theme.</p>
+                <p style="margin:0 0 12px; font-size:12.5px; color:#64748b; line-height:1.4;"><?php _e('Revert your session to a default theme to verify if a layout conflict is originating from your current theme.', 'phpinfo-wp'); ?></p>
                 <label style="display:flex; align-items:center; gap:8px; font-weight:600; font-size:13px; color:#1e293b; cursor:pointer;">
                     <input type="checkbox" name="disable_theme" value="1">
                     Also revert to default WordPress theme (<?php echo esc_html(defined('WP_DEFAULT_THEME') && WP_DEFAULT_THEME ? WP_DEFAULT_THEME : 'twentytwentyfour'); ?>)
@@ -463,13 +459,13 @@ $active_plugins = (array) get_option('active_plugins', []);
                     <span class="dashicons dashicons-clock" style="color:#777BB3; font-size:18px; width:18px; height:18px;"></span>
                     Session Duration
                 </h2>
-                <p style="margin:0 0 12px; font-size:12.5px; color:#64748b; line-height:1.4;">Select how long you want Troubleshooting Mode to remain active before automatically expiring.</p>
+                <p style="margin:0 0 12px; font-size:12.5px; color:#64748b; line-height:1.4;"><?php _e('Select how long you want Troubleshooting Mode to remain active before automatically expiring.', 'phpinfo-wp'); ?></p>
                 <select name="duration" style="min-width:240px; padding:8px 12px; border-radius:6px; border:1px solid #cbd5e1; font-size:13px; background:#fff; color:#334155; outline:none;">
-                    <option value="900">15 minutes</option>
-                    <option value="1800">30 minutes</option>
-                    <option value="3600" selected>1 hour (recommended)</option>
-                    <option value="7200">2 hours</option>
-                    <option value="14400">4 hours (max)</option>
+                    <option value="900"><?php _e('15 minutes', 'phpinfo-wp'); ?></option>
+                    <option value="1800"><?php _e('30 minutes', 'phpinfo-wp'); ?></option>
+                    <option value="3600" selected><?php _e('1 hour (recommended)', 'phpinfo-wp'); ?></option>
+                    <option value="7200"><?php _e('2 hours', 'phpinfo-wp'); ?></option>
+                    <option value="14400"><?php _e('4 hours (max)', 'phpinfo-wp'); ?></option>
                 </select>
             </div>
 
@@ -479,7 +475,7 @@ $active_plugins = (array) get_option('active_plugins', []);
                     <span class="dashicons dashicons-shield-alt" style="font-size:16px; width:16px; height:16px; margin-top:2px;"></span>
                     Engage Troubleshooting Mode
                 </button>
-                <span id="phpinfowp-btn-helper" style="color:#94a3b8; font-size:12.5px;">Select at least one plugin to enable the button</span>
+                <span id="phpinfowp-btn-helper" style="color:#94a3b8; font-size:12.5px;"><?php _e('Select at least one plugin to enable the button', 'phpinfo-wp'); ?></span>
             </div>
         </form>
 
@@ -510,3 +506,77 @@ $active_plugins = (array) get_option('active_plugins', []);
 
     <?php endif; ?>
 </div>
+
+<?php if ($show_success_modal): ?>
+<!-- Troubleshooting Mode Success Modal -->
+<div id="phpinfowp-success-modal" class="phpinfowp-success-modal" role="dialog" aria-modal="true" aria-labelledby="phpinfowp-success-modal-title">
+    <div class="phpinfowp-success-modal-content">
+        <div style="width:54px; height:54px; border-radius:50%; background:rgba(34, 197, 94, 0.12); display:flex; align-items:center; justify-content:center; margin:0 auto 18px;">
+            <span class="dashicons dashicons-yes" style="font-size:32px; width:32px; height:32px; color:#22c55e;"></span>
+        </div>
+        <h2 id="phpinfowp-success-modal-title" style="margin: 0 0 10px; font-size: 20px; font-weight: 600; color: #1d2327;"><?php _e('Conflict resolved!', 'phpinfo-wp'); ?></h2>
+        <p style="margin: 0 0 24px; font-size: 13.5px; color: #475569; line-height: 1.5; text-align: center;">
+            <?php _e('Pro\'s Update Guard automatically intercepts updates and warns you about version incompatibilities before you activate them. Never experience another broken dashboard.', 'phpinfo-wp'); ?>
+        </p>
+        <div style="display:flex; justify-content:center; gap:12px;">
+            <button type="button" class="button phpinfowp-success-modal-close" style="height:40px; line-height:38px; font-size:13.5px; font-weight:600; padding:0 20px; border-radius:6px;"><?php _e('Dismiss', 'phpinfo-wp'); ?></button>
+            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary" style="background:#777BB3; border-color:#777BB3; height:40px; line-height:38px; font-size:13.5px; font-weight:600; padding:0 20px; border-radius:6px; text-decoration:none; display:inline-block;"><?php _e('Explore Pro Security', 'phpinfo-wp'); ?></a>
+        </div>
+    </div>
+</div>
+
+<style>
+.phpinfowp-success-modal {
+    display: none;
+    position: fixed;
+    z-index: 999999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.phpinfowp-success-modal.is-open {
+    display: flex;
+    opacity: 1;
+}
+.phpinfowp-success-modal-content {
+    background-color: #fff;
+    padding: 36px 30px;
+    border: 1px solid #e2e8f0;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.phpinfowp-success-modal.is-open .phpinfowp-success-modal-content {
+    transform: scale(1);
+}
+</style>
+
+<script>
+jQuery(document).ready(function($) {
+    var $modal = $('#phpinfowp-success-modal');
+    setTimeout(function() {
+        $modal.addClass('is-open');
+    }, 150);
+    
+    $(document).on('click', '.phpinfowp-success-modal-close, .phpinfowp-success-modal', function(e) {
+        if ($(e.target).hasClass('phpinfowp-success-modal') || $(e.target).hasClass('phpinfowp-success-modal-close')) {
+            $modal.removeClass('is-open');
+            if (window.history && window.history.replaceState) {
+                var url = window.location.href.split('?')[0] + '?page=phpinfowp-safemode';
+                window.history.replaceState({}, document.title, url);
+            }
+        }
+    });
+});
+</script>
+<?php endif; ?>

@@ -3,7 +3,7 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.0
-Stable tag: 7.2.4
+Stable tag: 7.2.5
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -156,6 +156,11 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 7. Audit Report (Pro): single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.2.5 =
+* **Improved**: Price increase reminder — Single Site plan increases from $29 to $39/year on August 31st. Lock in the current rate before then.
+* **Improved**: Enhanced upgrade prompts now surface your site's real config issues so you know exactly what Pro will fix on your site.
+* **Improved**: Minor UI polish across the admin dashboard and feature gate screens.
 
 = 7.2.4 =
 *   **NEW**: Complete visual plugin localization and translation files for French, German, Spanish, Italian, and Dutch.

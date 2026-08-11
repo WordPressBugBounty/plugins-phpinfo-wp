@@ -58,6 +58,9 @@ class Phpinfo_WP_Whats_New_Notice {
                     '<strong>Pro:</strong> all new features + white-label PDF reports, one-click fixes, SSL/security monitors. <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener"><strong>Upgrade from $29/year →</strong></a>',
                 ],
             ],
+            '7.2.5' => [
+                'headline' => 'phpinfo() WP 7.2.5',
+            ],
         ];
 
         if (!isset($catalog[PHPINFOWP_VERSION])) return;
@@ -67,7 +70,39 @@ class Phpinfo_WP_Whats_New_Notice {
             add_query_arg('phpinfowp_dismiss_notice', '1'),
             'phpinfowp_dismiss_notice'
         );
-        $is_pro      = Phpinfo_WP_License::is_valid();
+        $is_pro = Phpinfo_WP_License::is_valid();
+
+        // For 7.2.5: pull real site data to make the notice personal.
+        $site_msg   = '';
+        $cta_label  = __('Get Pro & Unlock →', 'phpinfo-wp');
+        if (PHPINFOWP_VERSION === '7.2.5' && !$is_pro) {
+            $grader = Phpinfo_WP_Config_Grader::summary();
+            $fails  = (int) ($grader['fails'] ?? 0);
+            $grade  = $grader['grade'] ?? '';
+            $days_left = (int) ceil((strtotime('2026-08-31') - time()) / DAY_IN_SECONDS);
+
+            if ($fails > 0 && $grade) {
+                $site_msg = sprintf(
+                    /* translators: 1: letter grade, 2: number of failing checks */
+                    __('Your config scores <strong>%1$s</strong> with <strong>%2$d failing check%3$s</strong>. Pro shows the exact fix for each one.', 'phpinfo-wp'),
+                    esc_html($grade),
+                    $fails,
+                    $fails === 1 ? '' : 's'
+                );
+            } else {
+                $site_msg = __('Pro adds one-click config fixes, SSL monitor, security headers, OPcache dashboard and white-label PDF reports.', 'phpinfo-wp');
+            }
+
+            if ($days_left > 0) {
+                $site_msg .= ' ' . sprintf(
+                    /* translators: %d: days remaining before price increase */
+                    __('<strong>Price goes up in %d days</strong> — $29 → $39/yr on Aug 31.', 'phpinfo-wp'),
+                    $days_left
+                );
+                $cta_label = sprintf(__('Lock in $29 — %d days left →', 'phpinfo-wp'), $days_left);
+            }
+        }
+
         ?>
         <style>
         .phpinfowp-whats-new-notice {
@@ -114,22 +149,25 @@ class Phpinfo_WP_Whats_New_Notice {
                 <span style="background:#777BB3; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:3px; letter-spacing:.4px; text-transform:uppercase; flex-shrink: 0; line-height: 1.4;">v<?php echo esc_html(PHPINFOWP_VERSION); ?></span>
                 <p style="font-size:13px; color:#1d2327; line-height:1.45;">
                     <?php if ($is_pro): ?>
-                        🎉 <strong><?php _e('What\'s New in Pro 7.2:', 'phpinfo-wp'); ?></strong> Accelerate loading with Web Server Snippets, isolate integrations using External API Monitor, and enjoy auto-Update Guard scans before updates.
+                        ✅ <strong><?php _e('phpinfo() WP Pro is up to date.', 'phpinfo-wp'); ?></strong> <?php _e('Your site is running the latest version.', 'phpinfo-wp'); ?>
+                    <?php elseif ($site_msg): ?>
+                        🔒 <?php echo wp_kses($site_msg, ['strong' => [], 'a' => ['href' => [], 'target' => [], 'rel' => []]]); ?>
                     <?php else: ?>
-                        🚀 <strong><?php _e('Boost speed & security with 7.2:', 'phpinfo-wp'); ?></strong> Stop site breaks using auto-Update Guard, load pages faster with 1-click Server Snippets, and detect API latency.
+                        🚀 <strong><?php _e('phpinfo() WP 7.2.5 is ready.', 'phpinfo-wp'); ?></strong> <?php _e('Upgrade to Pro to unlock one-click fixes, SSL monitor, security headers, and white-label PDF reports.', 'phpinfo-wp'); ?>
                     <?php endif; ?>
                 </p>
             </div>
             <div>
                 <?php if ($is_pro): ?>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-htaccess')); ?>" class="phpinfowp-btn-upgrade-notice">
-                        Configure Snippets →
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfo-wp')); ?>" class="phpinfowp-btn-upgrade-notice">
+                        <?php _e('View Dashboard →', 'phpinfo-wp'); ?>
                     </a>
                 <?php else: ?>
-                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn-upgrade-notice"><?php _e('Get Pro & Unlock →', 'phpinfo-wp'); ?></a>
+                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn-upgrade-notice"><?php echo esc_html($cta_label); ?></a>
                 <?php endif; ?>
             </div>
         </div>
+
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             var notice = document.querySelector('.phpinfowp-whats-new-notice');

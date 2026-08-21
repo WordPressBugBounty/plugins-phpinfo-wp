@@ -1,19 +1,8 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) {
-    phpinfowp_render_feature_lock([
-        'feature'  => 'External API Monitor',
-        'icon'     => 'dashicons-networking',
-        'tagline'  => 'Track response times and uptime of 3rd-party services your site depends on.',
-        'previews' => [
-            'api.stripe.com: <strong>— ms</strong>',
-            'api.mailchimp.com: <strong>— ms</strong>',
-            'fonts.googleapis.com: <strong>— ms</strong>',
-        ],
-    ]);
-    return;
-}
+$is_pro          = Phpinfo_WP_License::is_valid();
+$is_free_preview = !$is_pro;
 
 $stats = Phpinfo_WP_API_Monitor::get_stats();
 
@@ -38,83 +27,131 @@ foreach ($stats as $host => $data) {
             <h1>API Monitor <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
             <p class="phpinfowp-page-subtitle"><?php _e('Track slow outbound API requests that silently block page loads (last 24 hours).', 'phpinfo-wp'); ?></p>
         </div>
-        <?php if ($stats): ?>
+        <?php if ($is_pro && $stats): ?>
             <button id="phpinfowp-clear-api-stats" class="button button-secondary"><?php _e('Reset Stats', 'phpinfo-wp'); ?></button>
         <?php endif; ?>
     </div>
 
-    <?php if (!$stats): ?>
-        <div class="notice notice-info inline">
-            <p><strong><?php _e('Monitoring Active.', 'phpinfo-wp'); ?></strong> We are now tracking outbound HTTP requests. No external API calls have been made yet.</p>
+
+
+    <!-- Summary Cards (Visible to all users) -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin-bottom:24px;">
+        <div style="background:#fff; border:1px solid #ccd0d4; border-left:4px solid #007cba; padding:16px; border-radius:4px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
+            <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;"><?php _e('Total Waiting Time', 'phpinfo-wp'); ?></div>
+            <div style="font-size:28px; font-weight:300; color:#1d2327;">
+                <?php echo number_format($total_time, 2); ?>s
+            </div>
+            <div style="font-size:12px; color:#777; margin-top:4px;">Across <?php echo number_format($total_reqs); ?> outbound requests</div>
         </div>
-        <p><?php _e('To test this, you can trigger a plugin update check or wait for normal site traffic to generate API calls.', 'phpinfo-wp'); ?></p>
-        <button id="phpinfowp-test-api" class="button button-primary"><?php _e('Trigger Dummy Slow Request (1.5s)', 'phpinfo-wp'); ?></button>
+
+        <div style="background:#fff; border:1px solid #ccd0d4; border-left:4px solid <?php echo $slowest_max > 2.0 ? '#d63638' : ($slowest_max > 0 ? '#dba617' : '#00a32a'); ?>; padding:16px; border-radius:4px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
+            <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;"><?php _e('Slowest API Response', 'phpinfo-wp'); ?></div>
+            <div style="font-size:28px; font-weight:300; color:#1d2327;">
+                <?php echo $slowest_max > 0 ? number_format($slowest_max, 2) . 's' : '0.00s'; ?>
+            </div>
+            <div style="font-size:12px; color:#777; margin-top:4px;">Domain: <code><?php echo esc_html($slowest_domain ?: 'None recorded'); ?></code></div>
+        </div>
+    </div>
+
+    <?php if ($is_free_preview): ?>
+        <!-- Free preview: compact skeleton rows + centered upgrade card (fits in single viewpoint) -->
+        <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:10px; min-height:260px; display:flex; align-items:center; justify-content:center;">
+            
+            <!-- Skeleton content -->
+            <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.5;">
+                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">
+                        <div style="height:11px; width:30%; background:#cbd5e1; border-radius:4px;"></div>
+                        <div style="height:11px; width:15%; background:#cbd5e1; border-radius:4px;"></div>
+                        <div style="height:11px; width:15%; background:#cbd5e1; border-radius:4px;"></div>
+                    </div>
+                    <?php for ($sk = 0; $sk < 3; $sk++): ?>
+                    <div style="display:flex; justify-content:space-between; padding:6px 0;">
+                        <div style="height:10px; width:<?php echo [45, 55, 38][$sk]; ?>%; background:#e2e8f0; border-radius:4px;"></div>
+                        <div style="height:10px; width:12%; background:#e2e8f0; border-radius:4px;"></div>
+                        <div style="height:10px; width:12%; background:#e2e8f0; border-radius:4px;"></div>
+                    </div>
+                    <?php endfor; ?>
+                </div>
+            </div>
+
+            <!-- Gradient fade-out overlay -->
+            <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(246,249,252,0.4) 0%, rgba(246,249,252,0.95) 40%, #f6f9fc 100%); pointer-events:none;"></div>
+
+            <!-- Upgrade card floating over skeleton -->
+            <div style="position:relative; z-index:2; width:100%; max-width:480px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; box-shadow:0 6px 20px -4px rgba(0,0,0,0.07); text-align:center; margin:12px auto;">
+                <span class="dashicons dashicons-lock" style="font-size:30px; width:30px; height:30px; color:#777BB3; display:inline-block; margin-bottom:6px;"></span>
+                <h3 style="margin:0 0 6px; font-size:18px; font-weight:600; color:#1d2327;"><?php _e('External API Bottleneck Breakdown Locked', 'phpinfo-wp'); ?></h3>
+                <p style="margin:0 0 4px; font-size:13px; color:#475569; line-height:1.5; max-width:400px; margin-left:auto; margin-right:auto;">
+                    <?php _e('Unlock per-domain latency metrics, timeout warnings, failure logs, and 24-hour API call profiles that slow down TTFB.', 'phpinfo-wp'); ?>
+                </p>
+                <p style="margin:0 0 16px; font-size:12px; color:#94a3b8;">
+                    <?php _e('Your total outbound API request time above is real — upgrade to identify slow 3rd-party services.', 'phpinfo-wp'); ?>
+                </p>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary button-large" style="background:#777BB3; border-color:#777BB3; height:38px; line-height:36px; font-size:13.5px; font-weight:600; padding:0 22px; border-radius:6px; text-decoration:none; display:inline-block;">
+                    <?php _e('Upgrade to Pro &rarr;', 'phpinfo-wp'); ?>
+                </a>
+            </div>
+        </div>
+
     <?php else: ?>
 
-        <!-- Summary Cards -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin-bottom:24px;">
-            <div style="background:#fff; border:1px solid #ccd0d4; border-left:4px solid #007cba; padding:16px; border-radius:4px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
-                <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;"><?php _e('Total Waiting Time', 'phpinfo-wp'); ?></div>
-                <div style="font-size:28px; font-weight:300; color:#1d2327;">
-                    <?php echo number_format($total_time, 2); ?>s
-                </div>
-                <div style="font-size:12px; color:#777; margin-top:4px;">Across <?php echo number_format($total_reqs); ?> outbound requests</div>
+        <?php if (!$stats): ?>
+            <div class="notice notice-info inline">
+                <p><strong><?php _e('Monitoring Active.', 'phpinfo-wp'); ?></strong> We are now tracking outbound HTTP requests. No external API calls have been made yet.</p>
+            </div>
+            <p><?php _e('To test this, you can trigger a plugin update check or wait for normal site traffic to generate API calls.', 'phpinfo-wp'); ?></p>
+            <button id="phpinfowp-test-api" class="button button-primary"><?php _e('Trigger Dummy Slow Request (1.5s)', 'phpinfo-wp'); ?></button>
+        <?php else: ?>
+
+            <div style="margin-bottom:16px;">
+                <button id="phpinfowp-test-api" class="button button-secondary"><?php _e('Trigger Dummy Slow Request (1.5s)', 'phpinfo-wp'); ?></button>
             </div>
 
-            <div style="background:#fff; border:1px solid #ccd0d4; border-left:4px solid <?php echo $slowest_max > 2.0 ? '#d63638' : '#dba617'; ?>; padding:16px; border-radius:4px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
-                <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;"><?php _e('Slowest API Response', 'phpinfo-wp'); ?></div>
-                <div style="font-size:28px; font-weight:300; color:#1d2327;">
-                    <?php echo number_format($slowest_max, 2); ?>s
-                </div>
-                <div style="font-size:12px; color:#777; margin-top:4px;">Domain: <code><?php echo esc_html($slowest_domain); ?></code></div>
-            </div>
-        </div>
-        
-        <div style="margin-bottom:16px;">
-            <button id="phpinfowp-test-api" class="button button-secondary"><?php _e('Trigger Dummy Slow Request (1.5s)', 'phpinfo-wp'); ?></button>
-        </div>
+            <!-- Details Table -->
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width:30%;"><?php _e('Domain (Endpoint)', 'phpinfo-wp'); ?></th>
+                        <th scope="col"><?php _e('Requests', 'phpinfo-wp'); ?></th>
+                        <th scope="col"><?php _e('Avg Time', 'phpinfo-wp'); ?></th>
+                        <th scope="col"><?php _e('Max Time', 'phpinfo-wp'); ?></th>
+                        <th scope="col"><?php _e('Total Time', 'phpinfo-wp'); ?></th>
+                        <th scope="col"><?php _e('Errors/Timeouts', 'phpinfo-wp'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($stats as $host => $data):
+                        $avg = $data['count'] > 0 ? $data['total_time'] / $data['count'] : 0;
+                        $err_color = $data['errors'] > 0 ? '#d63638' : '#555';
+                        $max_color = $data['max_time'] > 2.0 ? '#d63638' : ($data['max_time'] > 1.0 ? '#dba617' : '#00a32a');
+                    ?>
+                    <tr>
+                        <td><strong><code><?php echo esc_html($host); ?></code></strong></td>
+                        <td><?php echo number_format($data['count']); ?></td>
+                        <td><?php echo number_format($avg, 3); ?>s</td>
+                        <td style="color:<?php echo $max_color; ?>; font-weight:600;"><?php echo number_format($data['max_time'], 3); ?>s</td>
+                        <td><?php echo number_format($data['total_time'], 2); ?>s</td>
+                        <td style="color:<?php echo $err_color; ?>; font-weight:<?php echo $data['errors'] > 0 ? '600' : 'normal'; ?>;">
+                            <?php echo number_format($data['errors']); ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            
+            <p class="description" style="margin-top:12px;">
+                This table tracks all external HTTP requests made via <code>wp_remote_get</code>, <code>wp_remote_post</code>, and the core HTTP API. 
+                Because PHP is synchronous, a 3-second API call blocks your WordPress page load for 3 entire seconds. 
+                <strong><?php _e('Any API with a max time over 2.0s should be investigated.', 'phpinfo-wp'); ?></strong>
+            </p>
 
-        <!-- Details Table -->
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
-                <tr>
-                    <th scope="col" style="width:30%;"><?php _e('Domain (Endpoint)', 'phpinfo-wp'); ?></th>
-                    <th scope="col"><?php _e('Requests', 'phpinfo-wp'); ?></th>
-                    <th scope="col"><?php _e('Avg Time', 'phpinfo-wp'); ?></th>
-                    <th scope="col"><?php _e('Max Time', 'phpinfo-wp'); ?></th>
-                    <th scope="col"><?php _e('Total Time', 'phpinfo-wp'); ?></th>
-                    <th scope="col"><?php _e('Errors/Timeouts', 'phpinfo-wp'); ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($stats as $host => $data):
-                    $avg = $data['count'] > 0 ? $data['total_time'] / $data['count'] : 0;
-                    $err_color = $data['errors'] > 0 ? '#d63638' : '#555';
-                    $max_color = $data['max_time'] > 2.0 ? '#d63638' : ($data['max_time'] > 1.0 ? '#dba617' : '#00a32a');
-                ?>
-                <tr>
-                    <td><strong><code><?php echo esc_html($host); ?></code></strong></td>
-                    <td><?php echo number_format($data['count']); ?></td>
-                    <td><?php echo number_format($avg, 3); ?>s</td>
-                    <td style="color:<?php echo $max_color; ?>; font-weight:600;"><?php echo number_format($data['max_time'], 3); ?>s</td>
-                    <td><?php echo number_format($data['total_time'], 2); ?>s</td>
-                    <td style="color:<?php echo $err_color; ?>; font-weight:<?php echo $data['errors'] > 0 ? '600' : 'normal'; ?>;">
-                        <?php echo number_format($data['errors']); ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-        
-        <p class="description" style="margin-top:12px;">
-            This table tracks all external HTTP requests made via <code>wp_remote_get</code>, <code>wp_remote_post</code>, and the core HTTP API. 
-            Because PHP is synchronous, a 3-second API call blocks your WordPress page load for 3 entire seconds. 
-            <strong><?php _e('Any API with a max time over 2.0s should be investigated.', 'phpinfo-wp'); ?></strong>
-        </p>
+        <?php endif; ?>
 
     <?php endif; ?>
 </div>
 
+<?php if ($is_pro): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var btnClear = document.getElementById('phpinfowp-clear-api-stats');
@@ -173,3 +210,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<?php endif; ?>

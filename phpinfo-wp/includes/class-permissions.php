@@ -16,8 +16,6 @@ class Phpinfo_WP_Permissions {
     }
 
     public static function scan(): array {
-        if (!Phpinfo_WP_License::is_valid()) return [];
-
         $php_uid = function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
 
         $results = [

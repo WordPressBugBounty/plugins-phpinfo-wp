@@ -127,7 +127,7 @@ class Phpinfo_WP_Admin_Nav {
         // file that may also call it. Render only once per request.
         if (self::$tabs_rendered) return;
 
-        $current_slug = $current_slug ?? sanitize_key($_GET['page'] ?? '');
+        $current_slug = $current_slug ?? self::current_tab_slug() ?? sanitize_key($_GET['page'] ?? '');
         $info = self::find($current_slug);
         if (!$info) return;
 
@@ -188,13 +188,14 @@ class Phpinfo_WP_Admin_Nav {
 
     /**
      * Map group-landing slugs back to their group key. Used by auto_render
-     * to know "if user is on phpinfowp-audit, what group is that?"
+     * to know "if user is on phpinfowp-performance or phpinfowp-audit, what group is that?"
      */
-    private static function group_for_slug(string $slug): ?string {
+    public static function group_for_slug(string $slug): ?string {
         $m = [
-            'phpinfowp-audit'   => 'audit',
-            'phpinfowp-tools'   => 'tools',
-            'phpinfowp-reports' => 'reports',
+            'phpinfowp-performance' => 'performance',
+            'phpinfowp-audit'       => 'audit',
+            'phpinfowp-tools'       => 'tools',
+            'phpinfowp-reports'     => 'reports',
         ];
         return $m[$slug] ?? null;
     }

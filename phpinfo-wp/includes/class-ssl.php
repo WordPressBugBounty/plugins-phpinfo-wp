@@ -9,7 +9,6 @@ class Phpinfo_WP_SSL {
 
     // Returns cert info array or ['error' => '...']
     public static function check(string $host, int $port = 443): array {
-        if (!self::_pro()) return ['error' => 'Pro license required.'];
         $host = strtolower(trim($host));
         if (!$host) return ['error' => 'No host provided.'];
 

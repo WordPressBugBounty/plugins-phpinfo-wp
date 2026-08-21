@@ -480,6 +480,131 @@ html {
 }
 
 /* =========================================================
+   Unified Design System & Brand Palette
+   Brand Primary: #777BB3 | Hover: #62659e | Active: #515488
+   Surface: #f8f8fc | Border: #d8daeb | Text: #2c2f48
+   ========================================================= */
+
+/* Every button in the plugin gets modern 6px rounded corners */
+body.phpinfowp-page .button,
+body.phpinfowp-page .button-primary,
+body.phpinfowp-page .button-secondary,
+body.phpinfowp-page .button-small,
+body.phpinfowp-page .button-large,
+body.phpinfowp-page .button-hero,
+.phpinfowp-btn,
+.phpinfowp-btn-primary,
+.phpinfowp-btn-secondary {
+  border-radius: 6px !important;
+  font-family: inherit !important;
+  line-height: 1.4 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+/* Secondary / Default Outline Buttons (e.g. White-label, Clear, Reset, Backup, etc.) */
+body.phpinfowp-page .button:not(.button-primary):not(.button-link):not(.button-link-delete):not(.phpinfowp-btn-danger):not(.phpinfowp-btn-primary),
+body.phpinfowp-page .button-secondary,
+.phpinfowp-btn-secondary {
+  background: #ffffff !important;
+  border: 1px solid #d8daeb !important;
+  color: #3b3e58 !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  text-shadow: none !important;
+}
+
+body.phpinfowp-page .button:not(.button-primary):not(.button-link):not(.button-link-delete):not(.phpinfowp-btn-danger):not(.phpinfowp-btn-primary):hover,
+body.phpinfowp-page .button-secondary:hover,
+.phpinfowp-btn-secondary:hover {
+  background: #f8f8fc !important;
+  border-color: #777BB3 !important;
+  color: #777BB3 !important;
+  box-shadow: 0 2px 5px rgba(119, 123, 179, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+body.phpinfowp-page .button:not(.button-primary):not(.button-link):not(.button-link-delete):not(.phpinfowp-btn-danger):not(.phpinfowp-btn-primary):active,
+body.phpinfowp-page .button-secondary:active,
+.phpinfowp-btn-secondary:active {
+  background: #eff0f9 !important;
+  border-color: #777BB3 !important;
+  color: #515488 !important;
+  transform: translateY(0);
+}
+
+/* Primary Action Buttons */
+body.phpinfowp-page .button-primary:not(.phpinfowp-btn-danger):not(.phpinfowp-btn-secondary),
+body.phpinfowp-page .button.button-primary:not(.phpinfowp-btn-danger):not(.phpinfowp-btn-secondary),
+.phpinfowp-btn-primary {
+  background: #777BB3 !important;
+  border-color: #777BB3 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 1px 2px rgba(119, 123, 179, 0.25) !important;
+  text-shadow: none !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+body.phpinfowp-page .button-primary:not(.phpinfowp-btn-danger):not(.phpinfowp-btn-secondary):hover,
+body.phpinfowp-page .button.button-primary:not(.phpinfowp-btn-danger):not(.phpinfowp-btn-secondary):hover,
+.phpinfowp-btn-primary:hover {
+  background: #62659e !important;
+  border-color: #62659e !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(119, 123, 179, 0.3) !important;
+}
+
+body.phpinfowp-page .button-primary:not(.phpinfowp-btn-danger):not(.phpinfowp-btn-secondary):active,
+body.phpinfowp-page .button.button-primary:not(.phpinfowp-btn-danger):not(.phpinfowp-btn-secondary):active,
+.phpinfowp-btn-primary:active {
+  background: #515488 !important;
+  border-color: #515488 !important;
+  transform: translateY(0);
+}
+
+/* Unified Action Banner / Hero Card */
+.phpinfowp-action-banner {
+  background: linear-gradient(135deg, #f8f8fc 0%, #eff0f9 100%) !important;
+  border: 1px solid #d8daeb !important;
+  border-radius: 8px !important;
+  padding: 16px 20px !important;
+  margin-bottom: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+  box-shadow: 0 1px 3px rgba(119, 123, 179, 0.06) !important;
+}
+
+.phpinfowp-action-banner strong {
+  font-size: 14px;
+  color: #2c2f48;
+}
+
+.phpinfowp-action-banner p {
+  margin: 4px 0 0;
+  color: #555870;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* Active Nav Side Tab */
+.phpinfowp-side-nav-item.is-active {
+  background: #eff0f9 !important;
+  color: #2c2f48 !important;
+  border-left: 3px solid #777BB3 !important;
+  font-weight: 600 !important;
+}
+
+.phpinfowp-side-nav-item.is-active .phpinfowp-side-nav-icon {
+  color: #777BB3 !important;
+}
+
+/* =========================================================
    Upgrade gate
    ========================================================= */
 .phpinfowp-upgrade-gate {
@@ -1586,12 +1711,12 @@ html {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  height: 56px;
+  height: 52px;
   padding: 0 24px;
-  /* Match WP 7.0's main admin menu colour (~#1e1e1e), not the older #1d2327 */
-  background: #1e1e1e;
+  background: #777BB3;
   color: #fff;
   box-sizing: border-box;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 body.phpinfowp-page .phpinfowp-topbar {
@@ -1612,23 +1737,27 @@ body.phpinfowp-page .phpinfowp-topbar {
   flex-shrink: 0;
 }
 
+.phpinfowp-topbar-logo svg {
+  fill: #ffffff !important;
+}
+
 .phpinfowp-topbar-name {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: .2px;
-  color: #fff;
+  color: #ffffff;
   white-space: nowrap;
 }
 
 .phpinfowp-topbar-sep {
-  color: #50575e;
-  margin: 0 2px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 3px;
 }
 
 .phpinfowp-topbar-title {
   font-size: 14px;
   font-weight: 500;
-  color: #c3c4c7;
+  color: rgba(255, 255, 255, 0.92);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1642,27 +1771,35 @@ body.phpinfowp-page .phpinfowp-topbar {
 
 .phpinfowp-topbar-cta {
   display: inline-block;
-  padding: 7px 16px;
-  background: #777BB3;
-  color: #fff !important;
+  padding: 6px 14px;
+  background: #ffffff;
+  color: #777BB3 !important;
   text-decoration: none;
-  border-radius: 5px;
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
   line-height: 1;
-  transition: background .15s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: all .15s ease;
 }
 
 .phpinfowp-topbar-cta:hover,
 .phpinfowp-topbar-cta:focus {
-  background: #6366a0;
-  color: #fff !important;
+  background: #f8f8fc;
+  color: #515488 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
 }
 
 .phpinfowp-topbar-pro-active {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  color: #46d160;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 3px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  letter-spacing: .2px;
 }
 
 /* Page-wide breathing room on every plugin page.

@@ -40,7 +40,6 @@ class Phpinfo_WP_DB_Health {
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
     public static function server_info(): array {
-        if (!self::_pro()) return [];
         global $wpdb;
         $raw = $wpdb->db_version();
         $full = $wpdb->get_var('SELECT VERSION()');
@@ -73,7 +72,6 @@ class Phpinfo_WP_DB_Health {
     }
 
     public static function autoload_size(): array {
-        if (!self::_pro()) return [];
         global $wpdb;
         $bytes = (int) $wpdb->get_var(
             "SELECT SUM(LENGTH(option_value)) FROM {$wpdb->options} WHERE autoload = 'yes'"
@@ -102,7 +100,6 @@ class Phpinfo_WP_DB_Health {
     }
 
     public static function transients(): array {
-        if (!self::_pro()) return [];
         global $wpdb;
         $all     = (int) $wpdb->get_var(
             "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout_%'"
@@ -137,7 +134,6 @@ class Phpinfo_WP_DB_Health {
     }
 
     public static function tables(): array {
-        if (!self::_pro()) return [];
         global $wpdb;
         $rows = $wpdb->get_results($wpdb->prepare(
             "SELECT TABLE_NAME, TABLE_ROWS, DATA_LENGTH, INDEX_LENGTH, DATA_FREE, ENGINE
@@ -164,7 +160,6 @@ class Phpinfo_WP_DB_Health {
     }
 
     public static function db_size(): array {
-        if (!self::_pro()) return [];
         $tables = self::tables();
         $data  = 0;
         $index = 0;

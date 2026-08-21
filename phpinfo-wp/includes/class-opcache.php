@@ -10,7 +10,6 @@ class Phpinfo_WP_OPcache {
     }
 
     public static function status(): ?array {
-        if (!self::_pro()) return null;
         if (!self::is_available()) return null;
 
         $status = @opcache_get_status(false);

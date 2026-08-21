@@ -15,8 +15,6 @@ class Phpinfo_WP_Cron_Monitor {
 
     // Returns flat list of scheduled events with metadata
     public static function events(): array {
-        if (!self::_pro()) return [];
-
         $crons = _get_cron_array();
         if (!is_array($crons)) return [];
 
@@ -58,8 +56,6 @@ class Phpinfo_WP_Cron_Monitor {
     }
 
     public static function summary(): array {
-        if (!self::_pro()) return [];
-
         $events  = self::events();
         $overdue = 0;
         $orphan  = 0; // events with no registered callback

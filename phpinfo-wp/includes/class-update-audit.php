@@ -112,7 +112,7 @@ class Phpinfo_WP_Update_Audit {
             return self::major_minor($latest_real);
         }
         
-        return self::next_major($latest_real);
+        return self::major_minor($current);
     }
 
     // -------------------------------------------------------------------------

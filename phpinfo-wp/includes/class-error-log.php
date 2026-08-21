@@ -104,7 +104,6 @@ class Phpinfo_WP_Error_Log {
 
     // Returns last $lines lines, newest first
     public static function tail(string $path, int $lines = 150): array {
-        if (!self::_pro()) return [];
         if (!@file_exists($path) || !@is_readable($path)) return [];
 
         $file = new SplFileObject($path, 'r');

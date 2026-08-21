@@ -19,7 +19,6 @@ class Phpinfo_WP_Security_Headers {
     ];
 
     public static function audit(string $url = ''): array {
-        if (!self::_pro()) return ['error' => 'Pro license required.'];
         if (!$url) $url = get_site_url();
 
         $response = wp_remote_head($url, [
@@ -66,7 +65,6 @@ class Phpinfo_WP_Security_Headers {
 
     // Results are expensive (HTTP call) — cache per site for 1 hour
     public static function get_cached(): array {
-        if (!self::_pro()) return ['error' => 'Pro license required.'];
         $cached = get_transient('phpinfowp_sec_headers');
         if ($cached !== false) {
             $cached['cached'] = true;

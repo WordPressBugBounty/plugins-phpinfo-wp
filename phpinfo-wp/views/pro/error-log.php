@@ -1,24 +1,12 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-if (!Phpinfo_WP_License::is_valid()) {
-    phpinfowp_render_feature_lock([
-        'feature'  => 'PHP Error Log Viewer',
-        'icon'     => 'dashicons-warning',
-        'tagline'  => 'Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host.',
-        'previews' => [
-            '<strong>[—] PHP Warning:</strong> Undefined variable $foo in /wp-content/…',
-            '<strong>[—] PHP Deprecated:</strong> strpos() expects string …',
-            '<strong>[—] PHP Fatal error:</strong> Allowed memory size exhausted …',
-        ],
-    ]);
-    return;
-}
+$is_pro          = Phpinfo_WP_License::is_valid();
+$is_free_preview = !$is_pro;
+$message         = '';
+$msg_type        = 'success';
 
-$message  = '';
-$msg_type = 'success';
-
-if (isset($_POST['phpinfowp_log_action']) && check_admin_referer('phpinfowp_log_nonce')) {
+if ($is_pro && isset($_POST['phpinfowp_log_action']) && check_admin_referer('phpinfowp_log_nonce')) {
     if ($_POST['phpinfowp_log_action'] === 'clear') {
         $path = Phpinfo_WP_Error_Log::find_path();
         if ($path && Phpinfo_WP_Error_Log::clear($path)) {
@@ -43,6 +31,8 @@ $search = sanitize_text_field($_GET['log_search'] ?? '');
             <p class="phpinfowp-page-subtitle"><?php _e('Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host.', 'phpinfo-wp'); ?></p>
         </div>
     </div>
+
+
 
     <?php if ($message): ?>
         <div class="notice notice-<?php echo $msg_type; ?> inline is-dismissible"><p><?php echo esc_html($message); ?></p></div>
@@ -109,47 +99,88 @@ define('WP_DEBUG_DISPLAY', false);
         </div>
     <?php else: ?>
 
+        <!-- Toolbar / Meta info (Visible to all users) -->
         <div class="phpinfowp-log-toolbar">
             <div class="phpinfowp-log-meta">
                 <strong><?php _e('File:', 'phpinfo-wp'); ?></strong> <code><?php echo esc_html($path); ?></code>
                 &nbsp;&middot;&nbsp; <strong><?php _e('Size:', 'phpinfo-wp'); ?></strong> <?php echo esc_html($size); ?>
-                &nbsp;&middot;&nbsp; <strong><?php _e('Showing:', 'phpinfo-wp'); ?></strong> last <?php echo count($lines); ?> lines
+                &nbsp;&middot;&nbsp; <strong><?php _e('Recorded:', 'phpinfo-wp'); ?></strong> <?php echo count($lines); ?> lines
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <input type="text" id="phpinfowp-log-search" placeholder="<?php echo esc_attr__('Filter lines...', 'phpinfo-wp'); ?>"
-                       value="<?php echo esc_attr($search); ?>" class="regular-text"
-                       oninput="phpinfowpFilterLog(this.value)">
-                <form method="post" onsubmit="return confirm('Clear the entire log file? This cannot be undone.')">
-                    <?php wp_nonce_field('phpinfowp_log_nonce'); ?>
-                    <input type="hidden" name="phpinfowp_log_action" value="clear">
-                    <button type="submit" class="button button-secondary"><?php _e('Clear Log', 'phpinfo-wp'); ?></button>
-                </form>
-            </div>
-        </div>
-
-        <div id="phpinfowp-log-viewer">
-            <?php if (empty($lines)): ?>
-                <p style="padding:20px;color:#666;text-align:center"><?php _e('Log is empty — no errors recorded.', 'phpinfo-wp'); ?></p>
-            <?php else: ?>
-                <?php foreach ($lines as $line): ?>
-                    <div class="log-line <?php echo esc_attr(Phpinfo_WP_Error_Log::classify($line)); ?>" data-line="<?php echo esc_attr(strtolower($line)); ?>">
-                        <?php echo esc_html($line); ?>
-                    </div>
-                <?php endforeach; ?>
+            <?php if ($is_pro): ?>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                    <input type="text" id="phpinfowp-log-search" placeholder="<?php echo esc_attr__('Filter lines...', 'phpinfo-wp'); ?>"
+                           value="<?php echo esc_attr($search); ?>" class="regular-text"
+                           oninput="phpinfowpFilterLog(this.value)">
+                    <form method="post" onsubmit="return confirm('Clear the entire log file? This cannot be undone.')">
+                        <?php wp_nonce_field('phpinfowp_log_nonce'); ?>
+                        <input type="hidden" name="phpinfowp_log_action" value="clear">
+                        <button type="submit" class="button button-secondary"><?php _e('Clear Log', 'phpinfo-wp'); ?></button>
+                    </form>
+                </div>
             <?php endif; ?>
         </div>
 
-        <script>
-        function phpinfowpFilterLog(q) {
-            q = q.toLowerCase();
-            document.querySelectorAll('#phpinfowp-log-viewer .log-line').forEach(function(el) {
-                el.style.display = (!q || el.dataset.line.includes(q)) ? '' : 'none';
-            });
-        }
-        <?php if ($search): ?>
-        phpinfowpFilterLog(<?php echo json_encode($search); ?>);
+        <?php if ($is_free_preview): ?>
+            <!-- Free preview: compact skeleton rows + centered upgrade card (fits in single viewpoint) -->
+            <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:10px; min-height:260px; display:flex; align-items:center; justify-content:center;">
+                
+                <!-- Skeleton content -->
+                <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; background:#1e1e1e; padding:16px; border-radius:6px; opacity:0.4;">
+                    <?php for ($sk = 0; $sk < 4; $sk++): ?>
+                    <div style="display:flex; gap:10px; margin-bottom:8px; align-items:center;">
+                        <div style="height:10px; width:110px; background:#444; border-radius:3px;"></div>
+                        <div style="height:10px; width:<?php echo [70, 90, 60, 80][$sk]; ?>px; background:<?php echo ['#d63638', '#dba617', '#569cd6', '#d63638'][$sk]; ?>; border-radius:3px;"></div>
+                        <div style="height:10px; width:<?php echo [40, 55, 35, 50][$sk]; ?>%; background:#333; border-radius:3px;"></div>
+                    </div>
+                    <?php endfor; ?>
+                </div>
+
+                <!-- Gradient fade-out overlay -->
+                <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(246,249,252,0.4) 0%, rgba(246,249,252,0.95) 40%, #f6f9fc 100%); pointer-events:none;"></div>
+
+                <!-- Upgrade card floating over skeleton -->
+                <div style="position:relative; z-index:2; width:100%; max-width:480px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; box-shadow:0 6px 20px -4px rgba(0,0,0,0.07); text-align:center; margin:12px auto;">
+                    <span class="dashicons dashicons-lock" style="font-size:30px; width:30px; height:30px; color:#777BB3; display:inline-block; margin-bottom:6px;"></span>
+                    <h3 style="margin:0 0 6px; font-size:18px; font-weight:600; color:#1d2327;"><?php _e('Live PHP Error Log Viewer Locked', 'phpinfo-wp'); ?></h3>
+                    <p style="margin:0 0 4px; font-size:13px; color:#475569; line-height:1.5; max-width:400px; margin-left:auto; margin-right:auto;">
+                        <?php _e('Unlock real-time log streaming, full text & regex search filters, stack trace inspection, and 1-click log reset without FTP or SSH.', 'phpinfo-wp'); ?>
+                    </p>
+                    <p style="margin:0 0 16px; font-size:12px; color:#94a3b8;">
+                        <?php _e('Your active log path and file size above are real — upgrade to stream and filter errors.', 'phpinfo-wp'); ?>
+                    </p>
+                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary button-large" style="background:#777BB3; border-color:#777BB3; height:38px; line-height:36px; font-size:13.5px; font-weight:600; padding:0 22px; border-radius:6px; text-decoration:none; display:inline-block;">
+                        <?php _e('Upgrade to Pro &rarr;', 'phpinfo-wp'); ?>
+                    </a>
+                </div>
+            </div>
+
+        <?php else: ?>
+
+            <div id="phpinfowp-log-viewer">
+                <?php if (empty($lines)): ?>
+                    <p style="padding:20px;color:#666;text-align:center"><?php _e('Log is empty — no errors recorded.', 'phpinfo-wp'); ?></p>
+                <?php else: ?>
+                    <?php foreach ($lines as $line): ?>
+                        <div class="log-line <?php echo esc_attr(Phpinfo_WP_Error_Log::classify($line)); ?>" data-line="<?php echo esc_attr(strtolower($line)); ?>">
+                            <?php echo esc_html($line); ?>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <script>
+            function phpinfowpFilterLog(q) {
+                q = q.toLowerCase();
+                document.querySelectorAll('#phpinfowp-log-viewer .log-line').forEach(function(el) {
+                    el.style.display = (!q || el.dataset.line.includes(q)) ? '' : 'none';
+                });
+            }
+            <?php if ($search): ?>
+            phpinfowpFilterLog(<?php echo json_encode($search); ?>);
+            <?php endif; ?>
+            </script>
+
         <?php endif; ?>
-        </script>
 
     <?php endif; ?>
 </div>

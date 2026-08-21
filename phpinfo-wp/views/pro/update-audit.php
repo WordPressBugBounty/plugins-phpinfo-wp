@@ -110,7 +110,7 @@ $verdict_meta = [
             <div class="phpinfowp-score-card-body">
                 <div class="phpinfowp-score-card-value">
                     <?php echo esc_html($vm['label']); ?>
-                    <span>updating to WordPress <?php echo esc_html($result['target']); ?></span>
+                    <span><?php echo version_compare($result['target'], $current, '>') ? 'updating to WordPress ' . esc_html($result['target']) : 'for WordPress ' . esc_html($result['target']); ?></span>
                 </div>
                 <div class="phpinfowp-score-card-meta">
                     <strong><?php echo (int) $result['total_breaks']; ?></strong> hard break<?php echo $result['total_breaks'] !== 1 ? 's' : ''; ?>

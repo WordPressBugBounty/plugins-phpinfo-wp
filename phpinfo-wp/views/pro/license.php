@@ -12,23 +12,44 @@ if (isset($_POST['phpinfowp_license_action']) && check_admin_referer('phpinfowp_
 
     if ($action === 'activate' && !empty($_POST['license_key'])) {
         $submitted = sanitize_text_field(trim($_POST['license_key']));
-        $ok = Phpinfo_WP_License::activate($submitted);
+        $reason    = '';
+        $ok        = Phpinfo_WP_License::activate($submitted, $reason);
         if ($ok) {
-            $message  = 'License activated successfully. Pro features are now unlocked.';
-            $is_valid = true;
-            $key      = $submitted;
+            $message   = __('License activated successfully. Pro features are now unlocked.', 'phpinfo-wp');
+            $is_valid  = true;
+            $is_locked = false;
+            $key       = $submitted;
         } else {
-            $message  = 'License key invalid, expired, or revoked. If you just purchased, allow a moment for activation to propagate, then try again. Contact <a href="mailto:support@exeebit.com">support@exeebit.com</a> if the problem persists.';
-            $msg_type = 'error';
+            if ($reason === 'site_limit_exceeded') {
+                $message = __('Activation failed: This license has reached its maximum site limit. Upgrade your license or deactivate another site.', 'phpinfo-wp');
+            } elseif ($reason === 'revoked' || $reason === 'refunded' || $reason === 'disputed') {
+                $message = __('Activation failed: This license has been revoked or refunded. Contact <a href="mailto:support@exeebit.com">support@exeebit.com</a>.', 'phpinfo-wp');
+            } else {
+                $message = __('License key invalid, expired, or unrecognised. If you just purchased, allow a moment for activation to propagate, then try again. Contact <a href="mailto:support@exeebit.com">support@exeebit.com</a> if the problem persists.', 'phpinfo-wp');
+            }
+            $msg_type  = 'error';
+            $is_valid  = false;
+            $is_locked = Phpinfo_WP_License::is_locked();
         }
     } elseif ($action === 'deactivate') {
         Phpinfo_WP_License::deactivate();
         delete_option('phpinfowp_free_trial_expires');
         delete_option('phpinfowp_free_trial_email');
-        $message  = 'License deactivated. Pro features are disabled.';
-        $msg_type = 'info';
-        $is_valid = false;
-        $key      = '';
+        $message   = __('License deactivated. Pro features are disabled.', 'phpinfo-wp');
+        $msg_type  = 'info';
+        $is_valid  = false;
+        $is_locked = false;
+        $key       = '';
+    }
+} else {
+    // Non-blocking background verification when viewing license screen
+    if ($is_valid && !empty($key)) {
+        $last_check = (int) get_option(Phpinfo_WP_License::OPT_LAST_CHECK, 0);
+        if (time() - $last_check > HOUR_IN_SECONDS) {
+            if (!wp_next_scheduled('phpinfowp_license_ping_async')) {
+                wp_schedule_single_event(time(), 'phpinfowp_license_ping_async');
+            }
+        }
     }
 }
 
@@ -98,24 +119,24 @@ $pillars = [
     <?php endif; ?>
 
     <?php if ($is_locked): ?>
-        <div class="notice notice-error inline" style="margin:0 0 20px">
-            <p><strong><?php _e('License locked.', 'phpinfo-wp'); ?></strong> Your license could not be verified for 14+ days. Re-enter your key to unlock, or contact support at <a href="mailto:support@exeebit.com">support@exeebit.com</a>.</p>
-        </div>
+        <?php 
+        $revoke_reason = Phpinfo_WP_License::get_revoke_reason();
+        if ($revoke_reason === 'revoked' || $revoke_reason === 'refunded' || $revoke_reason === 'disputed'): ?>
+            <div class="notice notice-error inline" style="margin:0 0 20px">
+                <p><strong><?php _e('License Revoked.', 'phpinfo-wp'); ?></strong> <?php _e('This license has been revoked or refunded. Pro features have been disabled. Contact <a href="mailto:support@exeebit.com">support@exeebit.com</a> if you believe this is an error.', 'phpinfo-wp'); ?></p>
+            </div>
+        <?php elseif ($revoke_reason === 'site_limit_exceeded'): ?>
+            <div class="notice notice-error inline" style="margin:0 0 20px">
+                <p><strong><?php _e('Site Limit Exceeded.', 'phpinfo-wp'); ?></strong> <?php _e('This license is active on too many sites. Please upgrade to an Unlimited tier or deactivate unused sites.', 'phpinfo-wp'); ?></p>
+            </div>
+        <?php else: ?>
+            <div class="notice notice-error inline" style="margin:0 0 20px">
+                <p><strong><?php _e('License locked.', 'phpinfo-wp'); ?></strong> <?php _e('Your license could not be verified with our servers. Re-enter your key to unlock, or contact <a href="mailto:support@exeebit.com">support@exeebit.com</a>.', 'phpinfo-wp'); ?></p>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 
-    <?php if (!$is_valid): ?>
-        <div class="phpinfowp-price-alert-banner" style="position:relative; background:#fff3cd; border-left:4px solid #ffc107; padding:12px 40px 12px 16px; margin: 0 0 24px; border-radius: 0 4px 4px 0; font-size:13.5px; color:#664d03; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
-            <button type="button" onclick="try{localStorage.setItem('phpinfowp_price_alert_dismissed','1')}catch(e){} this.closest('.phpinfowp-price-alert-banner').style.display='none';" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" style="position:absolute; top:6px; right:8px; background:none; border:none; cursor:pointer; color:#664d03; opacity:0.5; font-size:20px; line-height:1; padding:2px 4px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&times;</button>
-            <span>
-                <strong>⏰ <?php _e('Price Increase Alert:', 'phpinfo-wp'); ?></strong> 
-                <?php _e('On August 31st, the Single Site Pro license increases from $29 to $39/year. Upgrade today to secure the current $29/year rate before the price goes up.', 'phpinfo-wp'); ?>
-            </span>
-            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" style="background:#777BB3; color:#fff; padding:6px 14px; border-radius:4px; font-size:12.5px; font-weight:600; text-decoration:none; display:inline-block;">
-                <?php _e('Lock in $29 Now →', 'phpinfo-wp'); ?>
-            </a>
-        </div>
-        <script>if(localStorage.getItem('phpinfowp_price_alert_dismissed')==='1'){document.querySelectorAll('.phpinfowp-price-alert-banner').forEach(function(e){e.style.display='none';});}</script>
-    <?php endif; ?>
+
 
     <!-- License status card -->
     <div class="phpinfowp-license-card <?php echo $is_valid ? 'is-active' : 'is-inactive'; ?>">

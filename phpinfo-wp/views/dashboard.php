@@ -75,19 +75,7 @@ if (!function_exists('render_dash_grid')) {
         </div>
     </div>
 
-    <?php if (!$is_pro): ?>
-        <div class="phpinfowp-price-alert-banner" style="position:relative; background:#fff3cd; border-left:4px solid #ffc107; padding:12px 40px 12px 16px; margin: 0 0 24px; border-radius: 0 4px 4px 0; font-size:13.5px; color:#664d03; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
-            <button type="button" onclick="try{localStorage.setItem('phpinfowp_price_alert_dismissed','1')}catch(e){} this.closest('.phpinfowp-price-alert-banner').style.display='none';" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" style="position:absolute; top:6px; right:8px; background:none; border:none; cursor:pointer; color:#664d03; opacity:0.5; font-size:20px; line-height:1; padding:2px 4px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&times;</button>
-            <span>
-                <strong>⏰ <?php _e('Price Increase Alert:', 'phpinfo-wp'); ?></strong> 
-                <?php _e('On August 31st, the Single Site Pro license increases from $29 to $39/year. Upgrade today to secure the current $29/year rate before the price goes up.', 'phpinfo-wp'); ?>
-            </span>
-            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" style="background:#777BB3; color:#fff; padding:6px 14px; border-radius:4px; font-size:12.5px; font-weight:600; text-decoration:none; display:inline-block;">
-                <?php _e('Lock in $29 Now →', 'phpinfo-wp'); ?>
-            </a>
-        </div>
-        <script>if(localStorage.getItem('phpinfowp_price_alert_dismissed')==='1'){document.querySelectorAll('.phpinfowp-price-alert-banner').forEach(function(e){e.style.display='none';});}</script>
-    <?php endif; ?>
+
 
     <!-- VISUAL INSIGHTS WIDGETS -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-bottom:32px;">
@@ -151,6 +139,7 @@ if (!function_exists('render_dash_grid')) {
         </a>
 
         <!-- 4. API Monitor Bar Chart -->
+        <?php if ($is_pro): ?>
         <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-api-monitor')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column;">
             <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Slowest External APIs', 'phpinfo-wp'); ?></h3>
             <?php if (empty($top_apis)): ?>
@@ -178,6 +167,23 @@ if (!function_exists('render_dash_grid')) {
                 </div>
             <?php endif; ?>
         </a>
+        <?php else: ?>
+        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-api-monitor')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                    <h3 style="margin:0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Slowest External APIs', 'phpinfo-wp'); ?></h3>
+                    <span class="phpinfowp-dash-card-pro"><?php _e('PRO', 'phpinfo-wp'); ?></span>
+                </div>
+                <div style="font-size:13px; color:#64748b; line-height:1.45; margin-bottom:8px;">
+                    <span class="dashicons dashicons-lock" style="font-size:16px; width:16px; height:16px; vertical-align:text-bottom; color:#777BB3; margin-right:2px;"></span>
+                    <?php _e('Track outbound HTTP latency & slow 3rd-party services impacting TTFB.', 'phpinfo-wp'); ?>
+                </div>
+            </div>
+            <div style="font-size:12px; font-weight:600; color:#777BB3; display:flex; align-items:center; gap:4px;">
+                <?php _e('Unlock API Monitor &rarr;', 'phpinfo-wp'); ?>
+            </div>
+        </a>
+        <?php endif; ?>
 
     </div>
 

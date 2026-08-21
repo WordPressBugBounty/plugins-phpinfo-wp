@@ -41,19 +41,7 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
         </div>
     <?php endif; ?>
 
-    <?php if ($is_free_preview): ?>
-        <div class="phpinfowp-price-alert-banner" style="position:relative; background:#fff3cd; border-left:4px solid #ffc107; padding:12px 40px 12px 16px; margin: 0 0 24px; border-radius: 0 4px 4px 0; font-size:13.5px; color:#664d03; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
-            <button type="button" onclick="try{localStorage.setItem('phpinfowp_price_alert_dismissed','1')}catch(e){} this.closest('.phpinfowp-price-alert-banner').style.display='none';" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" style="position:absolute; top:6px; right:8px; background:none; border:none; cursor:pointer; color:#664d03; opacity:0.5; font-size:20px; line-height:1; padding:2px 4px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&times;</button>
-            <span>
-                <strong>⏰ <?php _e('Price Increase Alert:', 'phpinfo-wp'); ?></strong> 
-                <?php _e('On August 31st, the Single Site Pro license increases from $29 to $39/year. Upgrade today to secure the current $29/year rate before the price goes up.', 'phpinfo-wp'); ?>
-            </span>
-            <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" style="background:#777BB3; color:#fff; padding:6px 14px; border-radius:4px; font-size:12.5px; font-weight:600; text-decoration:none; display:inline-block;">
-                <?php _e('Lock in $29 Now →', 'phpinfo-wp'); ?>
-            </a>
-        </div>
-        <script>if(localStorage.getItem('phpinfowp_price_alert_dismissed')==='1'){document.querySelectorAll('.phpinfowp-price-alert-banner').forEach(function(e){e.style.display='none';});}</script>
-    <?php endif; ?>
+
 
     <div class="phpinfowp-page-header no-print">
         <div>
@@ -85,11 +73,11 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
          success notice above confirms the change was applied. -->
     <div id="phpinfowp-report-branding" class="phpinfowp-report-branding-form no-print" style="display:none">
         <?php if (!Phpinfo_WP_License::is_unlimited()): ?>
-            <div class="phpinfowp-upgrade-banner" style="background:#fcfaff;border:1px solid #e2d9f3;border-radius:8px;padding:24px;text-align:center;margin-bottom:12px">
-                <span class="dashicons dashicons-lock" style="font-size:36px;width:36px;height:36px;color:#7c3aed;margin-bottom:12px"></span>
+            <div class="phpinfowp-upgrade-banner" style="background:#f8f8fc;border:1px solid #d8daeb;border-radius:8px;padding:24px;text-align:center;margin-bottom:12px">
+                <span class="dashicons dashicons-lock" style="font-size:36px;width:36px;height:36px;color:#777BB3;margin-bottom:12px"></span>
                 <h3 style="margin:0 0 8px;font-size:18px;color:#2c3338"><?php _e('White-Label Branding is an Unlimited Tier Feature', 'phpinfo-wp'); ?></h3>
                 <p style="margin:0 0 16px;color:#646970;font-size:14px"><?php _e('Upload your own company logo, set a custom accent color, and hide the "phpinfo() WP" branding from client PDF reports.', 'phpinfo-wp'); ?></p>
-                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary button-large" style="background:#7c3aed;border-color:#7c3aed"><?php _e('Upgrade License →', 'phpinfo-wp'); ?></a>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" class="button button-primary button-large" style="background:#777BB3;border-color:#777BB3"><?php _e('Upgrade License →', 'phpinfo-wp'); ?></a>
             </div>
         <?php else: ?>
             <form method="post">
@@ -316,91 +304,40 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
         <?php endif; ?>
 
         <?php if ($is_free_preview): ?>
-            <!-- Free preview: skeleton rows + gradient overlay — no real data sent to browser -->
-            <div style="position:relative; margin-top:24px; overflow:hidden; border-radius:10px;">
+            <!-- Free preview: compact skeleton rows + centered upgrade card (fits in single viewpoint) -->
+            <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:10px; min-height:260px; display:flex; align-items:center; justify-content:center;">
 
                 <!-- Skeleton rows mimicking actual report content -->
-                <div style="pointer-events:none; user-select:none;">
-
-                    <!-- Skeleton: critical issues bar -->
-                    <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:16px 20px; margin-bottom:16px; display:flex; align-items:center; gap:14px;">
-                        <div style="width:32px; height:32px; border-radius:50%; background:#fee2e2; flex-shrink:0;"></div>
-                        <div style="flex:1;">
-                            <div style="height:13px; width:55%; background:#fecaca; border-radius:4px; margin-bottom:8px;"></div>
-                            <div style="height:11px; width:80%; background:#fee2e2; border-radius:4px;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Skeleton: section label -->
-                    <div style="height:11px; width:160px; background:#e2e8f0; border-radius:4px; margin:20px 0 12px; text-transform:uppercase;"></div>
-
+                <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.5;">
                     <!-- Skeleton: priority card 1 -->
-                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:18px 20px; margin-bottom:10px; display:flex; gap:16px; align-items:flex-start;">
-                        <div style="width:28px; height:28px; border-radius:50%; background:#f1f5f9; flex-shrink:0;"></div>
+                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:center;">
+                        <div style="width:24px; height:24px; border-radius:50%; background:#fecaca; flex-shrink:0;"></div>
                         <div style="flex:1;">
-                            <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
-                                <div style="height:20px; width:68px; background:#fecaca; border-radius:20px;"></div>
-                                <div style="height:12px; width:90px; background:#e2e8f0; border-radius:4px;"></div>
-                            </div>
-                            <div style="height:13px; width:70%; background:#cbd5e1; border-radius:4px; margin-bottom:8px;"></div>
-                            <div style="height:11px; width:95%; background:#e2e8f0; border-radius:4px; margin-bottom:6px;"></div>
-                            <div style="height:11px; width:85%; background:#e2e8f0; border-radius:4px;"></div>
+                            <div style="height:12px; width:45%; background:#cbd5e1; border-radius:4px; margin-bottom:6px;"></div>
+                            <div style="height:10px; width:75%; background:#e2e8f0; border-radius:4px;"></div>
                         </div>
                     </div>
-
                     <!-- Skeleton: priority card 2 -->
-                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:18px 20px; margin-bottom:10px; display:flex; gap:16px; align-items:flex-start;">
-                        <div style="width:28px; height:28px; border-radius:50%; background:#f1f5f9; flex-shrink:0;"></div>
+                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:center;">
+                        <div style="width:24px; height:24px; border-radius:50%; background:#fef3c7; flex-shrink:0;"></div>
                         <div style="flex:1;">
-                            <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
-                                <div style="height:20px; width:60px; background:#fef3c7; border-radius:20px;"></div>
-                                <div style="height:12px; width:110px; background:#e2e8f0; border-radius:4px;"></div>
-                            </div>
-                            <div style="height:13px; width:60%; background:#cbd5e1; border-radius:4px; margin-bottom:8px;"></div>
-                            <div style="height:11px; width:90%; background:#e2e8f0; border-radius:4px;"></div>
+                            <div style="height:12px; width:50%; background:#cbd5e1; border-radius:4px; margin-bottom:6px;"></div>
+                            <div style="height:10px; width:80%; background:#e2e8f0; border-radius:4px;"></div>
                         </div>
-                    </div>
-
-                    <!-- Skeleton: priority card 3 -->
-                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:18px 20px; margin-bottom:10px; display:flex; gap:16px; align-items:flex-start;">
-                        <div style="width:28px; height:28px; border-radius:50%; background:#f1f5f9; flex-shrink:0;"></div>
-                        <div style="flex:1;">
-                            <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
-                                <div style="height:20px; width:60px; background:#fef3c7; border-radius:20px;"></div>
-                                <div style="height:12px; width:80px; background:#e2e8f0; border-radius:4px;"></div>
-                            </div>
-                            <div style="height:13px; width:75%; background:#cbd5e1; border-radius:4px; margin-bottom:8px;"></div>
-                            <div style="height:11px; width:88%; background:#e2e8f0; border-radius:4px;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Skeleton: section divider rows -->
-                    <div style="margin-top:20px; padding-top:16px; border-top:1px solid #e2e8f0;">
-                        <div style="height:11px; width:140px; background:#e2e8f0; border-radius:4px; margin-bottom:14px;"></div>
-                        <div style="display:flex; gap:12px; margin-bottom:10px;">
-                            <div style="height:40px; flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;"></div>
-                            <div style="height:40px; flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;"></div>
-                            <div style="height:40px; flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;"></div>
-                        </div>
-                        <div style="height:11px; width:120px; background:#e2e8f0; border-radius:4px; margin-top:16px; margin-bottom:14px;"></div>
-                        <div style="height:38px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px;"></div>
                     </div>
                 </div>
 
                 <!-- Gradient fade-out overlay -->
-                <div style="position:absolute; bottom:0; left:0; right:0; height:75%; background:linear-gradient(to bottom, rgba(246,249,252,0) 0%, rgba(246,249,252,0.92) 40%, #f6f9fc 100%); pointer-events:none;"></div>
+                <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(246,249,252,0.4) 0%, rgba(246,249,252,0.95) 40%, #f6f9fc 100%); pointer-events:none;"></div>
 
                 <!-- Upgrade card floating over skeleton -->
-                <div style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%); width:100%; max-width:520px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:32px 28px; box-shadow:0 8px 24px -6px rgba(0,0,0,0.08); text-align:center;">
-                    <span class="dashicons dashicons-lock" style="font-size:36px; width:36px; height:36px; color:#777BB3; display:inline-block; margin-bottom:12px;"></span>
-                    <h3 style="margin:0 0 8px; font-size:20px; font-weight:600; color:#1d2327;">Full diagnostics locked</h3>
-                    <p style="margin:0 0 6px; font-size:13.5px; color:#475569; line-height:1.6; max-width:400px; margin-left:auto; margin-right:auto;">Unlock critical issues, security headers, SSL, OPcache, database health, and 1-click auto-fixes.</p>
-                    <p style="margin:0 0 22px; font-size:12.5px; color:#94a3b8;">Your overall score above is real - the details explain exactly what to fix.</p>
-                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary button-large" style="background:#777BB3; border-color:#777BB3; height:42px; line-height:40px; font-size:14px; font-weight:600; padding:0 26px; border-radius:6px; text-decoration:none; display:inline-block;">Upgrade to Pro &rarr;</a>
+                <div style="position:relative; z-index:2; width:100%; max-width:480px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; box-shadow:0 6px 20px -4px rgba(0,0,0,0.07); text-align:center; margin:12px auto;">
+                    <span class="dashicons dashicons-lock" style="font-size:30px; width:30px; height:30px; color:#777BB3; display:inline-block; margin-bottom:6px;"></span>
+                    <h3 style="margin:0 0 6px; font-size:18px; font-weight:600; color:#1d2327;"><?php _e('Full Diagnostics & Action Items Locked', 'phpinfo-wp'); ?></h3>
+                    <p style="margin:0 0 4px; font-size:13px; color:#475569; line-height:1.5; max-width:400px; margin-left:auto; margin-right:auto;"><?php _e('Unlock detailed issue breakdowns, security headers, SSL, OPcache, database health, and 1-click auto-fixes.', 'phpinfo-wp'); ?></p>
+                    <p style="margin:0 0 16px; font-size:12px; color:#94a3b8;"><?php _e('Your overall score above is real — upgrade to see the exact steps to fix issues.', 'phpinfo-wp'); ?></p>
+                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary button-large" style="background:#777BB3; border-color:#777BB3; height:38px; line-height:36px; font-size:13.5px; font-weight:600; padding:0 22px; border-radius:6px; text-decoration:none; display:inline-block;"><?php _e('Upgrade to Pro &rarr;', 'phpinfo-wp'); ?></a>
                 </div>
-
-                <!-- Spacer so the floating card has room -->
-                <div style="height:220px;"></div>
             </div>
         <?php else: // Pro users get the full detail HTML below ?>
 

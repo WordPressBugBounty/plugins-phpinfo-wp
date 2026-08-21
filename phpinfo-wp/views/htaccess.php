@@ -298,39 +298,40 @@ Phpinfo_wp::thankyou();
       animation: phpinfowp-pulse 2s infinite ease-in-out;
   }
 
-  /* Mock IDE / Terminal Window Wrapper */
+  /* Mock IDE / Terminal Window Wrapper (White Theme) */
   .phpinfowp-ide-window {
-      background: #1e1e2e;
-      border-radius: 6px;
-      border: 1px solid #313244;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       overflow: hidden;
       margin-bottom: 16px;
   }
   .phpinfowp-ide-header {
-      background: #181825;
+      background: #f8fafc;
       padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #313244;
+      border-bottom: 1px solid #e2e8f0;
   }
   .phpinfowp-ide-footer {
-      background: #181825;
+      background: #f8fafc;
       padding: 12px 16px;
-      border-top: 1px solid #313244;
+      border-top: 1px solid #e2e8f0;
       font-size: 12px;
-      color: #a6adc8 !important;
+      color: #64748b !important;
       line-height: 1.5;
   }
   .phpinfowp-ide-footer strong {
-      color: #cdd6f4 !important;
+      color: #1e293b !important;
   }
   .phpinfowp-ide-footer code {
-      background: #313244 !important;
-      color: #cdd6f4 !important;
-      border: 1px solid #45475a !important;
-      padding: 2px 4px !important;
+      background: #f1f5f9 !important;
+      color: #0f172a !important;
+      border: 1px solid #e2e8f0 !important;
+      padding: 2px 5px !important;
+      border-radius: 4px !important;
       font-size: 11px !important;
   }
   .phpinfowp-ide-dots {
@@ -350,32 +351,34 @@ Phpinfo_wp::thankyou();
   
   .phpinfowp-ide-tabs {
       display: flex;
-      margin-bottom: -13px;
+      margin-bottom: -11px;
       margin-left: 16px;
   }
   .phpinfowp-ide-tab {
-      background: #1e1e2e;
-      color: #cdd6f4;
+      background: #ffffff;
+      color: #334155;
       padding: 6px 14px;
       border-radius: 6px 6px 0 0;
       font-size: 12px;
+      font-weight: 500;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       display: flex;
       align-items: center;
       gap: 6px;
-      border: 1px solid #313244;
-      border-bottom: none;
+      border: 1px solid #e2e8f0;
+      border-bottom: 1px solid #ffffff;
   }
   .phpinfowp-ide-body {
       position: relative;
+      background: #ffffff;
   }
 
   /* IDE Editor Textarea */
   .phpinfowp-ide-textarea {
       width: 100%;
       min-height: 280px;
-      background: #1e1e2e !important;
-      color: #cdd6f4 !important;
+      background: #ffffff !important;
+      color: #0f172a !important;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Fira Code", monospace !important;
       font-size: 13px !important;
       line-height: 1.6 !important;
@@ -388,7 +391,7 @@ Phpinfo_wp::thankyou();
       box-sizing: border-box;
   }
   .phpinfowp-ide-textarea::placeholder {
-      color: #585b70;
+      color: #94a3b8;
       font-style: italic;
   }
   .phpinfowp-ide-textarea:focus {
@@ -400,8 +403,8 @@ Phpinfo_wp::thankyou();
   .phpinfowp-ide-preview {
       width: 100%;
       height: 280px;
-      background: #1e1e2e;
-      color: #cdd6f4;
+      background: #ffffff;
+      color: #334155;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Fira Code", monospace;
       font-size: 12px;
       line-height: 1.6;
@@ -422,16 +425,16 @@ Phpinfo_wp::thankyou();
   }
   .phpinfowp-ide-textarea::-webkit-scrollbar-track,
   .phpinfowp-ide-preview::-webkit-scrollbar-track {
-      background: #181825;
+      background: #f8fafc;
   }
   .phpinfowp-ide-textarea::-webkit-scrollbar-thumb,
   .phpinfowp-ide-preview::-webkit-scrollbar-thumb {
-      background: #313244;
+      background: #cbd5e1;
       border-radius: 4px;
   }
   .phpinfowp-ide-textarea::-webkit-scrollbar-thumb:hover,
   .phpinfowp-ide-preview::-webkit-scrollbar-thumb:hover {
-      background: #45475a;
+      background: #94a3b8;
   }
 
   /* Page columns grid layout */
@@ -541,8 +544,9 @@ Phpinfo_wp::thankyou();
       letter-spacing: 0.5px;
   }
   .phpinfowp-badge-pro {
-      background: #e0e7ff;
-      color: #4f46e5;
+      background: #eff0f9;
+      color: #777BB3;
+      border: 1px solid #d8daeb;
   }
   .phpinfowp-badge-neutral {
       background: #f1f5f9;
@@ -799,7 +803,7 @@ Phpinfo_wp::thankyou();
                       </button>
                   </form>
               <?php else: ?>
-                  <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="background:#4f46e5; border-color:#4338ca;">
+                  <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="background:#777BB3; border-color:#777BB3;">
                       <span class="dashicons dashicons-lock" style="font-size:14px; width:14px; height:14px;"></span>
                       Upgrade to Pro
                   </a>
@@ -823,12 +827,12 @@ Phpinfo_wp::thankyou();
                       <h3 style="margin:0; font-size:15px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
                           <?php echo esc_html($snippet['title']); ?>
                           <?php if (!$is_pro): ?>
-                              <span class="dashicons dashicons-lock" style="font-size:16px; width:16px; height:16px; color:#6366f1; margin-top:2px;"></span>
+                              <span class="dashicons dashicons-lock" style="font-size:16px; width:16px; height:16px; color:#777BB3; margin-top:2px;"></span>
                           <?php endif; ?>
                       </h3>
                       <div style="display:flex; gap:6px;">
                           <?php if (!$is_pro): ?>
-                              <span class="phpinfowp-badge phpinfowp-badge-pro" style="background:#e0e7ff; color:#4f46e5;"><?php _e('PRO', 'phpinfo-wp'); ?></span>
+                              <span class="phpinfowp-badge phpinfowp-badge-pro" style="background:#eff0f9; color:#777BB3; border:1px solid #d8daeb;"><?php _e('PRO', 'phpinfo-wp'); ?></span>
                           <?php endif; ?>
                           <span class="phpinfowp-badge phpinfowp-badge-neutral"><?php echo $snippet_server === 'nginx' ? 'Nginx' : 'Apache'; ?></span>
                       </div>
@@ -837,16 +841,16 @@ Phpinfo_wp::thankyou();
                   
                   <div style="margin-bottom: 14px; position: relative;">
                       <div class="phpinfowp-ide-window" style="margin-bottom:0; box-shadow:none; border-radius:6px; <?php echo !$is_pro ? 'filter: blur(4px); opacity: 0.6; pointer-events: none; user-select: none;' : ''; ?>">
-                          <div class="phpinfowp-ide-header" style="padding: 6px 12px; background: #181825;">
+                          <div class="phpinfowp-ide-header" style="padding: 6px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                               <div class="phpinfowp-ide-dots">
                                   <span class="phpinfowp-ide-dot red" style="width:7px; height:7px;"></span>
                                   <span class="phpinfowp-ide-dot yellow" style="width:7px; height:7px;"></span>
                                   <span class="phpinfowp-ide-dot green" style="width:7px; height:7px;"></span>
                               </div>
-                              <span style="font-size:11px; color:#585b70; font-family:monospace;"><?php echo $snippet_server === 'nginx' ? 'nginx.conf' : '.htaccess'; ?></span>
+                              <span style="font-size:11px; color:#64748b; font-family:monospace;"><?php echo $snippet_server === 'nginx' ? 'nginx.conf' : '.htaccess'; ?></span>
                           </div>
                           <div class="phpinfowp-ide-body">
-                              <pre style="margin:0; padding:10px 14px; background:#1e1e2e; color:#a6adc8; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11.5px; line-height:1.5; overflow-x:auto; max-height:120px;"><?php echo esc_html($snippet_code); ?></pre>
+                              <pre style="margin:0; padding:10px 14px; background:#ffffff; color:#334155; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11.5px; line-height:1.5; overflow-x:auto; max-height:120px;"><?php echo esc_html($snippet_code); ?></pre>
                           </div>
                       </div>
                   </div>
@@ -857,7 +861,7 @@ Phpinfo_wp::thankyou();
                               ⚡ <strong><?php _e('These settings can make your site up to 2x faster!', 'phpinfo-wp'); ?></strong> Unlock this optimization snippet and boost your performance instantly.
                           </p>
                           <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 10px;">
-                              <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="padding: 6px 12px; font-size: 12.5px; background: #4f46e5; border-color: #4338ca;">
+                              <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="padding: 6px 14px; font-size: 12.5px; background: #777BB3; border-color: #777BB3;">
                                   <span class="dashicons dashicons-lock" style="font-size: 14px; width: 14px; height: 14px;"></span>
                                   Upgrade to Pro
                               </a>
@@ -927,7 +931,7 @@ Phpinfo_wp::thankyou();
           <?php if ($preview): ?>
             <pre class="phpinfowp-ide-preview"><?php echo esc_html($preview); ?></pre>
           <?php else: ?>
-            <div class="phpinfowp-ide-preview" style="display:flex; align-items:center; justify-content:center; color:#585b70; font-style:italic;"><?php _e('File does not exist yet — it will be created on first save.', 'phpinfo-wp'); ?></div>
+            <div class="phpinfowp-ide-preview" style="display:flex; align-items:center; justify-content:center; color:#94a3b8; font-style:italic;"><?php _e('File does not exist yet — it will be created on first save.', 'phpinfo-wp'); ?></div>
           <?php endif; ?>
         </div>
         <div class="phpinfowp-ide-footer"><?php _e('Active directives on disk.', 'phpinfo-wp'); ?></div>

@@ -5,12 +5,20 @@ class Phpinfo_WP_Mail_Check {
 
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
-    public static function audit(): array {
-        if (!self::_pro()) return [];
-
+    public static function audit(bool $force_refresh = false): array {
         $from   = get_option('admin_email', '');
         $parts  = explode('@', $from);
         $domain = isset($parts[1]) ? strtolower($parts[1]) : '';
+
+        $transient_key = 'phpinfowp_mail_audit_' . md5($domain);
+        if (!$force_refresh) {
+            $cached = get_transient($transient_key);
+            if (is_array($cached)) {
+                $cached['smtp_plugin'] = self::_detect_smtp_plugin();
+                $cached['using_php_mail'] = empty($cached['smtp_plugin']);
+                return $cached;
+            }
+        }
 
         $spf   = $domain ? self::_lookup_spf($domain) : ['present' => false];
         $dmarc = $domain ? self::_lookup_dmarc($domain) : ['present' => false];
@@ -18,15 +26,19 @@ class Phpinfo_WP_Mail_Check {
 
         $smtp_plugin = self::_detect_smtp_plugin();
 
-        return [
-            'from_email'   => $from,
-            'domain'       => $domain,
-            'spf'          => $spf,
-            'dmarc'        => $dmarc,
-            'mx'           => $mx,
-            'smtp_plugin'  => $smtp_plugin,
+        $result = [
+            'from_email'     => $from,
+            'domain'         => $domain,
+            'spf'            => $spf,
+            'dmarc'          => $dmarc,
+            'mx'             => $mx,
+            'smtp_plugin'    => $smtp_plugin,
             'using_php_mail' => empty($smtp_plugin),
+            'last_checked'   => current_time('timestamp'),
         ];
+
+        set_transient($transient_key, $result, 12 * HOUR_IN_SECONDS);
+        return $result;
     }
 
     private static function _lookup_spf(string $domain): array {
@@ -100,8 +112,16 @@ class Phpinfo_WP_Mail_Check {
         return null;
     }
 
-    public static function discover_routing_emails(): array {
+    public static function discover_routing_emails(bool $force_refresh = false): array {
         if (!self::_pro()) return [];
+
+        $transient_key = 'phpinfowp_mail_routing_' . md5(get_option('admin_email'));
+        if (!$force_refresh) {
+            $cached = get_transient($transient_key);
+            if (is_array($cached)) {
+                return $cached;
+            }
+        }
 
         $emails = [];
         $admin_email = get_option('admin_email');
@@ -193,14 +213,22 @@ class Phpinfo_WP_Mail_Check {
             }
         }
 
-        // De-duplicate and check MX
+        // De-duplicate and check MX with domain-level memoization
         $unique = [];
+        $domain_mx_cache = [];
         foreach ($emails as $e) {
             $email_lower = strtolower($e['email']);
             if (!isset($unique[$email_lower])) {
                 $parts = explode('@', $e['email']);
                 $domain = $parts[1] ?? '';
-                $mx = $domain ? self::_lookup_mx($domain) : [];
+                if ($domain) {
+                    if (!isset($domain_mx_cache[$domain])) {
+                        $domain_mx_cache[$domain] = self::_lookup_mx($domain);
+                    }
+                    $mx = $domain_mx_cache[$domain];
+                } else {
+                    $mx = [];
+                }
                 $e['mx_ok'] = !empty($mx);
                 $e['sources'] = [$e['source']];
                 $unique[$email_lower] = $e;
@@ -218,7 +246,9 @@ class Phpinfo_WP_Mail_Check {
         }
         unset($e);
 
-        return array_values($unique);
+        $out = array_values($unique);
+        set_transient($transient_key, $out, 12 * HOUR_IN_SECONDS);
+        return $out;
     }
 
     public static function send_test(string $to): array {

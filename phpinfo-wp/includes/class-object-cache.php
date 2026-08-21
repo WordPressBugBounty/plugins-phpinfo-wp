@@ -31,8 +31,6 @@ class Phpinfo_WP_Object_Cache {
     }
 
     public static function status(): ?array {
-        if (!self::_pro()) return null;
-
         $type = self::active_type();
         if (!$type) return null;
 

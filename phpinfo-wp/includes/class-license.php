@@ -3,12 +3,14 @@ defined('ABSPATH') or die('Unauthorized Access');
 
 class Phpinfo_WP_License {
 
-    const OPT_KEY    = 'phpinfowp_license_key';
-    const OPT_CACHE  = 'phpinfowp_lic_cache';
-    const OPT_FAILS  = 'phpinfowp_lic_fails';
-    const OPT_LOCKED = 'phpinfowp_lic_locked';
-    const MAX_FAILS  = 2;
-    const PING_URL   = 'https://exeebit.com/api/license/validate';
+    const OPT_KEY         = 'phpinfowp_license_key';
+    const OPT_CACHE       = 'phpinfowp_lic_cache';
+    const OPT_FAILS       = 'phpinfowp_lic_fails';
+    const OPT_LOCKED      = 'phpinfowp_lic_locked';
+    const OPT_REVOKE_REASON = 'phpinfowp_lic_revoke_reason';
+    const OPT_LAST_CHECK  = 'phpinfowp_lic_last_check';
+    const MAX_FAILS       = 2;
+    const PING_URL        = 'https://exeebit.com/api/license/validate';
 
     // Secret assembled from fragments
     private const _F1 = "\x50\x49\x57\x50";
@@ -67,6 +69,10 @@ class Phpinfo_WP_License {
         return (string) get_option(self::OPT_KEY, '');
     }
 
+    public static function get_revoke_reason(): string {
+        return (string) get_option(self::OPT_REVOKE_REASON, '');
+    }
+
     // Parse the active key's payload for UI display. Returns null when the
     // key is missing or malformed. Does NOT re-verify the HMAC — call
     // is_valid() for that. Returned keys: email, url, exp, iat (all from
@@ -106,7 +112,23 @@ class Phpinfo_WP_License {
         $cached = self::_cache_read();
         if ($cached !== null) return $cached;
 
-        $valid = self::_validate_local(self::get_key());
+        $key = self::get_key();
+        if (empty($key)) return false;
+
+        $valid = self::_validate_local($key);
+        if (!$valid) {
+            self::_cache_write(false);
+            return false;
+        }
+
+        // Trigger non-blocking background verification if last remote check is > 24 hours
+        $last_check = (int) get_option(self::OPT_LAST_CHECK, 0);
+        if (time() - $last_check > DAY_IN_SECONDS) {
+            if (!wp_next_scheduled('phpinfowp_license_ping_async')) {
+                wp_schedule_single_event(time(), 'phpinfowp_license_ping_async');
+            }
+        }
+
         self::_cache_write($valid);
         return $valid;
     }
@@ -125,22 +147,47 @@ class Phpinfo_WP_License {
         return (bool) get_option(self::OPT_LOCKED, false);
     }
 
-    public static function activate(string $key): bool {
+    public static function lock_revoked(string $reason = 'revoked'): void {
+        update_option(self::OPT_LOCKED, 1, false);
+        update_option(self::OPT_REVOKE_REASON, $reason, false);
+        self::_cache_write(false);
+    }
+
+    public static function activate(string $key, ?string &$reason = null): bool {
         $key = sanitize_text_field(trim($key));
+        if (empty($key)) {
+            $reason = 'missing_key';
+            return false;
+        }
+
+        // 1. Basic format & signature check locally first
+        if (!self::_validate_local($key)) {
+            $reason = 'bad_signature';
+            return false;
+        }
+
+        // 2. Query Exeebit to verify real-time status and check for revocations / site limits
+        $remote = self::check_remote($key);
+
+        if ($remote['status'] === 'invalid') {
+            // Server EXPLICITLY rejected the key (revoked, refunded, expired, site_limit_exceeded)
+            // DO NOT fall back to local validation.
+            self::deactivate();
+            self::lock_revoked($remote['reason'] ?? 'revoked');
+            $reason = $remote['reason'] ?? 'revoked';
+            return false;
+        }
+
+        // Key is either validated by remote server OR remote server is unreachable (offline grace)
         update_option(self::OPT_KEY, $key, false);
         self::_cache_clear();
         delete_option(self::OPT_FAILS);
         delete_option(self::OPT_LOCKED);
+        delete_option(self::OPT_REVOKE_REASON);
+        update_option(self::OPT_LAST_CHECK, time(), false);
 
-        // Always ping remote during manual activation to track it in real-time
-        // and enforce site limits immediately.
-        $valid = self::_ping_remote($key);
-        if (!$valid) {
-            // Fallback to local check if remote server is unreachable or offline
-            $valid = self::_validate_local($key);
-        }
-        self::_cache_write($valid);
-        return $valid;
+        self::_cache_write(true);
+        return true;
     }
 
     public static function deactivate(): void {
@@ -148,27 +195,74 @@ class Phpinfo_WP_License {
         self::_cache_clear();
         delete_option(self::OPT_FAILS);
         delete_option(self::OPT_LOCKED);
+        delete_option(self::OPT_REVOKE_REASON);
+        delete_option(self::OPT_LAST_CHECK);
     }
 
-    // Called by weekly wp_cron. After MAX_FAILS consecutive failures, locks Pro.
+    // Called by wp_cron. Locks Pro IMMEDIATELY if server returns invalid/revoked.
     public static function cron_ping(): void {
         $key = self::get_key();
         if (!$key) return;
 
-        $ok = self::_ping_remote($key);
-        if ($ok) {
+        $check = self::check_remote($key);
+
+        if ($check['status'] === 'valid') {
             update_option(self::OPT_FAILS, 0, false);
             delete_option(self::OPT_LOCKED);
-            self::_cache_clear();
+            delete_option(self::OPT_REVOKE_REASON);
+            update_option(self::OPT_LAST_CHECK, time(), false);
+            self::_cache_write(true);
             return;
         }
 
+        if ($check['status'] === 'invalid') {
+            // Server explicitly returned revoked / refunded / invalid
+            // Lock IMMEDIATELY on the very first ping!
+            self::lock_revoked($check['reason'] ?? 'revoked');
+            return;
+        }
+
+        // Network error: only lock after MAX_FAILS consecutive network failures
         $fails = (int) get_option(self::OPT_FAILS, 0) + 1;
         update_option(self::OPT_FAILS, $fails, false);
         if ($fails >= self::MAX_FAILS) {
             update_option(self::OPT_LOCKED, 1, false);
+            update_option(self::OPT_REVOKE_REASON, 'unreachable', false);
             self::_cache_clear();
         }
+    }
+
+    // --- Remote verification ---
+
+    public static function check_remote(string $key): array {
+        $resp = wp_remote_post(self::PING_URL, [
+            'timeout' => 12,
+            'body'    => [
+                'license_key' => $key,
+                'site_url'    => get_site_url(),
+                'plugin_v'    => PHPINFOWP_VERSION,
+            ],
+        ]);
+
+        if (is_wp_error($resp)) {
+            return ['status' => 'network_error', 'error' => $resp->get_error_message()];
+        }
+
+        $code = wp_remote_retrieve_response_code($resp);
+        if ($code >= 500 || $code === 429) {
+            return ['status' => 'network_error', 'error' => 'HTTP ' . $code];
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($resp), true);
+        if (is_array($body) && isset($body['valid'])) {
+            if ($body['valid'] === true) {
+                return ['status' => 'valid', 'tier' => $body['tier'] ?? 'single'];
+            } else {
+                return ['status' => 'invalid', 'reason' => $body['reason'] ?? 'revoked'];
+            }
+        }
+
+        return ['status' => 'network_error', 'error' => 'Invalid server response'];
     }
 
     // --- Key validation ---
@@ -206,25 +300,13 @@ class Phpinfo_WP_License {
     }
 
     private static function _ping_remote(string $key): bool {
-        $resp = wp_remote_post(self::PING_URL, [
-            'timeout' => 12,
-            'body'    => [
-                'license_key' => $key,
-                'site_url'    => get_site_url(),
-                'plugin_v'    => PHPINFOWP_VERSION,
-            ],
-        ]);
-
-        if (is_wp_error($resp)) return false;
-        if (wp_remote_retrieve_response_code($resp) !== 200) return false;
-
-        $body = json_decode(wp_remote_retrieve_body($resp), true);
-        return !empty($body['valid']);
+        $check = self::check_remote($key);
+        return $check['status'] === 'valid';
     }
 
     public static function schedule_remote_check_event(): void {
         if (!wp_next_scheduled('phpinfowp_license_ping')) {
-            wp_schedule_event(time() + WEEK_IN_SECONDS, 'weekly', 'phpinfowp_license_ping');
+            wp_schedule_event(time() + DAY_IN_SECONDS, 'daily', 'phpinfowp_license_ping');
         }
     }
 

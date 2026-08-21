@@ -220,13 +220,13 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
     <?php if ($fixable_keys && $target_writable): ?>
         <?php $profile = Phpinfo_WP_Config_Grader::dominant_profile($ctx); ?>
         <?php if ($profile): ?>
-            <div style="background:linear-gradient(135deg, #1e1e1e, #2a2a2a); border:1px solid #333; border-radius:10px; padding:20px 24px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="phpinfowp-action-banner" style="background:linear-gradient(135deg, #1e1e2f, #26273b); border:1px solid #3d3e56; border-radius:10px; padding:20px 24px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
                 <div style="flex:1; min-width:300px;">
                     <div style="display:inline-block; font-size:24px; margin-right:12px; vertical-align:middle;"><?php echo esc_html($profile['icon']); ?></div>
-                    <strong style="font-size:18px; color:#fff; vertical-align:middle; letter-spacing:0.3px;"><?php echo esc_html($profile['name']); ?> Detected</strong>
-                    <p style="margin:8px 0 0; color:#aaa; font-size:13.5px; line-height:1.5;">
+                    <strong style="font-size:17px; color:#fff; vertical-align:middle; letter-spacing:0.3px;"><?php echo esc_html($profile['name']); ?> Detected</strong>
+                    <p style="margin:8px 0 0; color:#a6adc8; font-size:13px; line-height:1.5;">
                         <?php echo esc_html($profile['desc']); ?><br>
-                        <span style="color:#ddd; margin-top:6px; display:inline-block;">We'll automatically apply the optimal configuration to <code><?php echo esc_html(basename($target_info['file'])); ?></code>.</span>
+                        <span style="color:#d8daeb; margin-top:6px; display:inline-block;">We'll automatically apply the optimal configuration to <code><?php echo esc_html(basename($target_info['file'])); ?></code>.</span>
                     </p>
                 </div>
                 <form method="post" style="margin:0">
@@ -235,14 +235,14 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                     <?php foreach ($fixable_keys as $k): ?>
                         <input type="hidden" name="fix_keys[]" value="<?php echo esc_attr($k); ?>">
                     <?php endforeach; ?>
-                    <button type="submit" class="button button-primary" style="font-size:14px; padding:6px 16px; height:auto; background:#007cba; border-color:#007cba;"><?php _e('1-Click Optimize Server →', 'phpinfo-wp'); ?></button>
+                    <button type="submit" class="button button-primary" style="font-size:13.5px; padding:7px 18px; height:auto; background:#777BB3; border-color:#777BB3; color:#fff; font-weight:600; border-radius:6px;"><?php _e('1-Click Optimize Server →', 'phpinfo-wp'); ?></button>
                 </form>
             </div>
         <?php else: ?>
-            <div style="background:linear-gradient(135deg,#f3f7ff,#eaf4ff);border:1px solid #c8d8f5;border-radius:8px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+            <div class="phpinfowp-action-banner" style="background:linear-gradient(135deg, #f8f8fc 0%, #eff0f9 100%); border:1px solid #d8daeb; border-radius:8px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; box-shadow:0 1px 3px rgba(119,123,179,0.06);">
                 <div>
-                    <strong style="font-size:14px;color:#1a3a72">⚡ Optimize Server Profile (<?php echo count($fixable_keys); ?> missing directives)</strong>
-                    <p style="margin:4px 0 0;color:#3a567c;font-size:12px">
+                    <strong style="font-size:14px; color:#2c2f48; display:flex; align-items:center; gap:6px;">⚡ Optimize Server Profile (<?php echo count($fixable_keys); ?> missing directives)</strong>
+                    <p style="margin:4px 0 0; color:#555870; font-size:12.5px; line-height:1.5;">
                         Writes our recommended WordPress defaults to <code><?php echo esc_html(basename($target_info['file'])); ?></code> with automatic rollback on errors.
                     </p>
                 </div>
@@ -252,7 +252,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
                     <?php foreach ($fixable_keys as $k): ?>
                         <input type="hidden" name="fix_keys[]" value="<?php echo esc_attr($k); ?>">
                     <?php endforeach; ?>
-                    <button type="submit" class="button button-primary"><?php _e('Apply Server Profile →', 'phpinfo-wp'); ?></button>
+                    <button type="submit" class="button button-primary" style="background:#777BB3; border-color:#777BB3; color:#fff; font-weight:600; padding:6px 16px; border-radius:6px;"><?php _e('Apply Server Profile →', 'phpinfo-wp'); ?></button>
                 </form>
             </div>
         <?php endif; ?>

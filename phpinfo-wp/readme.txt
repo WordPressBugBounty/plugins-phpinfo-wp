@@ -2,8 +2,8 @@
 Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
-Tested up to: 7.0
-Stable tag: 7.2.5
+Tested up to: 7.1
+Stable tag: 7.2.6
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -48,15 +48,17 @@ Think of it as the official **"Health Check & Troubleshooting"** plugin, but bui
 
 *   **Full Config Grader**: Detailed grading with the exact recommended values and why each directive matters.
 *   **Database Health**: Engine version, EOL status, size, and autoload bloat detection.
-*   **OPcache Dashboard**: Hit rate, memory usage, cached scripts, and one-click OPcache clearing.
-*   **PHP Error Log Viewer**: Browse, search, and clear your PHP error log directly from the dashboard.
-*   **WP Cron Monitor**: Find overdue events, orphan hooks, and recently-run cron tasks.
-*   **Outbound API Latency Tracker**: Pinpoint slow third-party connections (payment gateways, CRMs, webhooks) that bottleneck page load times.
-*   **Mail Deliverability**: Send-test, SPF and DKIM validation.
+*   **External API Monitor**: Track response times, status codes, and SSL expiry for third-party endpoints your site depends on.
+*   **Permissions Audit**: Recursive file and directory permission auditor.
+*   **OPcache Dashboard**: Memory usage, hit rate, cached scripts, and one-click reset.
+*   **Object Cache Monitor**: Status, backend detection, hit/miss metrics, and Redis/Memcached verification.
+*   **Live Error Log Viewer**: Filterable error stream directly inside wp-admin.
+*   **WP-Cron Monitor**: Catch missed tasks, runaway jobs, and stuck schedules.
+*   **Mail Deliverability**: Test wp_mail(), inspect PHPMailer transport, and send test emails.
+*   **Health Alerts**: Real-time email notifications and Slack/Discord webhook alerts when critical issues occur.
 
 **Deliver: Look professional to clients**
 
-*   **Audit Report**: Single-page PDF audit report to hand to clients (fully white-labeled on Unlimited or Lifetime, branded on Single).
 *   **Email Alerts**: Get notified on PHP EOL, config drift, OPcache drops, and SSL expiry.
 *   **Weekly Digest**: Full server health summary delivered to your inbox every Monday (Unlimited or Lifetime).
 *   **Integrations**: Slack, Discord, and Webhook support for real-time alerts (Unlimited or Lifetime).
@@ -156,6 +158,9 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 7. Audit Report (Pro): single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.2.6 =
+* **Compatibility**: Tested up to WordPress 7.1.
 
 = 7.2.5 =
 * **Improved**: Price increase reminder — Single Site plan increases from $29 to $39/year on August 31st. Lock in the current rate before then.

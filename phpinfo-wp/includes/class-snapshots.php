@@ -42,7 +42,6 @@ class Phpinfo_WP_Snapshots {
     }
 
     public static function capture(): array {
-        if (!self::_pro()) return [];
         $data = [];
         foreach (self::TRACKED as $key) {
             $val = ini_get($key);
@@ -67,7 +66,6 @@ class Phpinfo_WP_Snapshots {
     }
 
     public static function list(int $limit = 50): array {
-        if (!self::_pro()) return [];
         global $wpdb;
         return $wpdb->get_results($wpdb->prepare(
             "SELECT id, label, created_by, created_at FROM " . self::table() . " ORDER BY created_at DESC LIMIT %d",

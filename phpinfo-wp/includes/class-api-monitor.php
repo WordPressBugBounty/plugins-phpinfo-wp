@@ -14,8 +14,6 @@ class Phpinfo_WP_API_Monitor {
     private static $is_dirty = false;
 
     public static function register(): void {
-        if (!Phpinfo_WP_License::is_valid()) return;
-
         add_filter('http_request_args', [__CLASS__, 'mark_start'], 9999, 2);
         add_action('http_api_debug',    [__CLASS__, 'mark_end'],   9999, 5);
         add_action('shutdown',          [__CLASS__, 'save_stats']);

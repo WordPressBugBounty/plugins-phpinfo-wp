@@ -22,8 +22,20 @@ $options = [
     'phpinfowp_last_unhealthy_ts',
     'phpinfowp_opcache_baseline_hit',
     'phpinfowp_install_ts',
+    // Pro License Data
+    'phpinfowp_license_key',
+    'phpinfowp_lic_cache',
+    'phpinfowp_lic_fails',
+    'phpinfowp_lic_locked',
+    'phpinfowp_lic_revoke_reason',
+    'phpinfowp_lic_last_check',
+    // Pro Branding
+    'phpinfowp_report_branding',
 ];
 foreach ($options as $opt) delete_option($opt);
+
+// Clear scheduled cron events
+wp_clear_scheduled_hook('phpinfowp_license_ping_async');
 
 // 3. Drop our transients (peak-memory daily keys, safemode session tokens,
 //    SSL cache per host, security-headers cache).

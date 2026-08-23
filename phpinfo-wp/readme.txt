@@ -3,7 +3,7 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.1
-Stable tag: 7.2.6
+Stable tag: 7.2.7
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -21,7 +21,7 @@ Think of it as the official **"Health Check & Troubleshooting"** plugin, but bui
 
 *   **phpinfo() viewer**: Clean, searchable, and modern (the original feature, completely restyled).
 *   **Host-Friendly Compatibility Scanner**: Scan all plugins and themes for PHP version conflicts before upgrading, built to work smoothly even on strict managed hosts.
-*   **Update Guard**: Preview core upgrade stability. Detect deprecated calls and removed APIs to get a clear Safe, Caution, or Risky rating before clicking update.
+*   **Update Guard**: Complete pre-update & post-update safety suite. Preview core upgrade stability, scan pending plugin and theme updates for breaking changes, and auto-verify site health 60s after every update.
 *   **Zero-Downtime Troubleshooting**: Safely debug theme and plugin conflicts in your own admin session without affecting visitors or live sales.
 *   **PHP EOL Timeline**: Every PHP version's end-of-life date, current status, and days remaining.
 *   **Config Grader summary**: Overall A-F grade of your PHP config against WordPress best practices.
@@ -38,7 +38,7 @@ Think of it as the official **"Health Check & Troubleshooting"** plugin, but bui
 
 *   **1-Click Auto-Fix with Rollback**: Fix config issues instantly. Writes optimization rules to .htaccess or .user.ini and auto-reverts if the server hits a 500 error.
 *   **Pre-Update PHP check**: Scan plugin updates before upgrading to verify they do not require a PHP version you do not have.
-*   **Update Guard Pro**: Automatic interception on the WordPress Updates page, tested-up-to alerts, abandonment alerts, AI-written remediation steps, and full line-by-line inspection.
+*   **Update Guard Pro**: Automatic interception on the WordPress Updates page, changelog breaking-change risk analysis, WP.org abandonment alerts, post-update diagnostic health checks (loopback, error log delta, cron), and AI-written remediation steps.
 *   **Config Snapshots**: Weekly automatic snapshots of every php.ini directive, with visual diffs.
 *   **Security Headers Auditor**: Grade your HTTP response headers (CSP, HSTS, X-Frame-Options) with fix suggestions.
 *   **Web Server Snippet Library**: Optimized Nginx and Apache configuration blocks for caching, security, and bad bot blocking, with 1-click injection for Apache and LiteSpeed.
@@ -158,6 +158,14 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 7. Audit Report (Pro): single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.2.7 =
+* **Feature**: Enriched Update Guard — Added Plugin & Theme pre-update compatibility scanning (PHP/WP floors, changelog risk parsing, abandonment checks), automated 60-second post-update health diagnostics (loopback, admin reachability, error log delta, cron integrity), and per-component stability tracking.
+* **Fix**: Renamed admin page query string slugs to `piwp-*` to prevent 403 Forbidden false-positives caused by 8G/7G Firewalls, BBQ (Block Bad Queries), and LiteSpeed rules blocklisting the `phpinfo` token in URL parameters. Special thanks to **Simon Richards** for discovering and reporting this.
+* **Enhancement**: Added seamless AJAX license activation and deactivation with instant inline validation and loading feedback.
+* **Enhancement**: Made Technical Support & Server Diagnostics accessible to all users with live environment signals.
+* **Fix**: Fixed button text vertical alignment across admin screens.
+* **Fix**: Corrected whitespace formatting and line wrapping in PHP error log viewer.
 
 = 7.2.6 =
 * **Compatibility**: Tested up to WordPress 7.1.

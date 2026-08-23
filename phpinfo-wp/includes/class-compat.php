@@ -286,7 +286,7 @@ class Phpinfo_WP_Compat {
 
         $is_pro = self::_pro();
         $upgrade_url = $is_pro
-            ? admin_url('admin.php?page=phpinfowp-compat')
+            ? admin_url('admin.php?page=piwp-compat')
             : 'https://exeebit.com/phpinfo-wp#pricing';
         $cta = $is_pro ? 'Run full compatibility scan →' : 'Get pre-upgrade auto-scan with Pro →';
 

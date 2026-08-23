@@ -3,7 +3,7 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.1
-Stable tag: 7.2.6
+Stable tag: 7.2.7
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -20,7 +20,7 @@ Zie het als de officiële plug-in **"Health Check & Problemen oplossen"**, maar 
 
 * **phpinfo() viewer**: Schoon, doorzoekbaar en modern (de originele functie, volledig gerestyled).
 * **Hostvriendelijke compatibiliteitsscanner**: Scan alle plug-ins en thema's op PHP-versieconflicten voordat u upgradet, gebouwd om soepel te werken, zelfs op strikt beheerde hosts.
-* **Update Guard**: Bekijk een voorbeeld van de stabiliteit van de kernupgrade. Detecteer verouderde aanroepen en verwijderde API's om een ​​duidelijke Safe-, Caution- of Risky-beoordeling te krijgen voordat u op Update klikt.
+* **Update Guard**: Volledige veiligheidssuite voor en na updates. Bekijk de stabiliteit van de kernupgrade, scan openstaande plug-in- en thema-updates op compatibiliteitsrisico's en controleer de sitestatus 60 seconden na elke update automatisch.
 * ** Probleemoplossing zonder downtime **: debug veilig thema- en plug-inconflicten in uw eigen beheerderssessie zonder bezoekers of live verkopen te beïnvloeden.
 * **PHP EOL-tijdlijn**: de einddatum van elke PHP-versie, de huidige status en het resterende aantal dagen.
 * **Config Grader-samenvatting**: Algeheel A-F-cijfer van uw PHP-configuratie ten opzichte van de best practices van WordPress.
@@ -37,7 +37,7 @@ Zie het als de officiële plug-in **"Health Check & Problemen oplossen"**, maar 
 
 * **Automatisch repareren met 1 klik en terugdraaien**: configuratieproblemen direct oplossen. Schrijft optimalisatieregels naar .htaccess of .user.ini en keert automatisch terug als de server een 500-fout tegenkomt.
 * **PHP-controle vooraf**: Scan plugin-updates voordat u de upgrade uitvoert om te verifiëren dat deze geen PHP-versie vereisen die u niet heeft.
-* **Update Guard Pro**: Automatische onderschepping op de WordPress Updates-pagina, up-to-date waarschuwingen, verlatingswaarschuwingen, door AI geschreven herstelstappen en volledige regel-voor-regel inspectie.
+* **Update Guard Pro**: Automatische onderschepping op de WordPress Updates-pagina, risicoanalyse van changelogs, waarschuwingen voor verlaten plug-ins, automatische 60-seconden statuscontroles na updates (loopback, fouten, cron) en door AI geschreven herstelstappen.
 * **Config Snapshots**: Wekelijkse automatische snapshots van elke php.ini-richtlijn, met visuele verschillen.
 * **Security Headers Auditor**: Beoordeel uw HTTP-antwoordheaders (CSP, HSTS, X-Frame-Options) met suggesties voor oplossingen.
 * **Webserverfragmentbibliotheek**: geoptimaliseerde Nginx- en Apache-configuratieblokken voor caching, beveiliging en blokkering van slechte bots, met 1-klik-injectie voor Apache en LiteSpeed.
@@ -155,6 +155,22 @@ Ja. In tegenstelling tot scanners die afhankelijk zijn van PHP_CodeSniffer of de
 7. Audit Report (Pro): single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.2.7 =
+* **Functie**: Verrijkte Update Guard — Compatibiliteitsscans voorafgaand aan updates toegevoegd voor plug-ins en thema's (PHP/WP-vereisten, risicoanalyse van changelogs, controle op verlaten plug-ins), automatische 60-seconden statuscontroles na updates (loopback, beheerderstoegang, foutenlogboekdelta, cron-integriteit) en stabiliteitsscores.
+* **Opgelost**: Paginastructuren (slugs) hernoemd naar `piwp-*` om 403 Forbidden foutmeldingen te voorkomen die worden veroorzaakt door 8G/7G-firewalls, BBQ en LiteSpeed-regels die de term `phpinfo` blokkeren. Met dank aan **Simon Richards** voor het ontdekken en melden hiervan.
+* **Verbetering**: Naadloze AJAX-licentieactivatie en -deactivatie toegevoegd met directe validatie en laadindicator.
+* **Verbetering**: Technische ondersteuning en serverdiagnostiek toegankelijk gemaakt voor alle gebruikers met realtime omgevingssignalen.
+* **Opgelost**: Verticale uitlijning van knopteksten op beheerschermen gecorrigeerd.
+* **Opgelost**: Witruimte-opmaak en regelafbreking in PHP-foutenlogboekviewer gecorrigeerd.
+
+= 7.2.6 =
+* **Compatibiliteit**: Getest tot WordPress 7.1.
+
+= 7.2.5 =
+* **Verbeterd**: Herinnering voor prijsverhoging voor het Single Site-abonnement per 31 augustus.
+* **Verbeterd**: Upgrade-meldingen tonen nu echte configuratieproblemen die op uw site zijn gedetecteerd.
+* **Verbeterd**: Visuele verfijningen aan het beheerdersdashboard.
 
 = 7.2.4 =
 * **NIEUW**: Volledige lokalisatie- en vertaalbestanden van visuele plug-ins voor Frans, Duits, Spaans, Italiaans en Nederlands.

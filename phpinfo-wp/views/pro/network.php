@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $eol      = Phpinfo_WP_EOL::status();
 $is_pro   = Phpinfo_WP_License::is_valid();
@@ -51,7 +52,7 @@ $db       = $is_pro ? Phpinfo_WP_DB_Health::server_info() : null;
     <h2 class="phpinfowp-section-heading" style="margin-top:28px"><?php _e('Per-site health', 'phpinfo-wp'); ?></h2>
 
     <?php if (!$is_pro): ?>
-        <div class="notice notice-info inline"><p>Per-site autoload analysis requires a Pro license. <a href="<?php echo esc_url(network_admin_url('admin.php?page=phpinfowp-network')); ?>">Activate one</a>.</p></div>
+        <div class="notice notice-info inline"><p>Per-site autoload analysis requires a Pro license. <a href="<?php echo esc_url(network_admin_url('admin.php?page=piwp-network')); ?>">Activate one</a>.</p></div>
     <?php endif; ?>
 
     <table class="wp-list-table widefat fixed striped">

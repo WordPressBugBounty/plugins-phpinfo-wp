@@ -1,7 +1,8 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 $buy_url     = 'https://exeebit.com/phpinfo-wp#pricing';
-$license_url = admin_url('admin.php?page=phpinfowp-license');
+$license_url = admin_url('admin.php?page=piwp-license');
 
 $pillars = [
     [

@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $is_pro    = Phpinfo_WP_License::is_valid();
 $grader    = Phpinfo_WP_Config_Grader::summary();
@@ -81,7 +82,7 @@ if (!function_exists('render_dash_grid')) {
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-bottom:32px;">
 
         <!-- 1. Config Grader Gauge -->
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-config-grader')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
+        <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-config-grader')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
             <div>
                 <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Setup Optimization', 'phpinfo-wp'); ?></h3>
                 <div style="font-size:32px; font-weight:300; line-height:1; margin-bottom:8px; color:#1d2327;">
@@ -103,7 +104,7 @@ if (!function_exists('render_dash_grid')) {
         </a>
 
         <!-- 2. Memory Donut Chart -->
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-info')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; align-items:center; justify-content:space-between;">
+        <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-info')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; align-items:center; justify-content:space-between;">
             <div>
                 <h3 style="margin:0 0 8px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Memory Peak', 'phpinfo-wp'); ?></h3>
                 <div style="font-size:24px; font-weight:300; line-height:1.2; margin-bottom:4px; color:#1d2327;">
@@ -121,7 +122,7 @@ if (!function_exists('render_dash_grid')) {
         </a>
 
         <!-- 3. DB Autoload Progress -->
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-db-health')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
+        <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-db-health')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
             <div>
                 <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Autoload Bloat', 'phpinfo-wp'); ?></h3>
                 <div style="font-size:24px; font-weight:300; line-height:1; margin-bottom:8px; color:<?php echo $db_color; ?>;">
@@ -140,7 +141,7 @@ if (!function_exists('render_dash_grid')) {
 
         <!-- 4. API Monitor Bar Chart -->
         <?php if ($is_pro): ?>
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-api-monitor')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column;">
+        <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-api-monitor')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column;">
             <h3 style="margin:0 0 12px 0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Slowest External APIs', 'phpinfo-wp'); ?></h3>
             <?php if (empty($top_apis)): ?>
                 <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#888; font-size:13px; font-style:italic;">
@@ -168,7 +169,7 @@ if (!function_exists('render_dash_grid')) {
             <?php endif; ?>
         </a>
         <?php else: ?>
-        <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-api-monitor')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
+        <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-api-monitor')); ?>" style="background:#fff; border:1px solid #ccd0d4; border-radius:6px; padding:20px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(0,0,0,0.02); display:flex; flex-direction:column; justify-content:space-between;">
             <div>
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
                     <h3 style="margin:0; font-size:14px; color:#555; text-transform:uppercase; letter-spacing:0.5px;"><?php _e('Slowest External APIs', 'phpinfo-wp'); ?></h3>

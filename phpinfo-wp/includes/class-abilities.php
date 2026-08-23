@@ -24,13 +24,13 @@ class Phpinfo_WP_Abilities {
         }
 
         wp_register_ability_category('phpinfowp/audit', [
-            'label'       => __('Server Health Audit', 'phpinfo-wp'),
-            'description' => __('Inspect PHP version, server configuration, extensions, and audit grade collected by phpinfo() WP.', 'phpinfo-wp'),
+            'label'       => __('Server Health Audit', 'piwp'),
+            'description' => __('Inspect PHP version, server configuration, extensions, and audit grade collected by phpinfo() WP.', 'piwp'),
         ]);
 
         wp_register_ability('phpinfowp/get-php-version', [
-            'label'               => __('Get PHP Version & EOL Status', 'phpinfo-wp'),
-            'description'         => __('Returns the running PHP version, its end-of-life date, days remaining, and an ok/warning/eol status flag.', 'phpinfo-wp'),
+            'label'               => __('Get PHP Version & EOL Status', 'piwp'),
+            'description'         => __('Returns the running PHP version, its end-of-life date, days remaining, and an ok/warning/eol status flag.', 'piwp'),
             'category'            => 'phpinfowp/audit',
             'input_schema'        => ['type' => 'object', 'properties' => new stdClass()],
             'output_schema'       => [
@@ -49,8 +49,8 @@ class Phpinfo_WP_Abilities {
         ]);
 
         wp_register_ability('phpinfowp/get-config-grade', [
-            'label'               => __('Get Config Grade', 'phpinfo-wp'),
-            'description'         => __('Returns the overall A–F config grade, numeric score, and counts of passing/warning/failing checks.', 'phpinfo-wp'),
+            'label'               => __('Get Config Grade', 'piwp'),
+            'description'         => __('Returns the overall A–F config grade, numeric score, and counts of passing/warning/failing checks.', 'piwp'),
             'category'            => 'phpinfowp/audit',
             'input_schema'        => ['type' => 'object', 'properties' => new stdClass()],
             'output_schema'       => [
@@ -70,8 +70,8 @@ class Phpinfo_WP_Abilities {
         ]);
 
         wp_register_ability('phpinfowp/get-config-issues', [
-            'label'               => __('List Failing Config Checks', 'phpinfo-wp'),
-            'description'         => __('Returns each failing or warning config check with its directive key, current value, recommended value, and severity. Pro-only — free tier returns an empty list.', 'phpinfo-wp'),
+            'label'               => __('List Failing Config Checks', 'piwp'),
+            'description'         => __('Returns each failing or warning config check with its directive key, current value, recommended value, and severity. Pro-only — free tier returns an empty list.', 'piwp'),
             'category'            => 'phpinfowp/audit',
             'input_schema'        => ['type' => 'object', 'properties' => new stdClass()],
             'output_schema'       => [
@@ -95,8 +95,8 @@ class Phpinfo_WP_Abilities {
         ]);
 
         wp_register_ability('phpinfowp/get-directive', [
-            'label'               => __('Get PHP Directive Value', 'phpinfo-wp'),
-            'description'         => __('Returns the current value of a named php.ini directive (e.g. memory_limit, upload_max_filesize).', 'phpinfo-wp'),
+            'label'               => __('Get PHP Directive Value', 'piwp'),
+            'description'         => __('Returns the current value of a named php.ini directive (e.g. memory_limit, upload_max_filesize).', 'piwp'),
             'category'            => 'phpinfowp/audit',
             'input_schema'        => [
                 'type'       => 'object',
@@ -119,8 +119,8 @@ class Phpinfo_WP_Abilities {
         ]);
 
         wp_register_ability('phpinfowp/list-extensions', [
-            'label'               => __('List Loaded PHP Extensions', 'phpinfo-wp'),
-            'description'         => __('Returns the names of all PHP extensions currently loaded on the server, sorted alphabetically.', 'phpinfo-wp'),
+            'label'               => __('List Loaded PHP Extensions', 'piwp'),
+            'description'         => __('Returns the names of all PHP extensions currently loaded on the server, sorted alphabetically.', 'piwp'),
             'category'            => 'phpinfowp/audit',
             'input_schema'        => ['type' => 'object', 'properties' => new stdClass()],
             'output_schema'       => [
@@ -133,8 +133,8 @@ class Phpinfo_WP_Abilities {
         ]);
 
         wp_register_ability('phpinfowp/get-audit-summary', [
-            'label'               => __('Get Server Audit Summary', 'phpinfo-wp'),
-            'description'         => __('Returns a high-level rollup of server health: PHP version, EOL status, config grade, and counts of issues. The single best ability to call for a "how is my server doing" check.', 'phpinfo-wp'),
+            'label'               => __('Get Server Audit Summary', 'piwp'),
+            'description'         => __('Returns a high-level rollup of server health: PHP version, EOL status, config grade, and counts of issues. The single best ability to call for a "how is my server doing" check.', 'piwp'),
             'category'            => 'phpinfowp/audit',
             'input_schema'        => ['type' => 'object', 'properties' => new stdClass()],
             'output_schema'       => [

@@ -32,7 +32,7 @@ function phpinfowp_render_feature_lock(array $args = []): void {
     $tagline  = $args['tagline']  ?? 'Available in phpinfo() WP Pro.';
     $previews = $args['previews'] ?? [];
     $buy_url  = 'https://exeebit.com/phpinfo-wp#pricing';
-    $lic_url  = admin_url('admin.php?page=phpinfowp-license');
+    $lic_url  = admin_url('admin.php?page=piwp-license');
     ?>
     <div class="phpinfowp-pro-page">
         <div style="
@@ -56,7 +56,7 @@ function phpinfowp_render_feature_lock(array $args = []): void {
                     font-size:9px;font-weight:700;letter-spacing:.5px;
                     padding:2px 5px;border-radius:3px;
                     line-height:1.5;
-                "><?php _e('PRO', 'phpinfo-wp'); ?></span>
+                "><?php _e('PRO', 'piwp'); ?></span>
             </div>
 
             <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#1d2327;">

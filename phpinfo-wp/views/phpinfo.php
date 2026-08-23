@@ -1,4 +1,7 @@
-<?php defined('ABSPATH') or die('Unauthorized Access'); ?>
+<?php
+defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
+?>
 
 <div id="phpinfo-info">
 

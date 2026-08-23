@@ -48,7 +48,7 @@ class Phpinfo_WP_Site_Health {
                 'description' => '<p>PHP ' . esc_html($s['minor']) . ' reached end-of-life on <strong>' . esc_html($s['eol']) . '</strong>. '
                                . 'No security updates are being issued. Your site is exposed to unpatched PHP vulnerabilities. '
                                . 'Contact your host and request an upgrade to PHP 8.2 or newer immediately.</p>',
-                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-eol')) . '">View PHP EOL timeline</a>',
+                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-eol')) . '">View PHP EOL timeline</a>',
                 'test'        => 'phpinfowp_php_eol',
             ];
         }
@@ -61,7 +61,7 @@ class Phpinfo_WP_Site_Health {
                 'description' => '<p>PHP ' . esc_html($s['minor']) . ' will reach end-of-life on <strong>' . esc_html($s['eol']) . '</strong> '
                                . '(' . esc_html($s['days']) . ' days from now). After that date, no security patches will be issued. '
                                . 'Plan your PHP upgrade before this deadline.</p>',
-                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-eol')) . '">View PHP EOL timeline</a>',
+                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-eol')) . '">View PHP EOL timeline</a>',
                 'test'        => 'phpinfowp_php_eol',
             ];
         }
@@ -89,7 +89,7 @@ class Phpinfo_WP_Site_Health {
                 'description' => '<p><code>display_errors</code> is <strong>On</strong>. PHP error messages are visible to site visitors, '
                                . 'which can expose file paths, database credentials, and internal logic. '
                                . 'Set <code>display_errors = Off</code> in <code>php.ini</code> or your <code>.user.ini</code>.</p>',
-                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-config-grader')) . '">View Config Grader</a>',
+                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-config-grader')) . '">View Config Grader</a>',
                 'test'        => 'phpinfowp_display_errors',
             ];
         }
@@ -116,7 +116,7 @@ class Phpinfo_WP_Site_Health {
                 'description' => '<p><code>allow_url_include</code> is <strong>On</strong>. This allows PHP code to include files from remote URLs, '
                                . 'which is a common vector for Remote File Inclusion (RFI) attacks. '
                                . 'This directive should be disabled on all production servers. Contact your host if you cannot change it.</p>',
-                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-htaccess')) . '">Open PHP Config editor</a>',
+                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-htaccess')) . '">Open PHP Config editor</a>',
                 'test'        => 'phpinfowp_allow_url_include',
             ];
         }
@@ -142,7 +142,7 @@ class Phpinfo_WP_Site_Health {
                 'badge'       => ['label' => 'Security', 'color' => 'orange'],
                 'description' => '<p><code>expose_php</code> is <strong>On</strong>. PHP adds an <code>X-Powered-By: PHP/x.x.x</code> header to every response, '
                                . 'advertising your exact PHP version to attackers. Set <code>expose_php = Off</code> to remove it.</p>',
-                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-htaccess')) . '">Open PHP Config editor</a>',
+                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-htaccess')) . '">Open PHP Config editor</a>',
                 'test'        => 'phpinfowp_expose_php',
             ];
         }
@@ -169,7 +169,7 @@ class Phpinfo_WP_Site_Health {
                 'description' => '<p><code>memory_limit</code> is set to <strong>' . esc_html($raw) . '</strong>. '
                                . 'WordPress and popular plugins routinely require 128 MB or more. A low limit causes white screens and failed operations. '
                                . 'The recommended minimum is 256 MB.</p>',
-                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-htaccess')) . '">Open PHP Config editor</a>',
+                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-htaccess')) . '">Open PHP Config editor</a>',
                 'test'        => 'phpinfowp_memory',
             ];
         }
@@ -205,7 +205,7 @@ class Phpinfo_WP_Site_Health {
                 'badge'       => ['label' => 'Performance', 'color' => 'orange'],
                 'description' => '<p>The <code>opcache</code> extension is installed but not enabled. '
                                . 'Enable it by setting <code>opcache.enable = 1</code> in your PHP configuration.</p>',
-                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-opcache')) . '">View OPcache dashboard</a>',
+                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-opcache')) . '">View OPcache dashboard</a>',
                 'test'        => 'phpinfowp_opcache',
             ];
         }
@@ -215,7 +215,7 @@ class Phpinfo_WP_Site_Health {
             'status'      => 'good',
             'badge'       => ['label' => 'Performance', 'color' => 'blue'],
             'description' => '<p>OPcache is active. PHP bytecode is cached in memory, improving performance on every request.</p>',
-            'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-opcache')) . '">View OPcache dashboard</a>',
+            'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-opcache')) . '">View OPcache dashboard</a>',
             'test'        => 'phpinfowp_opcache',
         ];
     }

@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     7.2.6
+Version:     7.2.7
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com/phpinfo-wp
@@ -15,9 +15,10 @@ Domain Path: /languages
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '7.2.6');
+define('PHPINFOWP_VERSION', '7.2.7');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
+define('PHPINFOWP_SLUG_PREFIX', 'piwp');
 
 require_once PHPINFOWP_DIR . 'includes/class-license.php';
 require_once PHPINFOWP_DIR . 'includes/class-eol.php';
@@ -32,6 +33,8 @@ require_once PHPINFOWP_DIR . 'includes/class-ssl.php';
 require_once PHPINFOWP_DIR . 'includes/class-site-health.php';
 require_once PHPINFOWP_DIR . 'includes/class-compat.php';
 require_once PHPINFOWP_DIR . 'includes/class-update-audit.php';
+require_once PHPINFOWP_DIR . 'includes/class-update-guard.php';
+require_once PHPINFOWP_DIR . 'includes/class-update-history.php';
 require_once PHPINFOWP_DIR . 'includes/class-db-health.php';
 require_once PHPINFOWP_DIR . 'includes/class-cron-monitor.php';
 require_once PHPINFOWP_DIR . 'includes/class-mail-check.php';
@@ -63,6 +66,8 @@ class Phpinfo_wp {
         add_action('wp_dashboard_setup',          [$this, 'register_dashboard_widget']);
         add_action('phpinfowp_license_ping',      ['Phpinfo_WP_License', 'cron_ping']);
         add_action('phpinfowp_license_ping_async',['Phpinfo_WP_License', 'cron_ping']);
+        add_action('wp_ajax_phpinfowp_activate_license',   ['Phpinfo_WP_License', 'ajax_activate']);
+        add_action('wp_ajax_phpinfowp_deactivate_license', ['Phpinfo_WP_License', 'ajax_deactivate']);
         add_action('phpinfowp_weekly_maintenance',['Phpinfo_WP_Alerts', 'cron_weekly']);
         add_filter('clean_url',                   [$this, 'script_async'], 11, 1);
         add_filter('plugin_row_meta',             [$this, 'meta'], 10, 2);
@@ -86,6 +91,8 @@ class Phpinfo_wp {
         Phpinfo_WP_Safemode::register();
         Phpinfo_WP_Compat::register_update_warnings();
         Phpinfo_WP_Update_Audit::register();
+        Phpinfo_WP_Update_Guard::register();
+        Phpinfo_WP_Update_History::register();
         Phpinfo_WP_Abilities::register();
         Phpinfo_WP_AI_Explain::register();
         Phpinfo_WP_Upgrade_Notice::register();
@@ -112,17 +119,61 @@ class Phpinfo_wp {
     public function redirect_group_landings(): void {
         if (!is_admin()) return;
         $page = sanitize_key($_GET['page'] ?? '');
+
+        // ── Legacy slug shim (pre-rename backward compat) ──────────────────
+        // Old slugs contained "phpinfo" and were blocked by 8G/BBQ/ModSec WAFs.
+        // Silently redirect any saved bookmark or admin-bar link to the new slug.
+        $legacy = [
+            'phpinfo-wp'               => 'piwp',
+            'phpinfowp-performance'    => 'piwp-performance',
+            'phpinfowp-audit'          => 'piwp-audit',
+            'phpinfowp-tools'          => 'piwp-tools',
+            'phpinfowp-reports'        => 'piwp-reports',
+            'phpinfowp-license'        => 'piwp-license',
+            'phpinfowp-support'        => 'piwp-support',
+            'phpinfowp-config-grader'  => 'piwp-config-grader',
+            'phpinfowp-eol'            => 'piwp-eol',
+            'phpinfowp-compat'         => 'piwp-compat',
+            'phpinfowp-update-audit'   => 'piwp-update-audit',
+            'phpinfowp-security-headers' => 'piwp-security-headers',
+            'phpinfowp-ssl'            => 'piwp-ssl',
+            'phpinfowp-opcache'        => 'piwp-opcache',
+            'phpinfowp-object-cache'   => 'piwp-object-cache',
+            'phpinfowp-db-health'      => 'piwp-db-health',
+            'phpinfowp-api-monitor'    => 'piwp-api-monitor',
+            'phpinfowp-permissions'    => 'piwp-permissions',
+            'phpinfowp-htaccess'       => 'piwp-htaccess',
+            'phpinfowp-safemode'       => 'piwp-safemode',
+            'phpinfowp-viewer'         => 'piwp-viewer',
+            'phpinfowp-extensions'     => 'piwp-extensions',
+            'phpinfowp-info'           => 'piwp-info',
+            'phpinfowp-snapshots'      => 'piwp-snapshots',
+            'phpinfowp-cron'           => 'piwp-cron',
+            'phpinfowp-mail'           => 'piwp-mail',
+            'phpinfowp-error-log'      => 'piwp-error-log',
+            'phpinfowp-log'            => 'piwp-log',
+            'phpinfowp-report'         => 'piwp-report',
+            'phpinfowp-alerts'         => 'piwp-alerts',
+            'phpinfowp-network'        => 'piwp-network',  // Multisite network admin
+        ];
+        if (isset($legacy[$page])) {
+            wp_safe_redirect(admin_url('admin.php?page=' . $legacy[$page]));
+            exit;
+        }
+
+        // ── Group-landing redirects (group slug → first real tab) ───────────
         $redirects = [
-            'phpinfowp-performance' => 'phpinfowp-config-grader',
-            'phpinfowp-audit'       => 'phpinfowp-eol',
-            'phpinfowp-tools'       => 'phpinfowp-viewer',
-            'phpinfowp-reports'     => 'phpinfowp-log',
+            'piwp-performance' => 'piwp-config-grader',
+            'piwp-audit'       => 'piwp-eol',
+            'piwp-tools'       => 'piwp-viewer',
+            'piwp-reports'     => 'piwp-log',
         ];
         if (isset($redirects[$page])) {
             wp_safe_redirect(admin_url('admin.php?page=' . $redirects[$page]));
             exit;
         }
     }
+
 
     public function load_textdomain(): void {
         load_plugin_textdomain('phpinfo-wp', false, dirname(plugin_basename(__FILE__)) . '/languages');
@@ -152,36 +203,36 @@ class Phpinfo_wp {
 
     public function add_admin_pages(): void {
         // Top-level: opens the Dashboard storefront. The old top-level slug
-        // 'phpinfo-wp' kept its identity for SEO + backward compatibility,
+        // 'phpinfo-wp' (plugin file name) is kept for SEO + backward compatibility,
         // but now lands on Dashboard instead of phpinfo() output.
         add_menu_page(
             'phpinfo() WP', 'phpinfo() WP', 'manage_options',
-            'phpinfo-wp', [$this, 'view_dashboard'],
+            'piwp', [$this, 'view_dashboard'],
             self::menu_icon(), 99
         );
 
         // The 5 VISIBLE sidebar items. Everything else is registered below
         // as a hidden submenu so direct ?page=X links still resolve.
-        add_submenu_page('phpinfo-wp', 'Dashboard', 'Dashboard',
-            'manage_options', 'phpinfo-wp', [$this, 'view_dashboard']);
+        add_submenu_page('piwp', 'Dashboard', 'Dashboard',
+            'manage_options', 'piwp', [$this, 'view_dashboard']);
 
-        add_submenu_page('phpinfo-wp', 'Performance', 'Performance',
-            'manage_options', 'phpinfowp-performance', [$this, 'view_performance_group']);
+        add_submenu_page('piwp', 'Performance', 'Performance',
+            'manage_options', 'piwp-performance', [$this, 'view_performance_group']);
 
-        add_submenu_page('phpinfo-wp', 'Security & Core', 'Security & Core',
-            'manage_options', 'phpinfowp-audit', [$this, 'view_audit_group']);
+        add_submenu_page('piwp', 'Security & Core', 'Security & Core',
+            'manage_options', 'piwp-audit', [$this, 'view_audit_group']);
 
-        add_submenu_page('phpinfo-wp', 'Tools', 'Tools',
-            'manage_options', 'phpinfowp-tools', [$this, 'view_tools_group']);
+        add_submenu_page('piwp', 'Tools', 'Tools',
+            'manage_options', 'piwp-tools', [$this, 'view_tools_group']);
 
-        add_submenu_page('phpinfo-wp', 'Reports', 'Reports',
-            'manage_options', 'phpinfowp-reports', [$this, 'view_reports_group']);
+        add_submenu_page('piwp', 'Reports', 'Reports',
+            'manage_options', 'piwp-reports', [$this, 'view_reports_group']);
 
-        add_submenu_page('phpinfo-wp', 'License', 'License',
-            'manage_options', 'phpinfowp-license', [$this, 'view_license']);
+        add_submenu_page('piwp', 'License', 'License',
+            'manage_options', 'piwp-license', [$this, 'view_license']);
 
-        add_submenu_page('phpinfo-wp', 'Support', 'Support',
-            'manage_options', 'phpinfowp-support', [$this, 'view_support']);
+        add_submenu_page('piwp', 'Support', 'Support',
+            'manage_options', 'piwp-support', [$this, 'view_support']);
 
         // Hidden registrations — these slugs work as direct URLs (admin bar,
         // dashboard widget, admin notices) but never appear in the sidebar.
@@ -191,31 +242,31 @@ class Phpinfo_wp {
         // appended to $submenu so it never clutters the sidebar.
         $hidden = [
             // Audit group
-            ['phpinfowp-config-grader',     'Config Grader',     'view_config_grader'],
-            ['phpinfowp-eol',               'PHP EOL',           'view_eol'],
-            ['phpinfowp-compat',            'PHP Compatibility', 'view_compat'],
-            ['phpinfowp-update-audit',      'Update Guard',      'view_update_audit'],
-            ['phpinfowp-security-headers',  'Security Headers',  'view_security_headers'],
-            ['phpinfowp-ssl',               'SSL Monitor',       'view_ssl'],
-            ['phpinfowp-opcache',           'OPcache',           'view_opcache'],
-            ['phpinfowp-object-cache',      'Object Cache',      'view_object_cache'],
-            ['phpinfowp-db-health',         'Database Health',   'view_db_health'],
-            ['phpinfowp-api-monitor',       'API Monitor',       'view_api_monitor'],
-            ['phpinfowp-permissions',       'Permissions Audit', 'view_permissions'],
+            ['piwp-config-grader',     'Config Grader',     'view_config_grader'],
+            ['piwp-eol',               'PHP EOL',           'view_eol'],
+            ['piwp-compat',            'PHP Compatibility', 'view_compat'],
+            ['piwp-update-audit',      'Update Guard',      'view_update_audit'],
+            ['piwp-security-headers',  'Security Headers',  'view_security_headers'],
+            ['piwp-ssl',               'SSL Monitor',       'view_ssl'],
+            ['piwp-opcache',           'OPcache',           'view_opcache'],
+            ['piwp-object-cache',      'Object Cache',      'view_object_cache'],
+            ['piwp-db-health',         'Database Health',   'view_db_health'],
+            ['piwp-api-monitor',       'API Monitor',       'view_api_monitor'],
+            ['piwp-permissions',       'Permissions Audit', 'view_permissions'],
             // Tools group
-            ['phpinfowp-htaccess',          'PHP Config',        'view_htaccess'],
-            ['phpinfowp-safemode',          'Troubleshooting',   'view_safemode'],
-            ['phpinfowp-viewer',            'phpinfo() Viewer',  'view_phpinfo'],
-            ['phpinfowp-extensions',        'Extensions',        'view_extensions'],
-            ['phpinfowp-info',              'Basic Info',        'view_info'],
-            ['phpinfowp-snapshots',         'Config Snapshots',  'view_snapshots'],
-            ['phpinfowp-cron',              'WP Cron Monitor',   'view_cron'],
-            ['phpinfowp-mail',              'Mail',              'view_mail'],
-            ['phpinfowp-error-log',         'Error Log',         'view_error_log'],
+            ['piwp-htaccess',          'PHP Config',        'view_htaccess'],
+            ['piwp-safemode',          'Troubleshooting',   'view_safemode'],
+            ['piwp-viewer',            'phpinfo() Viewer',  'view_phpinfo'],
+            ['piwp-extensions',        'Extensions',        'view_extensions'],
+            ['piwp-info',              'Basic Info',        'view_info'],
+            ['piwp-snapshots',         'Config Snapshots',  'view_snapshots'],
+            ['piwp-cron',              'WP Cron Monitor',   'view_cron'],
+            ['piwp-mail',              'Mail',              'view_mail'],
+            ['piwp-error-log',         'Error Log',         'view_error_log'],
             // Reports group
-            ['phpinfowp-log',               'Activity Log',      'view_log'],
-            ['phpinfowp-report',            'Audit Report',      'view_report'],
-            ['phpinfowp-alerts',            'Alerts',            'view_alerts'],
+            ['piwp-log',               'Activity Log',      'view_log'],
+            ['piwp-report',            'Audit Report',      'view_report'],
+            ['piwp-alerts',            'Alerts',            'view_alerts'],
         ];
         // Register every leaf page as a real child of phpinfo-wp so WP
         // natively highlights the toplevel + its submenu on every leaf
@@ -223,7 +274,7 @@ class Phpinfo_wp {
         // the extra <li>s from the visible sidebar via JS in render_sidebar_flyouts
         // — only the 5 grouped items above stay visible.
         foreach ($hidden as [$slug, $title, $cb]) {
-            add_submenu_page('phpinfo-wp', $title, $title, 'manage_options', $slug, [$this, $cb]);
+            add_submenu_page('piwp', $title, $title, 'manage_options', $slug, [$this, $cb]);
         }
     }
 
@@ -358,7 +409,7 @@ class Phpinfo_wp {
             ?>
             <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0">
                 <span style="color:#555">Config Grade</span>
-                <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-config-grader')); ?>" style="text-decoration:none;font-weight:700;font-size:16px;color:<?php echo $grade_color; ?>">
+                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-config-grader')); ?>" style="text-decoration:none;font-weight:700;font-size:16px;color:<?php echo $grade_color; ?>">
                     <?php echo esc_html($grade_letter); ?> <span style="font-size:11px;font-weight:400;color:#666"><?php echo (int)$grade_score; ?>/100</span>
                 </a>
             </div>
@@ -414,7 +465,7 @@ class Phpinfo_wp {
             ?>
                 <div style="padding:12px 0 8px 0;border-bottom:1px solid #f0f0f0">
                     <?php foreach ($upsell_lines as $line): ?>
-                        <div style="font-size:12px;color:#555;margin-bottom:6px;line-height:1.5">▸ <?php echo $line; ?></div>
+                        <div style="font-size:12px;color:#555;margin-bottom:6px;line-height:1.5">▸ <?php echo esc_html( $line ); ?></div>
                     <?php endforeach; ?>
                     <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" style="display:inline-block;margin-top:6px;color:#777BB3;font-weight:600;text-decoration:none">
                         Upgrade to Pro &rarr;
@@ -425,12 +476,12 @@ class Phpinfo_wp {
 
             <!-- Footer link -->
             <div style="padding-top:10px;display:flex;gap:12px;font-size:12px;flex-wrap:wrap">
-                <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-viewer')); ?>">Full phpinfo →</a>
-                <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-eol')); ?>">PHP EOL</a>
-                <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-config-grader')); ?>">Config Grader</a>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-viewer')); ?>">Full phpinfo →</a>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-eol')); ?>">PHP EOL</a>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-config-grader')); ?>">Config Grader</a>
                 <?php if ($is_pro): ?>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-report')); ?>">Audit Report</a>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-alerts')); ?>">Alerts</a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-report')); ?>">Audit Report</a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-alerts')); ?>">Alerts</a>
                 <?php endif; ?>
             </div>
 
@@ -467,14 +518,12 @@ class Phpinfo_wp {
 
     // EOL notice — free feature, only on plugin admin pages
     public function eol_admin_notice(): void {
-        $page = sanitize_key($_GET['page'] ?? '');
-        if (strncmp($page, 'phpinfo', strlen('phpinfo')) !== 0) return;
+        if (!class_exists('Phpinfo_WP_Admin_Nav') || !Phpinfo_WP_Admin_Nav::is_plugin_page()) return;
         Phpinfo_WP_EOL::admin_notice();
     }
 
     public function enqueue(string $hook): void {
-        $page = sanitize_key($_GET['page'] ?? '');
-        if (strncmp($page, 'phpinfo', strlen('phpinfo')) !== 0 && $hook !== 'plugins.php') return;
+        if (!class_exists('Phpinfo_WP_Admin_Nav') || (!Phpinfo_WP_Admin_Nav::is_plugin_page() && $hook !== 'plugins.php')) return;
         // Use filemtime as the cache key so any CSS/JS edit auto-busts browser
         // caches without bumping PHPINFOWP_VERSION. Falls back to plugin version.
         $css_path = PHPINFOWP_DIR . 'css/style.css';
@@ -505,8 +554,9 @@ class Phpinfo_wp {
         $leaf_css = [];
         foreach ($groups as $group) {
             foreach ($group['tabs'] as $slug => $tab) {
-                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href$="page=' . $slug . '"])';
-                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href*="page=' . $slug . '&"])';
+                if ($slug === $group['slug']) continue;
+                $leaf_css[] = '#toplevel_page_piwp .wp-submenu li:has(> a[href$="page=' . $slug . '"])';
+                $leaf_css[] = '#toplevel_page_piwp .wp-submenu li:has(> a[href*="page=' . $slug . '&"])';
             }
         }
 
@@ -519,9 +569,9 @@ class Phpinfo_wp {
 
         // Flyout panel base styles (structure + WP 7.0 native colors).
         $css .= <<<'FLYOUT'
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout { position: relative; }
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout > a { padding-right: 22px; }
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout > a::after {
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout { position: relative; }
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout > a { padding-right: 22px; }
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout > a::after {
     content: "\203A"; position: absolute; right: 10px; top: 50%;
     transform: translateY(-50%); opacity: .55; font-size: 16px; line-height: 1;
 }
@@ -531,24 +581,24 @@ class Phpinfo_wp {
     background-color: rgb(12.15,12.15,12.15); padding: 6px 0;
     z-index: 9999; box-shadow: 0 3px 5px rgba(0,0,0,.2);
 }
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout:hover > .phpinfowp-wpnav-flyout,
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout:focus-within > .phpinfowp-wpnav-flyout {
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout:hover > .phpinfowp-wpnav-flyout,
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout:focus-within > .phpinfowp-wpnav-flyout {
     display: block;
 }
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a {
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a {
     display: flex !important; align-items: center; justify-content: space-between;
     gap: 8px; margin: 0; padding: 5px 12px !important;
     color: rgba(240,246,252,0.7) !important; text-decoration: none !important;
     font-size: 13px !important; line-height: 1.4 !important; font-weight: 400 !important;
 }
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a:hover,
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a:focus {
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a:hover,
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a:focus {
     color: #7b90ff !important; background: none !important;
     box-shadow: inset 4px 0 0 0 currentColor; transition: box-shadow .1s linear;
 }
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active,
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active:hover,
-#toplevel_page_phpinfo-wp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active:focus {
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active,
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active:hover,
+#toplevel_page_piwp .wp-submenu li.phpinfowp-has-flyout .phpinfowp-wpnav-flyout a.phpinfowp-flyout-active:focus {
     color: #7b90ff !important; background: none !important;
     box-shadow: inset 4px 0 0 0 currentColor;
 }
@@ -557,13 +607,13 @@ class Phpinfo_wp {
     font-size: 9px; font-weight: 700; letter-spacing: .4px;
     padding: 1px 5px; border-radius: 3px;
 }
-body.folded #toplevel_page_phpinfo-wp .phpinfowp-wpnav-flyout { display: none !important; }
+body.folded #toplevel_page_piwp .phpinfowp-wpnav-flyout { display: none !important; }
 
-#toplevel_page_phpinfo-wp .wp-submenu > li > a:hover,
-#toplevel_page_phpinfo-wp .wp-submenu > li > a:focus,
-#toplevel_page_phpinfo-wp .wp-submenu > li.current > a,
-#toplevel_page_phpinfo-wp .wp-submenu > li.current > a:hover,
-#toplevel_page_phpinfo-wp .wp-submenu > li.current > a:focus {
+#toplevel_page_piwp .wp-submenu > li > a:hover,
+#toplevel_page_piwp .wp-submenu > li > a:focus,
+#toplevel_page_piwp .wp-submenu > li.current > a,
+#toplevel_page_piwp .wp-submenu > li.current > a:hover,
+#toplevel_page_piwp .wp-submenu > li.current > a:focus {
     color: #7b90ff !important;
 }
 FLYOUT;
@@ -590,7 +640,7 @@ FLYOUT;
     public function action_links(array $links, string $plugin_file): array {
         if (plugin_basename(__FILE__) !== $plugin_file) return $links;
         // Order: Dashboard | …WP defaults (Deactivate)… | Get Pro
-        array_unshift($links, '<a href="' . admin_url('admin.php?page=phpinfo-wp') . '">Dashboard</a>');
+        array_unshift($links, '<a href="' . admin_url('admin.php?page=piwp') . '">Dashboard</a>');
         if (!Phpinfo_WP_License::is_valid()) {
             $links[] = '<a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" style="color:#777BB3;font-weight:600">Get Pro</a>';
         }
@@ -599,7 +649,7 @@ FLYOUT;
 
     // Inject hover-flyout panels into the WP admin sidebar for the three
     // grouped items (Audit / Tools / Reports). The toplevel <li> is found
-    // by id (#toplevel_page_phpinfo-wp); each group's submenu <li> is found
+    // by id (#toplevel_page_piwp); each group's submenu <li> is found
     // by its admin.php?page= slug. CSS handles the actual hover reveal.
     public function render_sidebar_flyouts(): void {
         $groups = Phpinfo_WP_Admin_Nav::groups();
@@ -607,6 +657,10 @@ FLYOUT;
 
         $data = [];
         foreach ($groups as $key => $group) {
+            // Do not generate a flyout for single-item navigation links
+            if (count($group['tabs']) <= 1) {
+                continue;
+            }
             $items = [];
             foreach ($group['tabs'] as $slug => $tab) {
                 $items[] = [
@@ -626,8 +680,9 @@ FLYOUT;
         $leaf_css = [];
         foreach ($groups as $group) {
             foreach ($group['tabs'] as $lslug => $ltab) {
-                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href$="page=' . $lslug . '"])';
-                $leaf_css[] = '#toplevel_page_phpinfo-wp .wp-submenu li:has(> a[href*="page=' . $lslug . '&"])';
+                if ($lslug === $group['slug']) continue;
+                $leaf_css[] = '#toplevel_page_piwp .wp-submenu li:has(> a[href$="page=' . $lslug . '"])';
+                $leaf_css[] = '#toplevel_page_piwp .wp-submenu li:has(> a[href*="page=' . $lslug . '&"])';
             }
         }
         if ($leaf_css) {
@@ -640,15 +695,12 @@ FLYOUT;
         <script>
         (function() {
             var data = <?php echo wp_json_encode($data); ?>;
-            var root = document.getElementById('toplevel_page_phpinfo-wp');
+            var root = document.getElementById('toplevel_page_piwp');
             if (!root) return;
             // Hide every submenu <li> that isn't one of the 5 visible group items.
             // The leaf pages are registered as real submenus (so WP highlights the
             // toplevel natively) — we just suppress them in the sidebar list.
-            var visible = ['phpinfo-wp','phpinfowp-performance','phpinfowp-audit','phpinfowp-tools','phpinfowp-reports','phpinfowp-license'];
-            <?php if ($is_pro): ?>
-            visible.push('phpinfowp-support');
-            <?php endif; ?>
+            var visible = ['piwp','piwp-performance','piwp-audit','piwp-tools','piwp-reports','piwp-license','piwp-support'];
             root.querySelectorAll('.wp-submenu li > a').forEach(function(a) {
                 var m = (a.getAttribute('href') || '').match(/[?&]page=([\w-]+)/);
                 if (!m) return;
@@ -752,7 +804,7 @@ FLYOUT;
     // hidden leaf). Cheap — just inspects $_GET['page'].
     private function is_plugin_page(): bool {
         $page = sanitize_key($_GET['page'] ?? '');
-        return $page === 'phpinfo-wp' || strncmp($page, 'phpinfowp-', strlen('phpinfowp-')) === 0;
+        return $page === PHPINFOWP_SLUG_PREFIX || strncmp($page, PHPINFOWP_SLUG_PREFIX . '-', strlen(PHPINFOWP_SLUG_PREFIX . '-')) === 0;
     }
 
     // Render the dark topbar above every plugin page: logo + plugin name +
@@ -792,8 +844,8 @@ FLYOUT;
     }
 
     private function resolve_page_title(string $page): string {
-        if ($page === 'phpinfo-wp')        return 'Dashboard';
-        if ($page === 'phpinfowp-license') return 'License';
+        if ($page === 'piwp')        return 'Dashboard';
+        if ($page === 'piwp-license') return 'License';
         $info = Phpinfo_WP_Admin_Nav::find($page);
         if ($info) return $info['tab_info']['label'];
         // Group landing slugs like phpinfowp-audit / -tools / -reports.
@@ -877,10 +929,15 @@ FLYOUT;
         flush_rewrite_rules();
         wp_clear_scheduled_hook('phpinfowp_license_ping');
         wp_clear_scheduled_hook('phpinfowp_weekly_maintenance');
+        wp_clear_scheduled_hook('phpinfowp_deferred_health_check');
         // Clean up safemode artifacts — leaving an orphaned mu-plugin behind
         // could keep filtering plugins even after this one is gone.
+        // Skip uninstalling mu-plugin on deactivate for multisite, since other subsites may need it.
+        // (It gets removed globally on uninstall).
         Phpinfo_WP_Safemode::stop();
-        Phpinfo_WP_Safemode::uninstall_mu_plugin();
+        if (!is_multisite()) {
+            Phpinfo_WP_Safemode::uninstall_mu_plugin();
+        }
     }
 }
 

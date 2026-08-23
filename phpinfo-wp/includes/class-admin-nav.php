@@ -6,16 +6,12 @@ defined('ABSPATH') or die('Unauthorized Access');
  *
  * The sidebar shows only: Dashboard, Audit, Tools, Reports, License.
  * Within Audit / Tools / Reports, a horizontal tab bar lets users move
- * between related screens. All legacy slugs (?page=phpinfowp-eol etc.)
+ * between related screens. All legacy slugs (?page=piwp-eol etc.)
  * still work for backward compatibility — direct links from the admin
  * bar, dashboard widget, and admin notices keep functioning.
  */
 class Phpinfo_WP_Admin_Nav {
 
-    /**
-     * @var mixed[]|null
-     */
-    private static $cache;
     /**
      * @var bool
      */
@@ -26,62 +22,75 @@ class Phpinfo_WP_Admin_Nav {
      * entry, and an ordered map of tab-slug => tab-info.
      */
     public static function groups(): array {
-        if (self::$cache !== null) return self::$cache;
-
-        self::$cache = [
+        return [
             'performance' => [
-                'label' => __('Performance', 'phpinfo-wp'),
-                'slug'  => 'phpinfowp-performance',
-                'desc'  => __('Analyze and optimize speed, caching, and database bottlenecks', 'phpinfo-wp'),
+                'label' => __('Performance', 'piwp'),
+                'slug'  => 'piwp-performance',
+                'desc'  => __('Analyze and optimize speed, caching, and database bottlenecks', 'piwp'),
                 'tabs'  => [
-                    'phpinfowp-config-grader'    => ['label' => __('Config Grader', 'phpinfo-wp'),     'pro' => false, 'icon' => 'dashicons-chart-bar'],
-                    'phpinfowp-opcache'          => ['label' => __('OPcache', 'phpinfo-wp'),           'pro' => true,  'icon' => 'dashicons-performance'],
-                    'phpinfowp-object-cache'     => ['label' => __('Object Cache', 'phpinfo-wp'),      'pro' => true,  'icon' => 'dashicons-database'],
-                    'phpinfowp-db-health'        => ['label' => __('Database', 'phpinfo-wp'),          'pro' => true,  'icon' => 'dashicons-database'],
-                    'phpinfowp-api-monitor'      => ['label' => __('API Monitor', 'phpinfo-wp'),       'pro' => true,  'icon' => 'dashicons-networking'],
+                    'piwp-config-grader'    => ['label' => __('Config Grader', 'piwp'),     'pro' => false, 'icon' => 'dashicons-chart-bar'],
+                    'piwp-opcache'          => ['label' => __('OPcache', 'piwp'),           'pro' => true,  'icon' => 'dashicons-performance'],
+                    'piwp-object-cache'     => ['label' => __('Object Cache', 'piwp'),      'pro' => true,  'icon' => 'dashicons-database'],
+                    'piwp-db-health'        => ['label' => __('Database', 'piwp'),          'pro' => true,  'icon' => 'dashicons-database'],
+                    'piwp-api-monitor'      => ['label' => __('API Monitor', 'piwp'),       'pro' => true,  'icon' => 'dashicons-networking'],
                 ],
             ],
             'audit' => [
-                'label' => __('Security & Core', 'phpinfo-wp'),
-                'slug'  => 'phpinfowp-audit',
-                'desc'  => __('Read-only health checks across PHP, config, security, and infrastructure', 'phpinfo-wp'),
+                'label' => __('Security & Core', 'piwp'),
+                'slug'  => 'piwp-audit',
+                'desc'  => __('Read-only health checks across PHP, config, security, and infrastructure', 'piwp'),
                 'tabs'  => [
-                    'phpinfowp-eol'              => ['label' => __('PHP EOL', 'phpinfo-wp'),           'pro' => false, 'icon' => 'dashicons-calendar-alt'],
-                    'phpinfowp-compat'           => ['label' => __('PHP Compatibility', 'phpinfo-wp'), 'pro' => false, 'icon' => 'dashicons-yes-alt'],
-                    'phpinfowp-update-audit'     => ['label' => __('Update Guard', 'phpinfo-wp'),      'pro' => false, 'icon' => 'dashicons-shield'],
-                    'phpinfowp-permissions'      => ['label' => __('Permissions Audit', 'phpinfo-wp'), 'pro' => true,  'icon' => 'dashicons-admin-network'],
-                    'phpinfowp-security-headers' => ['label' => __('Security Headers', 'phpinfo-wp'),  'pro' => true,  'icon' => 'dashicons-shield-alt'],
-                    'phpinfowp-ssl'              => ['label' => __('SSL Monitor', 'phpinfo-wp'),       'pro' => true,  'icon' => 'dashicons-lock'],
+                    'piwp-eol'              => ['label' => __('PHP EOL', 'piwp'),           'pro' => false, 'icon' => 'dashicons-calendar-alt'],
+                    'piwp-compat'           => ['label' => __('PHP Compatibility', 'piwp'), 'pro' => false, 'icon' => 'dashicons-yes-alt'],
+                    'piwp-update-audit'     => ['label' => __('Update Guard', 'piwp'),      'pro' => false, 'icon' => 'dashicons-shield'],
+                    'piwp-permissions'      => ['label' => __('Permissions Audit', 'piwp'), 'pro' => true,  'icon' => 'dashicons-admin-network'],
+                    'piwp-security-headers' => ['label' => __('Security Headers', 'piwp'),  'pro' => true,  'icon' => 'dashicons-shield-alt'],
+                    'piwp-ssl'              => ['label' => __('SSL Monitor', 'piwp'),       'pro' => true,  'icon' => 'dashicons-lock'],
                 ],
             ],
             'tools' => [
-                'label' => __('Page Audit Tools', 'phpinfo-wp'),
-                'slug'  => 'phpinfowp-tools',
-                'desc'  => __('Active operations — edit config, troubleshoot, take snapshots, run diagnostics', 'phpinfo-wp'),
+                'label' => __('Page Audit Tools', 'piwp'),
+                'slug'  => 'piwp-tools',
+                'desc'  => __('Active operations — edit config, troubleshoot, take snapshots, run diagnostics', 'piwp'),
                 'tabs'  => [
-                    'phpinfowp-viewer'     => ['label' => __('phpinfo() Viewer', 'phpinfo-wp'),  'pro' => false, 'icon' => 'dashicons-info'],
-                    'phpinfowp-htaccess'   => ['label' => __('PHP Config Editor', 'phpinfo-wp'), 'pro' => false, 'icon' => 'dashicons-editor-code'],
-                    'phpinfowp-safemode'   => ['label' => __('Troubleshooting', 'phpinfo-wp'),   'pro' => false, 'icon' => 'dashicons-sos'],
-                    'phpinfowp-info'       => ['label' => __('Basic Info', 'phpinfo-wp'),        'pro' => false, 'icon' => 'dashicons-clipboard'],
-                    'phpinfowp-extensions' => ['label' => __('Extensions', 'phpinfo-wp'),        'pro' => false, 'icon' => 'dashicons-admin-plugins'],
-                    'phpinfowp-snapshots'  => ['label' => __('Config Snapshots', 'phpinfo-wp'),  'pro' => true,  'icon' => 'dashicons-camera'],
+                    'piwp-viewer'     => ['label' => __('phpinfo() Viewer', 'piwp'),  'pro' => false, 'icon' => 'dashicons-info'],
+                    'piwp-htaccess'   => ['label' => __('PHP Config Editor', 'piwp'), 'pro' => false, 'icon' => 'dashicons-editor-code'],
+                    'piwp-safemode'   => ['label' => __('Troubleshooting', 'piwp'),   'pro' => false, 'icon' => 'dashicons-sos'],
+                    'piwp-info'       => ['label' => __('Basic Info', 'piwp'),        'pro' => false, 'icon' => 'dashicons-clipboard'],
+                    'piwp-extensions' => ['label' => __('Extensions', 'piwp'),        'pro' => false, 'icon' => 'dashicons-admin-plugins'],
+                    'piwp-snapshots'  => ['label' => __('Config Snapshots', 'piwp'),  'pro' => true,  'icon' => 'dashicons-camera'],
                 ],
             ],
             'reports' => [
-                'label' => __('Reports & Logs', 'phpinfo-wp'),
-                'slug'  => 'phpinfowp-reports',
-                'desc'  => __('Monitoring tools, logs, and outbound alerts', 'phpinfo-wp'),
+                'label' => __('Reports & Logs', 'piwp'),
+                'slug'  => 'piwp-reports',
+                'desc'  => __('Monitoring tools, logs, and outbound alerts', 'piwp'),
                 'tabs'  => [
-                    'phpinfowp-log'        => ['label' => __('Activity Log', 'phpinfo-wp'),      'pro' => false, 'icon' => 'dashicons-list-view'],
-                    'phpinfowp-report'     => ['label' => __('Audit Report', 'phpinfo-wp'),      'pro' => true,  'icon' => 'dashicons-media-document'],
-                    'phpinfowp-cron'       => ['label' => __('WP-Cron Monitor', 'phpinfo-wp'),   'pro' => true,  'icon' => 'dashicons-clock'],
-                    'phpinfowp-mail'       => ['label' => __('Mail', 'phpinfo-wp'),              'pro' => true,  'icon' => 'dashicons-email-alt'],
-                    'phpinfowp-alerts'     => ['label' => __('Alerts', 'phpinfo-wp'),            'pro' => true,  'icon' => 'dashicons-bell'],
-                    'phpinfowp-error-log'  => ['label' => __('Error Log', 'phpinfo-wp'),         'pro' => true,  'icon' => 'dashicons-warning'],
+                    'piwp-log'        => ['label' => __('Activity Log', 'piwp'),      'pro' => false, 'icon' => 'dashicons-list-view'],
+                    'piwp-report'     => ['label' => __('Audit Report', 'piwp'),      'pro' => true,  'icon' => 'dashicons-media-document'],
+                    'piwp-cron'       => ['label' => __('WP-Cron Monitor', 'piwp'),   'pro' => true,  'icon' => 'dashicons-clock'],
+                    'piwp-mail'       => ['label' => __('Mail', 'piwp'),              'pro' => true,  'icon' => 'dashicons-email-alt'],
+                    'piwp-alerts'     => ['label' => __('Alerts', 'piwp'),            'pro' => true,  'icon' => 'dashicons-bell'],
+                    'piwp-error-log'  => ['label' => __('Error Log', 'piwp'),         'pro' => true,  'icon' => 'dashicons-warning'],
+                ],
+            ],
+            'license' => [
+                'label' => __('License', 'piwp'),
+                'slug'  => 'piwp-license',
+                'desc'  => __('Manage your PRO license subscription', 'piwp'),
+                'tabs'  => [
+                    'piwp-license'          => ['label' => __('License', 'piwp'),           'pro' => false, 'icon' => 'dashicons-admin-network'],
+                ],
+            ],
+            'support' => [
+                'label' => __('Support', 'piwp'),
+                'slug'  => 'piwp-support',
+                'desc'  => __('Get help from our engineers', 'piwp'),
+                'tabs'  => [
+                    'piwp-support'          => ['label' => __('Support', 'piwp'),           'pro' => false, 'icon' => 'dashicons-sos'],
                 ],
             ],
         ];
-        return self::$cache;
     }
 
     /**
@@ -129,7 +138,7 @@ class Phpinfo_WP_Admin_Nav {
 
         $current_slug = $current_slug ?? self::current_tab_slug() ?? sanitize_key($_GET['page'] ?? '');
         $info = self::find($current_slug);
-        if (!$info) return;
+        if (!$info || count($info['group_info']['tabs']) <= 1) return;
 
         self::$tabs_rendered = true;
 
@@ -155,6 +164,8 @@ class Phpinfo_WP_Admin_Nav {
         echo '</aside>';
     }
 
+    public static $current_dispatched_tab = '';
+
     /**
      * Render the group landing page. The tab bar itself is injected by the
      * admin_notices hook (see auto_render below) so it appears above every
@@ -163,27 +174,46 @@ class Phpinfo_WP_Admin_Nav {
      */
     public static function render_group(string $group_key): void {
         $groups = self::groups();
-        if (!isset($groups[$group_key])) wp_die(__('Unknown group.', 'phpinfo-wp'));
+        if (!isset($groups[$group_key])) wp_die(__('Unknown group.', 'piwp'));
 
         $tab = self::resolve_group_tab($group_key);
 
-        // Briefly impersonate the tab slug so the dispatched view's internal
-        // POST handlers and "is this my page?" checks work unchanged.
-        $original_page = $_GET['page'] ?? '';
-        $_GET['page'] = $tab;
+        // Store the active tab securely without mutating the global $_GET array
+        self::$current_dispatched_tab = $tab;
         self::dispatch_view($tab);
-        $_GET['page'] = $original_page;
+        self::$current_dispatched_tab = '';
     }
 
     /**
      * Resolve which tab is active when on a group landing page. Reads ?tab=
      * if present and valid; otherwise returns the first tab.
      */
-    public static function resolve_group_tab(string $group_key): string {
-        $g = self::groups()[$group_key] ?? null;
-        if (!$g) return '';
-        $req = sanitize_key($_GET['tab'] ?? '');
-        return isset($g['tabs'][$req]) ? $req : array_key_first($g['tabs']);
+    private static function resolve_group_tab(string $group_key): string {
+        $groups = self::groups();
+        $tabs = $groups[$group_key]['tabs'] ?? [];
+        if (empty($tabs)) return $group_key;
+
+        $req_tab = sanitize_key($_GET['tab'] ?? '');
+        return isset($tabs[$req_tab]) ? $req_tab : array_key_first($tabs);
+    }
+
+    /**
+     * Securely checks if the currently dispatched page matches the target slug.
+     * Use this instead of checking $_GET['page'] directly.
+     */
+    public static function is_page(string $slug): bool {
+        if (self::$current_dispatched_tab !== '') {
+            return self::$current_dispatched_tab === $slug;
+        }
+        return sanitize_key($_GET['page'] ?? '') === $slug;
+    }
+
+    /**
+     * Securely checks if the current page belongs to this plugin (starts with piwp).
+     */
+    public static function is_plugin_page(): bool {
+        $page = self::$current_dispatched_tab !== '' ? self::$current_dispatched_tab : sanitize_key($_GET['page'] ?? '');
+        return $page === PHPINFOWP_SLUG_PREFIX || strncmp($page, PHPINFOWP_SLUG_PREFIX . '-', strlen(PHPINFOWP_SLUG_PREFIX . '-')) === 0;
     }
 
     /**
@@ -192,10 +222,12 @@ class Phpinfo_WP_Admin_Nav {
      */
     public static function group_for_slug(string $slug): ?string {
         $m = [
-            'phpinfowp-performance' => 'performance',
-            'phpinfowp-audit'       => 'audit',
-            'phpinfowp-tools'       => 'tools',
-            'phpinfowp-reports'     => 'reports',
+            'piwp-performance' => 'performance',
+            'piwp-audit'       => 'audit',
+            'piwp-tools'       => 'tools',
+            'piwp-reports'     => 'reports',
+            'piwp-license'     => 'license',
+            'piwp-support'     => 'support',
         ];
         return $m[$slug] ?? null;
     }
@@ -205,13 +237,12 @@ class Phpinfo_WP_Admin_Nav {
      * including direct legacy slugs and the new group landing slugs.
      */
     public static function auto_render(): void {
-        $tab = self::current_tab_slug();
-        if (!$tab) return;
+        if (!self::is_group_page()) return;
 
         // admin_notices fires above the page's .wrap. The sidebar is
         // position:absolute via CSS, so it lifts out of normal flow and the
         // body-class added in admin_body_class pushes .wrap right to make room.
-        self::render_tabs($tab);
+        self::render_tabs(self::current_tab_slug());
     }
 
     /**
@@ -219,7 +250,11 @@ class Phpinfo_WP_Admin_Nav {
      * (so it needs the secondary sidebar layout). Used by admin_body_class.
      */
     public static function is_group_page(): bool {
-        return self::current_tab_slug() !== null;
+        $tab = self::current_tab_slug();
+        if (!$tab) return false;
+        
+        $info = self::find($tab);
+        return $info && count($info['group_info']['tabs']) > 1;
     }
 
     /**
@@ -228,7 +263,7 @@ class Phpinfo_WP_Admin_Nav {
      */
     private static function current_tab_slug(): ?string {
         $page = sanitize_key($_GET['page'] ?? '');
-        if (!$page || strncmp($page, 'phpinfo', strlen('phpinfo')) !== 0) return null;
+        if (!$page || ($page !== PHPINFOWP_SLUG_PREFIX && strncmp($page, PHPINFOWP_SLUG_PREFIX . '-', strlen(PHPINFOWP_SLUG_PREFIX . '-')) !== 0)) return null;
         if (self::find($page)) return $page;
         $group_key = self::group_for_slug($page);
         return $group_key ? self::resolve_group_tab($group_key) : null;
@@ -240,31 +275,31 @@ class Phpinfo_WP_Admin_Nav {
      */
     private static function dispatch_view(string $slug): void {
         $map = [
-            'phpinfowp-config-grader'    => 'views/pro/config-grader.php',
-            'phpinfowp-eol'              => 'views/pro/eol.php',
-            'phpinfowp-compat'           => 'views/pro/compat.php',
-            'phpinfowp-security-headers' => 'views/pro/security-headers.php',
-            'phpinfowp-ssl'              => 'views/pro/ssl.php',
-            'phpinfowp-opcache'          => 'views/pro/opcache.php',
-            'phpinfowp-object-cache'     => 'views/pro/object-cache.php',
-            'phpinfowp-db-health'        => 'views/pro/db-health.php',
-            'phpinfowp-api-monitor'      => 'views/pro/api-monitor.php',
-            'phpinfowp-permissions'      => 'views/pro/permissions.php',
-            'phpinfowp-htaccess'         => 'views/htaccess.php',
-            'phpinfowp-safemode'         => 'views/safemode.php',
-            'phpinfowp-viewer'           => 'views/phpinfo.php',
-            'phpinfowp-extensions'       => 'views/extension.php',
-            'phpinfowp-info'             => 'views/info.php',
-            'phpinfowp-snapshots'        => 'views/pro/snapshots.php',
-            'phpinfowp-cron'             => 'views/pro/cron.php',
-            'phpinfowp-mail'             => 'views/pro/mail.php',
-            'phpinfowp-error-log'        => 'views/pro/error-log.php',
-            'phpinfowp-log'              => 'views/log.php',
-            'phpinfowp-report'           => 'views/pro/report.php',
-            'phpinfowp-alerts'           => 'views/pro/alerts.php',
+            'piwp-config-grader'    => 'views/pro/config-grader.php',
+            'piwp-eol'              => 'views/pro/eol.php',
+            'piwp-compat'           => 'views/pro/compat.php',
+            'piwp-security-headers' => 'views/pro/security-headers.php',
+            'piwp-ssl'              => 'views/pro/ssl.php',
+            'piwp-opcache'          => 'views/pro/opcache.php',
+            'piwp-object-cache'     => 'views/pro/object-cache.php',
+            'piwp-db-health'        => 'views/pro/db-health.php',
+            'piwp-api-monitor'      => 'views/pro/api-monitor.php',
+            'piwp-permissions'      => 'views/pro/permissions.php',
+            'piwp-htaccess'         => 'views/htaccess.php',
+            'piwp-safemode'         => 'views/safemode.php',
+            'piwp-viewer'           => 'views/phpinfo.php',
+            'piwp-extensions'       => 'views/extension.php',
+            'piwp-info'             => 'views/info.php',
+            'piwp-snapshots'        => 'views/pro/snapshots.php',
+            'piwp-cron'             => 'views/pro/cron.php',
+            'piwp-mail'             => 'views/pro/mail.php',
+            'piwp-error-log'        => 'views/pro/error-log.php',
+            'piwp-log'              => 'views/log.php',
+            'piwp-report'           => 'views/pro/report.php',
+            'piwp-alerts'           => 'views/pro/alerts.php',
         ];
         $file = $map[$slug] ?? null;
-        if (!$file) { echo '<p>' . __('Unknown view.', 'phpinfo-wp') . '</p>'; return; }
+        if (!$file) { echo '<p>' . __('Unknown view.', 'piwp') . '</p>'; return; }
         require PHPINFOWP_DIR . $file;
     }
 }

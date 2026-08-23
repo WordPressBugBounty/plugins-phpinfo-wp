@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $is_pro          = Phpinfo_WP_License::is_valid();
 $is_free_preview = !$is_pro;
@@ -160,11 +161,7 @@ define('WP_DEBUG_DISPLAY', false);
                 <?php if (empty($lines)): ?>
                     <p style="padding:20px;color:#666;text-align:center"><?php _e('Log is empty — no errors recorded.', 'phpinfo-wp'); ?></p>
                 <?php else: ?>
-                    <?php foreach ($lines as $line): ?>
-                        <div class="log-line <?php echo esc_attr(Phpinfo_WP_Error_Log::classify($line)); ?>" data-line="<?php echo esc_attr(strtolower($line)); ?>">
-                            <?php echo esc_html($line); ?>
-                        </div>
-                    <?php endforeach; ?>
+                    <?php foreach ($lines as $line): ?><div class="log-line <?php echo esc_attr(Phpinfo_WP_Error_Log::classify($line)); ?>" data-line="<?php echo esc_attr(strtolower($line)); ?>"><?php echo esc_html($line); ?></div><?php endforeach; ?>
                 <?php endif; ?>
             </div>
 

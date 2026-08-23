@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 if (!function_exists('get_home_path')) {
     require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -10,8 +11,19 @@ $log_dir     = "$content_dir/logs/phpinfo-WP";
 $log_file    = "$log_dir/log.txt";
 
 if (!file_exists($log_dir)) wp_mkdir_p($log_dir);
+if (!file_exists("$log_dir/.htaccess")) file_put_contents("$log_dir/.htaccess", "Deny from all");
 if (!file_exists($log_file)) file_put_contents($log_file, '');
 
+$log_append = function(string $msg) use ($log_file) {
+    if (file_exists($log_file) && filesize($log_file) > 1024 * 1024) { // 1 MB limit
+        $lines = file($log_file);
+        if (is_array($lines) && count($lines) > 500) {
+            $lines = array_slice($lines, -500); // keep last 500 entries
+            file_put_contents($log_file, implode("", $lines));
+        }
+    }
+    file_put_contents($log_file, $msg, FILE_APPEND);
+};
 global $current_user;
 $user        = $current_user->user_login;
 $notice      = '';
@@ -79,7 +91,7 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
                 $new = rtrim($current) . "\n\n# BEGIN phpinfo-wp-{$block_name}\n" . $code . "\n# END phpinfo-wp-{$block_name}\n";
                 file_put_contents("$root_dir.htaccess", $new);
                 $notice = "Successfully appended <strong>{$snippets[$snippet_id]['title']}</strong> to .htaccess.<br /><span style='display:inline-block; margin-top: 6px; font-size:12.5px; opacity:0.9;'>⚡ <strong>Note:</strong> You must clear your cache (plugin cache, CDN, and browser cache) to see the results!</span>";
-                file_put_contents($log_file, ".htaccess snippet {$snippet_id} added on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+                $log_append(".htaccess snippet {$snippet_id} added on " . current_time('mysql') . " by {$user}<br />");
             }
         }
 
@@ -95,7 +107,7 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
                 $new = preg_replace("/\n?# BEGIN phpinfo-wp-{$block_name}.*?# END phpinfo-wp-{$block_name}\n?/s", "\n", $current);
                 file_put_contents("$root_dir.htaccess", $new);
                 $notice = "Rolled back <strong>{$snippets[$snippet_id]['title']}</strong> — block removed from .htaccess.";
-                file_put_contents($log_file, ".htaccess snippet {$snippet_id} rolled back on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+                $log_append(".htaccess snippet {$snippet_id} rolled back on " . current_time('mysql') . " by {$user}<br />");
             }
         }
 
@@ -115,7 +127,7 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             }
             file_put_contents("$root_dir.htaccess", $current);
             $notice = "All 4 snippets injected into .htaccess.<br /><span style='display:inline-block; margin-top: 6px; font-size:12.5px; opacity:0.9;'>⚡ <strong>Note:</strong> Clear your cache (plugin, CDN, browser) to see the results!</span>";
-            file_put_contents($log_file, "All .htaccess snippets injected on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+            $log_append("All .htaccess snippets injected on " . current_time('mysql') . " by {$user}<br />");
         }
 
     } elseif (isset($_POST['rollback_all_snippets'])) {
@@ -130,23 +142,23 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             }
             file_put_contents("$root_dir.htaccess", $current);
             $notice = 'All 4 snippets have been rolled back and removed from .htaccess.';
-            file_put_contents($log_file, "All .htaccess snippets rolled back on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+            $log_append("All .htaccess snippets rolled back on " . current_time('mysql') . " by {$user}<br />");
         }
     } elseif ($mode === 'htaccess') {
 
         if (isset($_POST['backup'])) {
-            file_put_contents("$root_dir.htaccess.bak", '#BACKED UP by phpinfo() WP' . PHP_EOL . file_get_contents("$root_dir.htaccess"));
+            file_put_contents("$log_dir/.htaccess.bak", '#BACKED UP by phpinfo() WP' . PHP_EOL . file_get_contents("$root_dir.htaccess"));
             $notice = 'Backup created: <code>.htaccess.bak</code>';
-            file_put_contents($log_file, ".htaccess backed up on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+            $log_append(".htaccess backed up on " . current_time('mysql') . " by {$user}<br />");
 
         } elseif (isset($_POST['restore'])) {
-            if (!file_exists("$root_dir.htaccess.bak")) {
+            if (!file_exists("$log_dir/.htaccess.bak")) {
                 $notice      = 'No backup file found. Take a backup first.';
                 $notice_type = 'error';
             } else {
-                file_put_contents("$root_dir.htaccess", file_get_contents("$root_dir.htaccess.bak"));
+                file_put_contents("$root_dir.htaccess", file_get_contents("$log_dir/.htaccess.bak"));
                 $notice = '.htaccess restored from backup.';
-                file_put_contents($log_file, ".htaccess restored on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+                $log_append(".htaccess restored on " . current_time('mysql') . " by {$user}<br />");
             }
 
         } elseif (isset($_POST['save'])) {
@@ -175,7 +187,7 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             } else {
                 file_put_contents($cache_file, $custom_raw);
                 $notice = '.htaccess saved successfully.';
-                file_put_contents($log_file, ".htaccess edited on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+                $log_append(".htaccess edited on " . current_time('mysql') . " by {$user}<br />");
             }
         }
 
@@ -202,7 +214,7 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             file_put_contents($target_file, $new);
             file_put_contents($cache_file, $custom_raw);
             $notice = ".user.ini saved. Changes take effect within {$user_ini_ttl} seconds (PHP-FPM cache TTL).";
-            file_put_contents($log_file, ".user.ini edited on " . current_time('mysql') . " by {$user}<br />", FILE_APPEND);
+            $log_append(".user.ini edited on " . current_time('mysql') . " by {$user}<br />");
         }
     }
 }

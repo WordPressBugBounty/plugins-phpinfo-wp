@@ -674,7 +674,7 @@ class Phpinfo_WP_Update_Audit {
         $avail = self::available_core_update();
         if (!$avail) return; // nothing to update to — stay quiet
 
-        $audit_url = admin_url('admin.php?page=phpinfowp-update-audit&target=' . rawurlencode($avail));
+        $audit_url = admin_url('admin.php?page=piwp-update-audit&target=' . rawurlencode($avail));
         $result    = self::get_result();
         $fresh     = $result && ($result['target'] ?? '') === $avail
                      && (time() - (int) $result['scanned_at']) < WEEK_IN_SECONDS;

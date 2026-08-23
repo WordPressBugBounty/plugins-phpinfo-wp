@@ -49,6 +49,9 @@ class Phpinfo_WP_API_Monitor {
         }
 
         if (!isset(self::$stats[$host])) {
+            // Cap at 100 unique hosts to prevent transient bloat in wp_options
+            if (count(self::$stats) >= 100) return;
+            
             self::$stats[$host] = [
                 'count'      => 0,
                 'total_time' => 0.0,

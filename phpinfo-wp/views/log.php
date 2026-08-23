@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $content_dir = WP_CONTENT_DIR;
 $log_dir     = "$content_dir/logs/phpinfo-WP";
@@ -11,8 +12,23 @@ if (!file_exists($log_file)) file_put_contents($log_file, '');
 $notice = '';
 
 // Parse entries — stored as "message<br />" lines, newest first
-$raw     = file_get_contents($log_file);
-$lines   = array_filter(array_map('trim', explode('<br />', $raw)));
+$lines = [];
+try {
+    $obj = new SplFileObject($log_file, 'r');
+    $obj->seek(PHP_INT_MAX);
+    $total_lines = $obj->key();
+    $start = max(0, $total_lines - 500);
+    $obj->seek($start);
+    while (!$obj->eof()) {
+        $chunk = $obj->fgets();
+        $parts = array_filter(array_map('trim', explode('<br />', $chunk)));
+        $lines = array_merge($lines, $parts);
+    }
+} catch (Exception $e) {
+    // Fallback if SplFileObject is disabled on the server
+    $raw = file_exists($log_file) ? file_get_contents($log_file) : '';
+    $lines = array_filter(array_map('trim', explode('<br />', $raw)));
+}
 $entries = array_reverse(array_values($lines));
 
 function phpinfowp_parse_log_entry(string $raw): array {
@@ -143,7 +159,7 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
             ];
             foreach ($tabs as $key => $tab):
                 $active = $filter === $key;
-                $url    = add_query_arg(['log_filter' => $key, 'log_search' => $search], admin_url('admin.php?page=phpinfowp-log'));
+                $url    = add_query_arg(['log_filter' => $key, 'log_search' => $search], admin_url('admin.php?page=piwp-log'));
             ?>
                 <a href="<?php echo esc_url($url); ?>"
                    class="phpinfowp-log-filter-pill <?php echo $active ? 'active' : ''; ?>">
@@ -174,7 +190,7 @@ $filtered = array_filter($parsed, function ($e) use ($filter, $search) {
             <p style="margin:0;font-size:13px;color:#888"><?php
                 printf(
                     __('Use the %s to start tracking changes.', 'phpinfo-wp'),
-                    '<a href="' . esc_url(admin_url('admin.php?page=phpinfowp-htaccess')) . '">' . __('PHP Config editor', 'phpinfo-wp') . '</a>'
+                    '<a href="' . esc_url(admin_url('admin.php?page=piwp-htaccess')) . '">' . __('PHP Config editor', 'phpinfo-wp') . '</a>'
                 );
             ?></p>
         </div>

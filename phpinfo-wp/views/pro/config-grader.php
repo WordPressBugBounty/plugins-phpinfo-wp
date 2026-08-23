@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $is_pro = Phpinfo_WP_License::is_valid();
 
@@ -258,7 +259,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
         <?php endif; ?>
     <?php elseif ($fixable_keys && !$target_writable): ?>
         <div class="notice notice-warning inline" style="margin:0 0 18px"><p>
-            <strong><?php _e('Auto-fix unavailable:', 'phpinfo-wp'); ?></strong> Your site root or <code><?php echo esc_html(basename($target_info['file'])); ?></code> is not writable by PHP. Fix permissions, or apply the recommended values manually via the <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-htaccess')); ?>">PHP Config editor</a>.
+            <strong><?php _e('Auto-fix unavailable:', 'phpinfo-wp'); ?></strong> Your site root or <code><?php echo esc_html(basename($target_info['file'])); ?></code> is not writable by PHP. Fix permissions, or apply the recommended values manually via the <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-htaccess')); ?>">PHP Config editor</a>.
         </p></div>
     <?php endif; ?>
 
@@ -435,7 +436,7 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
 
     <p class="description" style="margin-top:16px">
         Some directives differ between production and development. Review context before changing values.
-        Use the <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-htaccess')); ?>">PHP Config editor</a> to apply changes manually.
+        Use the <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-htaccess')); ?>">PHP Config editor</a> to apply changes manually.
     </p>
 
     <?php

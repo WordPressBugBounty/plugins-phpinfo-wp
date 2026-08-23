@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $is_pro          = Phpinfo_WP_License::is_valid();
 $is_free_preview = !$is_pro;

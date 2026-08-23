@@ -11,7 +11,7 @@ class Phpinfo_WP_Network {
     public static function menu(): void {
         add_menu_page(
             'phpinfo() WP', 'phpinfo() WP', 'manage_network_options',
-            'phpinfowp-network', [__CLASS__, 'view'],
+            'piwp-network', [__CLASS__, 'view'],
             Phpinfo_wp::menu_icon(), 99
         );
     }

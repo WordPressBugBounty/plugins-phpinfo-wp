@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 // PHP Compatibility Scanner is FREE — the WP-Engine and Eli scanners are
 // abandoned or only work in dev environments, so this captures real demand.

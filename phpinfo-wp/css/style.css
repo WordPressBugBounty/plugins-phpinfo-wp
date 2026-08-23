@@ -497,7 +497,10 @@ body.phpinfowp-page .button-hero,
 .phpinfowp-btn-secondary {
   border-radius: 6px !important;
   font-family: inherit !important;
-  line-height: 1.4 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
   transition: all 0.15s ease-in-out !important;
 }
 
@@ -1122,19 +1125,19 @@ body.phpinfowp-page .button.button-primary:not(.phpinfowp-btn-danger):not(.phpin
 #phpinfowp-log-viewer {
   font-family: monospace;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.5;
   background: #1e1e2e;
   color: #cdd6f4;
   border-radius: 6px;
   padding: 12px 16px;
   max-height: 550px;
   overflow-y: auto;
-  white-space: pre-wrap;
   word-break: break-all;
 }
 
 .log-line {
-  padding: 1px 0;
+  padding: 2px 0;
+  white-space: pre-wrap;
 }
 
 .log-fatal {
@@ -4181,6 +4184,18 @@ body.phpinfowp-has-sidenav #wpbody-content {
   background: rgba(124, 58, 237, 0.06);
 }
 
+.phpinfowp-compare tfoot .button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  line-height: 30px !important;
+  padding: 0 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
 .phpinfowp-compare .dashicons {
   font-size: 18px;
   width: 18px;
@@ -4388,9 +4403,18 @@ body.phpinfowp-has-sidenav #wpbody-content {
 }
 
 .phpinfowp-pricing-tier .button {
-  width: 100%;
-  text-align: center;
-  justify-content: center;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  line-height: 36px !important;
+  padding: 0 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
 }
 
 .phpinfowp-pricing-foot {
@@ -4722,4 +4746,161 @@ body.phpinfowp-has-sidenav #wpbody-content {
 
 .phpinfowp-ua-meta-pill strong {
   font-weight: 600;
+}
+
+@keyframes phpinfowp-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Update Guard Superior Styles */
+.phpinfowp-ug-tab-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #dcdcde;
+  padding-bottom: 0;
+}
+
+.phpinfowp-ug-tab-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #50575e;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: all .15s ease-in-out;
+}
+
+.phpinfowp-ug-tab-link:hover {
+  color: #2271b1;
+}
+
+.phpinfowp-ug-tab-link.is-active {
+  color: #2271b1;
+  font-weight: 600;
+  border-bottom-color: #2271b1;
+}
+
+.phpinfowp-ug-tab-count {
+  font-size: 11px;
+  font-weight: 700;
+  background: #d63638;
+  color: #fff;
+  padding: 1px 7px;
+  border-radius: 10px;
+  line-height: 1.3;
+}
+
+.phpinfowp-ug-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.phpinfowp-ug-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.phpinfowp-ug-item-card {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-left-width: 4px;
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.phpinfowp-ug-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f1;
+}
+
+.phpinfowp-ug-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.phpinfowp-ug-item-name {
+  font-size: 14px;
+  color: #1d2327;
+}
+
+.phpinfowp-ug-ver-pill {
+  font-size: 12px;
+  color: #646970;
+  background: #f6f7f7;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #e2e4e7;
+}
+
+.phpinfowp-ug-item-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phpinfowp-ug-stability-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+}
+
+.phpinfowp-ug-stability-pill.is-good {
+  background: #edfaef;
+  color: #008a20;
+  border-color: #c3e6cb;
+}
+
+.phpinfowp-ug-stability-pill.is-warn {
+  background: #fff8e5;
+  color: #996800;
+  border-color: #f0c33c;
+}
+
+.phpinfowp-ug-signals {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.phpinfowp-ug-signal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #2c3338;
+  background: #f8f9fa;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.phpinfowp-ug-signal.is-safe {
+  background: #f0f9f1;
+  color: #1a632b;
+  border-left: 3px solid #00a32a;
 }

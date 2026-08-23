@@ -6,7 +6,7 @@
     "author": "Exeebit",
     "categories": ["site-health", "developer", "performance"]
   },
-  "landingPage": "/wp-admin/admin.php?page=phpinfo-wp",
+  "landingPage": "/wp-admin/admin.php?page=piwp",
   "preferredVersions": {
     "php": "8.2",
     "wp": "latest"
@@ -21,7 +21,7 @@
       "step": "installPlugin",
       "pluginData": {
         "resource": "wordpress.org/plugins",
-        "slug": "phpinfo-wp"
+        "slug": "piwp"
       }
     },
     {

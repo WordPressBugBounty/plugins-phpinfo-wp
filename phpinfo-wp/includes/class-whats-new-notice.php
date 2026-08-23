@@ -64,6 +64,9 @@ class Phpinfo_WP_Whats_New_Notice {
             '7.2.6' => [
                 'headline' => 'WordPress 7.1 Update Guard & Compatibility Ready',
             ],
+            '7.2.7' => [
+                'headline' => 'phpinfo() WP 7.2.7 — Security & Performance Update',
+            ],
         ];
 
         if (!isset($catalog[PHPINFOWP_VERSION])) return;
@@ -77,7 +80,7 @@ class Phpinfo_WP_Whats_New_Notice {
 
         // Pull real site data + WP 7.1 Update Guard hook to drive Pro conversions.
         $site_msg   = '';
-        $cta_label  = __('Audit for WP 7.1 & Lock $29 →', 'phpinfo-wp');
+        $cta_label  = __('Audit for WP 7.1 & Lock $29 →', 'piwp');
         if (version_compare(PHPINFOWP_VERSION, '7.2.5', '>=') && !$is_pro) {
             $grader = Phpinfo_WP_Config_Grader::summary();
             $fails  = (int) ($grader['fails'] ?? 0);
@@ -87,24 +90,24 @@ class Phpinfo_WP_Whats_New_Notice {
             if ($fails > 0 && $grade) {
                 $site_msg = sprintf(
                     /* translators: 1: letter grade, 2: number of failing checks */
-                    __('🛡️ <strong>WordPress 7.1 is here — is your site ready?</strong> Your server scores <strong>%1$s</strong> (%2$d failing check%3$s). Scan plugins & PHP with Update Guard before updating core.', 'phpinfo-wp'),
+                    __('🛡️ <strong>WordPress 7.1 is here — is your site ready?</strong> Your server scores <strong>%1$s</strong> (%2$d failing check%3$s). Scan plugins & PHP with Update Guard before updating core.', 'piwp'),
                     esc_html($grade),
                     $fails,
                     $fails === 1 ? '' : 's'
                 );
             } else {
-                $site_msg = __('🛡️ <strong>WordPress 7.1 is here — is your site ready to update?</strong> Scan plugins, themes, and PHP compatibility with Update Guard before upgrading to prevent silent 500 errors.', 'phpinfo-wp');
+                $site_msg = __('🛡️ <strong>WordPress 7.1 is here — is your site ready to update?</strong> Scan plugins, themes, and PHP compatibility with Update Guard before upgrading to prevent silent 500 errors.', 'piwp');
             }
 
             if ($days_left > 0) {
                 $site_msg .= ' ' . sprintf(
                     /* translators: %d: days remaining before price increase */
-                    __('<strong>Lock in $29/yr before Aug 31 ($39/yr in %d days).</strong>', 'phpinfo-wp'),
+                    __('<strong>Lock in $29/yr before Aug 31 ($39/yr in %d days).</strong>', 'piwp'),
                     $days_left
                 );
-                $cta_label = sprintf(__('Audit for WP 7.1 & Lock $29 (%dd left) →', 'phpinfo-wp'), $days_left);
+                $cta_label = sprintf(__('Audit for WP 7.1 & Lock $29 (%dd left) →', 'piwp'), $days_left);
             } else {
-                $cta_label = __('Audit for WP 7.1 with Pro →', 'phpinfo-wp');
+                $cta_label = __('Audit for WP 7.1 with Pro →', 'piwp');
             }
         }
 
@@ -154,18 +157,18 @@ class Phpinfo_WP_Whats_New_Notice {
                 <span style="background:#777BB3; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:3px; letter-spacing:.4px; text-transform:uppercase; flex-shrink: 0; line-height: 1.4;">v<?php echo esc_html(PHPINFOWP_VERSION); ?> · WP 7.1</span>
                 <p style="font-size:13px; color:#1d2327; line-height:1.45;">
                     <?php if ($is_pro): ?>
-                        ✅ <strong><?php _e('phpinfo() WP Pro is ready for WordPress 7.1.', 'phpinfo-wp'); ?></strong> <?php _e('Your server health audit and Update Guard are fully up to date.', 'phpinfo-wp'); ?>
+                        ✅ <strong><?php _e('phpinfo() WP Pro is ready for WordPress 7.1.', 'piwp'); ?></strong> <?php _e('Your server health audit and Update Guard are fully up to date.', 'piwp'); ?>
                     <?php elseif ($site_msg): ?>
                         <?php echo wp_kses($site_msg, ['strong' => [], 'a' => ['href' => [], 'target' => [], 'rel' => []]]); ?>
                     <?php else: ?>
-                        🚀 <strong><?php printf(esc_html__('phpinfo() WP %s is ready.', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION)); ?></strong> <?php _e('Upgrade to Pro to unlock one-click fixes, SSL monitor, security headers, and white-label PDF reports.', 'phpinfo-wp'); ?>
+                        🚀 <strong><?php printf(esc_html__('phpinfo() WP %s is ready.', 'piwp'), esc_html(PHPINFOWP_VERSION)); ?></strong> <?php _e('Upgrade to Pro to unlock one-click fixes, SSL monitor, security headers, and white-label PDF reports.', 'piwp'); ?>
                     <?php endif; ?>
                 </p>
             </div>
             <div>
                 <?php if ($is_pro): ?>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfo-wp')); ?>" class="phpinfowp-btn-upgrade-notice">
-                        <?php _e('View Dashboard →', 'phpinfo-wp'); ?>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=piwp')); ?>" class="phpinfowp-btn-upgrade-notice">
+                        <?php _e('View Dashboard →', 'piwp'); ?>
                     </a>
                 <?php else: ?>
                     <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn-upgrade-notice"><?php echo esc_html($cta_label); ?></a>

@@ -49,14 +49,14 @@ class Phpinfo_WP_Alerts {
         return array_values(array_filter($list, 'is_email'));
     }
 
-    private static function send(string $subject, string $body): bool {
+    public static function send(string $subject, string $body): bool {
         $sent = false;
 
         $to = self::recipients();
         if ($to) {
             $site    = get_bloginfo('name') . ' (' . get_site_url() . ')';
             $full    = "Alert from phpinfo() WP Pro\nSite: {$site}\n\n{$body}\n\n---\n"
-                     . "Manage alerts: " . admin_url('admin.php?page=phpinfowp-alerts');
+                     . "Manage alerts: " . admin_url('admin.php?page=piwp-alerts');
             $headers = [
                 'Content-Type: text/plain; charset=UTF-8',
                 'From: phpinfo() WP <' . get_option('admin_email') . '>',
@@ -289,7 +289,7 @@ class Phpinfo_WP_Alerts {
 
         $lines[] = '';
         $lines[] = str_repeat('─', 60);
-        $lines[] = "View full dashboard: " . admin_url('admin.php?page=phpinfo-wp');
+        $lines[] = "View full dashboard: " . admin_url('admin.php?page=piwp');
 
         self::send("Weekly health digest — " . get_bloginfo('name'), implode("\n", $lines));
     }

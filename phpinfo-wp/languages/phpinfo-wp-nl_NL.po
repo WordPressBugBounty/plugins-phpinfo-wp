@@ -1,2469 +1,3347 @@
 # Translation of phpinfo-wp in nl_NL
-# This file is distributed under the same license as the phpinfo-wp package.
+# This file is distributed under the GPLv3 license.
 msgid ""
 msgstr ""
-"Project-Id-Version: phpinfo-wp\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-19 19:24+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: AI Translator <support@exeebit.com>\n"
+"Project-Id-Version: phpinfo-wp 7.2.7\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/phpinfo-wp/\n"
+"POT-Creation-Date: 2026-08-23 15:40+0200\n"
+"PO-Revision-Date: 2026-08-23 15:40+0200\n"
+"Last-Translator: Exeebit Team <support@exeebit.com>\n"
 "Language-Team: nl_NL <support@exeebit.com>\n"
 "Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-#: includes/fn-feature-lock.php:59 views/htaccess.php:825
-#: views/dashboard.php:59 views/pro/opcache.php:34
-#: views/pro/security-headers.php:30 views/pro/error-log.php:42
-#: views/pro/mail.php:52 views/pro/object-cache.php:37
-#: views/pro/permissions.php:34 views/pro/snapshots.php:61
-#: views/pro/alerts.php:48 views/pro/upgrade.php:36
-#: views/pro/api-monitor.php:38 views/pro/cron.php:47 views/pro/license.php:87
-#: views/pro/ssl.php:42 views/pro/db-health.php:40 views/pro/report.php:49
-#: views/pro/config-grader.php:152
-msgid "PRO"
-msgstr "PRO"
 
-#: includes/class-abilities.php:27
+#: includes/class-abilities.php
 msgid "Server Health Audit"
 msgstr "Serverstatusaudit"
 
-#: includes/class-abilities.php:28
+#: includes/class-abilities.php
 msgid "Inspect PHP version, server configuration, extensions, and audit grade collected by phpinfo() WP."
 msgstr "Inspecteer de PHP-versie, serverconfiguratie, extensies en auditcijfer verzameld door phpinfo() WP."
 
-#: includes/class-abilities.php:32
+#: includes/class-abilities.php
 msgid "Get PHP Version & EOL Status"
 msgstr "Ontvang PHP-versie en EOL-status"
 
-#: includes/class-abilities.php:33
+#: includes/class-abilities.php
 msgid "Returns the running PHP version, its end-of-life date, days remaining, and an ok/warning/eol status flag."
 msgstr "Retourneert de actieve PHP-versie, de einddatum ervan, de resterende dagen en een statusvlag ok/waarschuwing/eol."
 
-#: includes/class-abilities.php:52
+#: includes/class-abilities.php
 msgid "Get Config Grade"
 msgstr "Configuratiecijfer ophalen"
 
-#: includes/class-abilities.php:53
+#: includes/class-abilities.php
 msgid "Returns the overall A–F config grade, numeric score, and counts of passing/warning/failing checks."
 msgstr "Retourneert het algehele A-F-configuratiecijfer, de numerieke score en het aantal geslaagde/waarschuwings/mislukte controles."
 
-#: includes/class-abilities.php:73
+#: includes/class-abilities.php
 msgid "List Failing Config Checks"
 msgstr "Lijst met mislukte configuratiecontroles"
 
-#: includes/class-abilities.php:74
+#: includes/class-abilities.php
 msgid "Returns each failing or warning config check with its directive key, current value, recommended value, and severity. Pro-only — free tier returns an empty list."
 msgstr "Retourneert elke mislukte of waarschuwingsconfiguratiecontrole met de instructiesleutel, huidige waarde, aanbevolen waarde en ernst. Alleen voor pro's: de gratis laag retourneert een lege lijst."
 
-#: includes/class-abilities.php:98
+#: includes/class-abilities.php
 msgid "Get PHP Directive Value"
 msgstr "Ontvang PHP-richtlijnwaarde"
 
-#: includes/class-abilities.php:99
+#: includes/class-abilities.php
 msgid "Returns the current value of a named php.ini directive (e.g. memory_limit, upload_max_filesize)."
 msgstr "Retourneert de huidige waarde van een benoemde php.ini-instructie (bijvoorbeeld memory_limit, upload_max_filesize)."
 
-#: includes/class-abilities.php:122
+#: includes/class-abilities.php
 msgid "List Loaded PHP Extensions"
 msgstr "Lijst met geladen PHP-extensies"
 
-#: includes/class-abilities.php:123
+#: includes/class-abilities.php
 msgid "Returns the names of all PHP extensions currently loaded on the server, sorted alphabetically."
 msgstr "Retourneert de namen van alle PHP-extensies die momenteel op de server zijn geladen, alfabetisch gesorteerd."
 
-#: includes/class-abilities.php:136
+#: includes/class-abilities.php
 msgid "Get Server Audit Summary"
 msgstr "Ontvang een samenvatting van de serveraudit"
 
-#: includes/class-abilities.php:137
-msgid "Returns a high-level rollup of server health: PHP version, EOL status, config grade, and counts of issues. The single best ability to call for a \\\"how is my server doing\\\" check."
-msgstr "Retourneert een overzicht van de serverstatus op hoog niveau: PHP-versie, EOL-status, configuratieniveau en aantal problemen. De beste mogelijkheid om een ​​\\\\\"hoe gaat het met mijn server\\\\\"-controle uit te voeren."
+#: includes/class-abilities.php
+msgid "Returns a high-level rollup of server health: PHP version, EOL status, config grade, and counts of issues. The single best ability to call for a \"how is my server doing\" check."
+msgstr "Retourneert een overzicht van de serverstatus: PHP-versie, EOL-status, configuratiecijfer en aantal problemen."
 
-#: includes/class-admin-nav.php:33
+#: includes/class-admin-nav.php
 msgid "Performance"
 msgstr "Prestaties"
 
-#: includes/class-admin-nav.php:35
+#: includes/class-admin-nav.php
 msgid "Analyze and optimize speed, caching, and database bottlenecks"
 msgstr "Analyseer en optimaliseer snelheid, caching en databaseknelpunten"
 
-#: includes/class-admin-nav.php:37 views/pro/config-grader.php:16
+#: views/pro/config-grader.php
+#: includes/class-admin-nav.php
 msgid "Config Grader"
 msgstr "Grader configureren"
 
-#: includes/class-admin-nav.php:38
+#: includes/class-admin-nav.php
 msgid "OPcache"
 msgstr "OP-cache"
 
-#: includes/class-admin-nav.php:39
+#: includes/class-admin-nav.php
 msgid "Object Cache"
 msgstr "Objectcache"
 
-#: includes/class-admin-nav.php:40 views/info.php:114 views/info.php:181
-#: views/pro/network.php:45 views/pro/report.php:547
+#: views/pro/report.php
+#: includes/class-admin-nav.php
+#: views/info.php
+#: views/pro/network.php
 msgid "Database"
 msgstr "Database"
 
-#: includes/class-admin-nav.php:41
+#: includes/class-admin-nav.php
 msgid "API Monitor"
 msgstr "API-monitor"
 
-#: includes/class-admin-nav.php:45
+#: includes/class-admin-nav.php
 msgid "Security & Core"
 msgstr "Beveiliging en kern"
 
-#: includes/class-admin-nav.php:47
+#: includes/class-admin-nav.php
 msgid "Read-only health checks across PHP, config, security, and infrastructure"
 msgstr "Alleen-lezen statuscontroles voor PHP, configuratie, beveiliging en infrastructuur"
 
-#: includes/class-admin-nav.php:49
+#: includes/class-admin-nav.php
 msgid "PHP EOL"
 msgstr "PHP EOL"
 
-#: includes/class-admin-nav.php:50 views/pro/report.php:586
+#: views/pro/report.php
+#: includes/class-admin-nav.php
 msgid "PHP Compatibility"
 msgstr "PHP-compatibiliteit"
 
-#: includes/class-admin-nav.php:51
+#: includes/class-admin-nav.php
 msgid "Update Guard"
 msgstr "Bewaker bijwerken"
 
-#: includes/class-admin-nav.php:52
+#: includes/class-admin-nav.php
 msgid "Permissions Audit"
 msgstr "Machtigingencontrole"
 
-#: includes/class-admin-nav.php:53
+#: includes/class-admin-nav.php
 msgid "Security Headers"
 msgstr "Beveiligingskoppen"
 
-#: includes/class-admin-nav.php:54
+#: includes/class-admin-nav.php
 msgid "SSL Monitor"
 msgstr "SSL-monitor"
 
-#: includes/class-admin-nav.php:58
+#: includes/class-admin-nav.php
 msgid "Page Audit Tools"
 msgstr "Hulpmiddelen voor pagina-audit"
 
-#: includes/class-admin-nav.php:60
+#: includes/class-admin-nav.php
 msgid "Active operations — edit config, troubleshoot, take snapshots, run diagnostics"
 msgstr "Actieve bewerkingen: configuratie bewerken, problemen oplossen, momentopnamen maken, diagnoses uitvoeren"
 
-#: includes/class-admin-nav.php:62
+#: includes/class-admin-nav.php
 msgid "phpinfo() Viewer"
 msgstr "phpinfo() Kijker"
 
-#: includes/class-admin-nav.php:63 views/htaccess.php:575
+#: includes/class-admin-nav.php
+#: views/htaccess.php
 msgid "PHP Config Editor"
 msgstr "PHP-configuratie-editor"
 
-#: includes/class-admin-nav.php:64
+#: includes/class-admin-nav.php
 msgid "Troubleshooting"
 msgstr "Problemen oplossen"
 
-#: includes/class-admin-nav.php:65
+#: includes/class-admin-nav.php
 msgid "Basic Info"
 msgstr "Basisinformatie"
 
-#: includes/class-admin-nav.php:66
+#: includes/class-admin-nav.php
 msgid "Extensions"
 msgstr "Extensies"
 
-#: includes/class-admin-nav.php:67 views/pro/eol.php:114
+#: includes/class-admin-nav.php
+#: views/pro/eol.php
 msgid "Config Snapshots"
 msgstr "Configuratie-momentopnamen"
 
-#: includes/class-admin-nav.php:71
+#: includes/class-admin-nav.php
 msgid "Reports & Logs"
 msgstr "Rapporten en logboeken"
 
-#: includes/class-admin-nav.php:73
+#: includes/class-admin-nav.php
 msgid "Monitoring tools, logs, and outbound alerts"
 msgstr "Monitoringtools, logboeken en uitgaande waarschuwingen"
 
-#: includes/class-admin-nav.php:75 views/log.php:121
+#: views/log.php
+#: includes/class-admin-nav.php
 msgid "Activity Log"
 msgstr "Activiteitenlogboek"
 
-#: includes/class-admin-nav.php:76 views/pro/eol.php:115
+#: includes/class-admin-nav.php
+#: views/pro/eol.php
 msgid "Audit Report"
 msgstr "Auditrapport"
 
-#: includes/class-admin-nav.php:77
+#: includes/class-admin-nav.php
 msgid "WP-Cron Monitor"
 msgstr "WP-Cron-monitor"
 
-#: includes/class-admin-nav.php:78
+#: includes/class-admin-nav.php
 msgid "Mail"
 msgstr "Post"
 
-#: includes/class-admin-nav.php:79
+#: includes/class-admin-nav.php
 msgid "Alerts"
 msgstr "Waarschuwingen"
 
-#: includes/class-admin-nav.php:80
+#: includes/class-admin-nav.php
 msgid "Error Log"
 msgstr "Foutenlogboek"
 
-#: includes/class-admin-nav.php:166
+#: includes/class-admin-nav.php
+msgid "License"
+msgstr "Licentie"
+
+#: includes/class-admin-nav.php
+msgid "Manage your PRO license subscription"
+msgstr "Beheer uw PRO-licentieabonnement"
+
+#: includes/class-admin-nav.php
+msgid "Support"
+msgstr "Ondersteuning"
+
+#: includes/class-admin-nav.php
+msgid "Get help from our engineers"
+msgstr "Krijg hulp van onze technici"
+
+#: includes/class-admin-nav.php
 msgid "Unknown group."
 msgstr "Onbekende groep."
 
-#: includes/class-admin-nav.php:266
+#: includes/class-admin-nav.php
 msgid "Unknown view."
 msgstr "Onbekend zicht."
 
-#: includes/class-site-health.php:12
-msgid "PHP version end-of-life status"
-msgstr "Einde levensduur van PHP-versie"
-
-#: includes/class-site-health.php:16
-msgid "PHP error display is disabled in production"
-msgstr "PHP-foutweergave is uitgeschakeld in productie"
-
-#: includes/class-site-health.php:20
-msgid "PHP remote file inclusion is disabled"
-msgstr "PHP-bestandsopname op afstand is uitgeschakeld"
-
-#: includes/class-site-health.php:24
-msgid "PHP version is not exposed in HTTP headers"
-msgstr "De PHP-versie wordt niet weergegeven in HTTP-headers"
-
-#: includes/class-site-health.php:28
-msgid "PHP memory limit is sufficient"
-msgstr "PHP-geheugenlimiet is voldoende"
-
-#: includes/class-site-health.php:32
-msgid "OPcache is enabled"
-msgstr "OP-cache is ingeschakeld"
-
-#: includes/class-deactivate-modal.php:57
-msgid "Here's what stops working the moment this plugin goes off:"
-msgstr "Dit is wat er niet meer werkt zodra deze plug-in wordt uitgeschakeld:"
-
-#: includes/class-deactivate-modal.php:63
-msgid "You'll lose (Free)"
-msgstr "Je verliest (gratis)"
-
-#: includes/class-deactivate-modal.php:72
-msgid "You'll also lose (Pro)"
-msgstr "Je verliest ook (Pro)"
-
-#: includes/class-deactivate-modal.php:85
-msgid "doesn't delete"
-msgstr "verwijdert niet"
-
-#: includes/class-deactivate-modal.php:95
-msgid "Keep it active"
-msgstr "Houd het actief"
-
-#: includes/class-deactivate-modal.php:96 views/pro/license.php:202
-msgid "Deactivate anyway →"
-msgstr "Toch deactiveren →"
-
-#: includes/class-whats-new-notice.php:117
-msgid "What's New in Pro 7.2:"
-msgstr "Wat is er nieuw in Pro 7.2:"
-
-#: includes/class-whats-new-notice.php:119
-msgid "Boost speed & security with 7.2:"
-msgstr "Verhoog de snelheid en veiligheid met 7.2:"
-
-#: includes/class-whats-new-notice.php:129
-msgid "Get Pro & Unlock →"
-msgstr "Pro downloaden en ontgrendelen →"
-
-#: includes/class-ai-explain.php:35
+#: views/pro/update-audit.php
+#: includes/class-ai-explain.php
 msgid "Explain with AI"
 msgstr "Leg uit met AI"
 
-#: includes/class-ai-explain.php:36
+#: includes/class-ai-explain.php
 msgid "Asking AI…"
 msgstr "AI vragen..."
 
-#: includes/class-ai-explain.php:37
+#: includes/class-ai-explain.php
 msgid "AI request failed."
 msgstr "AI-verzoek is mislukt."
 
-#: includes/class-ai-explain.php:45
+#: includes/class-ai-explain.php
 msgid "Forbidden."
 msgstr "Verboden."
 
-#: includes/class-ai-explain.php:48
+#: includes/class-ai-explain.php
 msgid "AI Client is not available. Requires WordPress 7.0+ with a configured AI connector."
 msgstr "AI-client is niet beschikbaar. Vereist WordPress 7.0+ met een geconfigureerde AI-connector."
 
-#: includes/class-ai-explain.php:57
+#: includes/class-ai-explain.php
 msgid "Unknown topic."
 msgstr "Onbekend onderwerp."
 
-#: views/info.php:39
-msgid "not loaded"
-msgstr "niet geladen"
-
-#: views/info.php:49
-msgid "Server Overview"
-msgstr "Serveroverzicht"
-
-#: views/info.php:50
-msgid "PHP, WordPress, server, and database environment at a glance"
-msgstr "PHP-, WordPress-, server- en databaseomgeving in één oogopslag"
-
-#: views/info.php:58 views/info.php:163
-msgid "PHP Version"
-msgstr "PHP-versie"
-
-#: views/info.php:63 views/pro/eol.php:27
-msgid "END OF LIFE"
-msgstr "EINDE VAN HET LEVEN"
-
-#: views/info.php:64
-msgid "EOL SOON"
-msgstr "EOL BINNENKORT"
-
-#: views/info.php:65 views/pro/eol.php:29
-msgid "SUPPORTED"
-msgstr "ONDERSTEUND"
-
-#: views/info.php:70
-msgid "Upgrade immediately"
-msgstr "Upgrade onmiddellijk"
-
-#: views/info.php:71
-#, php-format
-msgid "EOL in %sd — %s"
-msgstr "EOL in%sd —%s"
-
-#: views/info.php:72
-#, php-format
-msgid "Until %s"
-msgstr "Tot%s"
-
-#: views/info.php:73
-msgid "EOL date unknown"
-msgstr "EOL-datum onbekend"
-
-#: views/info.php:81 views/info.php:128 views/pro/network.php:35
-msgid "WordPress"
-msgstr "WordPress"
-
-#: views/info.php:84
-msgid "Multisite network"
-msgstr "Netwerk met meerdere locaties"
-
-#: views/info.php:84
-msgid "Single site"
-msgstr "Enkele site"
-
-#: views/info.php:88
-#, php-format
-msgid "%s active plugin"
-msgstr "%sactieve plug-in"
-
-#: views/info.php:97 views/pro/opcache.php:74 views/pro/object-cache.php:82
-msgid "Memory Usage"
-msgstr "Geheugengebruik"
-
-#: views/info.php:102
-#, php-format
-msgid "of %1$s limit (%2$s%%)"
-msgstr "van%1$slimiet (%2$s%%)"
-
-#: views/info.php:118
-#, php-format
-msgid "%s total size"
-msgstr "%stotale grootte"
-
-#: views/info.php:124
-msgid "Environment Details"
-msgstr "Omgevingsdetails"
-
-#: views/info.php:129
-msgid "Site URL"
-msgstr "Site-URL"
-
-#: views/info.php:130
-msgid "Home URL"
-msgstr "Home-URL"
-
-#: views/info.php:131
-msgid "WP Version"
-msgstr "WP-versie"
-
-#: views/info.php:132
-msgid "Active Theme"
-msgstr "Actief thema"
-
-#: views/info.php:133
-msgid "Active Plugins"
-msgstr "Actieve plug-ins"
-
-#: views/info.php:139
-#, php-format
-msgid "%1$s of %2$s installed"
-msgstr "%1$svan%2$sgeïnstalleerd"
-
-#: views/info.php:145
-msgid "Active Themes"
-msgstr "Actieve thema's"
-
-#: views/info.php:149
-#, php-format
-msgid "%s installed"
-msgstr "%sgeïnstalleerd"
-
-#: views/info.php:154
-msgid "Debug Mode"
-msgstr "Foutopsporingsmodus"
-
-#: views/info.php:156
-msgid "ON"
-msgstr "AAN"
-
-#: views/info.php:156
-msgid "disable in production"
-msgstr "uitschakelen in de productie"
-
-#: views/info.php:158 views/info.php:170
-msgid "Off"
-msgstr "Uit"
-
-#: views/info.php:160
-msgid "Admin Email"
-msgstr "Beheerder e-mailadres"
-
-#: views/info.php:162 views/pro/network.php:22
-msgid "PHP"
-msgstr "PHP"
-
-#: views/info.php:164
-msgid "PHP SAPI"
-msgstr "PHP SAPI"
-
-#: views/info.php:165
-msgid "Memory Limit"
-msgstr "Geheugenlimiet"
-
-#: views/info.php:166
-msgid "Max Execution Time"
-msgstr "Maximale uitvoeringstijd"
-
-#: views/info.php:167
-msgid "Upload Max Filesize"
-msgstr "Upload maximale bestandsgrootte"
-
-#: views/info.php:168
-msgid "Post Max Size"
-msgstr "Maximale grootte posten"
-
-#: views/info.php:169
-msgid "Max Input Vars"
-msgstr "Maximale invoervar"
-
-#: views/info.php:170
-msgid "Display Errors"
-msgstr "Weergavefouten"
-
-#: views/info.php:170
-msgid "On"
-msgstr "Aan"
-
-#: views/info.php:171
-msgid "cURL Version"
-msgstr "cURL-versie"
-
-#: views/info.php:172 views/extension.php:63
-msgid "Loaded Extensions"
-msgstr "Geladen extensies"
-
-#: views/info.php:174
-msgid "Server"
-msgstr "Server"
-
-#: views/info.php:175
-msgid "Server Software"
-msgstr "Serversoftware"
-
-#: views/info.php:176
-msgid "Server Name"
-msgstr "Servernaam"
-
-#: views/info.php:177
-msgid "Document Root"
-msgstr "Documentwortel"
-
-#: views/info.php:178
-msgid "Operating System"
-msgstr "Besturingssysteem"
-
-#: views/info.php:179
-msgid "Hostname"
-msgstr "Hostnaam"
-
-#: views/info.php:182
-msgid "MySQL Version"
-msgstr "MySQL-versie"
-
-#: views/info.php:183
-msgid "Database Name"
-msgstr "Databasenaam"
-
-#: views/info.php:184
-msgid "Database Host"
-msgstr "Databasehost"
-
-#: views/info.php:185
-msgid "Table Prefix"
-msgstr "Tabelvoorvoegsel"
-
-#: views/info.php:186
-msgid "Database Size"
-msgstr "Databasegrootte"
-
-#: views/info.php:187
-msgid "Charset"
-msgstr "Tekenset"
-
-#: views/info.php:189
-msgid "Disk"
-msgstr "Schijf"
-
-#: views/info.php:190
-msgid "Root Directory"
-msgstr "Hoofdmap"
-
-#: views/info.php:191
-msgid "Uploads Directory"
-msgstr "Uploadmap"
-
-#: views/htaccess.php:576
-msgid "Configure php.ini directives and web server rules safely from your WordPress dashboard."
-msgstr "Configureer php.ini-richtlijnen en webserverregels veilig vanaf uw WordPress-dashboard."
-
-#: views/htaccess.php:588
-msgid "Detected Server"
-msgstr "Gedetecteerde server"
-
-#: views/htaccess.php:606
-msgid "Target Config File"
-msgstr "Doelconfiguratiebestand"
-
-#: views/htaccess.php:621 views/htaccess.php:630
-msgid "Propagation Time"
-msgstr "Voortplantingstijd"
-
-#: views/htaccess.php:623
-msgid "Changes apply after FPM reload (cache TTL)."
-msgstr "Wijzigingen zijn van toepassing na het opnieuw laden van FPM (cache TTL)."
-
-#: views/htaccess.php:631
-msgid "Instant"
-msgstr "Direct"
-
-#: views/htaccess.php:632
-msgid "Directives are parsed and applied immediately."
-msgstr "Richtlijnen worden ontleed en onmiddellijk toegepast."
-
-#: views/htaccess.php:643
-msgid "Write permission denied."
-msgstr "Schrijftoestemming geweigerd."
-
-#: views/htaccess.php:660
-msgid "PHP Directives"
-msgstr "PHP-richtlijnen"
-
-#: views/htaccess.php:685
-msgid "Editor"
-msgstr "Redacteur"
-
-#: views/htaccess.php:696
-msgid "Auto-rollback:"
-msgstr "Automatisch terugdraaien:"
-
-#: views/htaccess.php:699
-msgid "directive value"
-msgstr "richtinggevende waarde"
-
-#: views/htaccess.php:730
-msgid "Web Server Snippet Library"
-msgstr "Webserverfragmentbibliotheek"
-
-#: views/htaccess.php:734
-msgid "Nginx Detected."
-msgstr "Nginx gedetecteerd."
-
-#: views/htaccess.php:738
-msgid "Apache/LiteSpeed Detected."
-msgstr "Apache/LiteSpeed ​​gedetecteerd."
-
-#: views/htaccess.php:746
-msgid "Clear Cache:"
-msgstr "Cache wissen:"
-
-#: views/htaccess.php:770
-msgid "Bulk Actions"
-msgstr "Bulkacties"
-
-#: views/htaccess.php:771
-msgid "Inject or roll back all 4 snippets at once."
-msgstr "Injecteer of draai alle vier de fragmenten tegelijk terug."
-
-#: views/htaccess.php:851
-msgid "These settings can make your site up to 2x faster!"
-msgstr "Deze instellingen kunnen uw site tot 2x sneller maken!"
-
-#: views/htaccess.php:858
-msgid "14-day risk-free refund guarantee"
-msgstr "14 dagen risicovrije terugbetalingsgarantie"
-
-#: views/htaccess.php:918
-msgid "Read-Only"
-msgstr "Alleen-lezen"
-
-#: views/htaccess.php:924
-msgid "File does not exist yet — it will be created on first save."
-msgstr "Het bestand bestaat nog niet; het wordt aangemaakt bij de eerste keer opslaan."
-
-#: views/htaccess.php:927
-msgid "Active directives on disk."
-msgstr "Actieve richtlijnen op schijf."
-
-#: views/dashboard.php:73
+#: includes/class-deactivate-modal.php
+msgid "Here's what stops working the moment this plugin goes off:"
+msgstr "Dit is wat er niet meer werkt zodra deze plug-in wordt uitgeschakeld:"
+
+#: includes/class-deactivate-modal.php
+msgid "You'll lose (Free)"
+msgstr "Je verliest (gratis)"
+
+#: includes/class-deactivate-modal.php
+msgid "You'll also lose (Pro)"
+msgstr "Je verliest ook (Pro)"
+
+#: includes/class-deactivate-modal.php
+msgid "doesn't delete"
+msgstr "verwijdert niet"
+
+#: includes/class-deactivate-modal.php
+msgid "Keep it active"
+msgstr "Houd het actief"
+
+#: views/pro/license.php
+#: includes/class-deactivate-modal.php
+msgid "Deactivate anyway →"
+msgstr "Toch deactiveren →"
+
+#: includes/class-license.php
+msgid "Unauthorized permission."
+msgstr "Onbevoegde toegang."
+
+#: includes/class-license.php
+msgid "Please enter a valid license key."
+msgstr "Voer een geldige licentiesleutel in."
+
+#: views/pro/license.php
+#: includes/class-license.php
+msgid "License activated successfully. Pro features are now unlocked."
+msgstr "Licentie succesvol geactiveerd. Pro-functies zijn nu ontgrendeld."
+
+#: views/pro/license.php
+#: includes/class-license.php
+msgid "Activation failed: This license has reached its maximum site limit. Upgrade your license or deactivate another site."
+msgstr "Activering mislukt: deze licentie heeft de maximale websitelimiet bereikt. Upgrade uw licentie of deactiveer een andere site."
+
+#: includes/class-license.php
+msgid "Activation failed: This license has been revoked or refunded. Contact support@exeebit.com."
+msgstr "Activering mislukt: deze licentie is ingetrokken of terugbetaald. Neem contact op met support@exeebit.com."
+
+#: includes/class-license.php
+msgid "Activation failed: This license has expired. Please renew your license to continue using Pro features."
+msgstr "Activering mislukt: deze licentie is verlopen. Vernieuw uw licentie om door te gaan."
+
+#: includes/class-license.php
+msgid "License key invalid, expired, or unrecognised. If you just purchased, allow a moment for activation to propagate, then try again."
+msgstr "Licentiesleutel ongeldig, verlopen of niet herkend. Probeer het over een moment opnieuw."
+
+#: views/pro/license.php
+#: includes/class-license.php
+msgid "License deactivated. Pro features are disabled."
+msgstr "Licentie gedeactiveerd. Pro-functies zijn uitgeschakeld."
+
+#: includes/class-update-guard.php
+msgid "Requires PHP %s — you run %s"
+msgstr "Requires PHP %s — you run %s"
+
+#: includes/class-update-guard.php
+msgid "Requires WordPress %s — you run %s"
+msgstr "Requires WordPress %s — you run %s"
+
+#: includes/class-update-guard.php
+msgid "Major version jump: %s → %s"
+msgstr "Major version jump: %s → %s"
+
+#: includes/class-update-guard.php
+msgid "Tested up to WordPress %s (you run %s)"
+msgstr "Tested up to WordPress %s (you run %s)"
+
+#: includes/class-update-guard.php
+msgid "Plugin is closed on WordPress.org"
+msgstr "Plugin is closed on WordPress.org"
+
+#: includes/class-update-guard.php
+msgid "Not updated in %d months — likely abandoned"
+msgstr "Not updated in %d months — likely abandoned"
+
+#: includes/class-update-guard.php
+msgid "Requires plugin \"%s\" which is not active"
+msgstr "Requires plugin \"%s\" which is not active"
+
+#: includes/class-update-guard.php
+msgid "Past updates: %d of last %d had issues on this site"
+msgstr "Past updates: %d of last %d had issues on this site"
+
+#: includes/class-update-guard.php
+msgid "Changelog mentions: \"%s\""
+msgstr "Changelog mentions: \"%s\""
+
+#: includes/class-update-guard.php
+msgid "Update Guard:"
+msgstr "Update Guard:"
+
+#: includes/class-update-guard.php
+msgid "%d plugin/theme update(s) pending."
+msgstr "%d plugin/theme update(s) pending."
+
+#: includes/class-update-guard.php
+msgid "Run a pre-update compatibility scan →"
+msgstr "Run a pre-update compatibility scan →"
+
+#: includes/class-update-guard.php
+msgid "All %d pending update(s) passed compatibility checks."
+msgstr "All %d pending update(s) passed compatibility checks."
+
+#: includes/class-update-guard.php
+msgid "View report"
+msgstr "View report"
+
+#: includes/class-update-guard.php
+msgid "%d risky, %d caution among %d pending update(s)."
+msgstr "%d risky, %d caution among %d pending update(s)."
+
+#: includes/class-update-guard.php
+msgid "Review before updating →"
+msgstr "Review before updating →"
+
+#: includes/class-update-history.php
+msgid "Site returned non-200 response"
+msgstr "Site returned non-200 response"
+
+#: includes/class-update-history.php
+msgid "Admin dashboard unreachable"
+msgstr "Admin dashboard unreachable"
+
+#: includes/class-update-history.php
+msgid "%d new error(s) in log"
+msgstr "%d new error(s) in log"
+
+#: includes/class-update-history.php
+msgid "WP-Cron events may be disrupted"
+msgstr "WP-Cron events may be disrupted"
+
+#: includes/class-update-history.php
+msgid "Post-update health issues detected"
+msgstr "Post-update health issues detected"
+
+#: includes/class-update-history.php
+msgid "Update Guard detected issues after recent updates:"
+msgstr "Update Guard detected issues after recent updates:"
+
+#: includes/class-update-history.php
+msgid "Review:"
+msgstr "Review:"
+
+#: includes/class-update-history.php
+msgid "Update Guard — Post-Update Health Check:"
+msgstr "Update Guard — Post-Update Health Check:"
+
+#: includes/class-update-history.php
+msgid "View Full Report"
+msgstr "Volledig rapport bekijken"
+
+#: views/safemode.php
+#: includes/class-update-history.php
+msgid "Dismiss"
+msgstr "Dismiss"
+
+#: includes/class-whats-new-notice.php
+msgid "Audit for WP 7.1 & Lock $29 →"
+msgstr "Audit for WP 7.1 & Lock $29 →"
+
+#: includes/class-whats-new-notice.php
+msgid "🛡️ <strong>WordPress 7.1 is here — is your site ready?</strong> Your server scores <strong>%1$s</strong> (%2$d failing check%3$s). Scan plugins & PHP with Update Guard before updating core."
+msgstr "🛡️ <strong>WordPress 7.1 is here — is your site ready?</strong> Your server scores <strong>%1$s</strong> (%2$d failing check%3$s). Scan plugins & PHP with Update Guard before updating core."
+
+#: includes/class-whats-new-notice.php
+msgid "🛡️ <strong>WordPress 7.1 is here — is your site ready to update?</strong> Scan plugins, themes, and PHP compatibility with Update Guard before upgrading to prevent silent 500 errors."
+msgstr "🛡️ <strong>WordPress 7.1 is here — is your site ready to update?</strong> Scan plugins, themes, and PHP compatibility with Update Guard before upgrading to prevent silent 500 errors."
+
+#: includes/class-whats-new-notice.php
+msgid "<strong>Lock in $29/yr before Aug 31 ($39/yr in %d days).</strong>"
+msgstr "<strong>Lock in $29/yr before Aug 31 ($39/yr in %d days).</strong>"
+
+#: includes/class-whats-new-notice.php
+msgid "Audit for WP 7.1 & Lock $29 (%dd left) →"
+msgstr "Audit for WP 7.1 & Lock $29 (%dd left) →"
+
+#: includes/class-whats-new-notice.php
+msgid "Audit for WP 7.1 with Pro →"
+msgstr "Audit for WP 7.1 with Pro →"
+
+#: includes/class-whats-new-notice.php
+msgid "phpinfo() WP Pro is ready for WordPress 7.1."
+msgstr "phpinfo() WP Pro is ready for WordPress 7.1."
+
+#: includes/class-whats-new-notice.php
+msgid "Your server health audit and Update Guard are fully up to date."
+msgstr "Your server health audit and Update Guard are fully up to date."
+
+#: includes/class-whats-new-notice.php
+msgid "phpinfo() WP %s is ready."
+msgstr "phpinfo() WP %s is ready."
+
+#: includes/class-whats-new-notice.php
+msgid "Upgrade to Pro to unlock one-click fixes, SSL monitor, security headers, and white-label PDF reports."
+msgstr "Upgrade to Pro to unlock one-click fixes, SSL monitor, security headers, and white-label PDF reports."
+
+#: includes/class-whats-new-notice.php
+msgid "View Dashboard →"
+msgstr "View Dashboard →"
+
+#: views/pro/permissions.php
+#: views/pro/config-grader.php
+#: views/pro/error-log.php
+#: views/pro/cron.php
+#: views/pro/license.php
+#: views/pro/support.php
+#: views/pro/db-health.php
+#: views/pro/ssl.php
+#: views/pro/security-headers.php
+#: views/pro/opcache.php
+#: views/pro/upgrade.php
+#: views/pro/alerts.php
+#: views/pro/object-cache.php
+#: views/htaccess.php
+#: views/pro/api-monitor.php
+#: views/pro/report.php
+#: views/pro/mail.php
+#: views/pro/snapshots.php
+#: includes/fn-feature-lock.php
+#: views/dashboard.php
+msgid "PRO"
+msgstr "PRO"
+
+#: phpinfo-wp.php
+msgid "What you are unlocking in this version:"
+msgstr "Wat u ontgrendelt in deze versie:"
+
+#: phpinfo-wp.php
+msgid "Includes new translation packs (German, French, Spanish, Italian, Dutch) and optimized PHP server lifecycle audits."
+msgstr "Bevat nieuwe vertaalpakketten (Duits, Frans, Spaans, Italiaans, Nederlands) en geoptimaliseerde PHP-serverlevenscyclusaudits."
+
+#: phpinfo-wp.php
+msgid "💡 Note: Since this is a system diagnostics tool, standard backup practices are always recommended before upgrading."
+msgstr "💡 Opmerking: Aangezien dit een systeemdiagnosetool is, worden standaard back-uppraktijken altijd aanbevolen voor het upgraden."
+
+#: phpinfo-wp.php
+msgid "phpinfo() WP Pro"
+msgstr "phpinfo() WP Pro"
+
+#: phpinfo-wp.php
+msgid "Active & Protected:"
+msgstr "Actief & beschermd:"
+
+#: phpinfo-wp.php
+msgid "Your server health, security headers, and automated audits are running smoothly."
+msgstr "Uw serverstatus, beveiligingsheaders en geautomatiseerde audits werken soepel."
+
+#: phpinfo-wp.php
+msgid "Leave a ★★★★★ Review"
+msgstr "Laat een ★★★★★ recensie achter"
+
+#: phpinfo-wp.php
+msgid "Boost server speed & audit security."
+msgstr "Verbeter serversnelheid & controleer beveiliging."
+
+#: phpinfo-wp.php
+msgid "Unlock 1-Click Fixes, SSL Monitor & White-Label PDF Reports."
+msgstr "Ontgrendel 1-klik fixes, SSL-monitor & white-label PDF-rapporten."
+
+#: phpinfo-wp.php
+msgid "Buy Pro License"
+msgstr "Koop Pro-licentie"
+
+#: phpinfo-wp.php
+msgid "Pro Active"
+msgstr "Pro Actief"
+
+#: phpinfo-wp.php
+msgid "Rate 5-Stars on WP.org"
+msgstr "Beoordeel met 5 sterren op WP.org"
+
+#: views/pro/permissions.php
+#: views/pro/config-grader.php
+#: views/pro/error-log.php
+#: views/pro/network.php
+#: views/pro/cron.php
+#: views/pro/license.php
+#: views/pro/eol.php
+#: views/pro/support.php
+#: views/pro/db-health.php
+#: views/pro/ssl.php
+#: views/pro/security-headers.php
+#: views/info.php
+#: views/pro/opcache.php
+#: views/pro/upgrade.php
+#: views/pro/alerts.php
+#: views/pro/object-cache.php
+#: views/htaccess.php
+#: views/phpinfo.php
+#: views/pro/compat.php
+#: views/pro/api-monitor.php
+#: views/pro/mail.php
+#: views/pro/report.php
+#: views/extension.php
+#: views/pro/snapshots.php
+#: views/pro/update-audit.php
+#: views/log.php
+#: views/dashboard.php
+msgid "Unauthorized."
+msgstr "Unauthorized."
+
+#: views/dashboard.php
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: views/dashboard.php:74
+#: views/dashboard.php
 msgid "Visual health overview and system shortcuts"
 msgstr "Visueel gezondheidsoverzicht en systeemsnelkoppelingen"
 
-#: views/dashboard.php:84
+#: views/dashboard.php
 msgid "Setup Optimization"
 msgstr "Installatie-optimalisatie"
 
-#: views/dashboard.php:88
-#, php-format
+#: views/dashboard.php
 msgid "%s / 100"
 msgstr "%s/ 100"
 
-#: views/dashboard.php:98
+#: views/dashboard.php
 msgid "Current Grade:"
 msgstr "Huidig cijfer:"
 
-#: views/dashboard.php:106
+#: views/dashboard.php
 msgid "Memory Peak"
 msgstr "Geheugenpiek"
 
-#: views/dashboard.php:111
+#: views/dashboard.php
 msgid "Limit:"
 msgstr "Limiet:"
 
-#: views/dashboard.php:124
+#: views/dashboard.php
 msgid "Autoload Bloat"
 msgstr "Blaat automatisch laden"
 
-#: views/dashboard.php:134
+#: views/dashboard.php
 msgid "Danger: High TTFB Impact"
 msgstr "Gevaar: Hoge TTFB-impact"
 
-#: views/dashboard.php:134
+#: views/dashboard.php
 msgid "Healthy footprint"
 msgstr "Gezonde voetafdruk"
 
-#: views/dashboard.php:141
+#: views/dashboard.php
 msgid "Slowest External APIs"
 msgstr "Langzaamste externe API's"
 
-#: views/dashboard.php:144
+#: views/dashboard.php
 msgid "No slow API calls detected"
 msgstr "Geen langzame API-aanroepen gedetecteerd"
 
-#: views/dashboard.php:173
+#: views/dashboard.php
+msgid "Track outbound HTTP latency & slow 3rd-party services impacting TTFB."
+msgstr "Track outbound HTTP latency & slow 3rd-party services impacting TTFB."
+
+#: views/dashboard.php
+msgid "Unlock API Monitor &rarr;"
+msgstr "Unlock API Monitor &rarr;"
+
+#: views/dashboard.php
 msgid "Active Issues"
 msgstr "Actieve problemen"
 
-#: views/dashboard.php:199
+#: views/dashboard.php
 msgid "🔒 Running <strong>Pro features</strong> in preview mode."
 msgstr "🔒 <strong>Pro-functies</strong> uitvoeren in de voorbeeldmodus."
 
-#: views/dashboard.php:203
+#: views/dashboard.php
 msgid "Unlock full access →"
 msgstr "Volledige toegang ontgrendelen →"
 
-#: views/pro/opcache.php:35
-msgid "Check OPcache memory usage, hit rates, and list cached scripts."
-msgstr "Controleer het OPcache-geheugengebruik, de hitrates en maak een lijst van in de cache opgeslagen scripts."
-
-#: views/pro/opcache.php:45
-msgid "OPcache is not available"
-msgstr "OP-cache is niet beschikbaar"
-
-#: views/pro/opcache.php:49
-msgid "OPcache extension is installed but disabled."
-msgstr "De OPcache-extensie is geïnstalleerd maar uitgeschakeld."
-
-#: views/pro/opcache.php:60 views/pro/object-cache.php:70
-msgid "Hit Rate"
-msgstr "Hitpercentage"
-
-#: views/pro/opcache.php:87
-msgid "Cached Scripts"
-msgstr "In cache opgeslagen scripts"
-
-#: views/pro/opcache.php:106
-msgid "Key Directives"
-msgstr "Belangrijke richtlijnen"
-
-#: views/pro/opcache.php:108 views/pro/snapshots.php:130
-#: views/pro/snapshots.php:155 views/pro/report.php:491
-#: views/pro/config-grader.php:187
-msgid "Directive"
-msgstr "Richtlijn"
-
-#: views/pro/opcache.php:108 views/pro/snapshots.php:155
-msgid "Value"
-msgstr "Waarde"
-
-#: views/pro/opcache.php:138
-msgid "Forces recompilation of all cached PHP files."
-msgstr "Forceert hercompilatie van alle in de cache opgeslagen PHP-bestanden."
-
-#: views/pro/opcache.php:140 views/pro/opcache.php:142
-msgid "Clear OPcache disabled:"
-msgstr "OPcache wissen uitgeschakeld:"
-
-#: views/pro/security-headers.php:31
-msgid "HTTP response header audit — graded against OWASP recommendations"
-msgstr "Audit van HTTP-antwoordheader: beoordeeld op basis van OWASP-aanbevelingen"
-
-#: views/pro/security-headers.php:36
-msgid "Re-check headers"
-msgstr "Controleer de kopteksten opnieuw"
-
-#: views/pro/security-headers.php:67
-msgid "cached"
-msgstr "in de cache opgeslagen"
-
-#: views/pro/security-headers.php:100
-msgid "not set"
-msgstr "niet ingesteld"
-
-#: views/pro/security-headers.php:113
-msgid "OWASP Secure Headers"
-msgstr "OWASP beveiligde headers"
-
-#: views/pro/error-log.php:43
-msgid "Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host."
-msgstr "Blader, filter en wis uw PHP-foutenlogboek - zonder FTP, SSH of vraag het aan uw host."
-
-#: views/pro/error-log.php:62
-msgid "No log file discovered"
-msgstr "Geen logbestand ontdekt"
-
-#: views/pro/error-log.php:67
-msgid "WordPress debug constants"
-msgstr "WordPress debug constants"
-
-#: views/pro/error-log.php:82
-msgid "Should be <strong>off</strong> in production — leaking errors to visitors is a security risk."
-msgstr "Zou in productie <strong>uit</strong> moeten staan; het lekken van fouten naar bezoekers is een veiligheidsrisico."
-
-#: views/pro/error-log.php:86
-msgid "Paths checked"
-msgstr "Paden gecontroleerd"
-
-#: views/pro/error-log.php:114
-msgid "File:"
-msgstr "Bestand:"
-
-#: views/pro/error-log.php:115
-msgid "Size:"
-msgstr "Maat:"
-
-#: views/pro/error-log.php:116
-msgid "Showing:"
-msgstr "Tonen:"
-
-#: views/pro/error-log.php:119
-msgid "Filter lines..."
-msgstr "Lijnen filteren..."
-
-#: views/pro/error-log.php:125
-msgid "Clear Log"
-msgstr "Logboek wissen"
-
-#: views/pro/error-log.php:132
-msgid "Log is empty — no errors recorded."
-msgstr "Logboek is leeg: er zijn geen fouten geregistreerd."
-
-#: views/pro/mail.php:37
-msgid "not found"
-msgstr "niet gevonden"
-
-#: views/pro/mail.php:53
-msgid "SPF, DKIM, DMARC, and SMTP configuration audit"
-msgstr "SPF-, DKIM-, DMARC- en SMTP-configuratieaudit"
-
-#: views/pro/mail.php:58
-msgid "Could not audit mail configuration."
-msgstr "Kan de e-mailconfiguratie niet controleren."
-
-#: views/pro/mail.php:64
-msgid "Sending from"
-msgstr "Verzenden vanaf"
-
-#: views/pro/mail.php:69
-msgid "Mail method"
-msgstr "Mail methode"
-
-#: views/pro/mail.php:72
-msgid "SMTP plugin active"
-msgstr "SMTP-plug-in actief"
-
-#: views/pro/mail.php:74
-msgid "PHP mail()"
-msgstr "PHP-mail()"
-
-#: views/pro/mail.php:75
-msgid "Consider an SMTP plugin for deliverability"
-msgstr "Overweeg een SMTP-plug-in voor leverbaarheid"
-
-#: views/pro/mail.php:83
-msgid "Email Routing Audit"
-msgstr "Controle van e-mailroutering"
-
-#: views/pro/mail.php:84
-msgid "Discovered email addresses used for administration and contact forms."
-msgstr "E-mailadressen ontdekt die worden gebruikt voor administratie en contactformulieren."
-
-#: views/pro/mail.php:88
-msgid "Source"
-msgstr "Bron"
-
-#: views/pro/mail.php:89
-msgid "Email Address"
-msgstr "E-mailadres"
-
-#: views/pro/mail.php:90
-msgid "Domain MX"
-msgstr "Domein MX"
-
-#: views/pro/mail.php:91
-msgid "Test"
-msgstr "Testen"
-
-#: views/pro/mail.php:110
-msgid "Send test"
-msgstr "Test verzenden"
-
-#: views/pro/mail.php:120
-msgid "DNS Records"
-msgstr "DNS-records"
-
-#: views/pro/mail.php:129 views/pro/mail.php:139
-msgid "MX records"
-msgstr "MX-records"
-
-#: views/pro/mail.php:148
-msgid "DKIM"
-msgstr "DKIM"
-
-#: views/pro/mail.php:155 views/pro/alerts.php:145
-msgid "Send Test Email"
-msgstr "Test-e-mail verzenden"
-
-#: views/pro/mail.php:158
-msgid "recipient@example.com"
-msgstr "ontvanger@voorbeeld.com"
-
-#: views/pro/object-cache.php:38
-msgid "Monitor persistent object cache drop-ins, connection speed, and hit/miss ratios."
-msgstr "Bewaak persistente objectcache-drop-ins, verbindingssnelheid en hit/miss-ratio's."
-
-#: views/pro/object-cache.php:48
-msgid "Object Caching is not active."
-msgstr "Objectcaching is niet actief."
-
-#: views/pro/object-cache.php:50
-msgid "Redis"
-msgstr "Opnieuw"
-
-#: views/pro/object-cache.php:52
-msgid "Memcached"
-msgstr "Gememoriseerd"
-
-#: views/pro/object-cache.php:54
-msgid "Neither Redis nor Memcached PHP extensions are installed. Ask your host to enable one (Redis is recommended)."
-msgstr "Er zijn geen Redis- of Memcached PHP-extensies geïnstalleerd. Vraag uw host om er een in te schakelen (Redis wordt aanbevolen)."
-
-#: views/pro/object-cache.php:59
-msgid "Object Cache is active, but stats are unavailable."
-msgstr "Objectcache is actief, maar statistieken zijn niet beschikbaar."
-
-#: views/pro/object-cache.php:76
-msgid "Engine:"
-msgstr "Motor:"
-
-#: views/pro/object-cache.php:105
-msgid "Keys & Evictions"
-msgstr "Sleutels en uitzettingen"
-
-#: views/pro/object-cache.php:107
-msgid "Keys in Memory:"
-msgstr "Toetsen in geheugen:"
-
-#: views/pro/object-cache.php:110
-msgid "Evictions:"
-msgstr "Uitzettingen:"
-
-#: views/pro/object-cache.php:124
-msgid "Flush Cache"
-msgstr "Cache leegmaken"
-
-#: views/pro/object-cache.php:125
-msgid "Forces the cache to be entirely rebuilt."
-msgstr "Forceert dat de cache volledig opnieuw wordt opgebouwd."
-
-#: views/pro/permissions.php:35
-msgid "Deep scan of core files, plugins, and themes to detect security risks and auto-update failures."
-msgstr "Diepgaande scan van kernbestanden, plug-ins en thema's om beveiligingsrisico's en mislukte automatische updates te detecteren."
-
-#: views/pro/permissions.php:42
-msgid "PHP Execution User"
-msgstr "PHP-uitvoeringsgebruiker"
-
-#: views/pro/permissions.php:47
-msgid "Files Scanned"
-msgstr "Bestanden gescand"
-
-#: views/pro/permissions.php:49
-msgid "Capped at 5,000 for safety"
-msgstr "Gemaximeerd op 5.000 voor de veiligheid"
-
-#: views/pro/permissions.php:52 views/pro/permissions.php:77
-#: views/pro/eol.php:65 views/pro/cron.php:101 views/pro/report.php:528
-#: views/safemode.php:407
-msgid "Status"
-msgstr "Status"
-
-#: views/pro/permissions.php:54
-msgid "Action Required"
-msgstr "Actie vereist"
-
-#: views/pro/permissions.php:56
-msgid "Secure"
-msgstr "Veilig"
-
-#: views/pro/permissions.php:65
-msgid "Filesystem is Secure"
-msgstr "Bestandssysteem is veilig"
-
-#: views/pro/permissions.php:66
-msgid "No dangerous 777 permissions were found, and file ownership matches the PHP process (meaning native plugin updates will work perfectly)."
-msgstr "Er zijn geen gevaarlijke 777-rechten gevonden en het bestandseigendom komt overeen met het PHP-proces (wat betekent dat native plug-in-updates perfect zullen werken)."
-
-#: views/pro/permissions.php:77
-msgid "File"
-msgstr "Bestand"
-
-#: views/pro/permissions.php:77 views/pro/permissions.php:105
-msgid "Permissions"
-msgstr "Machtigingen"
-
-#: views/pro/permissions.php:77
-msgid "Owner"
-msgstr "Eigenaar"
-
-#: views/pro/permissions.php:102
-msgid "These files or folders are world-writable (777 or 666). Any other user on the server can modify them."
-msgstr "These files or folders are world-writable (777 or 666). Elke andere gebruiker op de server kan deze wijzigen."
-
-#: views/pro/permissions.php:105 views/pro/permissions.php:127
-msgid "Path"
-msgstr "Pad"
-
-#: views/pro/permissions.php:105
-msgid "Type"
-msgstr "Typ"
-
-#: views/pro/permissions.php:127
-msgid "Current Owner"
-msgstr "Huidige eigenaar"
-
-#: views/pro/permissions.php:127
-msgid "Required Owner"
-msgstr "Vereiste eigenaar"
-
-#: views/pro/permissions.php:140
-msgid "Showing first 20 examples only. Fixing the root folder recursively will solve the rest."
-msgstr "Alleen de eerste 20 voorbeelden worden getoond. Door de hoofdmap recursief te repareren, wordt de rest opgelost."
-
-#: views/pro/permissions.php:150
-msgid "Log into your server via SSH. Copy and paste the following bash commands to automatically set the correct, secure ownership and permissions for your entire WordPress installation."
-msgstr "Log in op uw server via SSH. Kopieer en plak de volgende bash-opdrachten om automatisch het juiste, veilige eigendom en de machtigingen voor uw gehele WordPress-installatie in te stellen."
-
-#: views/pro/permissions.php:154
-msgid "chown"
-msgstr "gekauwd"
-
-#: views/pro/permissions.php:157 views/pro/permissions.php:160
-msgid "find"
-msgstr "vinden"
-
-#: views/pro/permissions.php:157 views/pro/permissions.php:160
-#: views/pro/permissions.php:164
-msgid "chmod"
-msgstr "chmod"
-
-#: views/pro/snapshots.php:62
-msgid "Track php.ini changes over time. Automatic weekly snapshots run via WP Cron."
-msgstr "Houd php.ini-wijzigingen in de loop van de tijd bij. Automatische wekelijkse snapshots worden uitgevoerd via WP Cron."
-
-#: views/pro/snapshots.php:74
-msgid "Take Snapshot Now"
-msgstr "Maak nu een momentopname"
-
-#: views/pro/snapshots.php:77
-msgid "Upgrade to Unlimited"
-msgstr "Upgrade naar onbeperkt"
-
-#: views/pro/snapshots.php:83
-msgid "Label (optional)"
-msgstr "Etiket (optioneel)"
-
-#: views/pro/snapshots.php:84
-msgid "Take Snapshot"
-msgstr "Maak een momentopname"
-
-#: views/pro/snapshots.php:92
-msgid "Compare Two Snapshots"
-msgstr "Vergelijk twee momentopnamen"
-
-#: views/pro/snapshots.php:97
-msgid "From (older)"
-msgstr "Van (ouder)"
-
-#: views/pro/snapshots.php:105
-msgid "To (newer)"
-msgstr "Naar (nieuwer)"
-
-#: views/pro/snapshots.php:112
-msgid "Compare →"
-msgstr "Vergelijk →"
-
-#: views/pro/snapshots.php:127
-msgid "No changes detected between these two snapshots."
-msgstr "Er zijn geen wijzigingen gedetecteerd tussen deze twee momentopnamen."
-
-#: views/pro/snapshots.php:130
-msgid "Change"
-msgstr "Verandering"
-
-#: views/pro/snapshots.php:130
-msgid "Old Value"
-msgstr "Oude waarde"
-
-#: views/pro/snapshots.php:130
-msgid "New Value"
-msgstr "Nieuwe waarde"
-
-#: views/pro/snapshots.php:171
-msgid "No snapshots yet. Take one above — weekly auto-snapshots will accumulate here over time."
-msgstr "Nog geen momentopnames. Neem er één hierboven: wekelijkse automatische momentopnamen zullen zich hier in de loop van de tijd ophopen."
-
-#: views/pro/snapshots.php:174
-msgid "Label"
-msgstr "Etiket"
-
-#: views/pro/snapshots.php:174
-msgid "Created"
-msgstr "Gemaakt"
-
-#: views/pro/snapshots.php:174 views/pro/cron.php:102
-msgid "Actions"
-msgstr "Acties"
-
-#: views/pro/snapshots.php:188 views/pro/cron.php:151
-msgid "Delete"
-msgstr "Verwijderen"
-
-#: views/pro/alerts.php:49
-msgid "Email + Slack/Discord notifications for EOL, config changes, OPcache, and SSL events"
-msgstr "E-mail + Slack/Discord-meldingen voor EOL, configuratiewijzigingen, OPcache en SSL-gebeurtenissen"
-
-#: views/pro/alerts.php:62
-msgid "Enable Alerts"
-msgstr "Schakel waarschuwingen in"
-
-#: views/pro/alerts.php:71
-msgid "Email recipients"
-msgstr "E-mailontvangers"
-
-#: views/pro/alerts.php:74
-msgid "One email address per line (or comma-separated). Leave blank to disable email and use webhook only."
-msgstr "Eén e-mailadres per regel (of door komma's gescheiden). Laat dit leeg om e-mail uit te schakelen en alleen webhook te gebruiken."
-
-#: views/pro/alerts.php:78
-msgid "Webhook URL"
-msgstr "Webhook-URL"
-
-#: views/pro/alerts.php:81
-msgid "https://hooks.slack.com/services/... (Requires Unlimited/Lifetime plan)"
-msgstr "https://hooks.slack.com/services/... (Vereist een onbeperkt/levenslang abonnement)"
-
-#: views/pro/alerts.php:83
-msgid "Upgrade your plan →"
-msgstr "Upgrade uw abonnement →"
-
-#: views/pro/alerts.php:87
-msgid "https://hooks.slack.com/services/... or https://discord.com/api/webhooks/..."
-msgstr "https://hooks.slack.com/services/... of https://discord.com/api/webhooks/..."
-
-#: views/pro/alerts.php:102
-msgid "HTTPS only. Same alerts as email — delivered to your chat or automation."
-msgstr "Alleen HTTPS. Dezelfde waarschuwingen als e-mail: afgeleverd in uw chat of automatisering."
-
-#: views/pro/alerts.php:107
-msgid "Alert Conditions"
-msgstr "Waarschuwingsomstandigheden"
-
-#: views/pro/alerts.php:111
-msgid "PHP EOL approaching"
-msgstr "PHP EOL nadert"
-
-#: views/pro/alerts.php:115
-msgid "Config changes detected"
-msgstr "Configuratiewijzigingen gedetecteerd"
-
-#: views/pro/alerts.php:119
-msgid "OPcache hit rate below"
-msgstr "OPcache-hitpercentage hieronder"
-
-#: views/pro/alerts.php:125
-msgid "SSL certificate expiring within"
-msgstr "SSL-certificaat verloopt binnen"
-
-#: views/pro/alerts.php:133 views/pro/alerts.php:136
-msgid "Weekly digest"
-msgstr "Wekelijkse samenvatting"
-
-#: views/pro/alerts.php:144
-msgid "Save Settings"
-msgstr "Instellingen opslaan"
-
-#: views/pro/alerts.php:147
-msgid "Test Webhook"
-msgstr "Webhook testen"
-
-#: views/pro/alerts.php:153
-msgid "Alert schedule:"
-msgstr "Waarschuwingsschema:"
-
-#: views/pro/alerts.php:159
-msgid "WP Cron event not scheduled — deactivate and reactivate the plugin to fix this."
-msgstr "WP Cron-evenement niet gepland - deactiveer en reactiveer de plug-in om dit te verhelpen."
-
-#: views/pro/upgrade.php:37
-msgid "Upgrade to phpinfo() WP Pro"
-msgstr "Upgrade naar phpinfo() WP Pro"
-
-#: views/pro/upgrade.php:38
-msgid "The WordPress server health audit you can hand to clients."
-msgstr "De WordPress-servergezondheidsaudit die u aan klanten kunt overhandigen."
-
-#: views/pro/upgrade.php:58
-msgid "Choose your plan"
-msgstr "Kies uw abonnement"
-
-#: views/pro/upgrade.php:59
-msgid "Every plan unlocks <strong>every feature above</strong> — the only difference is the number of sites and update window."
-msgstr "Every plan unlocks <strong>every feature above</strong> — the only difference is the number of sites and update window."
-
-#: views/pro/upgrade.php:64
-msgid "Single"
-msgstr "Enkel"
-
-#: views/pro/upgrade.php:66
-msgid "1 site · Essential features · Branded reports"
-msgstr "1 site · Essentiële functies · Merkrapporten"
-
-#: views/pro/upgrade.php:69 views/pro/license.php:388
-msgid "Unlimited"
-msgstr "Onbeperkt"
-
-#: views/pro/upgrade.php:71
-msgid "Unlimited sites · White-labeled · Weekly digests"
-msgstr "Onbeperkt aantal sites · White-label · Wekelijkse samenvattingen"
-
-#: views/pro/upgrade.php:72
-msgid "Best value"
-msgstr "Beste waarde"
-
-#: views/pro/upgrade.php:75 views/pro/license.php:400
-msgid "Lifetime"
-msgstr "Levenslang"
-
-#: views/pro/upgrade.php:77
-msgid "Unlimited sites · Lifetime updates · White-labeled"
-msgstr "Onbeperkt aantal sites · Levenslange updates · White-label"
-
-#: views/pro/upgrade.php:90
-msgid "14-day money-back guarantee · Instant delivery · Site-locked license"
-msgstr "14 dagen geld-terug-garantie · Directe levering · Site-locked licentie"
-
-#: views/pro/api-monitor.php:39
-msgid "Track slow outbound API requests that silently block page loads (last 24 hours)."
-msgstr "Houd langzame uitgaande API-verzoeken bij die het laden van pagina's stil blokkeren (laatste 24 uur)."
-
-#: views/pro/api-monitor.php:42
-msgid "Reset Stats"
-msgstr "Statistieken opnieuw instellen"
-
-#: views/pro/api-monitor.php:48
-msgid "Monitoring Active."
-msgstr "Bewaking actief."
-
-#: views/pro/api-monitor.php:50
-msgid "To test this, you can trigger a plugin update check or wait for normal site traffic to generate API calls."
-msgstr "Om dit te testen, kunt u een plug-in-updatecontrole activeren of wachten tot normaal siteverkeer API-aanroepen genereert."
-
-#: views/pro/api-monitor.php:51 views/pro/api-monitor.php:74
-msgid "Trigger Dummy Slow Request (1.5s)"
-msgstr "Trigger dummy langzaam verzoek (1,5 s)"
-
-#: views/pro/api-monitor.php:57
-msgid "Total Waiting Time"
-msgstr "Totale wachttijd"
-
-#: views/pro/api-monitor.php:65
-msgid "Slowest API Response"
-msgstr "Langzaamste API-reactie"
-
-#: views/pro/api-monitor.php:81
-msgid "Domain (Endpoint)"
-msgstr "Domein (eindpunt)"
-
-#: views/pro/api-monitor.php:82
-msgid "Requests"
-msgstr "Verzoeken"
-
-#: views/pro/api-monitor.php:83
-msgid "Avg Time"
-msgstr "Gem. tijd"
-
-#: views/pro/api-monitor.php:84
-msgid "Max Time"
-msgstr "Maximale tijd"
-
-#: views/pro/api-monitor.php:85
-msgid "Total Time"
-msgstr "Totale tijd"
-
-#: views/pro/api-monitor.php:86
-msgid "Errors/Timeouts"
-msgstr "Fouten/time-outs"
-
-#: views/pro/api-monitor.php:112
-msgid "Any API with a max time over 2.0s should be investigated."
-msgstr "Elke API met een maximale tijd van meer dan 2,0 seconden moet worden onderzocht."
-
-#: views/pro/eol.php:9
-msgid "End of Life"
-msgstr "Einde van het leven"
-
-#: views/pro/eol.php:10
-msgid "EOL < 90 days"
-msgstr "EOL <90 dagen"
-
-#: views/pro/eol.php:11 views/pro/network.php:30
-msgid "Supported"
-msgstr "Ondersteund"
-
-#: views/pro/eol.php:12
-msgid "Unknown"
-msgstr "Onbekend"
-
-#: views/pro/eol.php:20
-msgid "PHP EOL Timeline"
-msgstr "PHP EOL-tijdlijn"
-
-#: views/pro/eol.php:21
-msgid "End-of-life dates and support status for every PHP version"
-msgstr "Einddatums en ondersteuningsstatus voor elke PHP-versie"
-
-#: views/pro/eol.php:28
-msgid "EXPIRING SOON"
-msgstr "BINNENKORT VERLOPEN"
-
-#: views/pro/eol.php:30
-msgid "UNKNOWN"
-msgstr "ONBEKEND"
-
-#: views/pro/eol.php:38
-msgid "Running on"
-msgstr "Loopt door"
-
-#: views/pro/eol.php:39 views/pro/eol.php:73
-#, php-format
-msgid "PHP %s"
-msgstr "PHP-%s"
-
-#: views/pro/eol.php:47
-#, php-format
-msgid "Reached end-of-life on <strong>%s</strong>. No security patches are being issued. Contact your host and request a PHP upgrade to 8.2 or newer immediately."
-msgstr "Einde levensduur bereikt op <strong>%s</strong>. Er worden geen beveiligingspatches uitgegeven. Neem contact op met uw host en vraag onmiddellijk een PHP-upgrade naar 8.2 of nieuwer aan."
-
-#: views/pro/eol.php:49
-#, php-format
-msgid "Reaches end-of-life on <strong>%1$s</strong> — <strong>%2$s days</strong> from now. Plan your PHP upgrade before that date."
-msgstr "Bereikt het einde van de levensduur over <strong>%1$s</strong> — <strong>%2$sdagen</strong> vanaf nu. Plan uw PHP-upgrade vóór die datum."
-
-#: views/pro/eol.php:51
-#, php-format
-msgid "Actively supported until <strong>%1$s</strong> — <strong>%2$s days</strong> from now. You're good."
-msgstr "Actief ondersteund tot <strong>%1$s</strong> — <strong>%2$sdagen</strong> vanaf nu. Je bent goed."
-
-#: views/pro/eol.php:53
-#, php-format
-msgid "EOL date not found for PHP %s. Check <a href=\\\"https://www.php.net/supported-versions.php\\\" target=\\\"_blank\\\">php.net/supported-versions</a>."
-msgstr "EOL-datum niet gevonden voor PHP%s. Controleer <a href=\\\\\"https://www.php.net/supported-versions.php\\\\\" target=\\\\\"_blank\\\\\">php.net/supported-versions</a>."
-
-#: views/pro/eol.php:59
-msgid "Version Lifecycle"
-msgstr "Versielevenscyclus"
-
-#: views/pro/eol.php:63 views/safemode.php:406
-msgid "Version"
-msgstr "Versie"
-
-#: views/pro/eol.php:64
-msgid "EOL Date"
-msgstr "EOL-datum"
-
-#: views/pro/eol.php:66
-msgid "Days"
-msgstr "Dagen"
-
-#: views/pro/eol.php:75
-msgid "YOU"
-msgstr "JIJ"
-
-#: views/pro/eol.php:86
-#, php-format
-msgid "%s day ago"
-msgstr "%sdag geleden"
-
-#: views/pro/eol.php:88
-#, php-format
-msgid "%s day"
-msgstr "%sdag"
-
-#: views/pro/eol.php:97
-#, php-format
-msgid "Source: %s — updated in each plugin release."
-msgstr "Bron:%s— bijgewerkt in elke plug-inrelease."
-
-#: views/pro/eol.php:108
-#, php-format
-msgid "Plan your PHP %s upgrade with confidence"
-msgstr "Plan uw PHP%s-upgrade met vertrouwen"
-
-#: views/pro/eol.php:110
-msgid "Before you upgrade, scan every plugin and theme for compatibility with your target PHP version. Save snapshots, monitor changes, and email yourself a digest."
-msgstr "Voordat u een upgrade uitvoert, scant u elke plug-in en elk thema op compatibiliteit met uw doel-PHP-versie. Sla momentopnamen op, houd wijzigingen in de gaten en e-mail uzelf een samenvatting."
-
-#: views/pro/eol.php:113 views/pro/compat.php:28
-msgid "PHP Compatibility Scanner"
-msgstr "PHP-compatibiliteitsscanner"
-
-#: views/pro/eol.php:113
-msgid "find breaking changes across all plugins/themes"
-msgstr "vind de belangrijkste wijzigingen in alle plug-ins/thema's"
-
-#: views/pro/eol.php:114
-msgid "diff php.ini before and after the upgrade"
-msgstr "diff php.ini voor en na de upgrade"
-
-#: views/pro/eol.php:115
-msgid "single-page PDF for clients or your records"
-msgstr "PDF van één pagina voor klanten of uw administratie"
-
-#: views/pro/eol.php:116
-msgid "Email Alerts"
-msgstr "E-mailwaarschuwingen"
-
-#: views/pro/eol.php:116
-msgid "get warned 90/30/7 days before any PHP EOL"
-msgstr "word 90/30/7 dagen vóór een PHP EOL gewaarschuwd"
-
-#: views/pro/eol.php:119
-msgid "Upgrade safely — Get Pro &rarr;"
-msgstr "Veilig upgraden — Koop Pro &rarr;"
-
-#: views/pro/cron.php:48
-msgid "Inspect scheduled events, spot missed crons, and find orphans"
-msgstr "Inspecteer geplande evenementen, ontdek gemiste crons en vind weeskinderen"
-
-#: views/pro/cron.php:66
-msgid "Scheduled events"
-msgstr "Geplande evenementen"
-
-#: views/pro/cron.php:70 views/pro/cron.php:131
-msgid "Overdue"
-msgstr "Te laat"
-
-#: views/pro/cron.php:74
-msgid "Orphans (no callback)"
-msgstr "Weeskinderen (geen terugbelactie)"
-
-#: views/pro/cron.php:78
-msgid "Due within 60s"
-msgstr "Te verwachten binnen de jaren 60"
-
-#: views/pro/cron.php:85
-msgid "Why orphan events come back after you delete them:"
-msgstr "Waarom weesgebeurtenissen terugkomen nadat je ze hebt verwijderd:"
-
-#: views/pro/cron.php:86
-msgid "Purge hook"
-msgstr "Reinigingshaak"
-
-#: views/pro/cron.php:92
-msgid "No scheduled events found."
-msgstr "Geen geplande evenementen gevonden."
-
-#: views/pro/cron.php:98
-msgid "Hook"
-msgstr "Haak"
-
-#: views/pro/cron.php:99
-msgid "Next Run"
-msgstr "Volgende uitvoering"
-
-#: views/pro/cron.php:100
-msgid "Schedule"
-msgstr "Schema"
-
-#: views/pro/cron.php:115
-msgid "orphan"
-msgstr "wees"
-
-#: views/pro/cron.php:133
-msgid "Soon"
-msgstr "Binnenkort"
-
-#: views/pro/cron.php:135
-msgid "OK"
-msgstr "Oké"
-
-#: views/pro/cron.php:143
-msgid "Run now"
-msgstr "Ren nu"
-
-#: views/pro/license.php:88
-msgid "Activate your license to unlock Pro features on this site"
-msgstr "Activeer uw licentie om Pro-functies op deze site te ontgrendelen"
-
-#: views/pro/license.php:100
-msgid "License locked."
-msgstr "Licentie vergrendeld."
-
-#: views/pro/license.php:110
-msgid "Pro license is active"
-msgstr "Pro-licentie is actief"
-
-#: views/pro/license.php:111
-msgid "All Pro features are unlocked on this site."
-msgstr "Alle Pro-functies zijn ontgrendeld op deze site."
-
-#: views/pro/license.php:116
-msgid "No active license"
-msgstr "Geen actieve licentie"
-
-#: views/pro/license.php:117
-msgid "Enter a valid license key to unlock Pro features."
-msgstr "Voer een geldige licentiesleutel in om Pro-functies te ontgrendelen."
-
-#: views/pro/license.php:125
-msgid "License key"
-msgstr "Licentiesleutel"
-
-#: views/pro/license.php:131
-msgid "Registered to"
-msgstr "Geregistreerd bij"
-
-#: views/pro/license.php:135 views/pro/ssl.php:88 views/pro/report.php:528
-msgid "Expires"
-msgstr "Verloopt"
-
-#: views/pro/license.php:147
-msgid "Activated"
-msgstr "Geactiveerd"
-
-#: views/pro/license.php:156
-msgid "Deactivate License"
-msgstr "Licentie deactiveren"
-
-#: views/pro/license.php:172
-msgid "Deactivate your Pro license?"
-msgstr "Uw Pro-licentie deactiveren?"
-
-#: views/pro/license.php:173
-msgid "The plugin keeps running, but every Pro feature below stops the moment you confirm."
-msgstr "De plug-in blijft actief, maar elke Pro-functie hieronder stopt zodra u bevestigt."
-
-#: views/pro/license.php:179
-msgid "Pro features that will lock"
-msgstr "Pro-functies die kunnen worden vergrendeld"
-
-#: views/pro/license.php:196
-msgid "Nothing is deleted."
-msgstr "Er wordt niets verwijderd."
-
-#: views/pro/license.php:201
-msgid "Keep Pro active"
-msgstr "Houd Pro actief"
-
-#: views/pro/license.php:232
-msgid "Enter your license key"
-msgstr "Voer uw licentiesleutel in"
-
-#: views/pro/license.php:235
-msgid "PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-msgstr "PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-
-#: views/pro/license.php:238
-msgid "Activate"
-msgstr "Activeer"
-
-#: views/pro/license.php:242
-msgid "Get phpinfo() WP Pro →"
-msgstr "Download phpinfo() WP Pro →"
-
-#: views/pro/license.php:297
-msgid "Compare plans"
-msgstr "Vergelijk abonnementen"
-
-#: views/pro/license.php:298
-msgid "Everything in Free, plus the Pro depth — see exactly what you get at each tier."
-msgstr "Alles in Free, plus de Pro-diepte: zie precies wat u op elk niveau krijgt."
-
-#: views/pro/license.php:303
-msgid "Feature"
-msgstr "Functie"
-
-#: views/pro/license.php:331
-msgid "Get Free"
-msgstr "Ontvang gratis"
-
-#: views/pro/license.php:334 views/pro/license.php:384
-msgid "Get Single"
-msgstr "Word single"
-
-#: views/pro/license.php:337 views/pro/license.php:396
-msgid "Get Unlimited"
-msgstr "Krijg onbeperkt"
-
-#: views/pro/license.php:340 views/pro/license.php:408
-msgid "Get Lifetime"
-msgstr "Krijg levenslang"
-
-#: views/pro/license.php:349
-msgid "What Pro unlocks"
-msgstr "Wat Pro ontgrendelt"
-
-#: views/pro/license.php:373
-msgid "Pricing"
-msgstr "Prijzen"
-
-#: views/pro/license.php:376
-msgid "Single Site"
-msgstr "Enkele site"
-
-#: views/pro/license.php:379
-msgid "Essential Pro features on 1 site"
-msgstr "Essentiële Pro-functies op 1 site"
-
-#: views/pro/license.php:380
-msgid "Standard PDF reports (Branded)"
-msgstr "Standaard PDF-rapporten (merk)"
-
-#: views/pro/license.php:381
-msgid "1 API monitor & 3 snapshots"
-msgstr "1 API-monitor en 3 snapshots"
-
-#: views/pro/license.php:382
-msgid "1 year of updates & support"
-msgstr "1 jaar updates en ondersteuning"
-
-#: views/pro/license.php:387
-msgid "Most Popular"
-msgstr "Meest populair"
-
-#: views/pro/license.php:391 views/pro/license.php:403
-msgid "All Pro features on unlimited sites"
-msgstr "Alle Pro-functies op een onbeperkt aantal sites"
-
-#: views/pro/license.php:392 views/pro/license.php:404
-msgid "White-labeled PDF reports (Logo)"
-msgstr "White-label PDF-rapporten (logo)"
-
-#: views/pro/license.php:393 views/pro/license.php:405
-msgid "Weekly digests & Slack/Discord"
-msgstr "Wekelijkse samenvattingen en Slack/Discord"
-
-#: views/pro/license.php:394
-msgid "Priority support & Multi-site"
-msgstr "Prioritaire ondersteuning en meerdere locaties"
-
-#: views/pro/license.php:399
-msgid "Founders &mdash; First 50"
-msgstr "Oprichters - Eerste 50"
-
-#: views/pro/license.php:401
-msgid "once"
-msgstr "een keer"
-
-#: views/pro/license.php:406
-msgid "Lifetime updates & priority support"
-msgstr "Levenslange updates en prioriteitsondersteuning"
-
-#: views/pro/license.php:411
-msgid "14-day money-back guarantee · Instant license delivery · Cancel anytime"
-msgstr "14 dagen geld-terug-garantie · Onmiddellijke levering van licenties · Annuleer op elk gewenst moment"
-
-#: views/pro/ssl.php:43
-msgid "Monitor SSL validity, expiration dates, and domain name mismatches."
-msgstr "Controleer de SSL-geldigheid, vervaldatums en niet-overeenkomende domeinnamen."
-
-#: views/pro/ssl.php:59
-msgid "ERROR"
-msgstr "FOUT"
-
-#: views/pro/ssl.php:79
-msgid "days left"
-msgstr "dagen over"
-
-#: views/pro/ssl.php:89
-msgid "Issued"
-msgstr "Uitgegeven"
-
-#: views/pro/ssl.php:90 views/pro/report.php:528
-msgid "Issuer"
-msgstr "Uitgever"
-
-#: views/pro/ssl.php:92
-msgid "CN"
-msgstr "CN"
-
-#: views/pro/ssl.php:96
-msgid "SANs"
-msgstr "SAN's"
-
-#: views/pro/ssl.php:115
-msgid "Re-check all certificates"
-msgstr "Controleer alle certificaten opnieuw"
-
-#: views/pro/ssl.php:118
-msgid "Results cached for 6 hours."
-msgstr "Resultaten in cache gedurende 6 uur."
-
-#: views/pro/ssl.php:124
-msgid "Monitor Additional Domains"
-msgstr "Bewaak extra domeinen"
-
-#: views/pro/ssl.php:133
-msgid "client-a.com&#10;client-b.com&#10;staging.mysite.com"
-msgstr "client-a.com&#10;client-b.com&#10;staging.mysite.com"
-
-#: views/pro/ssl.php:136
-msgid "Save Domains"
-msgstr "Domeinen opslaan"
-
-#: views/pro/compat.php:36
-msgid "Free scanner:"
-msgstr "Gratis scanner:"
-
-#: views/pro/compat.php:38 views/pro/update-audit.php:64
-msgid "Get Pro →"
-msgstr "Koop Pro →"
-
-#: views/pro/compat.php:45
-msgid "Target PHP version:"
-msgstr "Doel-PHP-versie:"
-
-#: views/pro/compat.php:56
-msgid "Clear results"
-msgstr "Duidelijke resultaten"
-
-#: views/pro/compat.php:65
-msgid "No scan yet"
-msgstr "Nog geen scan"
-
-#: views/pro/compat.php:66
-msgid "Pick a target PHP version above and click \\\"Run Scan\\\" to analyze your installed plugins and themes."
-msgstr "Kies hierboven een doel-PHP-versie en klik op \\\\\"Scan uitvoeren\\\\\" om uw geïnstalleerde plug-ins en thema's te analyseren."
-
-#: views/pro/compat.php:118
-msgid "Safe to upgrade!"
-msgstr "Veilig om te upgraden!"
-
-#: views/pro/compat.php:124
-msgid "false positives"
-msgstr "valse positieven"
-
-#: views/pro/compat.php:129
-msgid "fatal errors"
-msgstr "fatale fouten"
-
-#: views/pro/compat.php:138
-msgid "Regex-based scan — some matches may be false positives (e.g., function names in comments or strings). Always verify before changing third-party code."
-msgstr "Op Regex gebaseerde scan: sommige overeenkomsten kunnen valse positieven zijn (bijvoorbeeld functienamen in opmerkingen of tekenreeksen). Verifieer altijd voordat u de code van derden wijzigt."
-
-#: views/pro/network.php:14
-msgid "phpinfo() WP — Network"
-msgstr "phpinfo() WP — Netwerk"
-
-#: views/pro/network.php:15
-msgid "Server-level info applies to all sites in the network. Per-site stats appear below."
-msgstr "Informatie op serverniveau is van toepassing op alle sites in het netwerk. Statistieken per site worden hieronder weergegeven."
-
-#: views/pro/network.php:26
-msgid "End of life"
-msgstr "Einde van het leven"
-
-#: views/pro/network.php:40
-msgid "Memory"
-msgstr "Geheugen"
-
-#: views/pro/network.php:51
-msgid "Per-site health"
-msgstr "Gezondheid per locatie"
-
-#: views/pro/network.php:60
-msgid "ID"
-msgstr "Identiteitskaart"
-
-#: views/pro/network.php:61
-msgid "Site"
-msgstr "Locatie"
-
-#: views/pro/network.php:62
-msgid "URL"
-msgstr "URL"
-
-#: views/pro/network.php:63 views/pro/report.php:554
-msgid "Autoload data"
-msgstr "Gegevens automatisch laden"
-
-#: views/pro/db-health.php:41
-msgid "Analyze MySQL/MariaDB version, structural schema issues, and TTFB-killing autoload bloat."
-msgstr "Analyseer de MySQL/MariaDB-versie, structurele schemaproblemen en TTFB-dodende autoload-bloat."
-
-#: views/pro/db-health.php:82
-msgid "Database size"
-msgstr "Databasegrootte"
-
-#: views/pro/db-health.php:98
-msgid "Transients"
-msgstr "Transiënten"
-
-#: views/pro/db-health.php:110 views/pro/db-health.php:249
-msgid "Overhead"
-msgstr "Overhead"
-
-#: views/pro/db-health.php:112
-msgid "Reclaimable via OPTIMIZE TABLE"
-msgstr "Terug te vorderen via OPTIMALISEER TAFEL"
-
-#: views/pro/db-health.php:133
-msgid "every single page request"
-msgstr "elk paginaverzoek"
-
-#: views/pro/db-health.php:138
-msgid "Warning: High Autoload Size!"
-msgstr "Waarschuwing: hoge grootte voor automatisch laden!"
-
-#: views/pro/db-health.php:146
-msgid "Option Name"
-msgstr "Optienaam"
-
-#: views/pro/db-health.php:147
-msgid "Memory Footprint"
-msgstr "Geheugen voetafdruk"
-
-#: views/pro/db-health.php:148
-msgid "Recommendation"
-msgstr "Aanbeveling"
-
-#: views/pro/db-health.php:162
-msgid "Transient"
-msgstr "Van voorbijgaande aard"
-
-#: views/pro/db-health.php:170
-msgid "TTFB KILLER"
-msgstr "TTFB-KILLER"
-
-#: views/pro/db-health.php:173
-msgid "BLOAT"
-msgstr "BLOAT"
-
-#: views/pro/db-health.php:176
-msgid "Normal"
-msgstr "Normaal"
-
-#: views/pro/db-health.php:190
-msgid "Analyzes your database schema to find custom tables (often created by poorly coded plugins) that are missing critical MySQL indexes. Queries against these tables trigger <strong>full table scans</strong>, destroying database performance."
-msgstr "Analyseert uw databaseschema om aangepaste tabellen te vinden (vaak gemaakt door slecht gecodeerde plug-ins) waarin cruciale MySQL-indexen ontbreken. Zoekopdrachten op deze tabellen activeren <strong>volledige tabelscans</strong>, waardoor de databaseprestaties worden verslechterd."
-
-#: views/pro/db-health.php:194
-msgid "CRITICAL:"
-msgstr "KRITIEK:"
-
-#: views/pro/db-health.php:202
-msgid "Schema Optimized"
-msgstr "Schema geoptimaliseerd"
-
-#: views/pro/db-health.php:203
-msgid "No large tables are missing secondary indexes."
-msgstr "Bij geen enkele grote tabel ontbreken secundaire indexen."
-
-#: views/pro/db-health.php:211
-msgid "Table Name"
-msgstr "Tabelnaam"
-
-#: views/pro/db-health.php:212
-msgid "Rows (Approx)"
-msgstr "Rijen (ongeveer)"
-
-#: views/pro/db-health.php:213
-msgid "Data Size"
-msgstr "Gegevensgrootte"
-
-#: views/pro/db-health.php:214
-msgid "Risk Level"
-msgstr "Risiconiveau"
-
-#: views/pro/db-health.php:237
-msgid "These tables have > 500 rows but absolutely zero secondary indexes. Consider reporting this to the plugin developer, or creating indexes manually if you know which columns are queried frequently."
-msgstr "Deze tabellen hebben > 500 rijen, maar absoluut nul secundaire indexen. Overweeg om dit aan de ontwikkelaar van de plug-in te melden, of om handmatig indexen te maken als u weet welke kolommen vaak worden opgevraagd."
-
-#: views/pro/db-health.php:241
-msgid "All Tables"
-msgstr "Alle tafels"
-
-#: views/pro/db-health.php:245
-msgid "Table"
-msgstr "Tafel"
-
-#: views/pro/db-health.php:246
-msgid "Rows"
-msgstr "Rijen"
-
-#: views/pro/db-health.php:247
-msgid "Data"
-msgstr "Gegevens"
-
-#: views/pro/db-health.php:248
-msgid "Index"
-msgstr "Indexering"
-
-#: views/pro/db-health.php:250 views/pro/report.php:550
-msgid "Engine"
-msgstr "Motor"
-
-#: views/pro/update-audit.php:40
-msgid "Pre-update core audit"
-msgstr "Kernaudit vóór update"
-
-#: views/pro/update-audit.php:42
-msgid "Update WordPress"
-msgstr "WordPress bijwerken"
-
-#: views/pro/update-audit.php:50
-msgid "cloud"
-msgstr "wolk"
-
-#: views/pro/update-audit.php:61
-msgid "Free:"
-msgstr "Gratis:"
-
-#: views/pro/update-audit.php:62 views/pro/update-audit.php:134
-msgid "Pro"
-msgstr "Pro"
-
-#: views/pro/update-audit.php:71
-msgid "Audit against:"
-msgstr "Controle tegen:"
-
-#: views/pro/update-audit.php:74
-msgid "WordPress version"
-msgstr "WordPress-versie"
-
-#: views/pro/update-audit.php:80
-msgid "Clear"
-msgstr "Duidelijk"
-
-#: views/pro/update-audit.php:90
-msgid "No audit yet"
-msgstr "Nog geen controle"
-
-#: views/pro/update-audit.php:91
-msgid "Set the WordPress version you plan to upgrade to and click \\\"Run pre-update audit\\\"."
-msgstr "Stel de WordPress-versie in waarnaar u wilt upgraden en klik op \\\\\"Run pre-update audit\\\\\"."
-
-#: views/pro/update-audit.php:143
-msgid "jQuery Migrate is currently loaded on your site"
-msgstr "jQuery Migrate wordt momenteel op uw site geladen"
-
-#: views/pro/update-audit.php:143
-msgid "deprecated"
-msgstr "verouderd"
-
-#: views/pro/update-audit.php:147
-msgid "jQuery Migrate is not loaded on your site."
-msgstr "jQuery Migrate wordt niet op uw site geladen."
-
-#: views/pro/update-audit.php:147
-msgid "BREAKS"
-msgstr "PAUZE"
-
-#: views/pro/update-audit.php:153
-msgid "No plugins or themes detected in the scan roots."
-msgstr "Er zijn geen plug-ins of thema's gedetecteerd in de scanroots."
-
-#: views/pro/update-audit.php:156
-msgid "Regex-based static analysis — a match in a comment, string, or a plugin's own same-named function can be a false positive. Verify before editing third-party code."
-msgstr "Op Regex gebaseerde statische analyse: een overeenkomst in een opmerking, tekenreeks of de gelijknamige functie van een plug-in kan vals positief zijn. Controleer dit voordat u code van derden bewerkt."
-
-#: views/pro/update-audit.php:174
-msgid "metadata risk"
-msgstr "metadata-risico"
-
-#: views/pro/update-audit.php:190
-msgid "Not on WordPress.org (premium/custom) — metadata unavailable"
-msgstr "Niet op WordPress.org (premium/aangepast) – metadata niet beschikbaar"
-
-#: views/pro/update-audit.php:218
-msgid "new on this update"
-msgstr "nieuw in deze update"
-
-#: views/pro/update-audit.php:238
-msgid "unlock the full drill-down with Pro →"
-msgstr "ontgrendel het volledige overzicht met Pro →"
-
-#: views/pro/report.php:50
-msgid "A single-page server health report — print to PDF or share with clients"
-msgstr "Een serverstatusrapport van één pagina: print naar PDF of deel met klanten"
-
-#: views/pro/report.php:70
-msgid "White-Label Branding is an Unlimited Tier Feature"
-msgstr "White-Label Branding is een onbeperkte niveaufunctie"
-
-#: views/pro/report.php:71
-msgid "Upload your own company logo, set a custom accent color, and hide the \\\"phpinfo() WP\\\" branding from client PDF reports."
-msgstr "Upload uw eigen bedrijfslogo, stel een aangepaste accentkleur in en verberg de \\\\\"phpinfo() WP\\\\\"-branding in PDF-clientrapporten."
-
-#: views/pro/report.php:72
-msgid "Upgrade License →"
-msgstr "Licentie upgraden →"
-
-#: views/pro/report.php:78
-msgid "Report Branding"
-msgstr "Rapporteer branding"
-
-#: views/pro/report.php:79
-msgid "Customize the report cover and footer with your own brand. Toggle off to restore the default look."
-msgstr "Pas de omslag en voettekst van het rapport aan met uw eigen merk. Schakel uit om het standaard uiterlijk te herstellen."
-
-#: views/pro/report.php:82
-msgid "Enable white-label"
-msgstr "Schakel whitelabel in"
-
-#: views/pro/report.php:86
-msgid "Company name"
-msgstr "Bedrijfsnaam"
-
-#: views/pro/report.php:87
-msgid "Acme Digital Studio"
-msgstr "Acme Digitale Studio"
-
-#: views/pro/report.php:90
-msgid "Report title"
-msgstr "Titel van rapport"
-
-#: views/pro/report.php:91
-msgid "Quarterly Site Health Audit"
-msgstr "Driemaandelijkse sitegezondheidsaudit"
-
-#: views/pro/report.php:94
-msgid "Footer note"
-msgstr "Voettekst"
-
-#: views/pro/report.php:95
-msgid "Prepared by Acme Digital Studio · support@acme.com"
-msgstr "Opgesteld door Acme Digital Studio · support@acme.com"
-
-#: views/pro/report.php:98
-msgid "Company logo"
-msgstr "Bedrijfslogo"
-
-#: views/pro/report.php:105 views/pro/report.php:155
-msgid "No logo set"
-msgstr "Geen logo ingesteld"
-
-#: views/pro/report.php:125
-msgid "Accent color"
-msgstr "Accentkleur"
-
-#: views/pro/report.php:129
-msgid "Save branding"
-msgstr "Bewaar merkvoering"
-
-#: views/pro/report.php:262
-msgid "Overall Site Health"
-msgstr "Algemene sitegezondheid"
-
-#: views/pro/report.php:271
-msgid "No critical issues"
-msgstr "Geen kritieke problemen"
-
-#: views/pro/report.php:273
-msgid "A weighted score across PHP config, security headers, OPcache, SSL, PHP support window, and database health. <strong>Aim for 85+.</strong>"
-msgstr "Een gewogen score voor PHP-configuratie, beveiligingsheaders, OPcache, SSL, PHP-ondersteuningsvenster en databasegezondheid. <strong>Streef naar 85+.</strong>"
-
-#: views/pro/report.php:280
-msgid "Subscores"
-msgstr "Subscores"
-
-#: views/pro/report.php:305
-msgid "Anything here is impacting security, performance, or breaks within the next 90 days."
-msgstr "Alles hier heeft invloed op de beveiliging, prestaties of storingen binnen de komende 90 dagen."
-
-#: views/pro/report.php:323
-msgid "Tackle these in order. Each card explains why it matters and how to fix it."
-msgstr "Pak deze op volgorde aan. Op elke kaart wordt uitgelegd waarom dit belangrijk is en hoe u dit kunt oplossen."
-
-#: views/pro/report.php:335
-msgid "Why it matters:"
-msgstr "Waarom het belangrijk is:"
-
-#: views/pro/report.php:339
-msgid "How to fix:"
-msgstr "Hoe op te lossen:"
-
-#: views/pro/report.php:347
-msgid "No urgent actions"
-msgstr "Geen dringende acties"
-
-#: views/pro/report.php:348
-msgid "The site is in good shape. Keep an eye on the subscores above and review again next month."
-msgstr "De site is in goede staat. Houd de bovenstaande subscores in de gaten en bekijk ze volgende maand opnieuw."
-
-#: views/pro/report.php:352
-msgid "Snapshot"
-msgstr "Momentopname"
-
-#: views/pro/report.php:414
-msgid "Target 95% +"
-msgstr "Doel 95% +"
-
-#: views/pro/report.php:422
-msgid "Site configuration"
-msgstr "Siteconfiguratie"
-
-#: views/pro/report.php:426 views/pro/config-grader.php:259
-msgid "HTTPS"
-msgstr "HTTPS"
-
-#: views/pro/report.php:442
-msgid "Pending updates"
-msgstr "Updates in behandeling"
-
-#: views/pro/report.php:460
-msgid "Backup plugin"
-msgstr "Back-up plug-in"
-
-#: views/pro/report.php:491
-msgid "Current"
-msgstr "Huidig"
-
-#: views/pro/report.php:491
-msgid "Recommended"
-msgstr "Aanbevolen"
-
-#: views/pro/report.php:491
-msgid "Verdict"
-msgstr "Vonnis"
-
-#: views/pro/report.php:526
-msgid "SSL certificates"
-msgstr "SSL-certificaten"
-
-#: views/pro/report.php:528
-msgid "Host"
-msgstr "Gastheer"
-
-#: views/pro/report.php:551
-msgid "End-of-life"
-msgstr "Einde van de levensduur"
-
-#: views/pro/report.php:552
-msgid "Total size"
-msgstr "Totale grootte"
-
-#: views/pro/report.php:571
-msgid "Cron health"
-msgstr "Cron-gezondheid"
-
-#: views/pro/config-grader.php:17
-msgid "PHP configuration scored against WordPress best practices"
-msgstr "PHP-configuratie scoorde in vergelijking met de best practices van WordPress"
-
-#: views/pro/config-grader.php:48
-msgid "See every failing directive and how to fix it"
-msgstr "Bekijk elke falende richtlijn en hoe u deze kunt oplossen"
-
-#: views/pro/config-grader.php:49
-msgid "Pro unlocks the full breakdown across Performance, Security, OPcache, and Session categories — with the exact recommended values and one-line explanations."
-msgstr "Pro ontgrendelt het volledige overzicht van de categorieën Prestatie, Beveiliging, OPcache en Sessie, met de exacte aanbevolen waarden en uitleg in één regel."
-
-#: views/pro/config-grader.php:50
-msgid "Unlock full details — Get Pro →"
-msgstr "Ontgrendel alle details — Download Pro →"
-
-#: views/pro/config-grader.php:138
-msgid "Auto-fix applied — values are still propagating."
-msgstr "Automatische correctie toegepast: waarden worden nog steeds doorgegeven."
-
-#: views/pro/config-grader.php:153
-msgid "PHP configuration scored against WordPress, WooCommerce, and security best practices"
-msgstr "PHP-configuratie scoorde op basis van WordPress, WooCommerce en best practices op het gebied van beveiliging"
-
-#: views/pro/config-grader.php:188
-msgid "We wrote"
-msgstr "Wij schreven"
-
-#: views/pro/config-grader.php:189
-msgid "PHP reports"
-msgstr "PHP-rapporten"
-
-#: views/pro/config-grader.php:203
-msgid "What to do:"
-msgstr "Wat te doen:"
-
-#: views/pro/config-grader.php:226
-msgid "1-Click Optimize Server →"
-msgstr "1-Klik Server optimaliseren →"
-
-#: views/pro/config-grader.php:243
-msgid "Apply Server Profile →"
-msgstr "Serverprofiel toepassen →"
-
-#: views/pro/config-grader.php:249
-msgid "Auto-fix unavailable:"
-msgstr "Automatische correctie niet beschikbaar:"
-
-#: views/pro/config-grader.php:255
-msgid "Recommendations tuned for this site"
-msgstr "Aanbevelingen afgestemd op deze site"
-
-#: views/pro/config-grader.php:262
-msgid "Development mode"
-msgstr "Ontwikkelingsmodus"
-
-#: views/pro/config-grader.php:330
-msgid "Fix:"
-msgstr "Oplossing:"
-
-#: views/pro/config-grader.php:356
-msgid "All good"
-msgstr "Allemaal goed"
-
-#: views/pro/config-grader.php:381
-msgid "Fix this →"
-msgstr "Repareer dit →"
-
-#: views/pro/config-grader.php:404
-msgid "Observed:"
-msgstr "Waargenomen:"
-
-#: views/pro/config-grader.php:436
-msgid "Revert all auto-fix changes"
-msgstr "Zet alle autofix-wijzigingen terug"
-
-#: views/phpinfo.php:8
-msgid "Search directives, values, modules… (e.g. memory_limit)"
-msgstr "Zoekrichtlijnen, waarden, modules… (bijv. memory_limit)"
-
-#: views/phpinfo.php:14
-msgid "Clear search"
-msgstr "Duidelijke zoekopdracht"
-
-#: views/phpinfo.php:18
-msgid "Jump to section"
-msgstr "Ga naar sectie"
-
-#: views/phpinfo.php:19
-msgid "Jump to section…"
-msgstr "Ga naar sectie…"
-
-#: views/phpinfo.php:41
-msgid "Go to top"
-msgstr "Ga naar boven"
-
-#: views/phpinfo.php:43
-msgid "Top"
-msgstr "Boven"
-
-#: views/phpinfo.php:108
-msgid "rows matched"
-msgstr "rijen op elkaar afgestemd"
-
-#: views/phpinfo.php:109
-msgid "row matched"
-msgstr "rij afgestemd"
-
-#: views/phpinfo.php:110
-msgid "No results"
-msgstr "Geen resultaten"
-
-#: views/log.php:43
-#, php-format
-msgid "Edited %s"
-msgstr "Bewerkt%s"
-
-#: views/log.php:43
-msgid "Edited config"
-msgstr "Bewerkte configuratie"
-
-#: views/log.php:46
-#, php-format
-msgid "Backed up %s"
-msgstr "Back-up gemaakt%s"
-
-#: views/log.php:46
-msgid "Backed up config"
-msgstr "Er is een back-up gemaakt van de configuratie"
-
-#: views/log.php:49
-#, php-format
-msgid "Restored %s from backup"
-msgstr "%shersteld vanaf back-up"
-
-#: views/log.php:49
-msgid "Restored from backup"
-msgstr "Hersteld vanaf een back-up"
-
-#: views/log.php:55
-#, php-format
-msgid "Auto-fix applied to %1$d directory: %2$s"
-msgstr "Automatische correctie toegepast op map%1$d:%2$s"
-
-#: views/log.php:60
-msgid "Config Grader auto-fix applied"
-msgstr "Automatische correctie van Config Grader toegepast"
-
-#: views/log.php:64
-msgid "Config Grader auto-fix block reverted"
-msgstr "Blokkering voor automatische correctie van Config Grader is teruggedraaid"
-
-#: views/log.php:80
-msgid "just now"
-msgstr "zojuist"
-
-#: views/log.php:81
-#, php-format
-msgid "%dm ago"
-msgstr "%dm geleden"
-
-#: views/log.php:82
-#, php-format
-msgid "%dh ago"
-msgstr "%duur geleden"
-
-#: views/log.php:83
-#, php-format
-msgid "%dd ago"
-msgstr "%dd geleden"
-
-#: views/log.php:123
-msgid "Tracks every PHP Config change made through phpinfo() WP"
-msgstr "Houdt elke PHP-configuratiewijziging bij die is aangebracht via phpinfo() WP"
-
-#: views/log.php:124
-msgid "entry"
-msgstr "binnenkomst"
-
-#: views/log.php:138
-msgid "All"
-msgstr "Allemaal"
-
-#: views/log.php:139
-msgid "Edits"
-msgstr "Bewerkingen"
-
-#: views/log.php:140
-msgid "Backups"
-msgstr "Back-ups"
-
-#: views/log.php:141
-msgid "Restores"
-msgstr "Herstelt"
-
-#: views/log.php:142
-msgid "Auto-fixes"
-msgstr "Automatische correcties"
-
-#: views/log.php:159
-msgid "Search entries…"
-msgstr "Invoer zoeken..."
-
-#: views/log.php:173
-msgid "No activity recorded yet"
-msgstr "Nog geen activiteit geregistreerd"
-
-#: views/log.php:176
-#, php-format
-msgid "Use the %s to start tracking changes."
-msgstr "Gebruik de%som wijzigingen bij te houden."
-
-#: views/log.php:177
-msgid "PHP Config editor"
-msgstr "PHP-configuratie-editor"
-
-#: views/log.php:184
-msgid "No entries match your filter"
-msgstr "Er zijn geen vermeldingen die overeenkomen met uw filter"
-
-#: views/log.php:191
-msgid "EDIT"
-msgstr "BEWERK"
-
-#: views/log.php:194
-msgid "BACKUP"
-msgstr "BACK-UP"
-
-#: views/log.php:197
-msgid "RESTORE"
-msgstr "HERSTELLEN"
-
-#: views/log.php:200
-msgid "AUTO-FIX"
-msgstr "AUTO-FIX"
-
-#: views/log.php:203
-msgid "REVERTED"
-msgstr "TERUGGEKEERD"
-
-#: views/log.php:206
-msgid "EVENT"
-msgstr "EVENEMENT"
-
-#: views/safemode.php:198
-msgid "Troubleshooting Mode"
-msgstr "Modus voor probleemoplossing"
-
-#: views/safemode.php:199
-msgid "Safely disable plugins or revert to a default theme <strong>just for your own admin session</strong> to debug\\n                conflicts. Visitors see the site normally. Everything is reversible — no plugin is ever deactivated in the\\n                database. Session expires automatically; you can also exit any time."
-msgstr "Schakel plug-ins veilig uit of keer terug naar een standaardthema <strong>alleen voor uw eigen beheerderssessie</strong> om conflicten\\n op te lossen. Bezoekers zien de site normaal. Alles is omkeerbaar: geen enkele plug-in wordt ooit gedeactiveerd in de\\n database. Sessie verloopt automatisch; u kunt ook op elk gewenst moment afsluiten."
-
-#: views/safemode.php:242
-msgid "remaining"
-msgstr "overgebleven"
-
-#: views/safemode.php:259
-msgid "Plugins disabled in this session"
-msgstr "Plug-ins uitgeschakeld in deze sessie"
-
-#: views/safemode.php:264 views/safemode.php:405
-msgid "Plugin"
-msgstr "Plug-in"
-
-#: views/safemode.php:265
-msgid "Status in DB"
-msgstr "Status in DB"
-
-#: views/safemode.php:333
-msgid "Cookie is bound to your user account, time-limited, and expires automatically."
-msgstr "Cookie is gebonden aan uw gebruikersaccount, is beperkt in de tijd en verloopt automatisch."
-
-#: views/safemode.php:341
-msgid "Every page has an explicit <em>End</em> button. You cannot lock yourself out."
-msgstr "Elke pagina heeft een expliciete knop <em>Einde</em>. Je kunt jezelf niet buitensluiten."
-
-#: views/safemode.php:349
-msgid "Other visitors are unaffected — they see the live site with all plugins active."
-msgstr "Andere bezoekers hebben hier geen last van: zij zien de live site met alle plug-ins actief."
-
-#: views/safemode.php:359
-msgid "Request-Level Isolation Recommended"
-msgstr "Isolatie op verzoekniveau aanbevolen"
-
-#: views/safemode.php:381
-msgid "Uninstall Helper"
-msgstr "Helper verwijderen"
-
-#: views/safemode.php:391
-msgid "Pick what to disable"
-msgstr "Kies wat u wilt uitschakelen"
-
-#: views/safemode.php:427
-msgid "Active"
-msgstr "Actief"
-
-#: views/safemode.php:429
-msgid "Inactive"
-msgstr "Inactief"
-
-#: views/safemode.php:443
-msgid "Revert your session to a default theme to verify if a layout conflict is originating from your current theme."
-msgstr "Zet uw sessie terug naar een standaardthema om te verifiëren of een lay-outconflict afkomstig is van uw huidige thema."
-
-#: views/safemode.php:456
-msgid "Select how long you want Troubleshooting Mode to remain active before automatically expiring."
-msgstr "Selecteer hoe lang u wilt dat de probleemoplossingsmodus actief blijft voordat deze automatisch verloopt."
-
-#: views/safemode.php:458
-msgid "15 minutes"
-msgstr "15 minuten"
-
-#: views/safemode.php:459
-msgid "30 minutes"
-msgstr "30 minuten"
-
-#: views/safemode.php:460
-msgid "1 hour (recommended)"
-msgstr "1 uur (aanbevolen)"
-
-#: views/safemode.php:461
-msgid "2 hours"
-msgstr "2 uur"
-
-#: views/safemode.php:462
-msgid "4 hours (max)"
-msgstr "4 uur (max.)"
-
-#: views/safemode.php:472
-msgid "Select at least one plugin to enable the button"
-msgstr "Selecteer ten minste één plug-in om de knop in te schakelen"
-
-#: views/extension.php:24
+#: views/extension.php
 msgid "PHP Extensions"
 msgstr "PHP-extensies"
 
-#: views/extension.php:26
+#: views/extension.php
 msgid "loaded"
 msgstr "geladen"
 
-#: views/extension.php:28
+#: views/extension.php
 msgid "recommended not loaded"
 msgstr "aanbevolen niet geladen"
 
-#: views/extension.php:34
+#: views/extension.php
 msgid "Filter extensions…"
 msgstr "Extensies filteren…"
 
-#: views/extension.php:47
+#: views/extension.php
 msgid "Recommended — Not Loaded"
 msgstr "Aanbevolen — Niet geladen"
 
+#: views/info.php
+#: views/extension.php
+msgid "Loaded Extensions"
+msgstr "Geladen extensies"
+
+#: views/htaccess.php
+msgid "Configure php.ini directives and web server rules safely from your WordPress dashboard."
+msgstr "Configureer php.ini-richtlijnen en webserverregels veilig vanaf uw WordPress-dashboard."
+
+#: views/htaccess.php
+msgid "Detected Server"
+msgstr "Gedetecteerde server"
+
+#: views/htaccess.php
+msgid "Target Config File"
+msgstr "Doelconfiguratiebestand"
+
+#: views/htaccess.php
+msgid "Propagation Time"
+msgstr "Voortplantingstijd"
+
+#: views/htaccess.php
+msgid "Changes apply after FPM reload (cache TTL)."
+msgstr "Wijzigingen zijn van toepassing na het opnieuw laden van FPM (cache TTL)."
+
+#: views/htaccess.php
+msgid "Instant"
+msgstr "Direct"
+
+#: views/htaccess.php
+msgid "Directives are parsed and applied immediately."
+msgstr "Richtlijnen worden ontleed en onmiddellijk toegepast."
+
+#: views/htaccess.php
+msgid "Write permission denied."
+msgstr "Schrijftoestemming geweigerd."
+
+#: views/htaccess.php
+msgid "PHP Directives"
+msgstr "PHP-richtlijnen"
+
+#: views/htaccess.php
+msgid "Editor"
+msgstr "Redacteur"
+
+#: views/htaccess.php
+msgid "Auto-rollback:"
+msgstr "Automatisch terugdraaien:"
+
+#: views/htaccess.php
+msgid "directive value"
+msgstr "richtinggevende waarde"
+
+#: views/htaccess.php
+msgid "Web Server Snippet Library"
+msgstr "Webserverfragmentbibliotheek"
+
+#: views/htaccess.php
+msgid "Nginx Detected."
+msgstr "Nginx gedetecteerd."
+
+#: views/htaccess.php
+msgid "Nginx does not use <code>.htaccess</code>. Applying these rules requires root access to edit your <code>nginx.conf</code>."
+msgstr "Nginx does not use <code>.htaccess</code>. Applying these rules requires root access to edit your <code>nginx.conf</code>."
+
+#: views/htaccess.php
+msgid "No root access?"
+msgstr "No root access?"
+
+#: views/htaccess.php
+msgid "If you are on managed WordPress hosting, caching is usually handled for you automatically. Otherwise, we highly recommend using a free CDN like <strong>Cloudflare</strong> to handle caching and compression automatically without editing server files."
+msgstr "If you are on managed WordPress hosting, caching is usually handled for you automatically. Otherwise, we highly recommend using a free CDN like <strong>Cloudflare</strong> to handle caching and compression automatically without editing server files."
+
+#: views/htaccess.php
+msgid "Apache/LiteSpeed Detected."
+msgstr "Apache/LiteSpeed ​​gedetecteerd."
+
+#: views/htaccess.php
+msgid "Clear Cache:"
+msgstr "Cache wissen:"
+
+#: views/htaccess.php
+msgid "Bulk Actions"
+msgstr "Bulkacties"
+
+#: views/htaccess.php
+msgid "Inject or roll back all 4 snippets at once."
+msgstr "Injecteer of draai alle vier de fragmenten tegelijk terug."
+
+#: views/htaccess.php
+msgid "These settings can make your site up to 2x faster!"
+msgstr "Deze instellingen kunnen uw site tot 2x sneller maken!"
+
+#: views/htaccess.php
+msgid "14-day risk-free refund guarantee"
+msgstr "14 dagen risicovrije terugbetalingsgarantie"
+
+#: views/htaccess.php
+msgid "Read-Only"
+msgstr "Alleen-lezen"
+
+#: views/htaccess.php
+msgid "File does not exist yet — it will be created on first save."
+msgstr "Het bestand bestaat nog niet; het wordt aangemaakt bij de eerste keer opslaan."
+
+#: views/htaccess.php
+msgid "Active directives on disk."
+msgstr "Actieve richtlijnen op schijf."
+
+#: views/info.php
+msgid "not loaded"
+msgstr "niet geladen"
+
+#: views/info.php
+msgid "Server Overview"
+msgstr "Serveroverzicht"
+
+#: views/info.php
+msgid "PHP, WordPress, server, and database environment at a glance"
+msgstr "PHP-, WordPress-, server- en databaseomgeving in één oogopslag"
+
+#: views/info.php
+msgid "PHP Version"
+msgstr "PHP-versie"
+
+#: views/info.php
+#: views/pro/eol.php
+msgid "END OF LIFE"
+msgstr "EINDE VAN HET LEVEN"
+
+#: views/info.php
+msgid "EOL SOON"
+msgstr "EOL BINNENKORT"
+
+#: views/info.php
+#: views/pro/eol.php
+msgid "SUPPORTED"
+msgstr "ONDERSTEUND"
+
+#: views/info.php
+msgid "Upgrade immediately"
+msgstr "Upgrade onmiddellijk"
+
+#: views/info.php
+msgid "EOL in %sd — %s"
+msgstr "EOL in%sd —%s"
+
+#: views/info.php
+msgid "Until %s"
+msgstr "Tot%s"
+
+#: views/info.php
+msgid "EOL date unknown"
+msgstr "EOL-datum onbekend"
+
+#: views/info.php
+#: views/pro/network.php
+msgid "WordPress"
+msgstr "WordPress"
+
+#: views/info.php
+msgid "Multisite network"
+msgstr "Netwerk met meerdere locaties"
+
+#: views/info.php
+msgid "Single site"
+msgstr "Enkele site"
+
+#: views/pro/opcache.php
+#: views/pro/object-cache.php
+#: views/info.php
+msgid "Memory Usage"
+msgstr "Geheugengebruik"
+
+#: views/info.php
+msgid "of %1$s limit (%2$s%%)"
+msgstr "van%1$slimiet (%2$s%%)"
+
+#: views/info.php
+msgid "%s total size"
+msgstr "%stotale grootte"
+
+#: views/info.php
+msgid "Environment Details"
+msgstr "Omgevingsdetails"
+
+#: views/info.php
+msgid "Site URL"
+msgstr "Site-URL"
+
+#: views/info.php
+msgid "Home URL"
+msgstr "Home-URL"
+
+#: views/info.php
+msgid "WP Version"
+msgstr "WP-versie"
+
+#: views/info.php
+msgid "Active Theme"
+msgstr "Actief thema"
+
+#: views/info.php
+msgid "Active Plugins"
+msgstr "Actieve plug-ins"
+
+#: views/info.php
+msgid "%1$s of %2$s installed"
+msgstr "%1$svan%2$sgeïnstalleerd"
+
+#: views/info.php
+msgid "Active Themes"
+msgstr "Actieve thema's"
+
+#: views/info.php
+msgid "Debug Mode"
+msgstr "Foutopsporingsmodus"
+
+#: views/info.php
+msgid "ON"
+msgstr "AAN"
+
+#: views/info.php
+msgid "disable in production"
+msgstr "uitschakelen in de productie"
+
+#: views/info.php
+msgid "Off"
+msgstr "Uit"
+
+#: views/info.php
+msgid "Admin Email"
+msgstr "Beheerder e-mailadres"
+
+#: views/info.php
+#: views/pro/network.php
+msgid "PHP"
+msgstr "PHP"
+
+#: views/info.php
+msgid "PHP SAPI"
+msgstr "PHP SAPI"
+
+#: views/info.php
+msgid "Memory Limit"
+msgstr "Geheugenlimiet"
+
+#: views/info.php
+msgid "Max Execution Time"
+msgstr "Maximale uitvoeringstijd"
+
+#: views/info.php
+msgid "Upload Max Filesize"
+msgstr "Upload maximale bestandsgrootte"
+
+#: views/info.php
+msgid "Post Max Size"
+msgstr "Maximale grootte posten"
+
+#: views/info.php
+msgid "Max Input Vars"
+msgstr "Maximale invoervar"
+
+#: views/info.php
+msgid "Display Errors"
+msgstr "Weergavefouten"
+
+#: views/info.php
+msgid "On"
+msgstr "Aan"
+
+#: views/info.php
+msgid "cURL Version"
+msgstr "cURL-versie"
+
+#: views/info.php
+msgid "Server"
+msgstr "Server"
+
+#: views/info.php
+msgid "Server Software"
+msgstr "Serversoftware"
+
+#: views/info.php
+msgid "Server Name"
+msgstr "Servernaam"
+
+#: views/info.php
+msgid "Document Root"
+msgstr "Documentwortel"
+
+#: views/info.php
+msgid "Operating System"
+msgstr "Besturingssysteem"
+
+#: views/info.php
+msgid "Hostname"
+msgstr "Hostnaam"
+
+#: views/info.php
+msgid "MySQL Version"
+msgstr "MySQL-versie"
+
+#: views/info.php
+msgid "Database Name"
+msgstr "Databasenaam"
+
+#: views/info.php
+msgid "Database Host"
+msgstr "Databasehost"
+
+#: views/info.php
+msgid "Table Prefix"
+msgstr "Tabelvoorvoegsel"
+
+#: views/info.php
+msgid "Database Size"
+msgstr "Databasegrootte"
+
+#: views/info.php
+msgid "Charset"
+msgstr "Tekenset"
+
+#: views/info.php
+msgid "Disk"
+msgstr "Schijf"
+
+#: views/info.php
+msgid "Root Directory"
+msgstr "Hoofdmap"
+
+#: views/info.php
+msgid "Uploads Directory"
+msgstr "Uploadmap"
+
+#: views/log.php
+msgid "Edited %s"
+msgstr "Bewerkt%s"
+
+#: views/log.php
+msgid "Edited config"
+msgstr "Bewerkte configuratie"
+
+#: views/log.php
+msgid "Backed up %s"
+msgstr "Back-up gemaakt%s"
+
+#: views/log.php
+msgid "Backed up config"
+msgstr "Er is een back-up gemaakt van de configuratie"
+
+#: views/log.php
+msgid "Restored %s from backup"
+msgstr "%shersteld vanaf back-up"
+
+#: views/log.php
+msgid "Restored from backup"
+msgstr "Hersteld vanaf een back-up"
+
+#: views/log.php
+msgid "Config Grader auto-fix applied"
+msgstr "Automatische correctie van Config Grader toegepast"
+
+#: views/log.php
+msgid "Config Grader auto-fix block reverted"
+msgstr "Blokkering voor automatische correctie van Config Grader is teruggedraaid"
+
+#: views/log.php
+msgid "just now"
+msgstr "zojuist"
+
+#: views/log.php
+msgid "%dm ago"
+msgstr "%dm geleden"
+
+#: views/log.php
+msgid "%dh ago"
+msgstr "%duur geleden"
+
+#: views/log.php
+msgid "%dd ago"
+msgstr "%dd geleden"
+
+#: views/log.php
+msgid "Tracks every PHP Config change made through phpinfo() WP"
+msgstr "Houdt elke PHP-configuratiewijziging bij die is aangebracht via phpinfo() WP"
+
+#: views/log.php
+msgid "All"
+msgstr "Allemaal"
+
+#: views/log.php
+msgid "Edits"
+msgstr "Bewerkingen"
+
+#: views/log.php
+msgid "Backups"
+msgstr "Back-ups"
+
+#: views/log.php
+msgid "Restores"
+msgstr "Herstelt"
+
+#: views/log.php
+msgid "Auto-fixes"
+msgstr "Automatische correcties"
+
+#: views/log.php
+msgid "Search entries…"
+msgstr "Invoer zoeken..."
+
+#: views/log.php
+msgid "No activity recorded yet"
+msgstr "Nog geen activiteit geregistreerd"
+
+#: views/log.php
+msgid "Use the %s to start tracking changes."
+msgstr "Gebruik de%som wijzigingen bij te houden."
+
+#: views/log.php
+msgid "PHP Config editor"
+msgstr "PHP-configuratie-editor"
+
+#: views/log.php
+msgid "No entries match your filter"
+msgstr "Er zijn geen vermeldingen die overeenkomen met uw filter"
+
+#: views/log.php
+msgid "EDIT"
+msgstr "BEWERK"
+
+#: views/log.php
+msgid "BACKUP"
+msgstr "BACK-UP"
+
+#: views/log.php
+msgid "RESTORE"
+msgstr "HERSTELLEN"
+
+#: views/log.php
+msgid "AUTO-FIX"
+msgstr "AUTO-FIX"
+
+#: views/log.php
+msgid "REVERTED"
+msgstr "TERUGGEKEERD"
+
+#: views/log.php
+msgid "EVENT"
+msgstr "EVENEMENT"
+
+#: views/phpinfo.php
+msgid "Search directives, values, modules… (e.g. memory_limit)"
+msgstr "Zoekrichtlijnen, waarden, modules… (bijv. memory_limit)"
+
+#: views/phpinfo.php
+msgid "Clear search"
+msgstr "Duidelijke zoekopdracht"
+
+#: views/phpinfo.php
+msgid "Jump to section"
+msgstr "Ga naar sectie"
+
+#: views/phpinfo.php
+msgid "Jump to section…"
+msgstr "Ga naar sectie…"
+
+#: views/phpinfo.php
+msgid "Go to top"
+msgstr "Ga naar boven"
+
+#: views/phpinfo.php
+msgid "Top"
+msgstr "Boven"
+
+#: views/phpinfo.php
+msgid "rows matched"
+msgstr "rijen op elkaar afgestemd"
+
+#: views/phpinfo.php
+msgid "row matched"
+msgstr "rij afgestemd"
+
+#: views/phpinfo.php
+msgid "No results"
+msgstr "Geen resultaten"
+
+#: views/pro/alerts.php
+msgid "Email + Slack/Discord notifications for EOL, config changes, OPcache, and SSL events"
+msgstr "E-mail + Slack/Discord-meldingen voor EOL, configuratiewijzigingen, OPcache en SSL-gebeurtenissen"
+
+#: views/pro/alerts.php
+msgid "Email Destination"
+msgstr "Email Destination"
+
+#: views/pro/alerts.php
+msgid "Webhooks Supported"
+msgstr "Webhooks Supported"
+
+#: views/pro/alerts.php
+msgid "Weekly Scan Schedule"
+msgstr "Weekly Scan Schedule"
+
+#: views/pro/alerts.php
+msgid "Automatic"
+msgstr "Automatic"
+
+#: views/pro/alerts.php
+msgid "Email & Webhook Alerts Locked"
+msgstr "Email & Webhook Alerts Locked"
+
+#: views/pro/alerts.php
+msgid "Unlock automatic instant email, Slack, and Discord alerts for upcoming PHP EOL, silent config drift, OPcache hit drops, and SSL certificate expiration."
+msgstr "Unlock automatic instant email, Slack, and Discord alerts for upcoming PHP EOL, silent config drift, OPcache hit drops, and SSL certificate expiration."
+
+#: views/pro/alerts.php
+msgid "Catch server and configuration problems before your clients or visitors notice."
+msgstr "Catch server and configuration problems before your clients or visitors notice."
+
+#: views/pro/report.php
+#: views/pro/permissions.php
+#: views/pro/error-log.php
+#: views/pro/cron.php
+#: views/pro/snapshots.php
+#: views/pro/security-headers.php
+#: views/pro/opcache.php
+#: views/pro/api-monitor.php
+#: views/pro/alerts.php
+#: views/pro/db-health.php
+#: views/pro/ssl.php
+#: views/pro/object-cache.php
+#: views/pro/mail.php
+msgid "Upgrade to Pro &rarr;"
+msgstr "Upgrade to Pro &rarr;"
+
+#: views/pro/alerts.php
+msgid "Enable alerts"
+msgstr "Enable alerts"
+
+#: views/pro/alerts.php
+msgid "Send email and/or webhook notifications when events occur"
+msgstr "Send email and/or webhook notifications when events occur"
+
+#: views/pro/alerts.php
+msgid "Notification email(s)"
+msgstr "Notification email(s)"
+
+#: views/pro/alerts.php
+msgid "One email per line (or comma-separated). Defaults to site admin email."
+msgstr "One email per line (or comma-separated). Defaults to site admin email."
+
+#: views/pro/alerts.php
+msgid "Alert triggers"
+msgstr "Alert triggers"
+
+#: views/pro/alerts.php
+msgid "PHP EOL warning"
+msgstr "PHP EOL warning"
+
+#: views/pro/alerts.php
+msgid "Warn within 90 days of active/security support end"
+msgstr "Warn within 90 days of active/security support end"
+
+#: views/pro/alerts.php
+msgid "Config drift"
+msgstr "Config drift"
+
+#: views/pro/alerts.php
+msgid "Alert when critical php.ini directives change unexpectedly"
+msgstr "Alert when critical php.ini directives change unexpectedly"
+
+#: views/pro/alerts.php
+msgid "OPcache hit rate drops below"
+msgstr "OPcache hit rate drops below"
+
+#: views/pro/alerts.php
+msgid "SSL certificate expiring within"
+msgstr "SSL-certificaat verloopt binnen"
+
+#: views/pro/alerts.php
+msgid "days"
+msgstr "days"
+
+#: views/pro/alerts.php
+msgid "Weekly health digest"
+msgstr "Weekly health digest"
+
+#: views/pro/alerts.php
+msgid "Send a weekly summary email with score, EOL status, and log summary"
+msgstr "Send a weekly summary email with score, EOL status, and log summary"
+
+#: views/pro/alerts.php
+msgid "UNLIMITED"
+msgstr "UNLIMITED"
+
+#: views/pro/alerts.php
+#: views/pro/snapshots.php
+msgid "Upgrade to Unlimited"
+msgstr "Upgrade naar onbeperkt"
+
+#: views/pro/alerts.php
+msgid "Webhook integration"
+msgstr "Webhook integration"
+
+#: views/pro/alerts.php
+msgid "Slack, Discord, and custom webhook notifications are available on the <strong>Unlimited plan</strong>."
+msgstr "Slack, Discord, and custom webhook notifications are available on the <strong>Unlimited plan</strong>."
+
+#: views/pro/alerts.php
+msgid "Upgrade to Unlimited &rarr;"
+msgstr "Upgrade to Unlimited &rarr;"
+
+#: views/pro/alerts.php
+msgid "POST notifications to a Slack Incoming Webhook, Discord channel, or custom HTTP endpoint."
+msgstr "POST notifications to a Slack Incoming Webhook, Discord channel, or custom HTTP endpoint."
+
+#: views/pro/alerts.php
+msgid "Generic JSON POST"
+msgstr "Generic JSON POST"
+
+#: views/pro/alerts.php
+msgid "Save Alert Settings"
+msgstr "Save Alert Settings"
+
+#: views/pro/alerts.php
+#: views/pro/mail.php
+msgid "Send Test Email"
+msgstr "Test-e-mail verzenden"
+
+#: views/pro/alerts.php
+msgid "Test Webhook"
+msgstr "Webhook testen"
+
+#: views/pro/api-monitor.php
+msgid "Track slow outbound API requests that silently block page loads (last 24 hours). This monitor runs globally in the background across all frontend and admin traffic."
+msgstr "Track slow outbound API requests that silently block page loads (last 24 hours). This monitor runs globally in the background across all frontend and admin traffic."
+
+#: views/pro/api-monitor.php
+msgid "Reset Stats"
+msgstr "Statistieken opnieuw instellen"
+
+#: views/pro/api-monitor.php
+msgid "Total Waiting Time"
+msgstr "Totale wachttijd"
+
+#: views/pro/api-monitor.php
+msgid "Slowest API Response"
+msgstr "Langzaamste API-reactie"
+
+#: views/pro/api-monitor.php
+msgid "External API Bottleneck Breakdown Locked"
+msgstr "External API Bottleneck Breakdown Locked"
+
+#: views/pro/api-monitor.php
+msgid "Unlock per-domain latency metrics, timeout warnings, failure logs, and 24-hour API call profiles that slow down TTFB."
+msgstr "Unlock per-domain latency metrics, timeout warnings, failure logs, and 24-hour API call profiles that slow down TTFB."
+
+#: views/pro/api-monitor.php
+msgid "Your total outbound API request time above is real — upgrade to identify slow 3rd-party services."
+msgstr "Your total outbound API request time above is real — upgrade to identify slow 3rd-party services."
+
+#: views/pro/api-monitor.php
+msgid "Monitoring Active."
+msgstr "Bewaking actief."
+
+#: views/pro/api-monitor.php
+msgid "To test this, you can trigger a plugin update check or wait for normal site traffic to generate API calls."
+msgstr "Om dit te testen, kunt u een plug-in-updatecontrole activeren of wachten tot normaal siteverkeer API-aanroepen genereert."
+
+#: views/pro/api-monitor.php
+msgid "Trigger Dummy Slow Request (1.5s)"
+msgstr "Trigger dummy langzaam verzoek (1,5 s)"
+
+#: views/pro/api-monitor.php
+msgid "Domain (Endpoint)"
+msgstr "Domein (eindpunt)"
+
+#: views/pro/api-monitor.php
+msgid "Requests"
+msgstr "Verzoeken"
+
+#: views/pro/api-monitor.php
+msgid "Avg Time"
+msgstr "Gem. tijd"
+
+#: views/pro/api-monitor.php
+msgid "Max Time"
+msgstr "Maximale tijd"
+
+#: views/pro/api-monitor.php
+msgid "Total Time"
+msgstr "Totale tijd"
+
+#: views/pro/api-monitor.php
+msgid "Errors/Timeouts"
+msgstr "Fouten/time-outs"
+
+#: views/pro/api-monitor.php
+msgid "Any API with a max time over 2.0s should be investigated."
+msgstr "Elke API met een maximale tijd van meer dan 2,0 seconden moet worden onderzocht."
+
+#: views/pro/compat.php
+#: views/pro/eol.php
+msgid "PHP Compatibility Scanner"
+msgstr "PHP-compatibiliteitsscanner"
+
+#: views/pro/compat.php
+msgid "Free scanner:"
+msgstr "Gratis scanner:"
+
+#: views/pro/compat.php
+#: views/pro/update-audit.php
+msgid "Get Pro →"
+msgstr "Koop Pro →"
+
+#: views/pro/compat.php
+msgid "Target PHP version:"
+msgstr "Doel-PHP-versie:"
+
+#: views/pro/compat.php
+msgid "Clear results"
+msgstr "Duidelijke resultaten"
+
+#: views/pro/compat.php
+msgid "No scan yet"
+msgstr "Nog geen scan"
+
+#: views/pro/compat.php
+msgid "Pick a target PHP version above and click \"Run Scan\" to analyze your installed plugins and themes."
+msgstr "Pick a target PHP version above and click \"Run Scan\" to analyze your installed plugins and themes."
+
+#: views/pro/compat.php
+msgid "Safe to upgrade!"
+msgstr "Veilig om te upgraden!"
+
+#: views/pro/compat.php
+msgid "false positives"
+msgstr "valse positieven"
+
+#: views/pro/compat.php
+msgid "fatal errors"
+msgstr "fatale fouten"
+
+#: views/pro/compat.php
+msgid "Regex-based scan — some matches may be false positives (e.g., function names in comments or strings). Always verify before changing third-party code."
+msgstr "Op Regex gebaseerde scan: sommige overeenkomsten kunnen valse positieven zijn (bijvoorbeeld functienamen in opmerkingen of tekenreeksen). Verifieer altijd voordat u de code van derden wijzigt."
+
+#: views/pro/config-grader.php
+msgid "PHP configuration scored against WordPress best practices"
+msgstr "PHP-configuratie scoorde in vergelijking met de best practices van WordPress"
+
+#: views/pro/config-grader.php
+msgid "See every failing directive and how to fix it"
+msgstr "Bekijk elke falende richtlijn en hoe u deze kunt oplossen"
+
+#: views/pro/config-grader.php
+msgid "Pro unlocks the full breakdown across Performance, Security, OPcache, and Session categories — with the exact recommended values and one-line explanations."
+msgstr "Pro ontgrendelt het volledige overzicht van de categorieën Prestatie, Beveiliging, OPcache en Sessie, met de exacte aanbevolen waarden en uitleg in één regel."
+
+#: views/pro/config-grader.php
+msgid "Unlock full details — Get Pro →"
+msgstr "Ontgrendel alle details — Download Pro →"
+
+#: views/pro/config-grader.php
+msgid "Auto-fix applied — values are still propagating."
+msgstr "Automatische correctie toegepast: waarden worden nog steeds doorgegeven."
+
+#: views/pro/config-grader.php
+msgid "PHP configuration scored against WordPress, WooCommerce, and security best practices"
+msgstr "PHP-configuratie scoorde op basis van WordPress, WooCommerce en best practices op het gebied van beveiliging"
+
+#: views/pro/snapshots.php
+#: views/pro/config-grader.php
+#: views/pro/report.php
+#: views/pro/opcache.php
+msgid "Directive"
+msgstr "Richtlijn"
+
+#: views/pro/config-grader.php
+msgid "We wrote"
+msgstr "Wij schreven"
+
+#: views/pro/config-grader.php
+msgid "PHP reports"
+msgstr "PHP-rapporten"
+
+#: views/pro/config-grader.php
+msgid "What to do:"
+msgstr "Wat te doen:"
+
+#: views/pro/config-grader.php
+msgid "1-Click Optimize Server →"
+msgstr "1-Klik Server optimaliseren →"
+
+#: views/pro/config-grader.php
+msgid "Apply Server Profile →"
+msgstr "Serverprofiel toepassen →"
+
+#: views/pro/config-grader.php
+msgid "Auto-fix unavailable:"
+msgstr "Automatische correctie niet beschikbaar:"
+
+#: views/pro/config-grader.php
+msgid "Recommendations tuned for this site"
+msgstr "Aanbevelingen afgestemd op deze site"
+
+#: views/pro/config-grader.php
+#: views/pro/report.php
+msgid "HTTPS"
+msgstr "HTTPS"
+
+#: views/pro/config-grader.php
+msgid "Development mode"
+msgstr "Ontwikkelingsmodus"
+
+#: views/pro/config-grader.php
+msgid "Fix:"
+msgstr "Oplossing:"
+
+#: views/pro/config-grader.php
+msgid "All good"
+msgstr "Allemaal goed"
+
+#: views/pro/config-grader.php
+msgid "Fix this →"
+msgstr "Repareer dit →"
+
+#: views/pro/config-grader.php
+msgid "Observed:"
+msgstr "Waargenomen:"
+
+#: views/pro/config-grader.php
+msgid "Revert all auto-fix changes"
+msgstr "Zet alle autofix-wijzigingen terug"
+
+#: views/pro/config-grader.php
+msgid "Confirm Auto-Fix"
+msgstr "Confirm Auto-Fix"
+
+#: views/pro/config-grader.php
+msgid "You are about to automatically tune the following configuration directive:"
+msgstr "You are about to automatically tune the following configuration directive:"
+
+#: views/pro/config-grader.php
+msgid "This action will write an override rule directly to your %s file."
+msgstr "This action will write an override rule directly to your %s file."
+
+#: views/pro/config-grader.php
+msgid "Note: We wrap all auto-fix rules inside a custom section. You can revert this entire block of changes at any time using the revert button below the checks list."
+msgstr "Note: We wrap all auto-fix rules inside a custom section. You can revert this entire block of changes at any time using the revert button below the checks list."
+
+#: views/pro/config-grader.php
+msgid "Cancel"
+msgstr "Cancel"
+
+#: views/pro/config-grader.php
+msgid "Apply Auto-Fix"
+msgstr "Apply Auto-Fix"
+
+#: views/pro/cron.php
+msgid "Inspect scheduled events, spot missed crons, and find orphans"
+msgstr "Inspecteer geplande evenementen, ontdek gemiste crons en vind weeskinderen"
+
+#: views/pro/cron.php
+msgid "Scheduled events"
+msgstr "Geplande evenementen"
+
+#: views/pro/cron.php
+msgid "Overdue"
+msgstr "Te laat"
+
+#: views/pro/cron.php
+msgid "Orphans (no callback)"
+msgstr "Weeskinderen (geen terugbelactie)"
+
+#: views/pro/cron.php
+msgid "Due within 60s"
+msgstr "Te verwachten binnen de jaren 60"
+
+#: views/pro/cron.php
+msgid "Cron Job Manager & Orphan Cleaner Locked"
+msgstr "Cron Job Manager & Orphan Cleaner Locked"
+
+#: views/pro/cron.php
+msgid "Unlock real-time cron event inspection, 1-click \"Run Now\" triggers, orphan hook purging, and overdue cron alerts."
+msgstr "Unlock real-time cron event inspection, 1-click \"Run Now\" triggers, orphan hook purging, and overdue cron alerts."
+
+#: views/pro/cron.php
+msgid "Your scheduled event counts and overdue stats above are real — upgrade to manage schedules."
+msgstr "Your scheduled event counts and overdue stats above are real — upgrade to manage schedules."
+
+#: views/pro/cron.php
+msgid "Why orphan events come back after you delete them:"
+msgstr "Waarom weesgebeurtenissen terugkomen nadat je ze hebt verwijderd:"
+
+#: views/pro/cron.php
+msgid "Purge hook"
+msgstr "Reinigingshaak"
+
+#: views/pro/cron.php
+msgid "No scheduled events found."
+msgstr "Geen geplande evenementen gevonden."
+
+#: views/pro/cron.php
+msgid "Hook"
+msgstr "Haak"
+
+#: views/pro/cron.php
+msgid "Next Run"
+msgstr "Volgende uitvoering"
+
+#: views/pro/cron.php
+msgid "Schedule"
+msgstr "Schema"
+
+#: views/pro/permissions.php
+#: views/pro/cron.php
+#: views/pro/eol.php
+#: views/safemode.php
+#: views/pro/report.php
+msgid "Status"
+msgstr "Status"
+
+#: views/pro/snapshots.php
+#: views/pro/cron.php
+msgid "Actions"
+msgstr "Acties"
+
+#: views/pro/cron.php
+msgid "orphan"
+msgstr "wees"
+
+#: views/pro/cron.php
+msgid "Soon"
+msgstr "Binnenkort"
+
+#: views/pro/cron.php
+msgid "OK"
+msgstr "Oké"
+
+#: views/pro/cron.php
+msgid "Run now"
+msgstr "Ren nu"
+
+#: views/pro/snapshots.php
+#: views/pro/cron.php
+msgid "Delete"
+msgstr "Verwijderen"
+
+#: views/pro/db-health.php
+msgid "Analyze MySQL/MariaDB version, structural schema issues, and TTFB-killing autoload bloat."
+msgstr "Analyseer de MySQL/MariaDB-versie, structurele schemaproblemen en TTFB-dodende autoload-bloat."
+
+#: views/pro/db-health.php
+msgid "Database size"
+msgstr "Databasegrootte"
+
+#: views/pro/db-health.php
+msgid "Transients"
+msgstr "Transiënten"
+
+#: views/pro/db-health.php
+msgid "Overhead"
+msgstr "Overhead"
+
+#: views/pro/db-health.php
+msgid "Reclaimable via OPTIMIZE TABLE"
+msgstr "Terug te vorderen via OPTIMALISEER TAFEL"
+
+#: views/pro/db-health.php
+msgid "Database Schema & Bloat Tools Locked"
+msgstr "Database Schema & Bloat Tools Locked"
+
+#: views/pro/db-health.php
+msgid "Unlock the Autoload Bloat Visualizer, Missing Index Scanner, full table fragmentation inspector, and 1-click transient cleanup."
+msgstr "Unlock the Autoload Bloat Visualizer, Missing Index Scanner, full table fragmentation inspector, and 1-click transient cleanup."
+
+#: views/pro/db-health.php
+msgid "Your database engine, size, and autoload metrics above are real — upgrade to isolate slow queries and speed up TTFB."
+msgstr "Your database engine, size, and autoload metrics above are real — upgrade to isolate slow queries and speed up TTFB."
+
+#: views/pro/db-health.php
+msgid "every single page request"
+msgstr "elk paginaverzoek"
+
+#: views/pro/db-health.php
+msgid "Warning: High Autoload Size!"
+msgstr "Waarschuwing: hoge grootte voor automatisch laden!"
+
+#: views/pro/db-health.php
+msgid "Option Name"
+msgstr "Optienaam"
+
+#: views/pro/db-health.php
+msgid "Memory Footprint"
+msgstr "Geheugen voetafdruk"
+
+#: views/pro/db-health.php
+msgid "Recommendation"
+msgstr "Aanbeveling"
+
+#: views/pro/db-health.php
+msgid "Transient"
+msgstr "Van voorbijgaande aard"
+
+#: views/pro/db-health.php
+msgid "TTFB KILLER"
+msgstr "TTFB-KILLER"
+
+#: views/pro/db-health.php
+msgid "BLOAT"
+msgstr "BLOAT"
+
+#: views/pro/db-health.php
+msgid "Normal"
+msgstr "Normaal"
+
+#: views/pro/db-health.php
+msgid "Analyzes your database schema to find custom tables (often created by poorly coded plugins) that are missing critical MySQL indexes. Queries against these tables trigger <strong>full table scans</strong>, destroying database performance."
+msgstr "Analyseert uw databaseschema om aangepaste tabellen te vinden (vaak gemaakt door slecht gecodeerde plug-ins) waarin cruciale MySQL-indexen ontbreken. Zoekopdrachten op deze tabellen activeren <strong>volledige tabelscans</strong>, waardoor de databaseprestaties worden verslechterd."
+
+#: views/pro/db-health.php
+msgid "CRITICAL:"
+msgstr "KRITIEK:"
+
+#: views/pro/db-health.php
+msgid "Schema Optimized"
+msgstr "Schema geoptimaliseerd"
+
+#: views/pro/db-health.php
+msgid "No large tables are missing secondary indexes."
+msgstr "Bij geen enkele grote tabel ontbreken secundaire indexen."
+
+#: views/pro/db-health.php
+msgid "Table Name"
+msgstr "Tabelnaam"
+
+#: views/pro/db-health.php
+msgid "Rows (Approx)"
+msgstr "Rijen (ongeveer)"
+
+#: views/pro/db-health.php
+msgid "Data Size"
+msgstr "Gegevensgrootte"
+
+#: views/pro/db-health.php
+msgid "Risk Level"
+msgstr "Risiconiveau"
+
+#: views/pro/db-health.php
+msgid "These tables have > 500 rows but absolutely zero secondary indexes. Consider reporting this to the plugin developer, or creating indexes manually if you know which columns are queried frequently."
+msgstr "Deze tabellen hebben > 500 rijen, maar absoluut nul secundaire indexen. Overweeg om dit aan de ontwikkelaar van de plug-in te melden, of om handmatig indexen te maken als u weet welke kolommen vaak worden opgevraagd."
+
+#: views/pro/db-health.php
+msgid "All Tables"
+msgstr "Alle tafels"
+
+#: views/pro/db-health.php
+msgid "Table"
+msgstr "Tafel"
+
+#: views/pro/db-health.php
+msgid "Rows"
+msgstr "Rijen"
+
+#: views/pro/db-health.php
+msgid "Data"
+msgstr "Gegevens"
+
+#: views/pro/db-health.php
+msgid "Index"
+msgstr "Indexering"
+
+#: views/pro/db-health.php
+#: views/pro/report.php
+msgid "Engine"
+msgstr "Motor"
+
+#: views/pro/eol.php
+msgid "End of Life"
+msgstr "Einde van het leven"
+
+#: views/pro/eol.php
+msgid "EOL < 90 days"
+msgstr "EOL <90 dagen"
+
+#: views/pro/eol.php
+#: views/pro/network.php
+msgid "Supported"
+msgstr "Ondersteund"
+
+#: views/pro/eol.php
+msgid "Unknown"
+msgstr "Onbekend"
+
+#: views/pro/eol.php
+msgid "PHP EOL Timeline"
+msgstr "PHP EOL-tijdlijn"
+
+#: views/pro/eol.php
+msgid "End-of-life dates and support status for every PHP version"
+msgstr "Einddatums en ondersteuningsstatus voor elke PHP-versie"
+
+#: views/pro/eol.php
+msgid "EXPIRING SOON"
+msgstr "BINNENKORT VERLOPEN"
+
+#: views/pro/eol.php
+msgid "UNKNOWN"
+msgstr "ONBEKEND"
+
+#: views/pro/eol.php
+msgid "Running on"
+msgstr "Loopt door"
+
+#: views/pro/eol.php
+msgid "PHP %s"
+msgstr "PHP-%s"
+
+#: views/pro/eol.php
+msgid "Reached end-of-life on <strong>%s</strong>. No security patches are being issued. Contact your host and request a PHP upgrade to 8.2 or newer immediately."
+msgstr "Einde levensduur bereikt op <strong>%s</strong>. Er worden geen beveiligingspatches uitgegeven. Neem contact op met uw host en vraag onmiddellijk een PHP-upgrade naar 8.2 of nieuwer aan."
+
+#: views/pro/eol.php
+msgid "Reaches end-of-life on <strong>%1$s</strong> — <strong>%2$s days</strong> from now. Plan your PHP upgrade before that date."
+msgstr "Bereikt het einde van de levensduur over <strong>%1$s</strong> — <strong>%2$sdagen</strong> vanaf nu. Plan uw PHP-upgrade vóór die datum."
+
+#: views/pro/eol.php
+msgid "Actively supported until <strong>%1$s</strong> — <strong>%2$s days</strong> from now. You're good."
+msgstr "Actief ondersteund tot <strong>%1$s</strong> — <strong>%2$sdagen</strong> vanaf nu. Je bent goed."
+
+#: views/pro/eol.php
+msgid "EOL date not found for PHP %s. Check <a href=\"https://www.php.net/supported-versions.php\" target=\"_blank\">php.net/supported-versions</a>."
+msgstr "EOL date not found for PHP %s. Check <a href=\"https://www.php.net/supported-versions.php\" target=\"_blank\">php.net/supported-versions</a>."
+
+#: views/pro/eol.php
+msgid "Version Lifecycle"
+msgstr "Versielevenscyclus"
+
+#: views/safemode.php
+#: views/pro/eol.php
+msgid "Version"
+msgstr "Versie"
+
+#: views/pro/eol.php
+msgid "EOL Date"
+msgstr "EOL-datum"
+
+#: views/pro/eol.php
+msgid "Days"
+msgstr "Dagen"
+
+#: views/pro/eol.php
+msgid "YOU"
+msgstr "JIJ"
+
+#: views/pro/eol.php
+msgid "Source: %s — updated in each plugin release."
+msgstr "Bron:%s— bijgewerkt in elke plug-inrelease."
+
+#: views/pro/eol.php
+msgid "Plan your PHP %s upgrade with confidence"
+msgstr "Plan uw PHP%s-upgrade met vertrouwen"
+
+#: views/pro/eol.php
+msgid "Before you upgrade, scan every plugin and theme for compatibility with your target PHP version. Save snapshots, monitor changes, and email yourself a digest."
+msgstr "Voordat u een upgrade uitvoert, scant u elke plug-in en elk thema op compatibiliteit met uw doel-PHP-versie. Sla momentopnamen op, houd wijzigingen in de gaten en e-mail uzelf een samenvatting."
+
+#: views/pro/eol.php
+msgid "find breaking changes across all plugins/themes"
+msgstr "vind de belangrijkste wijzigingen in alle plug-ins/thema's"
+
+#: views/pro/eol.php
+msgid "diff php.ini before and after the upgrade"
+msgstr "diff php.ini voor en na de upgrade"
+
+#: views/pro/eol.php
+msgid "single-page PDF for clients or your records"
+msgstr "PDF van één pagina voor klanten of uw administratie"
+
+#: views/pro/eol.php
+msgid "Email Alerts"
+msgstr "E-mailwaarschuwingen"
+
+#: views/pro/eol.php
+msgid "get warned 90/30/7 days before any PHP EOL"
+msgstr "word 90/30/7 dagen vóór een PHP EOL gewaarschuwd"
+
+#: views/pro/eol.php
+msgid "Upgrade safely — Get Pro &rarr;"
+msgstr "Veilig upgraden — Koop Pro &rarr;"
+
+#: views/pro/error-log.php
+msgid "Browse, filter, and clear your PHP error log — without FTP, SSH, or asking your host."
+msgstr "Blader, filter en wis uw PHP-foutenlogboek - zonder FTP, SSH of vraag het aan uw host."
+
+#: views/pro/error-log.php
+msgid "No log file discovered"
+msgstr "Geen logbestand ontdekt"
+
+#: views/pro/error-log.php
+msgid "WordPress debug constants"
+msgstr "WordPress debug constants"
+
+#: views/pro/error-log.php
+msgid "Should be <strong>off</strong> in production — leaking errors to visitors is a security risk."
+msgstr "Zou in productie <strong>uit</strong> moeten staan; het lekken van fouten naar bezoekers is een veiligheidsrisico."
+
+#: views/pro/error-log.php
+msgid "Paths checked"
+msgstr "Paden gecontroleerd"
+
+#: views/pro/error-log.php
+msgid "File:"
+msgstr "Bestand:"
+
+#: views/pro/error-log.php
+msgid "Size:"
+msgstr "Maat:"
+
+#: views/pro/error-log.php
+msgid "Recorded:"
+msgstr "Recorded:"
+
+#: views/pro/error-log.php
+msgid "Filter lines..."
+msgstr "Lijnen filteren..."
+
+#: views/pro/error-log.php
+msgid "Clear Log"
+msgstr "Logboek wissen"
+
+#: views/pro/error-log.php
+msgid "Live PHP Error Log Viewer Locked"
+msgstr "Live PHP Error Log Viewer Locked"
+
+#: views/pro/error-log.php
+msgid "Unlock real-time log streaming, full text & regex search filters, stack trace inspection, and 1-click log reset without FTP or SSH."
+msgstr "Unlock real-time log streaming, full text & regex search filters, stack trace inspection, and 1-click log reset without FTP or SSH."
+
+#: views/pro/error-log.php
+msgid "Your active log path and file size above are real — upgrade to stream and filter errors."
+msgstr "Your active log path and file size above are real — upgrade to stream and filter errors."
+
+#: views/pro/error-log.php
+msgid "Log is empty — no errors recorded."
+msgstr "Logboek is leeg: er zijn geen fouten geregistreerd."
+
+#: views/pro/license.php
+msgid "Activation failed: This license has been revoked or refunded. Contact <a href=\"mailto:support@exeebit.com\">support@exeebit.com</a>."
+msgstr "Activation failed: This license has been revoked or refunded. Contact <a href=\"mailto:support@exeebit.com\">support@exeebit.com</a>."
+
+#: views/pro/license.php
+msgid "License key invalid, expired, or unrecognised. If you just purchased, allow a moment for activation to propagate, then try again. Contact <a href=\"mailto:support@exeebit.com\">support@exeebit.com</a> if the problem persists."
+msgstr "License key invalid, expired, or unrecognised. If you just purchased, allow a moment for activation to propagate, then try again. Contact <a href=\"mailto:support@exeebit.com\">support@exeebit.com</a> if the problem persists."
+
+#: views/pro/license.php
+msgid "Activate your license to unlock Pro features on this site"
+msgstr "Activeer uw licentie om Pro-functies op deze site te ontgrendelen"
+
+#: views/pro/license.php
+msgid "License Revoked."
+msgstr "License Revoked."
+
+#: views/pro/license.php
+msgid "This license has been revoked or refunded. Pro features have been disabled. Contact <a href=\"mailto:support@exeebit.com\">support@exeebit.com</a> if you believe this is an error."
+msgstr "This license has been revoked or refunded. Pro features have been disabled. Contact <a href=\"mailto:support@exeebit.com\">support@exeebit.com</a> if you believe this is an error."
+
+#: views/pro/license.php
+msgid "Site Limit Exceeded."
+msgstr "Site Limit Exceeded."
+
+#: views/pro/license.php
+msgid "This license is active on too many sites. Please upgrade to an Unlimited tier or deactivate unused sites."
+msgstr "This license is active on too many sites. Please upgrade to an Unlimited tier or deactivate unused sites."
+
+#: views/pro/license.php
+msgid "License locked."
+msgstr "Licentie vergrendeld."
+
+#: views/pro/license.php
+msgid "Your license could not be verified with our servers. Re-enter your key to unlock, or contact <a href=\"mailto:support@exeebit.com\">support@exeebit.com</a>."
+msgstr "Your license could not be verified with our servers. Re-enter your key to unlock, or contact <a href=\"mailto:support@exeebit.com\">support@exeebit.com</a>."
+
+#: views/pro/license.php
+msgid "Pro license is active"
+msgstr "Pro-licentie is actief"
+
+#: views/pro/license.php
+msgid "All Pro features are unlocked on this site."
+msgstr "Alle Pro-functies zijn ontgrendeld op deze site."
+
+#: views/pro/license.php
+msgid "No active license"
+msgstr "Geen actieve licentie"
+
+#: views/pro/license.php
+msgid "Enter a valid license key to unlock Pro features."
+msgstr "Voer een geldige licentiesleutel in om Pro-functies te ontgrendelen."
+
+#: views/pro/license.php
+msgid "License key"
+msgstr "Licentiesleutel"
+
+#: views/pro/license.php
+msgid "Registered to"
+msgstr "Geregistreerd bij"
+
+#: views/pro/ssl.php
+#: views/pro/license.php
+#: views/pro/report.php
+msgid "Expires"
+msgstr "Verloopt"
+
+#: views/pro/license.php
+msgid "Activated"
+msgstr "Geactiveerd"
+
+#: views/pro/license.php
+msgid "Deactivate License"
+msgstr "Licentie deactiveren"
+
+#: views/pro/license.php
+msgid "Deactivate your Pro license?"
+msgstr "Uw Pro-licentie deactiveren?"
+
+#: views/pro/license.php
+msgid "The plugin keeps running, but every Pro feature below stops the moment you confirm."
+msgstr "De plug-in blijft actief, maar elke Pro-functie hieronder stopt zodra u bevestigt."
+
+#: views/pro/license.php
+msgid "Pro features that will lock"
+msgstr "Pro-functies die kunnen worden vergrendeld"
+
+#: views/pro/license.php
+msgid "Nothing is deleted."
+msgstr "Er wordt niets verwijderd."
+
+#: views/pro/license.php
+msgid "Keep Pro active"
+msgstr "Houd Pro actief"
+
+#: views/pro/license.php
+msgid "Deactivating..."
+msgstr "Deactiveren..."
+
+#: views/pro/license.php
+msgid "Enter your license key"
+msgstr "Voer uw licentiesleutel in"
+
+#: views/pro/license.php
+msgid "PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+msgstr "PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+#: views/pro/license.php
+msgid "Activate"
+msgstr "Activeer"
+
+#: views/pro/license.php
+msgid "Get phpinfo() WP Pro →"
+msgstr "Download phpinfo() WP Pro →"
+
+#: views/pro/license.php
+msgid "Verifying..."
+msgstr "Verifiëren..."
+
+#: views/pro/license.php
+msgid "License activated!"
+msgstr "Licentie geactiveerd!"
+
+#: views/pro/license.php
+msgid "Reloading page..."
+msgstr "Pagina opnieuw laden..."
+
+#: views/pro/license.php
+msgid "Activation failed. Please check your key."
+msgstr "Activering mislukt. Controleer uw sleutel."
+
+#: views/pro/license.php
+msgid "Connection error. Please try again."
+msgstr "Verbindingsfout. Probeer het opnieuw."
+
+#: views/pro/license.php
+msgid "Compare plans"
+msgstr "Vergelijk abonnementen"
+
+#: views/pro/license.php
+msgid "Everything in Free, plus the Pro depth — see exactly what you get at each tier."
+msgstr "Alles in Free, plus de Pro-diepte: zie precies wat u op elk niveau krijgt."
+
+#: views/pro/license.php
+msgid "Feature"
+msgstr "Functie"
+
+#: views/pro/license.php
+msgid "Get Single"
+msgstr "Word single"
+
+#: views/pro/license.php
+msgid "Get Unlimited"
+msgstr "Krijg onbeperkt"
+
+#: views/pro/license.php
+msgid "Get Lifetime"
+msgstr "Krijg levenslang"
+
+#: views/pro/license.php
+msgid "What Pro unlocks"
+msgstr "Wat Pro ontgrendelt"
+
+#: views/pro/license.php
+msgid "Pricing"
+msgstr "Prijzen"
+
+#: views/pro/license.php
+msgid "Single Site"
+msgstr "Enkele site"
+
+#: views/pro/license.php
+msgid "Essential Pro features on 1 site"
+msgstr "Essentiële Pro-functies op 1 site"
+
+#: views/pro/license.php
+msgid "Standard PDF reports (Branded)"
+msgstr "Standaard PDF-rapporten (merk)"
+
+#: views/pro/license.php
+msgid "1 API monitor & 3 snapshots"
+msgstr "1 API-monitor en 3 snapshots"
+
+#: views/pro/license.php
+msgid "1 year of updates & support"
+msgstr "1 jaar updates en ondersteuning"
+
+#: views/pro/license.php
+msgid "Most Popular"
+msgstr "Meest populair"
+
+#: views/pro/license.php
+#: views/pro/upgrade.php
+msgid "Unlimited"
+msgstr "Onbeperkt"
+
+#: views/pro/license.php
+msgid "All Pro features on unlimited sites"
+msgstr "Alle Pro-functies op een onbeperkt aantal sites"
+
+#: views/pro/license.php
+msgid "White-labeled PDF reports (Logo)"
+msgstr "White-label PDF-rapporten (logo)"
+
+#: views/pro/license.php
+msgid "Weekly digests & Slack/Discord"
+msgstr "Wekelijkse samenvattingen en Slack/Discord"
+
+#: views/pro/license.php
+msgid "Priority support & Multi-site"
+msgstr "Prioritaire ondersteuning en meerdere locaties"
+
+#: views/pro/license.php
+msgid "Founders &mdash; First 50"
+msgstr "Oprichters - Eerste 50"
+
+#: views/pro/license.php
+#: views/pro/upgrade.php
+msgid "Lifetime"
+msgstr "Levenslang"
+
+#: views/pro/license.php
+msgid "once"
+msgstr "een keer"
+
+#: views/pro/license.php
+msgid "Lifetime updates & priority support"
+msgstr "Levenslange updates en prioriteitsondersteuning"
+
+#: views/pro/license.php
+msgid "14-day money-back guarantee · Instant license delivery · Cancel anytime"
+msgstr "14 dagen geld-terug-garantie · Onmiddellijke levering van licenties · Annuleer op elk gewenst moment"
+
+#: views/pro/mail.php
+msgid "not found"
+msgstr "niet gevonden"
+
+#: views/pro/mail.php
+msgid "SPF, DKIM, DMARC, and SMTP configuration audit"
+msgstr "SPF-, DKIM-, DMARC- en SMTP-configuratieaudit"
+
+#: views/pro/mail.php
+msgid "Re-check DNS"
+msgstr "Re-check DNS"
+
+#: views/pro/mail.php
+msgid "Could not audit mail configuration."
+msgstr "Kan de e-mailconfiguratie niet controleren."
+
+#: views/pro/mail.php
+msgid "Sending from"
+msgstr "Verzenden vanaf"
+
+#: views/pro/mail.php
+msgid "Mail method"
+msgstr "Mail methode"
+
+#: views/pro/mail.php
+msgid "SMTP plugin active"
+msgstr "SMTP-plug-in actief"
+
+#: views/pro/mail.php
+msgid "PHP mail()"
+msgstr "PHP-mail()"
+
+#: views/pro/mail.php
+msgid "Consider an SMTP plugin for deliverability"
+msgstr "Overweeg een SMTP-plug-in voor leverbaarheid"
+
+#: views/pro/mail.php
+msgid "Mail Deliverability & DNS Diagnostics Locked"
+msgstr "Mail Deliverability & DNS Diagnostics Locked"
+
+#: views/pro/mail.php
+msgid "Unlock deep SPF, DKIM, and DMARC DNS record validation, live email dispatch test runner, and spam deliverability diagnostics."
+msgstr "Unlock deep SPF, DKIM, and DMARC DNS record validation, live email dispatch test runner, and spam deliverability diagnostics."
+
+#: views/pro/mail.php
+msgid "Your sender domain and sending method above are real — upgrade to ensure customer emails do not hit spam."
+msgstr "Your sender domain and sending method above are real — upgrade to ensure customer emails do not hit spam."
+
+#: views/pro/mail.php
+msgid "Email Routing Audit"
+msgstr "Controle van e-mailroutering"
+
+#: views/pro/mail.php
+msgid "Discovered email addresses used for administration and contact forms."
+msgstr "E-mailadressen ontdekt die worden gebruikt voor administratie en contactformulieren."
+
+#: views/pro/mail.php
+msgid "Source"
+msgstr "Bron"
+
+#: views/pro/mail.php
+msgid "Email Address"
+msgstr "E-mailadres"
+
+#: views/pro/mail.php
+msgid "Domain MX"
+msgstr "Domein MX"
+
+#: views/pro/mail.php
+msgid "Test"
+msgstr "Testen"
+
+#: views/pro/mail.php
+msgid "Send test"
+msgstr "Test verzenden"
+
+#: views/pro/mail.php
+msgid "DNS Records"
+msgstr "DNS-records"
+
+#: views/pro/mail.php
+msgid "MX records"
+msgstr "MX-records"
+
+#: views/pro/mail.php
+msgid "DKIM"
+msgstr "DKIM"
+
+#: views/pro/mail.php
+msgid "recipient@example.com"
+msgstr "ontvanger@voorbeeld.com"
+
+#: views/pro/network.php
+msgid "phpinfo() WP — Network"
+msgstr "phpinfo() WP — Netwerk"
+
+#: views/pro/network.php
+msgid "Server-level info applies to all sites in the network. Per-site stats appear below."
+msgstr "Informatie op serverniveau is van toepassing op alle sites in het netwerk. Statistieken per site worden hieronder weergegeven."
+
+#: views/pro/network.php
+msgid "End of life"
+msgstr "Einde van het leven"
+
+#: views/pro/network.php
+msgid "Memory"
+msgstr "Geheugen"
+
+#: views/pro/network.php
+msgid "Per-site health"
+msgstr "Gezondheid per locatie"
+
+#: views/pro/network.php
+msgid "ID"
+msgstr "Identiteitskaart"
+
+#: views/pro/network.php
+msgid "Site"
+msgstr "Locatie"
+
+#: views/pro/network.php
+msgid "URL"
+msgstr "URL"
+
+#: views/pro/report.php
+#: views/pro/network.php
+msgid "Autoload data"
+msgstr "Gegevens automatisch laden"
+
+#: views/pro/object-cache.php
+msgid "Monitor persistent object cache drop-ins, connection speed, and hit/miss ratios."
+msgstr "Bewaak persistente objectcache-drop-ins, verbindingssnelheid en hit/miss-ratio's."
+
+#: views/pro/object-cache.php
+msgid "Object Caching is not active."
+msgstr "Objectcaching is niet actief."
+
+#: views/pro/object-cache.php
+msgid "Redis"
+msgstr "Opnieuw"
+
+#: views/pro/object-cache.php
+msgid "Memcached"
+msgstr "Gememoriseerd"
+
+#: views/pro/object-cache.php
+msgid "Neither Redis nor Memcached PHP extensions are installed. Ask your host to enable one (Redis is recommended)."
+msgstr "Er zijn geen Redis- of Memcached PHP-extensies geïnstalleerd. Vraag uw host om er een in te schakelen (Redis wordt aanbevolen)."
+
+#: views/pro/object-cache.php
+msgid "Object Cache is active, but stats are unavailable."
+msgstr "Objectcache is actief, maar statistieken zijn niet beschikbaar."
+
+#: views/pro/object-cache.php
+#: views/pro/opcache.php
+msgid "Hit Rate"
+msgstr "Hitpercentage"
+
+#: views/pro/object-cache.php
+msgid "Engine:"
+msgstr "Motor:"
+
+#: views/pro/object-cache.php
+msgid "Keys & Evictions"
+msgstr "Sleutels en uitzettingen"
+
+#: views/pro/object-cache.php
+msgid "Keys in Memory:"
+msgstr "Toetsen in geheugen:"
+
+#: views/pro/object-cache.php
+msgid "Evictions:"
+msgstr "Uitzettingen:"
+
+#: views/pro/object-cache.php
+msgid "Object Cache Management Locked"
+msgstr "Object Cache Management Locked"
+
+#: views/pro/object-cache.php
+msgid "Unlock live Redis/Memcached key inspection, latency benchmark, evictions monitor, and 1-click cache flushing."
+msgstr "Unlock live Redis/Memcached key inspection, latency benchmark, evictions monitor, and 1-click cache flushing."
+
+#: views/pro/object-cache.php
+msgid "Your live connection and hit rate metrics above are real — upgrade to manage cache and optimize TTFB."
+msgstr "Your live connection and hit rate metrics above are real — upgrade to manage cache and optimize TTFB."
+
+#: views/pro/object-cache.php
+msgid "Flush Cache"
+msgstr "Cache leegmaken"
+
+#: views/pro/object-cache.php
+msgid "Forces the cache to be entirely rebuilt."
+msgstr "Forceert dat de cache volledig opnieuw wordt opgebouwd."
+
+#: views/pro/opcache.php
+msgid "Check OPcache memory usage, hit rates, and list cached scripts."
+msgstr "Controleer het OPcache-geheugengebruik, de hitrates en maak een lijst van in de cache opgeslagen scripts."
+
+#: views/pro/opcache.php
+msgid "OPcache is not available"
+msgstr "OP-cache is niet beschikbaar"
+
+#: views/pro/opcache.php
+msgid "OPcache extension is installed but disabled."
+msgstr "De OPcache-extensie is geïnstalleerd maar uitgeschakeld."
+
+#: views/pro/opcache.php
+msgid "Cached Scripts"
+msgstr "In cache opgeslagen scripts"
+
+#: views/pro/opcache.php
+msgid "OPcache Directives & Flush Locked"
+msgstr "OPcache Directives & Flush Locked"
+
+#: views/pro/opcache.php
+msgid "Unlock detailed directive audits, JIT acceleration metrics, memory waste analysis, and 1-click OPcache clearing."
+msgstr "Unlock detailed directive audits, JIT acceleration metrics, memory waste analysis, and 1-click OPcache clearing."
+
+#: views/pro/opcache.php
+msgid "Your live hit rate and memory stats above are real — upgrade to manage cache and optimize performance."
+msgstr "Your live hit rate and memory stats above are real — upgrade to manage cache and optimize performance."
+
+#: views/pro/opcache.php
+msgid "Key Directives"
+msgstr "Belangrijke richtlijnen"
+
+#: views/pro/snapshots.php
+#: views/pro/opcache.php
+msgid "Value"
+msgstr "Waarde"
+
+#: views/pro/opcache.php
+msgid "Forces recompilation of all cached PHP files."
+msgstr "Forceert hercompilatie van alle in de cache opgeslagen PHP-bestanden."
+
+#: views/pro/opcache.php
+msgid "Clear OPcache disabled:"
+msgstr "OPcache wissen uitgeschakeld:"
+
+#: views/pro/permissions.php
+msgid "Scan Limited:"
+msgstr "Scan Limited:"
+
+#: views/pro/permissions.php
+msgid "The scan was truncated at 5,000 files to prevent performance impact. Some files may not have been checked."
+msgstr "The scan was truncated at 5,000 files to prevent performance impact. Some files may not have been checked."
+
+#: views/pro/permissions.php
+msgid "Deep scan of core files, plugins, and themes to detect security risks and auto-update failures."
+msgstr "Diepgaande scan van kernbestanden, plug-ins en thema's om beveiligingsrisico's en mislukte automatische updates te detecteren."
+
+#: views/pro/permissions.php
+msgid "PHP Execution User"
+msgstr "PHP-uitvoeringsgebruiker"
+
+#: views/pro/permissions.php
+msgid "Files Scanned"
+msgstr "Bestanden gescand"
+
+#: views/pro/permissions.php
+msgid "Capped at 5,000 for safety"
+msgstr "Gemaximeerd op 5.000 voor de veiligheid"
+
+#: views/pro/permissions.php
+msgid "Action Required"
+msgstr "Actie vereist"
+
+#: views/pro/permissions.php
+msgid "Secure"
+msgstr "Veilig"
+
+#: views/pro/permissions.php
+msgid "Permission & Ownership Details Locked"
+msgstr "Permission & Ownership Details Locked"
+
+#: views/pro/permissions.php
+msgid "Unlock the exact file paths of 0777 writeable files, ownership mismatches causing update failures, and 1-click SSH chmod/chown fix commands."
+msgstr "Unlock the exact file paths of 0777 writeable files, ownership mismatches causing update failures, and 1-click SSH chmod/chown fix commands."
+
+#: views/pro/permissions.php
+msgid "Your PHP execution user and file scan stats above are real — upgrade to identify vulnerable files."
+msgstr "Your PHP execution user and file scan stats above are real — upgrade to identify vulnerable files."
+
+#: views/pro/permissions.php
+msgid "Filesystem is Secure"
+msgstr "Bestandssysteem is veilig"
+
+#: views/pro/permissions.php
+msgid "No dangerous 777 permissions were found, and file ownership matches the PHP process (meaning native plugin updates will work perfectly)."
+msgstr "Er zijn geen gevaarlijke 777-rechten gevonden en het bestandseigendom komt overeen met het PHP-proces (wat betekent dat native plug-in-updates perfect zullen werken)."
+
+#: views/pro/permissions.php
+msgid "File"
+msgstr "Bestand"
+
+#: views/pro/permissions.php
+msgid "Permissions"
+msgstr "Machtigingen"
+
+#: views/pro/permissions.php
+msgid "Owner"
+msgstr "Eigenaar"
+
+#: views/pro/permissions.php
+msgid "These files or folders are world-writable (777 or 666). Any other user on the server can modify them."
+msgstr "These files or folders are world-writable (777 or 666). Elke andere gebruiker op de server kan deze wijzigen."
+
+#: views/pro/permissions.php
+msgid "Path"
+msgstr "Pad"
+
+#: views/pro/permissions.php
+#: views/pro/update-audit.php
+msgid "Type"
+msgstr "Typ"
+
+#: views/pro/permissions.php
+msgid "Current Owner"
+msgstr "Huidige eigenaar"
+
+#: views/pro/permissions.php
+msgid "Required Owner"
+msgstr "Vereiste eigenaar"
+
+#: views/pro/permissions.php
+msgid "Showing first 20 examples only. Fixing the root folder recursively will solve the rest."
+msgstr "Alleen de eerste 20 voorbeelden worden getoond. Door de hoofdmap recursief te repareren, wordt de rest opgelost."
+
+#: views/pro/permissions.php
+msgid "Log into your server via SSH. Copy and paste the following bash commands to automatically set the correct, secure ownership and permissions for your entire WordPress installation."
+msgstr "Log in op uw server via SSH. Kopieer en plak de volgende bash-opdrachten om automatisch het juiste, veilige eigendom en de machtigingen voor uw gehele WordPress-installatie in te stellen."
+
+#: views/pro/permissions.php
+msgid "chown"
+msgstr "gekauwd"
+
+#: views/pro/permissions.php
+msgid "find"
+msgstr "vinden"
+
+#: views/pro/permissions.php
+msgid "chmod"
+msgstr "chmod"
+
+#: views/pro/report.php
+msgid "Success!"
+msgstr "Success!"
+
+#: views/pro/report.php
+msgid "Your 7-day Pro Trial is now active. All Pro features are unlocked."
+msgstr "Your 7-day Pro Trial is now active. All Pro features are unlocked."
+
+#: views/pro/report.php
+msgid "A single-page server health report — print to PDF or share with clients"
+msgstr "Een serverstatusrapport van één pagina: print naar PDF of deel met klanten"
+
+#: views/pro/report.php
+msgid "White-label"
+msgstr "White-label"
+
+#: views/pro/report.php
+msgid "Print / Save as PDF"
+msgstr "Print / Save as PDF"
+
+#: views/pro/report.php
+msgid "White-Label Branding is an Unlimited Tier Feature"
+msgstr "White-Label Branding is een onbeperkte niveaufunctie"
+
+#: views/pro/report.php
+msgid "Upload your own company logo, set a custom accent color, and hide the \"phpinfo() WP\" branding from client PDF reports."
+msgstr "Upload your own company logo, set a custom accent color, and hide the \"phpinfo() WP\" branding from client PDF reports."
+
+#: views/pro/report.php
+msgid "Upgrade License →"
+msgstr "Licentie upgraden →"
+
+#: views/pro/report.php
+msgid "Report Branding"
+msgstr "Rapporteer branding"
+
+#: views/pro/report.php
+msgid "Customize the report cover and footer with your own brand. Toggle off to restore the default look."
+msgstr "Pas de omslag en voettekst van het rapport aan met uw eigen merk. Schakel uit om het standaard uiterlijk te herstellen."
+
+#: views/pro/report.php
+msgid "Enable white-label"
+msgstr "Schakel whitelabel in"
+
+#: views/pro/report.php
+msgid "Company name"
+msgstr "Bedrijfsnaam"
+
+#: views/pro/report.php
+msgid "Acme Digital Studio"
+msgstr "Acme Digitale Studio"
+
+#: views/pro/report.php
+msgid "Report title"
+msgstr "Titel van rapport"
+
+#: views/pro/report.php
+msgid "Quarterly Site Health Audit"
+msgstr "Driemaandelijkse sitegezondheidsaudit"
+
+#: views/pro/report.php
+msgid "Footer note"
+msgstr "Voettekst"
+
+#: views/pro/report.php
+msgid "Prepared by Acme Digital Studio · support@acme.com"
+msgstr "Opgesteld door Acme Digital Studio · support@acme.com"
+
+#: views/pro/report.php
+msgid "Company logo"
+msgstr "Bedrijfslogo"
+
+#: views/pro/report.php
+msgid "No logo set"
+msgstr "Geen logo ingesteld"
+
+#: views/pro/report.php
+msgid "Accent color"
+msgstr "Accentkleur"
+
+#: views/pro/report.php
+msgid "Save branding"
+msgstr "Bewaar merkvoering"
+
+#: views/pro/report.php
+msgid "Overall Site Health"
+msgstr "Algemene sitegezondheid"
+
+#: views/pro/report.php
+msgid "No critical issues"
+msgstr "Geen kritieke problemen"
+
+#: views/pro/report.php
+msgid "A weighted score across PHP config, security headers, OPcache, SSL, PHP support window, and database health. <strong>Aim for 85+.</strong>"
+msgstr "Een gewogen score voor PHP-configuratie, beveiligingsheaders, OPcache, SSL, PHP-ondersteuningsvenster en databasegezondheid. <strong>Streef naar 85+.</strong>"
+
+#: views/pro/report.php
+msgid "Subscores"
+msgstr "Subscores"
+
+#: views/pro/report.php
+msgid "Full Diagnostics & Action Items Locked"
+msgstr "Full Diagnostics & Action Items Locked"
+
+#: views/pro/report.php
+msgid "Unlock detailed issue breakdowns, security headers, SSL, OPcache, database health, and 1-click auto-fixes."
+msgstr "Unlock detailed issue breakdowns, security headers, SSL, OPcache, database health, and 1-click auto-fixes."
+
+#: views/pro/report.php
+msgid "Your overall score above is real — upgrade to see the exact steps to fix issues."
+msgstr "Your overall score above is real — upgrade to see the exact steps to fix issues."
+
+#: views/pro/report.php
+msgid "Anything here is impacting security, performance, or breaks within the next 90 days."
+msgstr "Alles hier heeft invloed op de beveiliging, prestaties of storingen binnen de komende 90 dagen."
+
+#: views/pro/report.php
+msgid "Tackle these in order. Each card explains why it matters and how to fix it."
+msgstr "Pak deze op volgorde aan. Op elke kaart wordt uitgelegd waarom dit belangrijk is en hoe u dit kunt oplossen."
+
+#: views/pro/report.php
+msgid "Why it matters:"
+msgstr "Waarom het belangrijk is:"
+
+#: views/pro/report.php
+msgid "How to fix:"
+msgstr "Hoe op te lossen:"
+
+#: views/pro/report.php
+msgid "No urgent actions"
+msgstr "Geen dringende acties"
+
+#: views/pro/report.php
+msgid "The site is in good shape. Keep an eye on the subscores above and review again next month."
+msgstr "De site is in goede staat. Houd de bovenstaande subscores in de gaten en bekijk ze volgende maand opnieuw."
+
+#: views/pro/report.php
+msgid "Snapshot"
+msgstr "Momentopname"
+
+#: views/pro/report.php
+msgid "Target 95% +"
+msgstr "Doel 95% +"
+
+#: views/pro/report.php
+msgid "Site configuration"
+msgstr "Siteconfiguratie"
+
+#: views/pro/report.php
+msgid "Pending updates"
+msgstr "Updates in behandeling"
+
+#: views/pro/report.php
+msgid "Backup plugin"
+msgstr "Back-up plug-in"
+
+#: views/pro/report.php
+msgid "Current"
+msgstr "Huidig"
+
+#: views/pro/report.php
+msgid "Recommended"
+msgstr "Aanbevolen"
+
+#: views/pro/report.php
+msgid "Verdict"
+msgstr "Vonnis"
+
+#: views/pro/report.php
+msgid "SSL certificates"
+msgstr "SSL-certificaten"
+
+#: views/pro/report.php
+msgid "Host"
+msgstr "Gastheer"
+
+#: views/pro/ssl.php
+#: views/pro/report.php
+msgid "Issuer"
+msgstr "Uitgever"
+
+#: views/pro/report.php
+msgid "End-of-life"
+msgstr "Einde van de levensduur"
+
+#: views/pro/report.php
+msgid "Total size"
+msgstr "Totale grootte"
+
+#: views/pro/report.php
+msgid "Cron health"
+msgstr "Cron-gezondheid"
+
+#: views/pro/security-headers.php
+msgid "HTTP response header audit — graded against OWASP recommendations"
+msgstr "Audit van HTTP-antwoordheader: beoordeeld op basis van OWASP-aanbevelingen"
+
+#: views/pro/security-headers.php
+msgid "Re-check headers"
+msgstr "Controleer de kopteksten opnieuw"
+
+#: views/pro/security-headers.php
+msgid "cached"
+msgstr "in de cache opgeslagen"
+
+#: views/pro/security-headers.php
+msgid "Security Header Directives & Fixes Locked"
+msgstr "Security Header Directives & Fixes Locked"
+
+#: views/pro/security-headers.php
+msgid "Unlock exact OWASP header recommendations, 1-click .htaccess/nginx snippets, CSP generator, and real-time security alerts."
+msgstr "Unlock exact OWASP header recommendations, 1-click .htaccess/nginx snippets, CSP generator, and real-time security alerts."
+
+#: views/pro/security-headers.php
+msgid "Your security score and header counts above are real — upgrade to get the exact code fixes for missing headers."
+msgstr "Your security score and header counts above are real — upgrade to get the exact code fixes for missing headers."
+
+#: views/pro/security-headers.php
+msgid "not set"
+msgstr "niet ingesteld"
+
+#: views/pro/snapshots.php
+msgid "Track php.ini changes over time. Automatic weekly snapshots run via WP Cron."
+msgstr "Houd php.ini-wijzigingen in de loop van de tijd bij. Automatische wekelijkse snapshots worden uitgevoerd via WP Cron."
+
+#: views/pro/snapshots.php
+msgid "PHP Version Active"
+msgstr "PHP Version Active"
+
+#: views/pro/snapshots.php
+msgid "Tracked Directives"
+msgstr "Tracked Directives"
+
+#: views/pro/snapshots.php
+msgid "directives"
+msgstr "directives"
+
+#: views/pro/snapshots.php
+msgid "Weekly Auto-Backup"
+msgstr "Weekly Auto-Backup"
+
+#: views/pro/snapshots.php
+msgid "Active (Cron)"
+msgstr "Active (Cron)"
+
+#: views/pro/snapshots.php
+msgid "Pro Only"
+msgstr "Pro Only"
+
+#: views/pro/snapshots.php
+msgid "Config Snapshots & Diff Inspector Locked"
+msgstr "Config Snapshots & Diff Inspector Locked"
+
+#: views/pro/snapshots.php
+msgid "Unlock automated weekly configuration backups, visual side-by-side diff tool, silent PHP drift detection, and historical rollback logs."
+msgstr "Unlock automated weekly configuration backups, visual side-by-side diff tool, silent PHP drift detection, and historical rollback logs."
+
+#: views/pro/snapshots.php
+msgid "Your active PHP directives and runtime values above are live — upgrade to take snapshots and detect drift."
+msgstr "Your active PHP directives and runtime values above are live — upgrade to take snapshots and detect drift."
+
+#: views/pro/snapshots.php
+msgid "Take Snapshot Now"
+msgstr "Maak nu een momentopname"
+
+#: views/pro/snapshots.php
+msgid "Label (optional)"
+msgstr "Etiket (optioneel)"
+
+#: views/pro/snapshots.php
+msgid "Take Snapshot"
+msgstr "Maak een momentopname"
+
+#: views/pro/snapshots.php
+msgid "Compare Two Snapshots"
+msgstr "Vergelijk twee momentopnamen"
+
+#: views/pro/snapshots.php
+msgid "From (older)"
+msgstr "Van (ouder)"
+
+#: views/pro/snapshots.php
+msgid "To (newer)"
+msgstr "Naar (nieuwer)"
+
+#: views/pro/snapshots.php
+msgid "Compare →"
+msgstr "Vergelijk →"
+
+#: views/pro/snapshots.php
+msgid "No changes detected between these two snapshots."
+msgstr "Er zijn geen wijzigingen gedetecteerd tussen deze twee momentopnamen."
+
+#: views/pro/snapshots.php
+msgid "Change"
+msgstr "Verandering"
+
+#: views/pro/snapshots.php
+msgid "Old Value"
+msgstr "Oude waarde"
+
+#: views/pro/snapshots.php
+msgid "New Value"
+msgstr "Nieuwe waarde"
+
+#: views/pro/snapshots.php
+msgid "No snapshots yet. Take one above — weekly auto-snapshots will accumulate here over time."
+msgstr "Nog geen momentopnames. Neem er één hierboven: wekelijkse automatische momentopnamen zullen zich hier in de loop van de tijd ophopen."
+
+#: views/pro/snapshots.php
+msgid "Label"
+msgstr "Etiket"
+
+#: views/pro/snapshots.php
+msgid "Created"
+msgstr "Gemaakt"
+
+#: views/pro/ssl.php
+msgid "Monitor SSL validity, expiration dates, and domain name mismatches."
+msgstr "Controleer de SSL-geldigheid, vervaldatums en niet-overeenkomende domeinnamen."
+
+#: views/pro/ssl.php
+msgid "ERROR"
+msgstr "FOUT"
+
+#: views/pro/ssl.php
+msgid "days left"
+msgstr "dagen over"
+
+#: views/pro/ssl.php
+msgid "Issued"
+msgstr "Uitgegeven"
+
+#: views/pro/ssl.php
+msgid "CN"
+msgstr "CN"
+
+#: views/pro/ssl.php
+msgid "SANs"
+msgstr "SAN's"
+
+#: views/pro/ssl.php
+msgid "Multi-Domain SSL Monitoring Locked"
+msgstr "Multi-Domain SSL Monitoring Locked"
+
+#: views/pro/ssl.php
+msgid "Unlock unlimited domain monitoring, automatic 14/7/1-day email & webhook expiry alerts, and SANs coverage validation."
+msgstr "Unlock unlimited domain monitoring, automatic 14/7/1-day email & webhook expiry alerts, and SANs coverage validation."
+
+#: views/pro/ssl.php
+msgid "Your primary certificate status above is real — upgrade to add multi-domain tracking and automated alerts."
+msgstr "Your primary certificate status above is real — upgrade to add multi-domain tracking and automated alerts."
+
+#: views/pro/ssl.php
+msgid "Re-check all certificates"
+msgstr "Controleer alle certificaten opnieuw"
+
+#: views/pro/ssl.php
+msgid "Results cached for 6 hours."
+msgstr "Resultaten in cache gedurende 6 uur."
+
+#: views/pro/ssl.php
+msgid "Monitor Additional Domains"
+msgstr "Bewaak extra domeinen"
+
+#: views/pro/ssl.php
+msgid "client-a.com&#10;client-b.com&#10;staging.mysite.com"
+msgstr "client-a.com&#10;client-b.com&#10;staging.mysite.com"
+
+#: views/pro/ssl.php
+msgid "Save Domains"
+msgstr "Domeinen opslaan"
+
+#: views/pro/support.php
+msgid "Technical Support & Diagnostics"
+msgstr "Technische ondersteuning en diagnostiek"
+
+#: views/pro/support.php
+msgid "VIP PRO"
+msgstr "VIP PRO"
+
+#: views/pro/support.php
+msgid "Need help or looking to fix server bottlenecks immediately? Our technical team and one-click tools are here for you."
+msgstr "Need help or looking to fix server bottlenecks immediately? Our technical team and one-click tools are here for you."
+
+#: views/pro/support.php
+msgid "Live Environment Signals:"
+msgstr "Live Environment Signals:"
+
+#: views/pro/support.php
+msgid "PHP errors logged today"
+msgstr "PHP errors logged today"
+
+#: views/pro/support.php
+msgid "0 PHP errors today"
+msgstr "0 PHP errors today"
+
+#: views/pro/support.php
+msgid "System Information"
+msgstr "Systeeminformatie"
+
+#: views/pro/support.php
+msgid "Real-time server environment specs. Copy and attach this when requesting technical support or debugging server issues."
+msgstr "Real-time server environment specs. Copy and attach this when requesting technical support or debugging server issues."
+
+#: views/pro/support.php
+msgid "Copy System Info"
+msgstr "Systeeminformatie kopiëren"
+
+#: views/pro/support.php
+msgid "Instant 1-Click Solutions (No Waiting)"
+msgstr "Instant 1-Click Solutions (No Waiting)"
+
+#: views/pro/support.php
+msgid "Over 85% of support requests can be resolved immediately without waiting for a reply:"
+msgstr "Over 85% of support requests can be resolved immediately without waiting for a reply:"
+
+#: views/pro/support.php
+msgid "Memory Exhausted?"
+msgstr "Memory Exhausted?"
+
+#: views/pro/support.php
+msgid "1-Click raise in PHP Config Editor"
+msgstr "1-Click raise in PHP Config Editor"
+
+#: views/pro/support.php
+msgid "Security Headers F?"
+msgstr "Security Headers F?"
+
+#: views/pro/support.php
+msgid "Auto-inject 6 OWASP headers"
+msgstr "Auto-inject 6 OWASP headers"
+
+#: views/pro/support.php
+msgid "500 Fatal Error?"
+msgstr "500 Fatal Error?"
+
+#: views/pro/support.php
+msgid "Live error log with stack traces"
+msgstr "Live error log with stack traces"
+
+#: views/pro/support.php
+msgid "Script Timeouts?"
+msgstr "Script Timeouts?"
+
+#: views/pro/support.php
+msgid "Extend max_execution_time"
+msgstr "Extend max_execution_time"
+
+#: views/pro/support.php
+msgid "Unlock Priority 1-on-1 Engineer Support"
+msgstr "Unlock Priority 1-on-1 Engineer Support"
+
+#: views/pro/support.php
+msgid "Get direct private email ticket support, <24-hour response SLA (including weekends), and expert server troubleshooting from our core engineers."
+msgstr "Get direct private email ticket support, <24-hour response SLA (including weekends), and expert server troubleshooting from our core engineers."
+
+#: views/pro/support.php
+msgid "Unlock Pro Support ($29/yr) &rarr;"
+msgstr "Unlock Pro Support ($29/yr) &rarr;"
+
+#: views/pro/support.php
+msgid "Contact Priority Support"
+msgstr "Contact Priority Support"
+
+#: views/pro/support.php
+msgid "As a Pro user, you get priority email support. If you are experiencing a bug, need help configuring the plugin, or have a feature request, please open a ticket. We usually reply within an hour on weekdays and weekends."
+msgstr "As a Pro user, you get priority email support. If you are experiencing a bug, need help configuring the plugin, or have a feature request, please open a ticket. We usually reply within an hour on weekdays and weekends."
+
+#: views/pro/support.php
+msgid "Open a Support Ticket &rarr;"
+msgstr "Open a Support Ticket &rarr;"
+
+#: views/pro/support.php
+msgid "Agency & Client Sites"
+msgstr "Agency & Client Sites"
+
+#: views/pro/support.php
+msgid "Upgrade to Unlimited & White-Label Reports"
+msgstr "Upgrade to Unlimited & White-Label Reports"
+
+#: views/pro/support.php
+msgid "Managing client websites? Upgrade to Unlimited or Lifetime to unlock White-Label PDF Reports (your own agency logo & colors), multi-site license keys, and VIP 1-hour weekend response."
+msgstr "Managing client websites? Upgrade to Unlimited or Lifetime to unlock White-Label PDF Reports (your own agency logo & colors), multi-site license keys, and VIP 1-hour weekend response."
+
+#: views/pro/support.php
+msgid "Upgrade to Unlimited / Lifetime &rarr;"
+msgstr "Upgrade to Unlimited / Lifetime &rarr;"
+
+#: views/pro/update-audit.php
+msgid "Safe to update"
+msgstr "Safe to update"
+
+#: views/pro/update-audit.php
+msgid "Update with caution"
+msgstr "Update with caution"
+
+#: views/pro/update-audit.php
+msgid "Risky — review first"
+msgstr "Risky — review first"
+
+#: views/pro/update-audit.php
+msgid "Pre & Post Update Security Suite"
+msgstr "Pre & Post Update Security Suite"
+
+#: views/pro/update-audit.php
+msgid "Eliminate staging site complexity. Audit pending plugin/theme updates, test WordPress core jumps for breakages, and auto-verify site health after every update."
+msgstr "Eliminate staging site complexity. Audit pending plugin/theme updates, test WordPress core jumps for breakages, and auto-verify site health after every update."
+
+#: views/pro/update-audit.php
+msgid "Plugins & Themes Guard"
+msgstr "Plugins & Themes Guard"
+
+#: views/pro/update-audit.php
+msgid "WordPress Core Audit"
+msgstr "WordPress Core Audit"
+
+#: views/pro/update-audit.php
+msgid "Update History & Health"
+msgstr "Update History & Health"
+
+#: views/pro/update-audit.php
+msgid "Free:"
+msgstr "Gratis:"
+
+#: views/pro/update-audit.php
+msgid "Pro"
+msgstr "Pro"
+
+#: views/pro/update-audit.php
+msgid "Pending Updates Compatibility Scan"
+msgstr "Pending Updates Compatibility Scan"
+
+#: views/pro/update-audit.php
+msgid "Scans %d pending plugin and theme update(s) before you apply them."
+msgstr "Scans %d pending plugin and theme update(s) before you apply them."
+
+#: views/pro/update-audit.php
+msgid "Scan Pending Updates"
+msgstr "Scan Pending Updates"
+
+#: views/pro/update-audit.php
+msgid "Clear"
+msgstr "Duidelijk"
+
+#: views/pro/update-audit.php
+msgid "All plugins and themes are up to date!"
+msgstr "All plugins and themes are up to date!"
+
+#: views/pro/update-audit.php
+msgid "No pending updates detected. When new updates arrive, return here to scan them for breaking changes before updating."
+msgstr "No pending updates detected. When new updates arrive, return here to scan them for breaking changes before updating."
+
+#: views/pro/update-audit.php
+msgid "Ready to scan pending updates"
+msgstr "Ready to scan pending updates"
+
+#: views/pro/update-audit.php
+msgid "You have %d pending update(s). Click \"Scan Pending Updates\" to evaluate PHP/WP compatibility, changelog risks, and stability scores."
+msgstr "You have %d pending update(s). Click \"Scan Pending Updates\" to evaluate PHP/WP compatibility, changelog risks, and stability scores."
+
+#: views/pro/update-audit.php
+msgid "%d pending update(s) analyzed"
+msgstr "%d pending update(s) analyzed"
+
+#: views/pro/update-audit.php
+msgid "risky"
+msgstr "risky"
+
+#: views/pro/update-audit.php
+msgid "caution"
+msgstr "caution"
+
+#: views/pro/update-audit.php
+msgid "safe"
+msgstr "safe"
+
+#: views/pro/update-audit.php
+msgid "No pending plugin or theme updates found."
+msgstr "No pending plugin or theme updates found."
+
+#: views/pro/update-audit.php
+msgid "Calculated from past update health checks on this site"
+msgstr "Calculated from past update health checks on this site"
+
+#: views/pro/update-audit.php
+msgid "Stability: %d%%"
+msgstr "Stability: %d%%"
+
+#: views/pro/update-audit.php
+msgid "No breaking changes or requirement conflicts detected."
+msgstr "No breaking changes or requirement conflicts detected."
+
+#: views/pro/update-audit.php
+msgid "WordPress Core Readiness Audit"
+msgstr "WordPress Core Readiness Audit"
+
+#: views/pro/update-audit.php
+msgid "Static code scan for deprecated WP core APIs, removed jQuery methods, and plugin compatibility gaps."
+msgstr "Static code scan for deprecated WP core APIs, removed jQuery methods, and plugin compatibility gaps."
+
+#: views/pro/update-audit.php
+msgid "Target Core:"
+msgstr "Target Core:"
+
+#: views/pro/update-audit.php
+msgid "Run Core Audit"
+msgstr "Run Core Audit"
+
+#: views/pro/update-audit.php
+msgid "No core audit yet"
+msgstr "No core audit yet"
+
+#: views/pro/update-audit.php
+msgid "Set the target WordPress version and click \"Run Core Audit\"."
+msgstr "Set the target WordPress version and click \"Run Core Audit\"."
+
+#: views/pro/update-audit.php
+msgid "Scans plugin & theme code on your server. Takes 10–60 seconds."
+msgstr "Scans plugin & theme code on your server. Takes 10–60 seconds."
+
+#: views/pro/update-audit.php
+msgid "hard break(s)"
+msgstr "hard break(s)"
+
+#: views/pro/update-audit.php
+msgid "deprecation(s)"
+msgstr "deprecation(s)"
+
+#: views/pro/update-audit.php
+msgid "flagged"
+msgstr "flagged"
+
+#: views/pro/update-audit.php
+msgid "files in"
+msgstr "files in"
+
+#: views/pro/update-audit.php
+msgid "Scan hit the %d-file limit. Some files were skipped."
+msgstr "Scan hit the %d-file limit. Some files were skipped."
+
+#: views/pro/update-audit.php
+msgid "Pro raises cap to 8,000 files."
+msgstr "Pro raises cap to 8,000 files."
+
+#: views/pro/update-audit.php
+msgid "jQuery Migrate is loaded on this site"
+msgstr "jQuery Migrate is loaded on this site"
+
+#: views/pro/update-audit.php
+msgid "Removed jQuery APIs are downgraded to deprecation warnings rather than breaking."
+msgstr "Removed jQuery APIs are downgraded to deprecation warnings rather than breaking."
+
+#: views/pro/update-audit.php
+msgid "jQuery Migrate is not loaded"
+msgstr "jQuery Migrate is not loaded"
+
+#: views/pro/update-audit.php
+msgid "Calls to removed jQuery APIs will fail on WordPress 5.7+."
+msgstr "Calls to removed jQuery APIs will fail on WordPress 5.7+."
+
+#: views/pro/update-audit.php
+msgid "No plugins or themes detected in the scan roots."
+msgstr "Er zijn geen plug-ins of thema's gedetecteerd in de scanroots."
+
+#: views/pro/update-audit.php
+msgid "metadata risk"
+msgstr "metadata-risico"
+
+#: views/pro/update-audit.php
+msgid "Not on WordPress.org (premium/custom)"
+msgstr "Not on WordPress.org (premium/custom)"
+
+#: views/pro/update-audit.php
+msgid "new on this update"
+msgstr "nieuw in deze update"
+
+#: views/pro/update-audit.php
+msgid "unlock full drill-down with Pro →"
+msgstr "unlock full drill-down with Pro →"
+
+#: views/pro/update-audit.php
+msgid "Update History & Post-Update Health Checks"
+msgstr "Update History & Post-Update Health Checks"
+
+#: views/pro/update-audit.php
+msgid "Automatic health checks execute 60 seconds after every plugin, theme, and core update to verify site stability."
+msgstr "Automatic health checks execute 60 seconds after every plugin, theme, and core update to verify site stability."
+
+#: views/pro/update-audit.php
+msgid "Run Live Health Check"
+msgstr "Run Live Health Check"
+
+#: views/pro/update-audit.php
+msgid "Clear all update history records?"
+msgstr "Clear all update history records?"
+
+#: views/pro/update-audit.php
+msgid "Clear History"
+msgstr "Clear History"
+
+#: views/pro/update-audit.php
+msgid "Live Diagnostic Health Results:"
+msgstr "Live Diagnostic Health Results:"
+
+#: views/pro/update-audit.php
+msgid "No update history recorded yet"
+msgstr "No update history recorded yet"
+
+#: views/pro/update-audit.php
+msgid "Update Guard automatically captures updates when you upgrade plugins, themes, or WordPress core and tests site health 60s later."
+msgstr "Update Guard automatically captures updates when you upgrade plugins, themes, or WordPress core and tests site health 60s later."
+
+#: views/pro/update-audit.php
+msgid "Date & Time"
+msgstr "Date & Time"
+
+#: views/pro/update-audit.php
+msgid "Component / Upgrade"
+msgstr "Component / Upgrade"
+
+#: views/pro/update-audit.php
+msgid "Post-Health"
+msgstr "Post-Health"
+
+#: views/pro/update-audit.php
+msgid "Stability Rating"
+msgstr "Stability Rating"
+
+#: views/pro/upgrade.php
+msgid "Upgrade to phpinfo() WP Pro"
+msgstr "Upgrade naar phpinfo() WP Pro"
+
+#: views/pro/upgrade.php
+msgid "The WordPress server health audit you can hand to clients."
+msgstr "De WordPress-servergezondheidsaudit die u aan klanten kunt overhandigen."
+
+#: views/pro/upgrade.php
+msgid "Choose your plan"
+msgstr "Kies uw abonnement"
+
+#: views/pro/upgrade.php
+msgid "Every plan unlocks <strong>every feature above</strong> — the only difference is the number of sites and update window."
+msgstr "Every plan unlocks <strong>every feature above</strong> — the only difference is the number of sites and update window."
+
+#: views/pro/upgrade.php
+msgid "Single"
+msgstr "Enkel"
+
+#: views/pro/upgrade.php
+msgid "1 site · Essential features · Branded reports"
+msgstr "1 site · Essentiële functies · Merkrapporten"
+
+#: views/pro/upgrade.php
+msgid "Unlimited sites · White-labeled · Weekly digests"
+msgstr "Onbeperkt aantal sites · White-label · Wekelijkse samenvattingen"
+
+#: views/pro/upgrade.php
+msgid "Best value"
+msgstr "Beste waarde"
+
+#: views/pro/upgrade.php
+msgid "Unlimited sites · Lifetime updates · White-labeled"
+msgstr "Onbeperkt aantal sites · Levenslange updates · White-label"
+
+#: views/pro/upgrade.php
+msgid "14-day money-back guarantee · Instant delivery · Site-locked license"
+msgstr "14 dagen geld-terug-garantie · Directe levering · Site-locked licentie"
+
+#: views/safemode.php
+msgid "Troubleshooting Mode"
+msgstr "Modus voor probleemoplossing"
+
+#: views/safemode.php
+msgid "Safely disable plugins or revert to a default theme <strong>just for your own admin session</strong> to debug\n"
+"                conflicts. Visitors see the site normally. Everything is reversible — no plugin is ever deactivated in the\n"
+"                database. Session expires automatically; you can also exit any time."
+msgstr "Safely disable plugins or revert to a default theme <strong>just for your own admin session</strong> to debug\n"
+"                conflicts. Visitors see the site normally. Everything is reversible — no plugin is ever deactivated in the\n"
+"                database. Session expires automatically; you can also exit any time."
+
+#: views/safemode.php
+msgid "remaining"
+msgstr "overgebleven"
+
+#: views/safemode.php
+msgid "Plugins disabled in this session"
+msgstr "Plug-ins uitgeschakeld in deze sessie"
+
+#: views/safemode.php
+msgid "Plugin"
+msgstr "Plug-in"
+
+#: views/safemode.php
+msgid "Status in DB"
+msgstr "Status in DB"
+
+#: views/safemode.php
+msgid "Cookie is bound to your user account, time-limited, and expires automatically."
+msgstr "Cookie is gebonden aan uw gebruikersaccount, is beperkt in de tijd en verloopt automatisch."
+
+#: views/safemode.php
+msgid "Every page has an explicit <em>End</em> button. You cannot lock yourself out."
+msgstr "Elke pagina heeft een expliciete knop <em>Einde</em>. Je kunt jezelf niet buitensluiten."
+
+#: views/safemode.php
+msgid "Other visitors are unaffected — they see the live site with all plugins active."
+msgstr "Andere bezoekers hebben hier geen last van: zij zien de live site met alle plug-ins actief."
+
+#: views/safemode.php
+msgid "Request-Level Isolation Recommended"
+msgstr "Isolatie op verzoekniveau aanbevolen"
+
+#: views/safemode.php
+msgid "Uninstall Helper"
+msgstr "Helper verwijderen"
+
+#: views/safemode.php
+msgid "Pick what to disable"
+msgstr "Kies wat u wilt uitschakelen"
+
+#: views/safemode.php
+msgid "Active"
+msgstr "Actief"
+
+#: views/safemode.php
+msgid "Inactive"
+msgstr "Inactief"
+
+#: views/safemode.php
+msgid "Revert your session to a default theme to verify if a layout conflict is originating from your current theme."
+msgstr "Zet uw sessie terug naar een standaardthema om te verifiëren of een lay-outconflict afkomstig is van uw huidige thema."
+
+#: views/safemode.php
+msgid "Select how long you want Troubleshooting Mode to remain active before automatically expiring."
+msgstr "Selecteer hoe lang u wilt dat de probleemoplossingsmodus actief blijft voordat deze automatisch verloopt."
+
+#: views/safemode.php
+msgid "15 minutes"
+msgstr "15 minuten"
+
+#: views/safemode.php
+msgid "30 minutes"
+msgstr "30 minuten"
+
+#: views/safemode.php
+msgid "1 hour (recommended)"
+msgstr "1 uur (aanbevolen)"
+
+#: views/safemode.php
+msgid "2 hours"
+msgstr "2 uur"
+
+#: views/safemode.php
+msgid "4 hours (max)"
+msgstr "4 uur (max.)"
+
+#: views/safemode.php
+msgid "Select at least one plugin to enable the button"
+msgstr "Selecteer ten minste één plug-in om de knop in te schakelen"
+
+#: views/safemode.php
+msgid "Conflict resolved!"
+msgstr "Conflict resolved!"
+
+#: views/safemode.php
+msgid "Pro's Update Guard automatically intercepts updates and warns you about version incompatibilities before you activate them. Never experience another broken dashboard."
+msgstr "Pro's Update Guard automatically intercepts updates and warns you about version incompatibilities before you activate them. Never experience another broken dashboard."
+
+#: views/safemode.php
+msgid "Explore Pro Security"
+msgstr "Explore Pro Security"

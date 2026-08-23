@@ -3,7 +3,7 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.1
-Stable tag: 7.2.6
+Stable tag: 7.2.7
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -20,7 +20,7 @@ Betrachten Sie es als das offizielle **„Health Check & Troubleshooting“-Plug
 
 * **phpinfo()-Viewer**: Sauber, durchsuchbar und modern (die ursprüngliche Funktion, komplett neu gestaltet).
 * **Hostfreundlicher Kompatibilitätsscanner**: Scannen Sie alle Plugins und Themes vor dem Upgrade auf PHP-Versionskonflikte und funktionieren Sie auch auf streng verwalteten Hosts reibungslos.
-* **Update Guard**: Vorschau der Kern-Upgrade-Stabilität. Erkennen Sie veraltete Aufrufe und entfernte APIs, um eine eindeutige „Sicher“, „Vorsicht“ oder „Risiko“-Bewertung zu erhalten, bevor Sie auf „Aktualisieren“ klicken.
+* **Update Guard**: Vollständige Sicherheits-Suite vor und nach Aktualisierungen. Prüfen Sie die Core-Upgrade-Stabilität, scannen Sie anstehende Plugin-/Theme-Updates auf Inkompatibilitäten und überprüfen Sie den Website-Zustand 60 Sekunden nach jedem Update automatisch.
 * **Fehlerbehebung ohne Ausfallzeiten**: Beheben Sie Theme- und Plugin-Konflikte sicher in Ihrer eigenen Admin-Sitzung, ohne Besucher oder Live-Verkäufe zu beeinträchtigen.
 * **PHP EOL-Zeitleiste**: End-of-Life-Datum, aktueller Status und verbleibende Tage jeder PHP-Version.
 * **Config Grader-Zusammenfassung**: Gesamtnote A–F Ihrer PHP-Konfiguration im Vergleich zu den Best Practices von WordPress.
@@ -37,7 +37,7 @@ Betrachten Sie es als das offizielle **„Health Check & Troubleshooting“-Plug
 
 * **1-Klick-Auto-Fix mit Rollback**: Beheben Sie Konfigurationsprobleme sofort. Schreibt Optimierungsregeln in .htaccess oder .user.ini und setzt sie automatisch zurück, wenn der Server auf einen 500-Fehler stößt.
 * **PHP-Prüfung vor dem Update**: Scannen Sie Plugin-Updates vor dem Upgrade, um sicherzustellen, dass sie keine PHP-Version erfordern, die Sie nicht haben.
-* **Update Guard Pro**: Automatisches Abfangen auf der Seite „WordPress-Updates“, Warnmeldungen über den aktuellen Stand, Warnmeldungen zu Abbrüchen, von der KI geschriebene Korrekturschritte und vollständige zeilenweise Überprüfung.
+* **Update Guard Pro**: Automatisches Abfangen auf der Seite „WordPress-Updates“, Risikobewertung von Changelog-Änderungen, Warnmeldungen zu verwaisten Plugins, automatische 60-Sekunden-Zustandsprüfungen nach Updates (Loopback, Fehlerprotokoll, Cron) und von der KI geschriebene Korrekturschritte.
 * **Konfigurations-Snapshots**: Wöchentliche automatische Snapshots jeder php.ini-Direktive mit visuellen Unterschieden.
 * **Security Headers Auditor**: Bewerten Sie Ihre HTTP-Antwortheader (CSP, HSTS, X-Frame-Optionen) mit Korrekturvorschlägen.
 * **Webserver-Snippet-Bibliothek**: Optimierte Nginx- und Apache-Konfigurationsblöcke für Caching, Sicherheit und Blockierung fehlerhafter Bots, mit 1-Klick-Injection für Apache und LiteSpeed.
@@ -155,6 +155,22 @@ Ja. Im Gegensatz zu Scannern, die auf PHP_CodeSniffer oder die Funktion „exec(
 7. Audit Report (Pro): single-page white-label PDF you can hand to clients.
 
 == Changelog ==
+
+= 7.2.7 =
+* **Funktion**: Erweiterter Update Guard — Kompatibilitätsscans vor dem Update für Plugins & Themes (PHP/WP-Anforderungen, Changelog-Risikoanalyse, Erkennung verwaister Plugins), automatische 60-Sekunden-Zustandsprüfungen nach Updates (Loopback, Admin-Erreichbarkeit, Fehlerprotokolldelta, Cron-Integrität) und Stabilitätsbewertung hinzugefügt.
+* **Behoben**: Admin-Seiten-Slugs wurden in `piwp-*` umbenannt, um 403-Forbidden-Fehlalarme durch 8G/7G-Firewalls, BBQ und LiteSpeed-Regeln zu verhindern, die den Begriff `phpinfo` blockieren. Besonderer Dank geht an **Simon Richards** für das Entdecken und Melden dieses Problems.
+* **Verbesserung**: Nahtlose AJAX-Lizenzaktivierung und -deaktivierung mit direkter Validierung und Ladeanzeige hinzugefügt.
+* **Verbesserung**: Technischer Support und Serverdiagnose für alle Benutzer mit Live-Umgebungssignalen zugänglich gemacht.
+* **Behoben**: Vertikale Ausrichtung des Schaltflächentextes auf den Admin-Seiten korrigiert.
+* **Behoben**: Leerzeichenformatierung und Zeilenumbruch im PHP-Fehlerprotokoll-Viewer korrigiert.
+
+= 7.2.6 =
+* **Kompatibilität**: Getestet bis WordPress 7.1.
+
+= 7.2.5 =
+* **Verbessert**: Preiserhöhungserinnerung für den Single-Site-Plan zum 31. August.
+* **Verbessert**: Upgrade-Aufforderungen zeigen nun reale Konfigurationsprobleme Ihrer Website an.
+* **Verbessert**: Visuelle Optimierungen der Admin-Oberfläche.
 
 = 7.2.4 =
 * **NEU**: Vollständige visuelle Plugin-Lokalisierung und Übersetzungsdateien für Französisch, Deutsch, Spanisch, Italienisch und Niederländisch.

@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $is_pro          = Phpinfo_WP_License::is_valid();
 $is_free_preview = !$is_pro;
@@ -25,7 +26,7 @@ foreach ($stats as $host => $data) {
     <div class="phpinfowp-page-header" style="display:flex; justify-content:space-between; align-items:center;">
         <div>
             <h1>API Monitor <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
-            <p class="phpinfowp-page-subtitle"><?php _e('Track slow outbound API requests that silently block page loads (last 24 hours).', 'phpinfo-wp'); ?></p>
+            <p class="phpinfowp-page-subtitle"><?php _e('Track slow outbound API requests that silently block page loads (last 24 hours). This monitor runs globally in the background across all frontend and admin traffic.', 'phpinfo-wp'); ?></p>
         </div>
         <?php if ($is_pro && $stats): ?>
             <button id="phpinfowp-clear-api-stats" class="button button-secondary"><?php _e('Reset Stats', 'phpinfo-wp'); ?></button>

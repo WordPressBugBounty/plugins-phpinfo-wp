@@ -125,6 +125,9 @@ class Phpinfo_WP_License {
         $last_check = (int) get_option(self::OPT_LAST_CHECK, 0);
         if (time() - $last_check > DAY_IN_SECONDS) {
             if (!wp_next_scheduled('phpinfowp_license_ping_async')) {
+                // Note: wp_schedule_single_event with time() runs on the NEXT page load, not immediately.
+                // If WP Cron is disabled via DISABLE_WP_CRON and no system cron is configured,
+                // this event may never fire. Local validation handles the fallback gracefully.
                 wp_schedule_single_event(time(), 'phpinfowp_license_ping_async');
             }
         }
@@ -234,9 +237,56 @@ class Phpinfo_WP_License {
 
     // --- Remote verification ---
 
+    public static function ajax_activate(): void {
+        check_ajax_referer('phpinfowp_license_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized permission.', 'piwp')], 403);
+        }
+
+        $key = sanitize_text_field(trim($_POST['license_key'] ?? ''));
+        if (empty($key)) {
+            wp_send_json_error(['message' => __('Please enter a valid license key.', 'piwp')], 400);
+        }
+
+        $reason = '';
+        $ok = self::activate($key, $reason);
+
+        if ($ok) {
+            wp_send_json_success([
+                'message' => __('License activated successfully. Pro features are now unlocked.', 'piwp'),
+            ]);
+        } else {
+            if ($reason === 'site_limit_exceeded') {
+                $msg = __('Activation failed: This license has reached its maximum site limit. Upgrade your license or deactivate another site.', 'piwp');
+            } elseif (in_array($reason, ['revoked', 'refunded', 'disputed'], true)) {
+                $msg = __('Activation failed: This license has been revoked or refunded. Contact support@exeebit.com.', 'piwp');
+            } elseif ($reason === 'expired') {
+                $msg = __('Activation failed: This license has expired. Please renew your license to continue using Pro features.', 'piwp');
+            } else {
+                $msg = __('License key invalid, expired, or unrecognised. If you just purchased, allow a moment for activation to propagate, then try again.', 'piwp');
+            }
+            wp_send_json_error(['message' => $msg], 400);
+        }
+    }
+
+    public static function ajax_deactivate(): void {
+        check_ajax_referer('phpinfowp_license_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized permission.', 'piwp')], 403);
+        }
+
+        self::deactivate();
+        delete_option('phpinfowp_free_trial_expires');
+        delete_option('phpinfowp_free_trial_email');
+
+        wp_send_json_success([
+            'message' => __('License deactivated. Pro features are disabled.', 'piwp'),
+        ]);
+    }
+
     public static function check_remote(string $key): array {
         $resp = wp_remote_post(self::PING_URL, [
-            'timeout' => 12,
+            'timeout' => 8,
             'body'    => [
                 'license_key' => $key,
                 'site_url'    => get_site_url(),
@@ -310,17 +360,4 @@ class Phpinfo_WP_License {
         }
     }
 
-    // --- Key generator (server-side helper, called from licensing plugin) ---
-
-    public static function generate_key(string $email, string $site_url, int $expiry_ts): string {
-        $payload = json_encode([
-            'email' => $email,
-            'url'   => rtrim(strtolower($site_url), '/'),
-            'exp'   => $expiry_ts,
-            'iat'   => time(),
-        ]);
-        $b64 = rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
-        $sig = substr(hash_hmac('sha256', $b64, self::_hmac_secret()), 0, 32);
-        return "PIWP-{$b64}-{$sig}";
-    }
 }

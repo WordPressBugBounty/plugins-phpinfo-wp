@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $is_valid  = Phpinfo_WP_License::is_valid();
 $is_locked = Phpinfo_WP_License::is_locked();
@@ -259,26 +260,105 @@ $pillars = [
                 document.addEventListener('keydown', function (e) {
                     if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
                 });
-                confirm.addEventListener('click', function () { form.submit(); });
+                confirm.addEventListener('click', function () {
+                    confirm.disabled = true;
+                    confirm.innerHTML = '<?php echo esc_js(__('Deactivating...', 'phpinfo-wp')); ?>';
+
+                    var data = new FormData();
+                    data.append('action', 'phpinfowp_deactivate_license');
+                    data.append('nonce', '<?php echo wp_create_nonce('phpinfowp_license_nonce'); ?>');
+
+                    fetch(ajaxurl, {
+                        method: 'POST',
+                        body: data
+                    })
+                    .then(function() {
+                        window.location.reload();
+                    })
+                    .catch(function() {
+                        form.submit();
+                    });
+                });
             }());
             </script>
         <?php else: ?>
-            <form method="post" class="phpinfowp-license-form">
-                <?php wp_nonce_field('phpinfowp_license_nonce'); ?>
+            <form id="phpinfowp-license-activate-form" method="post" class="phpinfowp-license-form">
+                <?php wp_nonce_field('phpinfowp_license_nonce', 'phpinfowp_license_nonce'); ?>
                 <input type="hidden" name="phpinfowp_license_action" value="activate">
+                <div id="phpinfowp-license-ajax-msg" style="display:none;margin-bottom:14px;"></div>
                 <label for="license_key" class="phpinfowp-license-input-label"><?php _e('Enter your license key', 'phpinfo-wp'); ?></label>
                 <div class="phpinfowp-license-input-row">
                     <input type="text" id="license_key" name="license_key"
                            placeholder="<?php echo esc_attr__('PIWP-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'phpinfo-wp'); ?>"
                            autocomplete="off" spellcheck="false"
                            value="<?php echo esc_attr($key); ?>">
-                    <button type="submit" class="button button-primary"><?php _e('Activate', 'phpinfo-wp'); ?></button>
+                    <button type="submit" id="phpinfowp-license-activate-btn" class="button button-primary"><?php _e('Activate', 'phpinfo-wp'); ?></button>
                 </div>
                 <p class="description" style="margin-top:10px">
                     This site: <strong><?php echo esc_html(get_site_url()); ?></strong><br>
                     Don't have a license? <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank"><?php _e('Get phpinfo() WP Pro →', 'phpinfo-wp'); ?></a>
                 </p>
             </form>
+
+            <script>
+            (function() {
+                var form = document.getElementById('phpinfowp-license-activate-form');
+                if (!form) return;
+                var btn = document.getElementById('phpinfowp-license-activate-btn');
+                var input = document.getElementById('license_key');
+                var msgBox = document.getElementById('phpinfowp-license-ajax-msg');
+
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var key = (input.value || '').trim();
+                    if (!key) {
+                        input.focus();
+                        return;
+                    }
+
+                    var origText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="dashicons dashicons-update phpinfowp-spin" style="margin-right:6px;font-size:16px;width:16px;height:16px;vertical-align:middle;animation:phpinfowp-spin 1s linear infinite;"></span> <?php echo esc_js(__('Verifying...', 'phpinfo-wp')); ?>';
+                    msgBox.style.display = 'none';
+
+                    var data = new FormData();
+                    data.append('action', 'phpinfowp_activate_license');
+                    data.append('license_key', key);
+                    data.append('nonce', '<?php echo wp_create_nonce('phpinfowp_license_nonce'); ?>');
+
+                    fetch(ajaxurl, {
+                        method: 'POST',
+                        body: data
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(res) {
+                        if (res && res.success) {
+                            msgBox.className = 'notice notice-success inline';
+                            msgBox.innerHTML = '<p><strong>✅ ' + (res.data.message || '<?php echo esc_js(__('License activated!', 'phpinfo-wp')); ?>') + '</strong> <?php echo esc_js(__('Reloading page...', 'phpinfo-wp')); ?></p>';
+                            msgBox.style.display = 'block';
+                            btn.innerHTML = '✓ <?php echo esc_js(__('Activated', 'phpinfo-wp')); ?>';
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 800);
+                        } else {
+                            var errMsg = (res && res.data && res.data.message) ? res.data.message : '<?php echo esc_js(__('Activation failed. Please check your key.', 'phpinfo-wp')); ?>';
+                            msgBox.className = 'notice notice-error inline';
+                            msgBox.innerHTML = '<p>' + errMsg + '</p>';
+                            msgBox.style.display = 'block';
+                            btn.disabled = false;
+                            btn.innerHTML = origText;
+                        }
+                    })
+                    .catch(function() {
+                        msgBox.className = 'notice notice-error inline';
+                        msgBox.innerHTML = '<p><?php echo esc_js(__('Connection error. Please try again.', 'phpinfo-wp')); ?></p>';
+                        msgBox.style.display = 'block';
+                        btn.disabled = false;
+                        btn.innerHTML = origText;
+                    });
+                });
+            })();
+            </script>
         <?php endif; ?>
     </div>
 

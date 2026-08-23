@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $is_pro          = Phpinfo_WP_License::is_valid();
 $is_free_preview = !$is_pro;
@@ -35,7 +36,7 @@ if ($is_pro && isset($_POST['phpinfowp_snap_action']) && check_admin_referer('ph
 }
 
 $snapshots    = $is_pro ? Phpinfo_WP_Snapshots::list(50) : [];
-$current_caps = Phpinfo_WP_Snapshots::capture();
+$current_caps = $is_pro ? Phpinfo_WP_Snapshots::capture() : [];
 $view_snap    = null;
 $view_snap_id = (int) ($_GET['snap_view'] ?? 0);
 if ($is_pro && $view_snap_id > 0) {
@@ -199,7 +200,7 @@ if ($is_pro && $view_snap_id > 0) {
             <div style="margin-top:24px;padding:20px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;max-width:720px">
                 <h2 style="margin-top:0">
                     Snapshot #<?php echo esc_html($view_snap->id); ?>: <?php echo esc_html($view_snap->label); ?>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-snapshots')); ?>" class="button button-small" style="margin-left:12px;vertical-align:middle">← Back</a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-snapshots')); ?>" class="button button-small" style="margin-left:12px;vertical-align:middle">← Back</a>
                 </h2>
                 <p style="font-size:12px;color:#666;margin-top:-12px"><?php echo esc_html($view_snap->created_at); ?> UTC</p>
                 <table class="wp-list-table widefat fixed striped">
@@ -230,7 +231,7 @@ if ($is_pro && $view_snap_id > 0) {
                         <td><?php echo esc_html($s->label); ?></td>
                         <td><?php echo esc_html($s->created_at); ?> UTC</td>
                         <td style="display:flex;gap:6px;flex-wrap:wrap">
-                            <a href="<?php echo esc_url(admin_url('admin.php?page=phpinfowp-snapshots&snap_view=' . $s->id)); ?>"
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-snapshots&snap_view=' . $s->id)); ?>"
                                class="button button-small">View</a>
                             <form method="post" style="display:inline" onsubmit="return confirm('Delete this snapshot?')">
                                 <?php wp_nonce_field('phpinfowp_snap_nonce'); ?>

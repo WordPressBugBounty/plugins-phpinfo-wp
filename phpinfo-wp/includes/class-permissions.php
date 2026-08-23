@@ -22,6 +22,7 @@ class Phpinfo_WP_Permissions {
             'dangerous' => [],
             'mismatch'  => [],
             'scanned'   => 0,
+            'truncated' => false,
             'wp_config' => null,
             'php_uid'   => $php_uid,
             'php_user'  => self::get_php_user(),
@@ -61,7 +62,10 @@ class Phpinfo_WP_Permissions {
             );
 
             foreach ($iterator as $file) {
-                if ($results['scanned'] >= $limit) break 2;
+                if ($results['scanned'] >= $limit) {
+                    $results['truncated'] = true;
+                    break 2;
+                }
                 
                 $results['scanned']++;
                 $path = $file->getPathname();

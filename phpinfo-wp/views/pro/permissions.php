@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $is_pro          = Phpinfo_WP_License::is_valid();
 $is_free_preview = !$is_pro;
@@ -13,11 +14,17 @@ $mismatch  = $scan_results['mismatch'];
 $scanned   = $scan_results['scanned'];
 $php_user  = $scan_results['php_user'];
 $php_uid   = $scan_results['php_uid'];
+$truncated = $scan_results['truncated'] ?? false;
 
 $has_issues = !empty($dangerous) || !empty($mismatch) || ($wp_config && $wp_config['is_dangerous']);
 ?>
 
 <div class="phpinfowp-pro-page">
+    <?php if ($truncated): ?>
+        <div style="background:#fff3cd; color:#856404; padding:12px 16px; border-left:4px solid #ffeeba; margin-bottom:24px; border-radius:0 4px 4px 0; font-size:14px;">
+            <strong><?php _e('Scan Limited:', 'phpinfo-wp'); ?></strong> <?php _e('The scan was truncated at 5,000 files to prevent performance impact. Some files may not have been checked.', 'phpinfo-wp'); ?>
+        </div>
+    <?php endif; ?>
     <div class="phpinfowp-page-header">
         <div>
             <h1>Permissions & Ownership Auditor <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>

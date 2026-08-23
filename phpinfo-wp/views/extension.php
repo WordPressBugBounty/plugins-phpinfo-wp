@@ -1,5 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
+if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'));
 
 $loaded = get_loaded_extensions();
 sort($loaded, SORT_STRING | SORT_FLAG_CASE);

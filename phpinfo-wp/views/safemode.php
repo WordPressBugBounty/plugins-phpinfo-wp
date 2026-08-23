@@ -17,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = 'started';
         $start_result = $result;
         // Redirect so the new cookie/transient applies on the next request
-        wp_safe_redirect(add_query_arg(['safemode' => 'started'], admin_url('admin.php?page=phpinfowp-safemode')));
+        wp_safe_redirect(add_query_arg(['safemode' => 'started'], admin_url('admin.php?page=piwp-safemode')));
         exit;
     }
     if (isset($_POST['phpinfowp_safemode_stop']) && check_admin_referer('phpinfowp_safemode_stop_nonce')) {
         Phpinfo_WP_Safemode::stop();
-        wp_safe_redirect(add_query_arg(['safemode' => 'stopped'], admin_url('admin.php?page=phpinfowp-safemode')));
+        wp_safe_redirect(add_query_arg(['safemode' => 'stopped'], admin_url('admin.php?page=piwp-safemode')));
         exit;
     }
     if (isset($_POST['phpinfowp_safemode_remove_mu']) && check_admin_referer('phpinfowp_safemode_remove_mu_nonce')) {
@@ -572,7 +572,7 @@ jQuery(document).ready(function($) {
         if ($(e.target).hasClass('phpinfowp-success-modal') || $(e.target).hasClass('phpinfowp-success-modal-close')) {
             $modal.removeClass('is-open');
             if (window.history && window.history.replaceState) {
-                var url = window.location.href.split('?')[0] + '?page=phpinfowp-safemode';
+                var url = window.location.href.split('?')[0] + '?page=piwp-safemode';
                 window.history.replaceState({}, document.title, url);
             }
         }

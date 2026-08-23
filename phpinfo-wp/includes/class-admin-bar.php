@@ -53,14 +53,14 @@ class Phpinfo_WP_Admin_Bar {
             'parent' => $status['issues'] ? 'phpinfowp-server' : 'phpinfowp-indicator',
             'id'     => 'phpinfowp-php',
             'title'  => 'PHP ' . PHP_VERSION,
-            'href'   => admin_url('admin.php?page=phpinfowp-viewer'),
+            'href'   => admin_url('admin.php?page=piwp-viewer'),
         ]);
 
         $bar->add_node([
             'parent' => $status['issues'] ? 'phpinfowp-server' : 'phpinfowp-indicator',
             'id'     => 'phpinfowp-mem',
             'title'  => self::memory_label($status['memory']),
-            'href'   => admin_url('admin.php?page=phpinfowp-info'),
+            'href'   => admin_url('admin.php?page=piwp-info'),
         ]);
 
         if ($status['is_pro'] && $status['opcache']) {
@@ -68,9 +68,9 @@ class Phpinfo_WP_Admin_Bar {
             $arrow = $oc['delta'] < -5 ? ' ↓' : '';
             $bar->add_node([
                 'parent' => $status['issues'] ? 'phpinfowp-server' : 'phpinfowp-indicator',
-                'id'     => 'phpinfowp-opcache',
+                'id'     => 'piwp-opcache',
                 'title'  => 'OPcache: ' . $oc['hit_rate'] . '%' . $arrow,
-                'href'   => admin_url('admin.php?page=phpinfowp-opcache'),
+                'href'   => admin_url('admin.php?page=piwp-opcache'),
             ]);
         }
 
@@ -80,7 +80,7 @@ class Phpinfo_WP_Admin_Bar {
                 'parent' => $status['issues'] ? 'phpinfowp-server' : 'phpinfowp-indicator',
                 'id'     => 'phpinfowp-streak',
                 'title'  => '✓ Healthy for ' . $status['streak_days'] . ' days',
-                'href'   => admin_url('admin.php?page=phpinfowp-config-grader'),
+                'href'   => admin_url('admin.php?page=piwp-config-grader'),
             ]);
         }
 
@@ -88,7 +88,7 @@ class Phpinfo_WP_Admin_Bar {
             $bar->add_node([
                 'parent' => $status['issues'] ? 'phpinfowp-server' : 'phpinfowp-indicator',
                 'id'     => 'phpinfowp-upgrade',
-                'title'  => '★ Unlock SSL · headers · cron alerts',
+                'title'  => '⚡ Unlock 1-Click Fixes & Pro ($29/yr) →',
                 'href'   => 'https://exeebit.com/phpinfo-wp#pricing',
                 'meta'   => ['target' => '_blank'],
             ]);
@@ -111,7 +111,7 @@ class Phpinfo_WP_Admin_Bar {
                 'level'   => 'critical',
                 'label'   => 'PHP ' . $eol['minor'] . ' EOL',
                 'detail'  => 'EOL ' . $eol['eol'] . ' — past',
-                'href'    => admin_url('admin.php?page=phpinfowp-eol'),
+                'href'    => admin_url('admin.php?page=piwp-eol'),
                 'sort'    => 0,
             ];
         } elseif ($eol['status'] === 'warning') {
@@ -119,8 +119,20 @@ class Phpinfo_WP_Admin_Bar {
                 'level'   => 'warning',
                 'label'   => 'EOL ' . $eol['days'] . 'd',
                 'detail'  => 'PHP ' . $eol['minor'] . ' EOL ' . $eol['eol'],
-                'href'    => admin_url('admin.php?page=phpinfowp-eol'),
+                'href'    => admin_url('admin.php?page=piwp-eol'),
                 'sort'    => 10,
+            ];
+        }
+
+        // --- Config Grader (Fails / warnings) ---
+        if ($grader && ($grader['fails'] ?? 0) > 0) {
+            $fails = (int) $grader['fails'];
+            $issues[] = [
+                'level'  => $fails >= 3 ? 'critical' : 'warning',
+                'label'  => $fails . ' config issue' . ($fails === 1 ? '' : 's'),
+                'detail' => 'Grade ' . ($grader['grade'] ?? 'F') . ' (' . $fails . ' failing checks) — 1-Click Fix',
+                'href'   => admin_url('admin.php?page=piwp-config-grader'),
+                'sort'   => 12,
             ];
         }
 
@@ -130,8 +142,8 @@ class Phpinfo_WP_Admin_Bar {
             $issues[] = [
                 'level'  => $err_count >= 100 ? 'critical' : 'warning',
                 'label'  => $err_count . ' error' . ($err_count === 1 ? '' : 's') . ' today',
-                'detail' => $err_count . ' PHP error log entries today',
-                'href'   => admin_url('admin.php?page=phpinfowp-error-log'),
+                'detail' => $err_count . ' PHP errors logged — Inspect in Live Viewer',
+                'href'   => admin_url('admin.php?page=piwp-error-log'),
                 'sort'   => 30,
             ];
         }
@@ -153,21 +165,21 @@ class Phpinfo_WP_Admin_Bar {
                     $issues[] = [
                         'level' => 'critical', 'label' => 'SSL expired (' . $h . ')',
                         'detail' => $h . ' expired ' . abs($d) . 'd ago',
-                        'href' => admin_url('admin.php?page=phpinfowp-ssl'),
+                        'href' => admin_url('admin.php?page=piwp-ssl'),
                         'sort' => 1,
                     ];
                 } elseif ($d < 7) {
                     $issues[] = [
                         'level' => 'critical', 'label' => 'SSL ' . $d . 'd (' . $h . ')',
                         'detail' => $h . ' expires in ' . $d . ' days',
-                        'href' => admin_url('admin.php?page=phpinfowp-ssl'),
+                        'href' => admin_url('admin.php?page=piwp-ssl'),
                         'sort' => 2,
                     ];
                 } elseif ($d < 30) {
                     $issues[] = [
                         'level' => 'warning', 'label' => 'SSL ' . $d . 'd',
                         'detail' => $h . ' expires in ' . $d . ' days',
-                        'href' => admin_url('admin.php?page=phpinfowp-ssl'),
+                        'href' => admin_url('admin.php?page=piwp-ssl'),
                         'sort' => 15,
                     ];
                 }
@@ -180,14 +192,14 @@ class Phpinfo_WP_Admin_Bar {
                     $issues[] = [
                         'level' => 'critical', 'label' => 'WP-Cron disabled',
                         'detail' => 'DISABLE_WP_CRON is true — scheduled tasks will not run',
-                        'href' => admin_url('admin.php?page=phpinfowp-cron'),
+                        'href' => admin_url('admin.php?page=piwp-cron'),
                         'sort' => 3,
                     ];
                 } elseif (!empty($cron['overdue'])) {
                     $issues[] = [
                         'level' => 'warning', 'label' => $cron['overdue'] . ' cron overdue',
                         'detail' => $cron['overdue'] . ' scheduled events past due',
-                        'href' => admin_url('admin.php?page=phpinfowp-cron'),
+                        'href' => admin_url('admin.php?page=piwp-cron'),
                         'sort' => 20,
                     ];
                 }
@@ -195,7 +207,7 @@ class Phpinfo_WP_Admin_Bar {
                     $issues[] = [
                         'level' => 'warning', 'label' => $cron['orphan'] . ' orphan cron',
                         'detail' => $cron['orphan'] . ' events with no registered callback',
-                        'href' => admin_url('admin.php?page=phpinfowp-cron'),
+                        'href' => admin_url('admin.php?page=piwp-cron'),
                         'sort' => 25,
                     ];
                 }
@@ -208,8 +220,8 @@ class Phpinfo_WP_Admin_Bar {
                 if (in_array($g, ['F', 'D'], true)) {
                     $issues[] = [
                         'level' => 'warning', 'label' => 'Headers ' . $g,
-                        'detail' => 'Security headers score: ' . ($hdr_cache['score'] ?? '?') . '/100',
-                        'href' => admin_url('admin.php?page=phpinfowp-security-headers'),
+                        'detail' => 'Score: ' . ($hdr_cache['score'] ?? 0) . '/100 — 1-Click Generate',
+                        'href' => admin_url('admin.php?page=piwp-security-headers'),
                         'sort' => 22,
                     ];
                 }
@@ -230,14 +242,14 @@ class Phpinfo_WP_Admin_Bar {
                     $issues[] = [
                         'level' => 'critical', 'label' => 'OPcache full',
                         'detail' => 'Cache is full — increase opcache.memory_consumption',
-                        'href' => admin_url('admin.php?page=phpinfowp-opcache'),
+                        'href' => admin_url('admin.php?page=piwp-opcache'),
                         'sort' => 4,
                     ];
                 } elseif ($delta < -15) {
                     $issues[] = [
                         'level' => 'warning', 'label' => 'OPcache ↓ ' . round($delta) . '%',
                         'detail' => 'Hit rate ' . $oc['hit_rate'] . '% vs baseline ' . $baseline . '%',
-                        'href' => admin_url('admin.php?page=phpinfowp-opcache'),
+                        'href' => admin_url('admin.php?page=piwp-opcache'),
                         'sort' => 28,
                     ];
                 }
@@ -254,7 +266,7 @@ class Phpinfo_WP_Admin_Bar {
                         $issues[] = [
                             'level' => 'warning', 'label' => $n . ' config change' . ($n === 1 ? '' : 's'),
                             'detail' => 'php.ini drift since last weekly snapshot',
-                            'href' => admin_url('admin.php?page=phpinfowp-snapshots'),
+                            'href' => admin_url('admin.php?page=piwp-snapshots'),
                             'sort' => 26,
                         ];
                     }
@@ -343,7 +355,7 @@ class Phpinfo_WP_Admin_Bar {
 
     private static function primary_href(array $s): string {
         if ($s['issues']) return $s['issues'][0]['href'];
-        return admin_url('admin.php?page=phpinfowp-config-grader');
+        return admin_url('admin.php?page=piwp-config-grader');
     }
 
     private static function issue_row(array $issue): string {

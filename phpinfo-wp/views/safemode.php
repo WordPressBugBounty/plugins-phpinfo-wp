@@ -6,33 +6,10 @@ if (!current_user_can('manage_options')) wp_die('Insufficient permissions.');
 $notice = '';
 $action = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['phpinfowp_safemode_start']) && check_admin_referer('phpinfowp_safemode_start_nonce')) {
-        $disabled = isset($_POST['disable']) && is_array($_POST['disable'])
-            ? array_map('sanitize_text_field', (array) $_POST['disable'])
-            : [];
-        $disable_theme = !empty($_POST['disable_theme']);
-        $duration = (int) ($_POST['duration'] ?? Phpinfo_WP_Safemode::DEFAULT_DURATION);
-        $result = Phpinfo_WP_Safemode::start($disabled, $disable_theme, $duration);
-        $action = 'started';
-        $start_result = $result;
-        // Redirect so the new cookie/transient applies on the next request
-        wp_safe_redirect(add_query_arg(['safemode' => 'started'], admin_url('admin.php?page=piwp-safemode')));
-        exit;
-    }
-    if (isset($_POST['phpinfowp_safemode_stop']) && check_admin_referer('phpinfowp_safemode_stop_nonce')) {
-        Phpinfo_WP_Safemode::stop();
-        wp_safe_redirect(add_query_arg(['safemode' => 'stopped'], admin_url('admin.php?page=piwp-safemode')));
-        exit;
-    }
-    if (isset($_POST['phpinfowp_safemode_remove_mu']) && check_admin_referer('phpinfowp_safemode_remove_mu_nonce')) {
-        $ok = Phpinfo_WP_Safemode::uninstall_mu_plugin();
-        $notice = $ok ? 'mu-plugin removed.' : 'Could not remove mu-plugin (check file permissions).';
-    }
-}
-
 if (isset($_GET['safemode']) && $_GET['safemode'] === 'started') $notice = 'Troubleshooting Mode engaged — only your admin session sees plugins disabled. The site is normal for other visitors.';
 if (isset($_GET['safemode']) && $_GET['safemode'] === 'stopped') $notice = 'Troubleshooting Mode ended. All plugins restored.';
+if (isset($_GET['safemode']) && $_GET['safemode'] === 'mu_removed') $notice = 'mu-plugin removed.';
+if (isset($_GET['safemode']) && $_GET['safemode'] === 'mu_failed') $notice = 'Could not remove mu-plugin (check file permissions).';
 
 $is_pro = Phpinfo_WP_License::is_valid();
 $show_success_modal = isset($_GET['safemode']) && $_GET['safemode'] === 'stopped' && !$is_pro;
@@ -201,22 +178,25 @@ $active_plugins = (array) get_option('active_plugins', []);
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1><?php _e('Troubleshooting Mode', 'phpinfo-wp'); ?></h1>
-            <p class="phpinfowp-page-subtitle"><?php _e('Safely disable plugins or revert to a default theme <strong>just for your own admin session</strong> to debug
-                conflicts. Visitors see the site normally. Everything is reversible — no plugin is ever deactivated in the
-                database. Session expires automatically; you can also exit any time.', 'phpinfo-wp'); ?></p>
+            <h1>
+                <?php _e('Troubleshooting Mode', 'phpinfo-wp'); ?>
+                <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Safely disable plugins or switch themes just for your admin session to debug conflicts. Visitors see the site normally.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
+            </h1>
         </div>
     </div>
 
     <!-- Notices bar -->
     <?php if ($notice): ?>
-        <div class="phpinfowp-custom-alert" style="background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #22c55e;">
+        <div class="phpinfowp-custom-alert" style="background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #22c55e; padding:12px 16px; margin-bottom:20px; border-radius:4px; display:flex; align-items:center; gap:8px;">
             <span class="dashicons dashicons-yes" style="color: #22c55e; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0;"></span>
-            <p style="color: #166534; font-weight: 500;"><?php echo esc_html($notice); ?></p>
+            <p style="color: #166534; font-weight: 500; margin: 0;"><?php echo esc_html($notice); ?></p>
         </div>
     <?php endif; ?>
 
     <!-- Switch rendering based on active status -->
+    <div style="display:flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 0; max-width: 780px;">
+
     <?php if ($is_active): ?>
         <?php
             $remaining = max(0, $session['expires'] - time());
@@ -313,82 +293,6 @@ $active_plugins = (array) get_option('active_plugins', []);
 
     <?php else: ?>
 
-        <!-- Difference Feature Grid -->
-        <div class="phpinfowp-diff-box" style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:24px; margin-bottom:28px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-            <div style="font-size:16px; font-weight:700; color:#0f172a; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
-                <span class="dashicons dashicons-info" style="color:#777BB3; font-size:20px; width:20px; height:20px;"></span>
-                How this differs from the official Health Check plugin
-            </div>
-            <div class="phpinfowp-diff-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px;">
-                <!-- Item 1 -->
-                <div class="phpinfowp-diff-item" style="border:1px solid #f1f5f9; background:#f8fafc; border-radius:8px; padding:16px; transition: all 0.2s ease;">
-                    <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#1e293b; font-size:13px; margin-bottom:6px;">
-                        <span class="dashicons dashicons-shield-alt" style="color:#10b981; font-size:16px; width:16px; height:16px;"></span>
-                        Safe DB Sandbox
-                    </div>
-                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;">
-                        The actual <code>active_plugins</code> option is never modified — your site cannot be left broken.
-                    </div>
-                </div>
-                <!-- Item 2 -->
-                <div class="phpinfowp-diff-item" style="border:1px solid #f1f5f9; background:#f8fafc; border-radius:8px; padding:16px; transition: all 0.2s ease;">
-                    <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#1e293b; font-size:13px; margin-bottom:6px;">
-                        <span class="dashicons dashicons-lock" style="color:#3b82f6; font-size:16px; width:16px; height:16px;"></span>
-                        Session Bound
-                    </div>
-                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;"><?php _e('Cookie is bound to your user account, time-limited, and expires automatically.', 'phpinfo-wp'); ?></div>
-                </div>
-                <!-- Item 3 -->
-                <div class="phpinfowp-diff-item" style="border:1px solid #f1f5f9; background:#f8fafc; border-radius:8px; padding:16px; transition: all 0.2s ease;">
-                    <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#1e293b; font-size:13px; margin-bottom:6px;">
-                        <span class="dashicons dashicons-dismiss" style="color:#ef4444; font-size:16px; width:16px; height:16px;"></span>
-                        No Lockouts
-                    </div>
-                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;"><?php _e('Every page has an explicit <em>End</em> button. You cannot lock yourself out.', 'phpinfo-wp'); ?></div>
-                </div>
-                <!-- Item 4 -->
-                <div class="phpinfowp-diff-item" style="border:1px solid #f1f5f9; background:#f8fafc; border-radius:8px; padding:16px; transition: all 0.2s ease;">
-                    <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#1e293b; font-size:13px; margin-bottom:6px;">
-                        <span class="dashicons dashicons-groups" style="color:#8b5cf6; font-size:16px; width:16px; height:16px;"></span>
-                        Zero Visitor Impact
-                    </div>
-                    <div style="font-size:12.5px; color:#64748b; line-height:1.5;"><?php _e('Other visitors are unaffected — they see the live site with all plugins active.', 'phpinfo-wp'); ?></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Installation Status warning helper -->
-        <?php if (!$mu_present): ?>
-            <div class="phpinfowp-custom-alert" style="background:#eff6ff; border:1px solid #bfdbfe; border-left:4px solid #3b82f6; border-radius:8px; padding:16px 20px; margin-bottom:24px; display:flex; gap:12px; align-items:flex-start;">
-                <span class="dashicons dashicons-info-outline" style="color:#3b82f6; font-size:20px; width:20px; height:20px; flex-shrink:0; margin-top:2px;"></span>
-                <div>
-                    <strong style="color:#1e3a8a; font-size:13.5px; display:block; margin-bottom:4px;"><?php _e('Request-Level Isolation Recommended', 'phpinfo-wp'); ?></strong>
-                    <p style="margin:0; font-size:13px; color:#1e40af; line-height:1.5;">
-                        The optional <code>mu-plugin</code> helper isn't installed yet. Without it, disabled plugins are only hidden in the <em>admin panel and AJAX requests</em>, but will run normally on frontend pages. 
-                        Engaging Troubleshooting Mode will attempt to install it automatically; if your directory is write-protected, it will fallback to admin-only isolation.
-                    </p>
-                </div>
-            </div>
-        <?php else: ?>
-            <div class="phpinfowp-custom-alert" style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span class="dashicons dashicons-yes-alt" style="color:#10b981; font-size:18px; width:18px; height:18px;"></span>
-                    <span style="font-size:13px; color:#166534; font-weight:600;">
-                        ✓ Full Request-Level Isolation Available
-                    </span>
-                    <span style="font-size:12px; color:#4b5563; font-family:monospace; background:#f3f4f6; padding:2px 6px; border-radius:4px; border:1px solid #e5e7eb; margin-left:4px;">
-                        mu-plugins/<?php echo esc_html(Phpinfo_WP_Safemode::MU_FILE); ?>
-                    </span>
-                </div>
-                <form method="post" style="display:inline; margin:0;">
-                    <?php wp_nonce_field('phpinfowp_safemode_remove_mu_nonce'); ?>
-                    <input type="hidden" name="phpinfowp_safemode_remove_mu" value="1">
-                    <button type="submit" class="phpinfowp-btn phpinfowp-btn-danger" style="padding:4px 10px; font-size:11.5px; border-radius:4px;"
-                            onclick="return confirm('Remove the helper mu-plugin? Troubleshooting Mode will fallback to admin-only isolation.')"><?php _e('Uninstall Helper', 'phpinfo-wp'); ?></button>
-                </form>
-            </div>
-        <?php endif; ?>
-
         <!-- Form Setup -->
         <form method="post">
             <?php wp_nonce_field('phpinfowp_safemode_start_nonce'); ?>
@@ -460,7 +364,7 @@ $active_plugins = (array) get_option('active_plugins', []);
                     Session Duration
                 </h2>
                 <p style="margin:0 0 12px; font-size:12.5px; color:#64748b; line-height:1.4;"><?php _e('Select how long you want Troubleshooting Mode to remain active before automatically expiring.', 'phpinfo-wp'); ?></p>
-                <select name="duration" style="min-width:240px; padding:8px 12px; border-radius:6px; border:1px solid #cbd5e1; font-size:13px; background:#fff; color:#334155; outline:none;">
+                <select name="duration" style="min-width:240px; padding:8px 36px 8px 12px; border-radius:6px; border:1px solid #cbd5e1; font-size:13px; color:#334155; outline:none; -webkit-appearance:none; appearance:none; background:#fff url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E') no-repeat right 12px center;">
                     <option value="900"><?php _e('15 minutes', 'phpinfo-wp'); ?></option>
                     <option value="1800"><?php _e('30 minutes', 'phpinfo-wp'); ?></option>
                     <option value="3600" selected><?php _e('1 hour (recommended)', 'phpinfo-wp'); ?></option>
@@ -505,6 +409,70 @@ $active_plugins = (array) get_option('active_plugins', []);
         </script>
 
     <?php endif; ?>
+
+        </div>
+        <div style="flex: 0 0 320px; width: 100%;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,0.01);">
+                <div style="font-size:14px; font-weight:800; color:#0f172a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px;">
+                    <?php _e('Health Check vs Safe Sandbox', 'phpinfo-wp'); ?>
+                </div>
+                <div style="font-size:13px; line-height:1.5; color:#475569; display:flex; flex-direction:column; gap:16px;">
+                    <div>
+                        <strong style="color:#0f172a; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                            <span class="dashicons dashicons-shield" style="color:#3b82f6;"></span>
+                            <?php _e('Safe DB Sandbox', 'phpinfo-wp'); ?>
+                        </strong>
+                        <div style="margin-left:26px;">
+                            <?php _e('The actual active_plugins DB table is never modified — site cannot be left broken.', 'phpinfo-wp'); ?>
+                        </div>
+                    </div>
+                    <div>
+                        <strong style="color:#0f172a; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                            <span class="dashicons dashicons-lock" style="color:#f59e0b;"></span>
+                            <?php _e('Session Bound', 'phpinfo-wp'); ?>
+                        </strong>
+                        <div style="margin-left:26px;">
+                            <?php _e('Scoped strictly to your admin user account & auto-expires.', 'phpinfo-wp'); ?>
+                        </div>
+                    </div>
+                    <div>
+                        <strong style="color:#0f172a; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                            <span class="dashicons dashicons-no-alt" style="color:#ef4444;"></span>
+                            <?php _e('No Lockouts', 'phpinfo-wp'); ?>
+                        </strong>
+                        <div style="margin-left:26px;">
+                            <?php _e('Explicit End button on every page prevents admin lockout.', 'phpinfo-wp'); ?>
+                        </div>
+                    </div>
+                    <div>
+                        <strong style="color:#0f172a; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                            <span class="dashicons dashicons-groups" style="color:#0ea5e9;"></span>
+                            <?php _e('Zero Visitor Impact', 'phpinfo-wp'); ?>
+                        </strong>
+                        <div style="margin-left:26px;">
+                            <?php _e('Public visitors see the live site normally with all plugins running.', 'phpinfo-wp'); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <?php if ($mu_present): ?>
+                <div style="display:flex; align-items:center; justify-content:space-between; font-size:12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:10px 14px; margin-top:16px;">
+                    <span style="color:#166534; font-weight:600;"><?php _e('mu-plugin helper active', 'phpinfo-wp'); ?></span>
+                    <form method="post" style="margin:0;">
+                        <?php wp_nonce_field('phpinfowp_safemode_remove_mu_nonce'); ?>
+                        <input type="hidden" name="phpinfowp_safemode_remove_mu" value="1">
+                        <button type="submit" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:12px; text-decoration:underline; padding:0;"
+                            data-confirm="<?php esc_attr_e('Remove the helper mu-plugin? Troubleshooting Mode will fallback to admin-only isolation.', 'phpinfo-wp'); ?>"
+                            data-confirm-title="<?php esc_attr_e('Remove Helper MU-Plugin', 'phpinfo-wp'); ?>"
+                            data-confirm-btn="<?php esc_attr_e('Remove Helper', 'phpinfo-wp'); ?>">
+                            <?php _e('Remove', 'phpinfo-wp'); ?>
+                        </button>
+                    </form>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <?php if ($show_success_modal): ?>

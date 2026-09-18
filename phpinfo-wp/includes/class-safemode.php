@@ -31,6 +31,8 @@ class Phpinfo_WP_Safemode {
     const MU_FILE            = 'phpinfowp-safemode.php';
 
     public static function register(): void {
+        add_action('admin_init', [self::class, 'handle_post_requests']);
+
         // Apply filters from main plugin too — covers admin pages even when
         // the mu-plugin isn't installed. The mu-plugin gives full coverage.
         $token = self::current_token();
@@ -59,6 +61,35 @@ class Phpinfo_WP_Safemode {
         add_action('wp_logout', [self::class, 'stop']);
     }
 
+    public static function handle_post_requests(): void {
+        if (!is_admin() || !isset($_GET['page']) || $_GET['page'] !== 'piwp-safemode') {
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['phpinfowp_safemode_start']) && check_admin_referer('phpinfowp_safemode_start_nonce')) {
+                $disabled = isset($_POST['disable']) && is_array($_POST['disable'])
+                    ? array_map('sanitize_text_field', (array) $_POST['disable'])
+                    : [];
+                $disable_theme = !empty($_POST['disable_theme']);
+                $duration = (int) ($_POST['duration'] ?? self::DEFAULT_DURATION);
+                self::start($disabled, $disable_theme, $duration);
+                wp_safe_redirect(add_query_arg(['safemode' => 'started'], admin_url('admin.php?page=piwp-safemode')));
+                exit;
+            }
+            if (isset($_POST['phpinfowp_safemode_stop']) && check_admin_referer('phpinfowp_safemode_stop_nonce')) {
+                self::stop();
+                wp_safe_redirect(add_query_arg(['safemode' => 'stopped'], admin_url('admin.php?page=piwp-safemode')));
+                exit;
+            }
+            if (isset($_POST['phpinfowp_safemode_remove_mu']) && check_admin_referer('phpinfowp_safemode_remove_mu_nonce')) {
+                $ok = self::uninstall_mu_plugin();
+                wp_safe_redirect(add_query_arg(['safemode' => $ok ? 'mu_removed' : 'mu_failed'], admin_url('admin.php?page=piwp-safemode')));
+                exit;
+            }
+        }
+    }
+
     // -- Session lifecycle -------------------------------------------------
 
     public static function start(array $disabled_plugins, bool $disable_theme = false, int $duration = self::DEFAULT_DURATION): array {
@@ -82,6 +113,21 @@ class Phpinfo_WP_Safemode {
         self::set_cookie($token, $session['expires']);
 
         $mu = self::install_mu_plugin();
+
+        if (class_exists('Phpinfo_WP_Activity_Log')) {
+            Phpinfo_WP_Activity_Log::log(
+                'server',
+                'safemode_started',
+                __('Started Troubleshooting Mode session', 'phpinfo-wp'),
+                [
+                    'disabled_plugins' => count($session['disabled_plugins']),
+                    'theme_disabled'   => $disable_theme,
+                    'duration_hours'   => round($duration / 3600, 1),
+                ],
+                'warning'
+            );
+        }
+
         return ['ok' => true, 'token' => $token, 'mu' => $mu, 'session' => $session];
     }
 
@@ -90,6 +136,16 @@ class Phpinfo_WP_Safemode {
         if ($token) delete_transient(self::TRANSIENT_PREFIX . $token);
         self::clear_cookie();
         unset($GLOBALS['phpinfowp_safemode_session']);
+
+        if (class_exists('Phpinfo_WP_Activity_Log')) {
+            Phpinfo_WP_Activity_Log::log(
+                'server',
+                'safemode_stopped',
+                __('Ended Troubleshooting Mode session', 'phpinfo-wp'),
+                [],
+                'info'
+            );
+        }
     }
 
     public static function is_active(): bool {

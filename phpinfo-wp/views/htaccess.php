@@ -49,28 +49,32 @@ $snippet_server = $is_nginx ? 'nginx' : 'apache'; // LiteSpeed uses Apache synta
 
 $snippets = [
     'gzip' => [
-        'title' => 'Aggressive GZIP / Brotli Compression',
-        'desc'  => 'Compresses HTML, CSS, JS, and JSON before sending it to the browser. Massively reduces page size and improves TTFB.',
-        'apache'=> "<IfModule mod_deflate.c>\n    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json\n</IfModule>",
-        'nginx' => "gzip on;\ngzip_comp_level 5;\ngzip_min_length 256;\ngzip_proxied any;\ngzip_vary on;\ngzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;"
+        'title'       => 'Aggressive GZIP / Brotli Compression',
+        'short_title' => 'Aggressive GZIP',
+        'desc'        => 'Compresses HTML, CSS, JS, and JSON before sending it to the browser. Massively reduces page size and improves TTFB.',
+        'apache'      => "<IfModule mod_deflate.c>\n    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json\n</IfModule>",
+        'nginx'       => "gzip on;\ngzip_comp_level 5;\ngzip_min_length 256;\ngzip_proxied any;\ngzip_vary on;\ngzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;"
     ],
     'browser_cache' => [
-        'title' => 'Browser Caching (Expires Headers)',
-        'desc'  => 'Instructs browsers to save static assets (images, fonts, css) locally for 1 year, drastically speeding up repeat visits.',
-        'apache'=> "<IfModule mod_expires.c>\n    ExpiresActive On\n    ExpiresByType image/jpg \"access 1 year\"\n    ExpiresByType image/jpeg \"access 1 year\"\n    ExpiresByType image/gif \"access 1 year\"\n    ExpiresByType image/png \"access 1 year\"\n    ExpiresByType image/webp \"access 1 year\"\n    ExpiresByType text/css \"access 1 month\"\n    ExpiresByType application/javascript \"access 1 month\"\n    ExpiresByType font/woff2 \"access 1 year\"\n    ExpiresDefault \"access 1 month\"\n</IfModule>",
-        'nginx' => "location ~* \\.(jpg|jpeg|gif|png|webp|ico|css|js|woff2|woff|ttf)$ {\n    expires 365d;\n    add_header Cache-Control \"public, no-transform\";\n}"
+        'title'       => 'Browser Caching (Expires Headers)',
+        'short_title' => 'Browser Caching',
+        'desc'        => 'Instructs browsers to save static assets (images, fonts, css) locally for 1 year, drastically speeding up repeat visits.',
+        'apache'      => "<IfModule mod_expires.c>\n    ExpiresActive On\n    ExpiresByType image/jpg \"access 1 year\"\n    ExpiresByType image/jpeg \"access 1 year\"\n    ExpiresByType image/gif \"access 1 year\"\n    ExpiresByType image/png \"access 1 year\"\n    ExpiresByType image/webp \"access 1 year\"\n    ExpiresByType text/css \"access 1 month\"\n    ExpiresByType application/javascript \"access 1 month\"\n    ExpiresByType font/woff2 \"access 1 year\"\n    ExpiresDefault \"access 1 month\"\n</IfModule>",
+        'nginx'       => "location ~* \\.(jpg|jpeg|gif|png|webp|ico|css|js|woff2|woff|ttf)$ {\n    expires 365d;\n    add_header Cache-Control \"public, no-transform\";\n}"
     ],
     'security' => [
-        'title' => 'Security Headers (Basic)',
-        'desc'  => 'Prevents clickjacking (X-Frame-Options) and MIME-type sniffing (X-Content-Type-Options).',
-        'apache'=> "<IfModule mod_headers.c>\n    Header always set X-Frame-Options \"SAMEORIGIN\"\n    Header always set X-Content-Type-Options \"nosniff\"\n    Header set X-XSS-Protection \"1; mode=block\"\n</IfModule>",
-        'nginx' => "add_header X-Frame-Options \"SAMEORIGIN\" always;\nadd_header X-Content-Type-Options \"nosniff\" always;\nadd_header X-XSS-Protection \"1; mode=block\" always;"
+        'title'       => 'Security Headers (Basic)',
+        'short_title' => 'Security Headers',
+        'desc'        => 'Prevents clickjacking (X-Frame-Options) and MIME-type sniffing (X-Content-Type-Options).',
+        'apache'      => "<IfModule mod_headers.c>\n    Header always set X-Frame-Options \"SAMEORIGIN\"\n    Header always set X-Content-Type-Options \"nosniff\"\n    Header set X-XSS-Protection \"1; mode=block\"\n</IfModule>",
+        'nginx'       => "add_header X-Frame-Options \"SAMEORIGIN\" always;\nadd_header X-Content-Type-Options \"nosniff\" always;\nadd_header X-XSS-Protection \"1; mode=block\" always;"
     ],
     'bots' => [
-        'title' => 'Block Bad Bots (Basic)',
-        'desc'  => 'Blocks common aggressive scrapers and vulnerability scanners to save server CPU.',
-        'apache'=> "<IfModule mod_rewrite.c>\n    RewriteEngine On\n    RewriteCond %{HTTP_USER_AGENT} (SemrushBot|AhrefsBot|DotBot|MJ12bot) [NC]\n    RewriteRule .* - [F,L]\n</IfModule>",
-        'nginx' => "if (\$http_user_agent ~* (SemrushBot|AhrefsBot|DotBot|MJ12bot)) {\n    return 403;\n}"
+        'title'       => 'Block Bad Bots (Basic)',
+        'short_title' => 'Bad Bots',
+        'desc'        => 'Blocks common aggressive scrapers and vulnerability scanners to save server CPU.',
+        'apache'      => "<IfModule mod_rewrite.c>\n    RewriteEngine On\n    RewriteCond %{HTTP_USER_AGENT} (SemrushBot|AhrefsBot|DotBot|MJ12bot) [NC]\n    RewriteRule .* - [F,L]\n</IfModule>",
+        'nginx'       => "if (\$http_user_agent ~* (SemrushBot|AhrefsBot|DotBot|MJ12bot)) {\n    return 403;\n}"
     ]
 ];
 
@@ -105,8 +109,8 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
                 $block_name = strtoupper($snippet_id);
                 $current = file_exists("$root_dir.htaccess") ? file_get_contents("$root_dir.htaccess") : '';
                 $new = preg_replace("/\n?# BEGIN phpinfo-wp-{$block_name}.*?# END phpinfo-wp-{$block_name}\n?/s", "\n", $current);
-                file_put_contents("$root_dir.htaccess", $new);
-                $notice = "Rolled back <strong>{$snippets[$snippet_id]['title']}</strong> — block removed from .htaccess.";
+                file_put_contents("$root_dir.htaccess", rtrim($new) . "\n");
+                $notice = "Rolled back <strong>{$snippets[$snippet_id]['title']}</strong> — only this snippet was removed from .htaccess.";
                 $log_append(".htaccess snippet {$snippet_id} rolled back on " . current_time('mysql') . " by {$user}<br />");
             }
         }
@@ -128,6 +132,9 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             file_put_contents("$root_dir.htaccess", $current);
             $notice = "All 4 snippets injected into .htaccess.<br /><span style='display:inline-block; margin-top: 6px; font-size:12.5px; opacity:0.9;'>⚡ <strong>Note:</strong> Clear your cache (plugin, CDN, browser) to see the results!</span>";
             $log_append("All .htaccess snippets injected on " . current_time('mysql') . " by {$user}<br />");
+            if (class_exists('Phpinfo_WP_Activity_Log')) {
+                Phpinfo_WP_Activity_Log::log('server', 'snippets_injected', __('Injected server performance & security snippets into .htaccess', 'phpinfo-wp'), ['count' => count($snippets)], 'warning');
+            }
         }
 
     } elseif (isset($_POST['rollback_all_snippets'])) {
@@ -143,6 +150,9 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             file_put_contents("$root_dir.htaccess", $current);
             $notice = 'All 4 snippets have been rolled back and removed from .htaccess.';
             $log_append("All .htaccess snippets rolled back on " . current_time('mysql') . " by {$user}<br />");
+            if (class_exists('Phpinfo_WP_Activity_Log')) {
+                Phpinfo_WP_Activity_Log::log('server', 'snippets_rollback', __('Rolled back snippets from .htaccess', 'phpinfo-wp'), [], 'info');
+            }
         }
     } elseif ($mode === 'htaccess') {
 
@@ -150,6 +160,9 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             file_put_contents("$log_dir/.htaccess.bak", '#BACKED UP by phpinfo() WP' . PHP_EOL . file_get_contents("$root_dir.htaccess"));
             $notice = 'Backup created: <code>.htaccess.bak</code>';
             $log_append(".htaccess backed up on " . current_time('mysql') . " by {$user}<br />");
+            if (class_exists('Phpinfo_WP_Activity_Log')) {
+                Phpinfo_WP_Activity_Log::log('server', 'htaccess_backup', __('Created .htaccess backup file', 'phpinfo-wp'), [], 'info');
+            }
 
         } elseif (isset($_POST['restore'])) {
             if (!file_exists("$log_dir/.htaccess.bak")) {
@@ -159,6 +172,9 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
                 file_put_contents("$root_dir.htaccess", file_get_contents("$log_dir/.htaccess.bak"));
                 $notice = '.htaccess restored from backup.';
                 $log_append(".htaccess restored on " . current_time('mysql') . " by {$user}<br />");
+                if (class_exists('Phpinfo_WP_Activity_Log')) {
+                    Phpinfo_WP_Activity_Log::log('server', 'htaccess_restore', __('Restored .htaccess from backup', 'phpinfo-wp'), [], 'warning');
+                }
             }
 
         } elseif (isset($_POST['save'])) {
@@ -188,6 +204,9 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
                 file_put_contents($cache_file, $custom_raw);
                 $notice = '.htaccess saved successfully.';
                 $log_append(".htaccess edited on " . current_time('mysql') . " by {$user}<br />");
+                if (class_exists('Phpinfo_WP_Activity_Log')) {
+                    Phpinfo_WP_Activity_Log::log('server', 'htaccess_saved', __('Saved custom PHP directives to .htaccess', 'phpinfo-wp'), [], 'info');
+                }
             }
         }
 
@@ -215,6 +234,9 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             file_put_contents($cache_file, $custom_raw);
             $notice = ".user.ini saved. Changes take effect within {$user_ini_ttl} seconds (PHP-FPM cache TTL).";
             $log_append(".user.ini edited on " . current_time('mysql') . " by {$user}<br />");
+            if (class_exists('Phpinfo_WP_Activity_Log')) {
+                Phpinfo_WP_Activity_Log::log('server', 'userini_saved', __('Saved custom PHP directives to .user.ini', 'phpinfo-wp'), [], 'info');
+            }
         }
     }
 }
@@ -524,15 +546,29 @@ Phpinfo_wp::thankyou();
       color: #dc2626;
   }
 
-  /* Snippet Library cards */
+  /* Snippet Library cards (2x2 Grid) */
+  .phpinfowp-snippets {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom:30px;
+  }
+  @media (max-width: 900px) {
+      .phpinfowp-snippets {
+          grid-template-columns: 1fr;
+      }
+  }
   .phpinfowp-snippet-card {
       background: #fff;
       border: 1px solid #dcdcde;
-      border-radius: 6px;
-      padding: 16px 18px;
-      margin-bottom: 14px;
-      box-shadow: none;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
       transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
   }
   .phpinfowp-snippet-card:hover {
       border-color: #ccd0d4;
@@ -569,7 +605,6 @@ Phpinfo_wp::thankyou();
       color: #059669;
   }
 
-  /* Inline Notification Boxes */
   .phpinfowp-custom-alert {
       margin-bottom: 20px;
       padding: 12px 16px;
@@ -583,73 +618,29 @@ Phpinfo_wp::thankyou();
       font-size: 13px;
       line-height: 1.5;
   }
+  .phpinfowp-htaccess-page .phpinfowp-page-header {
+      margin-bottom: 8px;
+  }
+  .phpinfowp-htaccess-layout {
+      margin-top: 0;
+  }
+  .phpinfowp-htaccess-layout .phpinfowp-section-heading {
+      margin-top: 24px;
+      margin-bottom: 12px;
+  }
   </style>
 
   <!-- Title Header -->
   <div class="phpinfowp-page-header">
       <div>
-          <h1><?php _e('PHP Config Editor', 'phpinfo-wp'); ?></h1>
-          <p class="phpinfowp-page-subtitle"><?php _e('Configure php.ini directives and web server rules safely from your WordPress dashboard.', 'phpinfo-wp'); ?></p>
+          <h1>
+              <?php _e('PHP Config Editor', 'phpinfo-wp'); ?>
+              <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Configure php.ini directives and web server rules safely from your WordPress dashboard.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
+          </h1>
       </div>
   </div>
 
-  <!-- Detected Environment Status Cards -->
-  <div class="phpinfowp-env-grid">
-      <!-- Environment Card -->
-      <div class="phpinfowp-env-card">
-          <div class="phpinfowp-env-icon-box" style="background: <?php echo $mode_icon_bg; ?>; color: <?php echo $mode_color; ?>;">
-              <span class="dashicons <?php echo $mode === 'htaccess' ? 'dashicons-admin-generic' : 'dashicons-networking'; ?>" style="font-size:20px; width:20px; height:20px;"></span>
-          </div>
-          <div class="phpinfowp-env-details">
-              <div class="phpinfowp-env-label"><?php _e('Detected Server', 'phpinfo-wp'); ?></div>
-              <div class="phpinfowp-env-value">
-                  <?php echo esc_html($mode_label); ?>
-                  <span class="phpinfowp-badge" style="background: <?php echo $mode_color; ?>15; color: <?php echo $mode_color; ?>; padding: 2px 6px;">
-                      <span class="phpinfowp-pulse-dot" style="background: <?php echo $mode_color; ?>; margin-right: 4px;"></span>
-                      Active
-                  </span>
-              </div>
-              <div class="phpinfowp-env-sub">Web server settings handled via <?php echo esc_html($mode_file); ?> directives.</div>
-          </div>
-      </div>
 
-      <!-- Target File Card -->
-      <div class="phpinfowp-env-card">
-          <div class="phpinfowp-env-icon-box" style="background: #f1f5f9; color: #475569;">
-              <span class="dashicons dashicons-editor-code" style="font-size:20px; width:20px; height:20px;"></span>
-          </div>
-          <div class="phpinfowp-env-details">
-              <div class="phpinfowp-env-label"><?php _e('Target Config File', 'phpinfo-wp'); ?></div>
-              <div class="phpinfowp-env-value" style="font-family: monospace; font-size: 13.5px;"><?php echo esc_html($mode_file); ?></div>
-              <div class="phpinfowp-env-sub" style="word-break: break-all; font-family: monospace; font-size: 11px; background: #f8fafc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e2e8f0; margin-top: 4px;">
-                  <?php echo esc_html($target_file); ?>
-              </div>
-          </div>
-      </div>
-
-      <!-- Cache TTL Card -->
-      <div class="phpinfowp-env-card">
-          <?php if ($mode === 'userini'): ?>
-              <div class="phpinfowp-env-icon-box" style="background: #fef3c7; color: #d97706;">
-                  <span class="dashicons dashicons-clock" style="font-size:20px; width:20px; height:20px;"></span>
-              </div>
-              <div class="phpinfowp-env-details">
-                  <div class="phpinfowp-env-label"><?php _e('Propagation Time', 'phpinfo-wp'); ?></div>
-                  <div class="phpinfowp-env-value">~<?php echo esc_html($user_ini_ttl); ?> Seconds</div>
-                  <div class="phpinfowp-env-sub"><?php _e('Changes apply after FPM reload (cache TTL).', 'phpinfo-wp'); ?></div>
-              </div>
-          <?php else: ?>
-              <div class="phpinfowp-env-icon-box" style="background: #ecfdf5; color: #10b981;">
-                  <span class="dashicons dashicons-yes-alt" style="font-size:20px; width:20px; height:20px;"></span>
-              </div>
-              <div class="phpinfowp-env-details">
-                  <div class="phpinfowp-env-label"><?php _e('Propagation Time', 'phpinfo-wp'); ?></div>
-                  <div class="phpinfowp-env-value"><?php _e('Instant', 'phpinfo-wp'); ?></div>
-                  <div class="phpinfowp-env-sub"><?php _e('Directives are parsed and applied immediately.', 'phpinfo-wp'); ?></div>
-              </div>
-          <?php endif; ?>
-      </div>
-  </div>
 
   <!-- Notifications / Alerts -->
   <?php if (!$writable): ?>
@@ -727,12 +718,17 @@ Phpinfo_wp::thankyou();
           <?php if ($mode === 'htaccess'): ?>
           <div style="display:flex; gap:8px">
             <button type="submit" name="backup" class="phpinfowp-btn phpinfowp-btn-secondary"
-                    onclick="return confirm('Create a .htaccess.bak backup file?')">
+                    data-confirm="<?php esc_attr_e('Create a .htaccess.bak backup file?', 'phpinfo-wp'); ?>"
+                    data-confirm-title="<?php esc_attr_e('Backup Configuration', 'phpinfo-wp'); ?>"
+                    data-confirm-btn="<?php esc_attr_e('Create Backup', 'phpinfo-wp'); ?>"
+                    data-confirm-danger="false">
               <span class="dashicons dashicons-backup" style="font-size: 16px; width: 16px; height: 16px;"></span>
               Backup
             </button>
             <button type="submit" name="restore" class="phpinfowp-btn phpinfowp-btn-danger"
-                    onclick="return confirm('Restore .htaccess from the last backup? Current changes will be lost.')">
+                    data-confirm="<?php esc_attr_e('Restore .htaccess from the last backup? Current changes will be lost.', 'phpinfo-wp'); ?>"
+                    data-confirm-title="<?php esc_attr_e('Restore Backup', 'phpinfo-wp'); ?>"
+                    data-confirm-btn="<?php esc_attr_e('Restore Backup', 'phpinfo-wp'); ?>">
               <span class="dashicons dashicons-undo" style="font-size: 16px; width: 16px; height: 16px;"></span>
               Restore Backup
             </button>
@@ -740,183 +736,6 @@ Phpinfo_wp::thankyou();
           <?php endif; ?>
         </div>
       </form>
-
-      <!-- Snippet Library -->
-      <hr style="margin: 40px 0 30px; border:0; border-top: 1px solid #e2e8f0;">
-      <h2 class="phpinfowp-section-heading"><?php _e('Web Server Snippet Library', 'phpinfo-wp'); ?></h2>
-      
-      <?php if ($snippet_server === 'nginx'): ?>
-          <p class="phpinfowp-section-desc">
-              <strong><?php _e('Nginx Detected.', 'phpinfo-wp'); ?></strong> <?php _e('Nginx does not use <code>.htaccess</code>. Applying these rules requires root access to edit your <code>nginx.conf</code>.', 'phpinfo-wp'); ?>
-          </p>
-          <div class="phpinfowp-custom-alert" style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #64748b; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
-              <span class="dashicons dashicons-shield" style="color: #64748b; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;"></span>
-              <p style="color: #334155; font-size: 13px; line-height: 1.5; margin: 0; font-weight: 500;">
-                  <strong><?php _e('No root access?', 'phpinfo-wp'); ?></strong> <?php _e('If you are on managed WordPress hosting, caching is usually handled for you automatically. Otherwise, we highly recommend using a free CDN like <strong>Cloudflare</strong> to handle caching and compression automatically without editing server files.', 'phpinfo-wp'); ?>
-              </p>
-          </div>
-      <?php else: ?>
-          <p class="phpinfowp-section-desc">
-              <strong><?php _e('Apache/LiteSpeed Detected.', 'phpinfo-wp'); ?></strong> Click any button below to instantly inject the optimized rules directly into your <code>.htaccess</code> file.
-          </p>
-      <?php endif; ?>
-
-      <!-- Cache warning banner above snippets -->
-      <div class="phpinfowp-custom-alert" style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
-          <span class="dashicons dashicons-info" style="color: #3b82f6; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;"></span>
-          <p style="color: #1e3a8a; font-size: 13px; line-height: 1.5; margin: 0; font-weight: 500;">
-              <strong><?php _e('Clear Cache:', 'phpinfo-wp'); ?></strong> You must clear your cache (plugin cache, server cache, CDN, and browser cache) after injecting or setting the code manually to see the results!
-          </p>
-      </div>
-
-      <?php
-      // Pre-calculate which snippets are injected for the bulk bar
-      $preview_for_bulk = file_exists("$root_dir.htaccess") ? file_get_contents("$root_dir.htaccess") : '';
-      $all_injected = true;
-      $none_injected = true;
-      foreach ($snippets as $_sid => $_snip) {
-          $block_check = strtoupper($_sid);
-          if (strpos($preview_for_bulk, "# BEGIN phpinfo-wp-{$block_check}") !== false) {
-              $none_injected = false;
-          } else {
-              $all_injected = false;
-          }
-      }
-      $is_pro_bulk = Phpinfo_WP_License::is_valid();
-      ?>
-
-      <?php if ($snippet_server === 'apache'): ?>
-      <!-- Bulk Action Bar -->
-      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px; padding:14px 18px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
-          <div>
-              <p style="margin:0; font-size:13px; font-weight:700; color:#0f172a;"><?php _e('Bulk Actions', 'phpinfo-wp'); ?></p>
-              <p style="margin:2px 0 0; font-size:12px; color:#64748b;"><?php _e('Inject or roll back all 4 snippets at once.', 'phpinfo-wp'); ?></p>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <?php if ($is_pro_bulk): ?>
-                  <form method="post" style="margin:0;">
-                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
-                      <button type="submit" name="inject_all_snippets" value="1"
-                          class="phpinfowp-btn phpinfowp-btn-primary"
-                          <?php echo $all_injected ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>
-                          onclick="return confirm('Inject all 4 optimization snippets into .htaccess?')">
-                          <span class="dashicons dashicons-upload" style="font-size:16px; width:16px; height:16px;"></span>
-                          Inject All 4
-                      </button>
-                  </form>
-                  <form method="post" style="margin:0;">
-                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
-                      <button type="submit" name="rollback_all_snippets" value="1"
-                          class="phpinfowp-btn phpinfowp-btn-danger"
-                          <?php echo $none_injected ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>
-                          onclick="return confirm('Remove ALL 4 injected snippets from .htaccess?')">
-                          <span class="dashicons dashicons-undo" style="font-size:16px; width:16px; height:16px;"></span>
-                          Rollback All 4
-                      </button>
-                  </form>
-              <?php else: ?>
-                  <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="background:#777BB3; border-color:#777BB3;">
-                      <span class="dashicons dashicons-lock" style="font-size:14px; width:14px; height:14px;"></span>
-                      Upgrade to Pro
-                  </a>
-              <?php endif; ?>
-          </div>
-      </div>
-      <?php endif; ?>
-
-      <div class="phpinfowp-snippets">
-          <?php 
-          $is_pro = Phpinfo_WP_License::is_valid();
-          foreach ($snippets as $id => $snippet): 
-              $real_code = $snippet_server === 'nginx' ? $snippet['nginx'] : $snippet['apache'];
-              $snippet_code = $is_pro ? $real_code : ($snippet_server === 'nginx' 
-                  ? "# Nginx configuration rule\n# Unlock phpinfo() WP Pro to copy this optimization rule."
-                  : "# Apache/LiteSpeed .htaccess rule\n# Unlock phpinfo() WP Pro to copy this optimization rule.");
-              $is_injected = ($snippet_server === 'apache' && strpos($preview, "# BEGIN phpinfo-wp-" . strtoupper($id)) !== false);
-          ?>
-              <div class="phpinfowp-snippet-card" style="<?php echo !$is_pro ? 'border-color: #e2e8f0; background: #fafafa;' : ''; ?>">
-                  <div class="phpinfowp-snippet-title-row">
-                      <h3 style="margin:0; font-size:15px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
-                          <?php echo esc_html($snippet['title']); ?>
-                          <?php if (!$is_pro): ?>
-                              <span class="dashicons dashicons-lock" style="font-size:16px; width:16px; height:16px; color:#777BB3; margin-top:2px;"></span>
-                          <?php endif; ?>
-                      </h3>
-                      <div style="display:flex; gap:6px;">
-                          <?php if (!$is_pro): ?>
-                              <span class="phpinfowp-badge phpinfowp-badge-pro" style="background:#eff0f9; color:#777BB3; border:1px solid #d8daeb;"><?php _e('PRO', 'phpinfo-wp'); ?></span>
-                          <?php endif; ?>
-                          <span class="phpinfowp-badge phpinfowp-badge-neutral"><?php echo $snippet_server === 'nginx' ? 'Nginx' : 'Apache'; ?></span>
-                      </div>
-                  </div>
-                  <p class="phpinfowp-snippet-desc" style="margin-bottom: 12px;"><?php echo esc_html($snippet['desc']); ?></p>
-                  
-                  <div style="margin-bottom: 14px; position: relative;">
-                      <div class="phpinfowp-ide-window" style="margin-bottom:0; box-shadow:none; border-radius:6px; <?php echo !$is_pro ? 'filter: blur(4px); opacity: 0.6; pointer-events: none; user-select: none;' : ''; ?>">
-                          <div class="phpinfowp-ide-header" style="padding: 6px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                              <div class="phpinfowp-ide-dots">
-                                  <span class="phpinfowp-ide-dot red" style="width:7px; height:7px;"></span>
-                                  <span class="phpinfowp-ide-dot yellow" style="width:7px; height:7px;"></span>
-                                  <span class="phpinfowp-ide-dot green" style="width:7px; height:7px;"></span>
-                              </div>
-                              <span style="font-size:11px; color:#64748b; font-family:monospace;"><?php echo $snippet_server === 'nginx' ? 'nginx.conf' : '.htaccess'; ?></span>
-                          </div>
-                          <div class="phpinfowp-ide-body">
-                              <pre style="margin:0; padding:10px 14px; background:#ffffff; color:#334155; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11.5px; line-height:1.5; overflow-x:auto; max-height:120px;"><?php echo esc_html($snippet_code); ?></pre>
-                          </div>
-                      </div>
-                  </div>
-                  
-                  <?php if (!$is_pro): ?>
-                      <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
-                          <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.4;">
-                              ⚡ <strong><?php _e('These settings can make your site up to 2x faster!', 'phpinfo-wp'); ?></strong> Unlock this optimization snippet and boost your performance instantly.
-                          </p>
-                          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 10px;">
-                              <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="padding: 6px 14px; font-size: 12.5px; background: #777BB3; border-color: #777BB3;">
-                                  <span class="dashicons dashicons-lock" style="font-size: 14px; width: 14px; height: 14px;"></span>
-                                  Upgrade to Pro
-                              </a>
-                              <span style="font-size: 11px; color: #64748b; font-style: italic;"><?php _e('14-day risk-free refund guarantee', 'phpinfo-wp'); ?></span>
-                          </div>
-                      </div>
-                  <?php else: ?>
-                      <?php if ($snippet_server === 'nginx'): ?>
-                          <button type="button" class="phpinfowp-btn phpinfowp-btn-secondary" onclick="phpinfowp_copy_snippet(this)">
-                              <span class="dashicons dashicons-admin-page" style="font-size:16px; width:16px; height:16px;"></span>
-                              Copy to Clipboard
-                          </button>
-                      <?php else: ?>
-                          <?php if ($is_injected): ?>
-                              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                  <button type="button" class="phpinfowp-btn" style="background: #ecfdf5; color: #059669; border-color: #a7f3d0; cursor: default;" disabled>
-                                      <span class="dashicons dashicons-yes" style="font-size:16px; width:16px; height:16px;"></span>
-                                      Injected
-                                  </button>
-                                  <form method="post" style="margin: 0;">
-                                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
-                                      <button type="submit" name="rollback_snippet" value="<?php echo esc_attr($id); ?>" class="phpinfowp-btn phpinfowp-btn-danger"
-                                          onclick="return confirm('Remove the &quot;<?php echo esc_js($snippet['title']); ?>&quot; block from .htaccess?')">
-                                          <span class="dashicons dashicons-undo" style="font-size:16px; width:16px; height:16px;"></span>
-                                          Rollback
-                                      </button>
-                                  </form>
-                              </div>
-                          <?php else: ?>
-                              <form method="post" style="margin: 0;">
-                                  <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
-                                  <button type="submit" name="append_snippet" value="<?php echo esc_attr($id); ?>" class="phpinfowp-btn phpinfowp-btn-secondary">
-                                      <span class="dashicons dashicons-upload" style="font-size:16px; width:16px; height:16px;"></span>
-                                      Inject into .htaccess
-                                  </button>
-                              </form>
-                          <?php endif; ?>
-                      <?php endif; ?>
-                  <?php endif; ?>
-              </div>
-          <?php endforeach; ?>
-      </div>
-
     </div>
 
     <!-- Right Column: Live file preview -->
@@ -951,6 +770,196 @@ Phpinfo_wp::thankyou();
       
     </div>
 
+  </div> <!-- / .phpinfowp-htaccess-layout -->
+
+  <!-- Full-Width Snippet Library Block Below -->
+  <div class="phpinfowp-snippets-section" style="margin-top: 36px;">
+      <h1 style="margin-bottom:30px;"><?php _e('Web Server Snippet Library', 'phpinfo-wp'); ?></h1>
+      
+      <?php if ($snippet_server === 'nginx'): ?>
+          <p class="phpinfowp-section-desc">
+              <strong><?php _e('Nginx Detected.', 'phpinfo-wp'); ?></strong> <?php _e('Nginx does not use <code>.htaccess</code>. Applying these rules requires root access to edit your <code>nginx.conf</code>.', 'phpinfo-wp'); ?>
+          </p>
+          <div class="phpinfowp-custom-alert" style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #64748b; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <span class="dashicons dashicons-shield" style="color: #64748b; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;"></span>
+              <p style="color: #334155; font-size: 13px; line-height: 1.5; margin: 0; font-weight: 500;">
+                  <strong><?php _e('No root access?', 'phpinfo-wp'); ?></strong> <?php _e('If you are on managed WordPress hosting, caching is usually handled for you automatically. Otherwise, we highly recommend using a free CDN like <strong>Cloudflare</strong> to handle caching and compression automatically without editing server files.', 'phpinfo-wp'); ?>
+              </p>
+          </div>
+      <?php else: ?>
+          <p class="phpinfowp-section-desc">
+              <strong><?php _e('Apache/LiteSpeed Detected.', 'phpinfo-wp'); ?></strong> <?php _e('Click any button below to instantly inject the optimized rules directly into your <code>.htaccess</code> file.', 'phpinfo-wp'); ?>
+          </p>
+      <?php endif; ?>
+
+      <!-- Cache warning banner above snippets -->
+      <div class="phpinfowp-custom-alert" style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+          <span class="dashicons dashicons-info" style="color: #3b82f6; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;"></span>
+          <p style="color: #1e3a8a; font-size: 13px; line-height: 1.5; margin: 0; font-weight: 500;">
+              <strong><?php _e('Clear Cache:', 'phpinfo-wp'); ?></strong> <?php _e('You must clear your cache (plugin cache, server cache, CDN, and browser cache) after injecting or setting the code manually to see the results!', 'phpinfo-wp'); ?>
+          </p>
+      </div>
+
+      <?php
+      // Pre-calculate which snippets are injected for the bulk bar and cards
+      $htaccess_content = file_exists("$root_dir.htaccess") ? file_get_contents("$root_dir.htaccess") : '';
+      $all_injected = true;
+      $none_injected = true;
+      foreach ($snippets as $_sid => $_snip) {
+          $block_check = strtoupper($_sid);
+          if (strpos($htaccess_content, "# BEGIN phpinfo-wp-{$block_check}") !== false) {
+              $none_injected = false;
+          } else {
+              $all_injected = false;
+          }
+      }
+      $is_pro_bulk = Phpinfo_WP_License::is_valid();
+      ?>
+
+      <?php if ($snippet_server === 'apache'): ?>
+      <!-- Bulk Action Bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px; padding:14px 18px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+          <div>
+              <p style="margin:0; font-size:13px; font-weight:700; color:#0f172a;"><?php _e('Bulk Actions', 'phpinfo-wp'); ?></p>
+              <p style="margin:2px 0 0; font-size:12px; color:#64748b;"><?php _e('Inject or roll back all 4 snippets at once.', 'phpinfo-wp'); ?></p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <?php if ($is_pro_bulk): ?>
+                  <form method="post" style="margin:0;">
+                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
+                      <button type="submit" name="inject_all_snippets" value="1"
+                          class="phpinfowp-btn phpinfowp-btn-primary"
+                          <?php echo $all_injected ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>
+                          data-confirm="<?php esc_attr_e('Inject all 4 optimization snippets into .htaccess?', 'phpinfo-wp'); ?>"
+                          data-confirm-title="<?php esc_attr_e('Inject Optimizations', 'phpinfo-wp'); ?>"
+                          data-confirm-btn="<?php esc_attr_e('Inject All 4', 'phpinfo-wp'); ?>"
+                          data-confirm-danger="false">
+                          <span class="dashicons dashicons-upload" style="font-size:16px; width:16px; height:16px;"></span>
+                          Inject All 4
+                      </button>
+                  </form>
+                  <form method="post" style="margin:0;">
+                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
+                      <button type="submit" name="rollback_all_snippets" value="1"
+                          class="phpinfowp-btn phpinfowp-btn-danger"
+                          <?php echo $none_injected ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>
+                          data-confirm="<?php esc_attr_e('Remove ALL 4 injected snippets from .htaccess?', 'phpinfo-wp'); ?>"
+                          data-confirm-title="<?php esc_attr_e('Rollback Snippets', 'phpinfo-wp'); ?>"
+                          data-confirm-btn="<?php esc_attr_e('Rollback All 4', 'phpinfo-wp'); ?>">
+                          <span class="dashicons dashicons-undo" style="font-size:16px; width:16px; height:16px;"></span>
+                          Rollback All 4
+                      </button>
+                  </form>
+              <?php else: ?>
+                  <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="background:#777BB3; border-color:#777BB3;">
+                      <span class="dashicons dashicons-lock" style="font-size:14px; width:14px; height:14px;"></span>
+                      <?php _e('Upgrade to Pro', 'phpinfo-wp'); ?>
+                  </a>
+              <?php endif; ?>
+          </div>
+      </div>
+      <?php endif; ?>
+
+      <!-- 2x2 Snippets Grid -->
+      <div class="phpinfowp-snippets">
+          <?php 
+          $is_pro = Phpinfo_WP_License::is_valid();
+          foreach ($snippets as $id => $snippet): 
+              $real_code = $snippet_server === 'nginx' ? $snippet['nginx'] : $snippet['apache'];
+              $snippet_code = $is_pro ? $real_code : ($snippet_server === 'nginx' 
+                  ? "# Nginx configuration rule\n# Unlock phpinfo() WP Pro to copy this optimization rule."
+                  : "# Apache/LiteSpeed .htaccess rule\n# Unlock phpinfo() WP Pro to copy this optimization rule.");
+              $is_injected = ($snippet_server === 'apache' && strpos($htaccess_content, "# BEGIN phpinfo-wp-" . strtoupper($id)) !== false);
+          ?>
+              <div class="phpinfowp-snippet-card" style="<?php echo !$is_pro ? 'border-color: #e2e8f0; background: #fafafa;' : ''; ?>">
+                  <div>
+                      <div class="phpinfowp-snippet-title-row">
+                          <h3 style="margin:0; font-size:15px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                              <?php echo esc_html($snippet['title']); ?>
+                              <?php if (!$is_pro): ?>
+                                  <span class="dashicons dashicons-lock" style="font-size:16px; width:16px; height:16px; color:#777BB3; margin-top:2px;"></span>
+                              <?php endif; ?>
+                          </h3>
+                          <div style="display:flex; align-items:center; gap:6px;">
+                              <?php if (!$is_pro): ?>
+                                  <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span>
+                              <?php endif; ?>
+                              <span class="phpinfowp-badge phpinfowp-badge-neutral"><?php echo $snippet_server === 'nginx' ? 'Nginx' : 'Apache'; ?></span>
+                          </div>
+                      </div>
+                      <p class="phpinfowp-snippet-desc" style="margin-bottom: 12px;"><?php echo esc_html($snippet['desc']); ?></p>
+                      
+                      <div style="margin-bottom: 14px; position: relative;">
+                          <div class="phpinfowp-ide-window" style="margin-bottom:0; box-shadow:none; border-radius:6px; <?php echo !$is_pro ? 'filter: blur(4px); opacity: 0.6; pointer-events: none; user-select: none;' : ''; ?>">
+                              <div class="phpinfowp-ide-header" style="padding: 6px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                  <div class="phpinfowp-ide-dots">
+                                      <span class="phpinfowp-ide-dot red" style="width:7px; height:7px;"></span>
+                                      <span class="phpinfowp-ide-dot yellow" style="width:7px; height:7px;"></span>
+                                      <span class="phpinfowp-ide-dot green" style="width:7px; height:7px;"></span>
+                                  </div>
+                                  <span style="font-size:11px; color:#64748b; font-family:monospace;"><?php echo $snippet_server === 'nginx' ? 'nginx.conf' : '.htaccess'; ?></span>
+                              </div>
+                              <div class="phpinfowp-ide-body">
+                                  <pre style="margin:0; padding:10px 14px; background:#ffffff; color:#334155; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11.5px; line-height:1.5; overflow-x:auto; max-height:120px;"><?php echo esc_html($snippet_code); ?></pre>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div>
+                      <?php if (!$is_pro): ?>
+                          <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+                              <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.4;">
+                                  ⚡ <strong><?php _e('These settings can make your site up to 2x faster!', 'phpinfo-wp'); ?></strong> <?php _e('Unlock this optimization snippet and boost your performance instantly.', 'phpinfo-wp'); ?>
+                              </p>
+                              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 10px;">
+                                  <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="phpinfowp-btn phpinfowp-btn-primary" style="padding: 6px 14px; font-size: 12.5px; background: #777BB3; border-color: #777BB3;">
+                                      <span class="dashicons dashicons-lock" style="font-size: 14px; width: 14px; height: 14px;"></span>
+                                      <?php _e('Upgrade to Pro', 'phpinfo-wp'); ?>
+                                  </a>
+                                  <span style="font-size: 11px; color: #64748b; font-style: italic;"><?php _e('14-day risk-free refund guarantee', 'phpinfo-wp'); ?></span>
+                              </div>
+                          </div>
+                      <?php else: ?>
+                          <?php if ($snippet_server === 'nginx'): ?>
+                              <button type="button" class="phpinfowp-btn phpinfowp-btn-secondary" onclick="phpinfowp_copy_snippet(this)">
+                                  <span class="dashicons dashicons-admin-page" style="font-size:16px; width:16px; height:16px;"></span>
+                                  <?php _e('Copy to Clipboard', 'phpinfo-wp'); ?>
+                              </button>
+                          <?php else: ?>
+                              <?php if ($is_injected): ?>
+                                  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                      <button type="button" class="phpinfowp-btn" style="background: #ecfdf5; color: #059669; border-color: #a7f3d0; cursor: default;" disabled>
+                                          <span class="dashicons dashicons-yes" style="font-size:16px; width:16px; height:16px;"></span>
+                                          <?php _e('Injected', 'phpinfo-wp'); ?>
+                                      </button>
+                                      <form method="post" style="margin: 0;">
+                                          <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
+                                          <button type="submit" name="rollback_snippet" value="<?php echo esc_attr($id); ?>" class="phpinfowp-btn phpinfowp-btn-danger"
+                                              data-confirm="<?php echo esc_attr(sprintf(__('Remove only the "%s" block from .htaccess? The other snippets will remain untouched.', 'phpinfo-wp'), $snippet['title'])); ?>"
+                                              data-confirm-title="<?php echo esc_attr(sprintf(__('Rollback %s', 'phpinfo-wp'), $snippet['short_title'])); ?>"
+                                              data-confirm-btn="<?php echo esc_attr(sprintf(__('Rollback %s', 'phpinfo-wp'), $snippet['short_title'])); ?>"
+                                              data-confirm-danger="true">
+                                              <span class="dashicons dashicons-undo" style="font-size:16px; width:16px; height:16px;"></span>
+                                              <?php echo esc_html(sprintf(__('Rollback %s', 'phpinfo-wp'), $snippet['short_title'])); ?>
+                                          </button>
+                                      </form>
+                                  </div>
+                              <?php else: ?>
+                                  <form method="post" style="margin: 0;">
+                                      <input type="hidden" name="phpinfo_nonce" value="<?php echo wp_create_nonce('phpinfo_nonce'); ?>">
+                                      <button type="submit" name="append_snippet" value="<?php echo esc_attr($id); ?>" class="phpinfowp-btn phpinfowp-btn-secondary">
+                                          <span class="dashicons dashicons-upload" style="font-size:16px; width:16px; height:16px;"></span>
+                                          <?php _e('Inject into .htaccess', 'phpinfo-wp'); ?>
+                                      </button>
+                                  </form>
+                              <?php endif; ?>
+                          <?php endif; ?>
+                      <?php endif; ?>
+                  </div>
+              </div>
+          <?php endforeach; ?>
+      </div>
   </div>
 </div>
 

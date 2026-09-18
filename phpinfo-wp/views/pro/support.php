@@ -36,30 +36,69 @@ foreach ($sysinfo as $k => $v) {
 <div class="phpinfowp-pro-page">
     <div class="phpinfowp-page-header">
         <div>
-            <h1><?php _e('Technical Support & Diagnostics', 'phpinfo-wp'); ?> <?php if ($is_pro): ?><span class="phpinfowp-pro-badge"><?php echo $is_unlimited ? __('VIP PRO', 'phpinfo-wp') : __('PRO', 'phpinfo-wp'); ?></span><?php endif; ?></h1>
-            <p class="phpinfowp-page-subtitle"><?php _e('Need help or looking to fix server bottlenecks immediately? Our technical team and one-click tools are here for you.', 'phpinfo-wp'); ?></p>
+            <h1>
+                <?php _e('Technical Support & Diagnostics', 'phpinfo-wp'); ?>
+                <?php if ($is_pro): ?><span class="phpinfowp-pro-badge"><?php echo $is_unlimited ? __('VIP PRO', 'phpinfo-wp') : __('PRO', 'phpinfo-wp'); ?></span><?php endif; ?>
+                <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Priority technical support, live environment signals, and diagnostics assistance.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
+            </h1>
         </div>
     </div>
 
-    <!-- Real-time Live Diagnostic Badges -->
-    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; padding:12px 16px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; align-items:center;">
-        <span style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#64748b;"><?php _e('Live Environment Signals:', 'phpinfo-wp'); ?></span>
-        <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#f1f5f9; color:#334155; font-weight:600;">PHP <?php echo esc_html(PHP_VERSION); ?></span>
-        <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:<?php echo ((int)$mem_limit < 256) ? '#fef3c7; color:#92400e;' : '#f1f5f9; color:#334155; font-weight:600;'; ?>">Memory: <?php echo esc_html($mem_limit); ?></span>
-        <?php if ($grader && isset($grader['grade'])): ?>
-            <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:<?php echo in_array($grader['grade'], ['A', 'B']) ? '#dcfce7; color:#166534;' : '#fee2e2; color:#991b1b;'; ?> font-weight:600;">
-                Config Score: Grade <?php echo esc_html($grader['grade']); ?> (<?php echo (int)($grader['fails'] ?? 0); ?> failing)
-            </span>
-        <?php endif; ?>
-        <?php if ($err_count > 0): ?>
-            <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#fee2e2; color:#991b1b; font-weight:600;">
-                <?php echo (int)$err_count; ?> <?php _e('PHP errors logged today', 'phpinfo-wp'); ?>
-            </span>
-        <?php else: ?>
-            <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#dcfce7; color:#166534; font-weight:600;">
-                ✓ <?php _e('0 PHP errors today', 'phpinfo-wp'); ?>
-            </span>
-        <?php endif; ?>
+    <!-- Real-time Live Diagnostic Badges — Server + Site -->
+    <?php
+    // Site telemetry signals
+    $wp_version      = get_bloginfo('version');
+    $update_core     = get_site_transient('update_core');
+    $wp_has_update   = false;
+    if ($update_core && !empty($update_core->updates)) {
+        foreach ($update_core->updates as $u) {
+            if (isset($u->response) && $u->response === 'upgrade') { $wp_has_update = true; break; }
+        }
+    }
+    $update_plugins  = get_site_transient('update_plugins');
+    $plugin_updates  = (!empty($update_plugins->response)) ? count($update_plugins->response) : 0;
+    $debug_on        = defined('WP_DEBUG') && WP_DEBUG;
+    $is_capped       = !empty($grader['is_capped']);
+    $grade_eff       = $grader['grade_effective'] ?? ($grader['grade_controllable'] ?? ($grader['grade'] ?? 'N/A'));
+    $score_eff       = (int)($grader['score_effective'] ?? ($grader['score_controllable'] ?? ($grader['score'] ?? 0)));
+    $grade_label     = $is_capped ? esc_html($grade_eff) . '*' : esc_html($grade_eff);
+    if ($is_capped) {
+        $grade_color_bg = ($score_eff >= 85) ? '#dcfce7; color:#166534;' : (($score_eff >= 75) ? '#fef3c7; color:#92400e;' : '#fee2e2; color:#991b1b;');
+    } else {
+        $grade_color_bg = in_array(substr($grade_eff, 0, 1), ['A'], true) ? '#dcfce7; color:#166534;' : '#fee2e2; color:#991b1b;';
+    }
+    ?>
+    <div style="display:flex; gap:0; flex-wrap:wrap; margin-top:20px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; align-items:stretch; overflow:hidden;">
+        <!-- SERVER group -->
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:11px 16px; border-right:1px solid #e2e8f0;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#64748b; white-space:nowrap;"><?php _e('Server:', 'phpinfo-wp'); ?></span>
+            <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#f1f5f9; color:#334155; font-weight:600;">PHP <?php echo esc_html(PHP_VERSION); ?></span>
+            <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:<?php echo ((int)$mem_limit < 256) ? '#fef3c7; color:#92400e;' : '#f1f5f9; color:#334155;'; ?> font-weight:600;">Memory: <?php echo esc_html($mem_limit); ?></span>
+            <?php if ($grader && isset($grader['grade'])): ?>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-config-grader&tab=locked')); ?>" style="font-size:12px; padding:3px 8px; border-radius:4px; background:<?php echo $grade_color_bg; ?> font-weight:600; text-decoration:none;" title="<?php echo $is_capped ? esc_attr(sprintf(__('Overall Grade %1$s* (%2$d/100): Balanced average of Site %3$s (%4$d/100) and Server %5$s (%6$d/100).', 'phpinfo-wp'), $grade_eff, $score_eff, $grader['grade_controllable'] ?? $grade_eff, (int)($grader['score_controllable'] ?? 0), $grader['grade'] ?? '', (int)($grader['score'] ?? 0))) : ''; ?>">
+                    Config: <?php echo $grade_label; ?> (<?php echo $score_eff; ?>/100)
+                </a>
+            <?php endif; ?>
+        </div>
+        <!-- SITE group -->
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:11px 16px;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#64748b; white-space:nowrap;"><?php _e('Site:', 'phpinfo-wp'); ?></span>
+            <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#f1f5f9; color:#334155; font-weight:600;">WP <?php echo esc_html($wp_version); ?></span>
+            <?php if ($wp_has_update): ?>
+                <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#fef3c7; color:#92400e; font-weight:600;">⚠ WP update available</span>
+            <?php endif; ?>
+            <?php if ($plugin_updates > 0): ?>
+                <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#fef3c7; color:#92400e; font-weight:600;"><?php echo $plugin_updates; ?> plugin update<?php echo $plugin_updates > 1 ? 's' : ''; ?></span>
+            <?php endif; ?>
+            <?php if ($debug_on): ?>
+                <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#fee2e2; color:#991b1b; font-weight:600;">WP_DEBUG on</span>
+            <?php endif; ?>
+            <?php if ($err_count > 0): ?>
+                <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#fee2e2; color:#991b1b; font-weight:600;"><?php echo (int)$err_count; ?> PHP errors today</span>
+            <?php else: ?>
+                <span style="font-size:12px; padding:3px 8px; border-radius:4px; background:#dcfce7; color:#166534; font-weight:600;">✓ 0 PHP errors today</span>
+            <?php endif; ?>
+        </div>
     </div>
 
     <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; align-items:flex-start;">
@@ -118,8 +157,8 @@ foreach ($sysinfo as $k => $v) {
                     <p style="margin:0 0 14px; font-size:13px; color:#475569; line-height:1.5; max-width:440px; margin-left:auto; margin-right:auto;">
                         <?php _e('Get direct private email ticket support, <24-hour response SLA (including weekends), and expert server troubleshooting from our core engineers.', 'phpinfo-wp'); ?>
                     </p>
-                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary" style="min-height:38px; padding:0 22px; font-size:13.5px; font-weight:600;">
-                        <?php _e('Unlock Pro Support ($29/yr) &rarr;', 'phpinfo-wp'); ?>
+                    <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary" style="background:#6366f1; border-color:#6366f1; min-height:38px; line-height:36px; padding:0 22px; font-size:13.5px; font-weight:600; border-radius:6px; box-shadow:0 2px 6px rgba(99,102,241,0.25);">
+                        <?php _e('Unlock Pro Support &rarr;', 'phpinfo-wp'); ?>
                     </a>
                     <div style="margin-top:14px; font-size:11.5px; color:#64748b; display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
                         <span>⭐ <strong>4.9/5</strong> Rating</span>

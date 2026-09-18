@@ -4,14 +4,20 @@
     "title": "phpinfo() WP — Site Health, PHP Compatibility & Server Audit",
     "description": "Modern WordPress site health, PHP compatibility scanner, troubleshooting mode, and config audit. A maintained, in-admin alternative to Health Check.",
     "author": "Exeebit",
-    "categories": ["site-health", "developer", "performance"]
+    "categories": [
+      "site-health",
+      "developer",
+      "performance"
+    ]
   },
   "landingPage": "/wp-admin/admin.php?page=piwp",
   "preferredVersions": {
     "php": "8.2",
     "wp": "latest"
   },
-  "phpExtensionBundles": ["kitchen-sink"],
+  "phpExtensionBundles": [
+    "kitchen-sink"
+  ],
   "features": {
     "networking": true
   },

@@ -107,8 +107,8 @@ class Phpinfo_WP_Alerts {
         if (!in_array($status['status'], ['warning', 'eol'], true)) return;
 
         // Throttle: don't send more than once per 7 days
-        if (get_transient('phpinfowp_alert_eol_sent')) return;
-        set_transient('phpinfowp_alert_eol_sent', 1, 7 * DAY_IN_SECONDS);
+        if (get_option('phpinfowp_alert_eol_sent') && (time() - (int)get_option('phpinfowp_alert_eol_sent') < 7 * DAY_IN_SECONDS)) return;
+        update_option('phpinfowp_alert_eol_sent', time());
 
         $minor = $status['minor'];
         $eol   = $status['eol'];
@@ -159,8 +159,8 @@ class Phpinfo_WP_Alerts {
         if (!$status || $status['hit_rate'] === null) return;
         if ($status['hit_rate'] >= (float) $s['opcache_thresh']) return;
 
-        if (get_transient('phpinfowp_alert_opcache_sent')) return;
-        set_transient('phpinfowp_alert_opcache_sent', 1, DAY_IN_SECONDS);
+        if (get_option('phpinfowp_alert_opcache_sent') && (time() - (int)get_option('phpinfowp_alert_opcache_sent') < DAY_IN_SECONDS)) return;
+        update_option('phpinfowp_alert_opcache_sent', time());
 
         $rate    = $status['hit_rate'];
         $thresh  = $s['opcache_thresh'];
@@ -177,7 +177,7 @@ class Phpinfo_WP_Alerts {
         if (!self::_pro()) return;
         $s = self::get_settings();
         if (!$s['enabled'] || !$s['ssl_expiry']) return;
-        if (get_transient('phpinfowp_alert_ssl_sent')) return;
+        if (get_option('phpinfowp_alert_ssl_sent') && (time() - (int)get_option('phpinfowp_alert_ssl_sent') < DAY_IN_SECONDS)) return;
 
         $results  = Phpinfo_WP_SSL::check_all();
         $problems = array_filter($results, function ($r) use ($s) {
@@ -187,7 +187,7 @@ class Phpinfo_WP_Alerts {
         });
 
         if (!$problems) return;
-        set_transient('phpinfowp_alert_ssl_sent', 1, DAY_IN_SECONDS);
+        update_option('phpinfowp_alert_ssl_sent', time());
 
         $lines = [];
         foreach ($problems as $cert) {
@@ -294,16 +294,24 @@ class Phpinfo_WP_Alerts {
         self::send("Weekly health digest — " . get_bloginfo('name'), implode("\n", $lines));
     }
 
-    // Weekly cron — runs all alert checks + auto-snapshot
+    // Daily cron — runs all time-sensitive alert checks + auto-snapshot
+    public static function cron_daily(): void {
+        if (!self::_pro()) return;
+        
+        try {
+            $diff = Phpinfo_WP_Snapshots::auto_snapshot();
+            self::maybe_send_config_change($diff);
+            Phpinfo_WP_Snapshots::prune(30);
+        } catch (\Throwable $e) {}
+
+        try { self::maybe_send_eol(); } catch (\Throwable $e) {}
+        try { self::maybe_send_opcache_low(); } catch (\Throwable $e) {}
+        try { self::maybe_send_ssl(); } catch (\Throwable $e) {}
+    }
+
+    // Weekly cron — strictly for reporting
     public static function cron_weekly(): void {
         if (!self::_pro()) return;
-        $diff = Phpinfo_WP_Snapshots::auto_snapshot();
-        self::maybe_send_config_change($diff);
-        Phpinfo_WP_Snapshots::prune(30);
-
-        self::maybe_send_eol();
-        self::maybe_send_opcache_low();
-        self::maybe_send_ssl();
         self::send_weekly_digest();
     }
 }

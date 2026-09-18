@@ -32,9 +32,9 @@ class Phpinfo_WP_AI_Explain {
             'nonce'     => wp_create_nonce(self::NONCE),
             'ajax_url'  => admin_url('admin-ajax.php'),
             'i18n'      => [
-                'explain'  => __('Explain with AI', 'piwp'),
-                'thinking' => __('Asking AI…', 'piwp'),
-                'error'    => __('AI request failed.', 'piwp'),
+                'explain'  => __('Explain with AI', 'phpinfo-wp'),
+                'thinking' => __('Asking AI…', 'phpinfo-wp'),
+                'error'    => __('AI request failed.', 'phpinfo-wp'),
             ],
         ];
     }
@@ -42,10 +42,10 @@ class Phpinfo_WP_AI_Explain {
     public static function ajax_explain(): void {
         check_ajax_referer(self::NONCE, 'nonce');
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => __('Forbidden.', 'piwp')], 403);
+            wp_send_json_error(['message' => __('Forbidden.', 'phpinfo-wp')], 403);
         }
         if (!self::available()) {
-            wp_send_json_error(['message' => __('AI Client is not available. Requires WordPress 7.0+ with a configured AI connector.', 'piwp')], 501);
+            wp_send_json_error(['message' => __('AI Client is not available. Requires WordPress 7.0+ with a configured AI connector.', 'phpinfo-wp')], 501);
         }
 
         $topic   = sanitize_key($_POST['topic']   ?? '');
@@ -54,7 +54,7 @@ class Phpinfo_WP_AI_Explain {
 
         $prompt = self::build_prompt($topic, $context, $value);
         if ($prompt === '') {
-            wp_send_json_error(['message' => __('Unknown topic.', 'piwp')], 400);
+            wp_send_json_error(['message' => __('Unknown topic.', 'phpinfo-wp')], 400);
         }
 
         $result = wp_ai_client_prompt($prompt)->generate_text();
@@ -88,12 +88,12 @@ class Phpinfo_WP_AI_Explain {
                     'Explain the PHP extension `%s` in the context of a WordPress site. Cover: what it provides, common plugins that need it, and the symptom when it is missing. Use 3–4 short sentences. Plain text, no markdown.',
                     $context
                 );
+            case 'core_deprecation':
             case 'update_break':
-                // $context = API name (e.g. ".live()" or "get_currentuserinfo()"),
-                // $value   = target WordPress version being audited.
+                // $context = API name / component, $value = file:line or target version.
                 return sprintf(
-                    'A WordPress plugin or theme calls `%s`, which is flagged when updating to WordPress %s. Explain in 3–4 short sentences: what this API was, why it is deprecated or removed in modern WordPress, the realistic symptom on the site after the update (e.g. JavaScript stops working, PHP notice in the log), and the modern replacement. Plain text, no markdown.',
-                    $context, $value !== '' ? $value : 'a newer version'
+                    'A WordPress plugin or theme calls `%s` (referenced at `%s`), which is flagged when auditing against modern WordPress. Explain in 3–4 short sentences: what this API was, why it is deprecated or removed in modern WordPress, the realistic symptom on the site after an update, and the modern replacement. Plain text, no markdown.',
+                    $context, $value !== '' ? $value : 'plugin code'
                 );
             default:
                 return '';

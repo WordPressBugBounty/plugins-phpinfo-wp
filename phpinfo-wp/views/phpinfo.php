@@ -9,14 +9,13 @@ if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'
     <div style="position:relative;flex:1;max-width:420px">
       <input type="text" id="phpinfowp-search"
              placeholder="<?php echo esc_attr__('Search directives, values, modules… (e.g. memory_limit)', 'phpinfo-wp'); ?>"
-             class="regular-text"
-             style="width:100%;padding-right:32px"
+             style="width:100%"
              autocomplete="off" spellcheck="false">
       <button type="button" id="phpinfowp-search-clear"
-              style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:18px;line-height:1;padding:0"
+              style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:18px;line-height:1;padding:4px"
               title="<?php echo esc_attr__('Clear search', 'phpinfo-wp'); ?>">&times;</button>
     </div>
-    <span id="phpinfowp-search-count" style="font-size:12px;color:#666;white-space:nowrap"></span>
+    <span id="phpinfowp-search-count" style="font-size:12px;color:#64748b;white-space:nowrap"></span>
 
     <select id="phpinfowp-section-jump" style="max-width:240px" title="<?php echo esc_attr__('Jump to section', 'phpinfo-wp'); ?>">
       <option value=""><?php _e('Jump to section…', 'phpinfo-wp'); ?></option>
@@ -41,9 +40,10 @@ if (!current_user_can('manage_options')) wp_die(__('Unauthorized.', 'phpinfo-wp'
     echo $phpinfo_body;
     Phpinfo_wp::thankyou();
     ?>
-    <button id="topButton-phpinfo-WP" title="<?php echo esc_attr__('Go to top', 'phpinfo-wp'); ?>" style="display:none">
-      <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../assets/images/top.png'); ?>"
-           alt="<?php echo esc_attr__('Top', 'phpinfo-wp'); ?>" id="topButtonImage-phpinfo-WP">
+    <button id="topButton-phpinfo-WP" title="<?php echo esc_attr__('Go to top', 'phpinfo-wp'); ?>" style="display:none" aria-label="<?php esc_attr_e('Scroll to top', 'phpinfo-wp'); ?>">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
     </button>
   </div>
 </div>

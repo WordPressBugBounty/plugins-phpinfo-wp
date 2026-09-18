@@ -20,77 +20,107 @@ foreach ($stats as $host => $data) {
         $slowest_domain = $host;
     }
 }
+
+$per_page    = 15;
+$total       = count($stats);
+$total_pages = max(1, (int) ceil($total / $per_page));
+$paged       = max(1, min($total_pages, (int) ($_GET['paged'] ?? 1)));
+$paged_stats = array_slice($stats, ($paged - 1) * $per_page, $per_page, true);
 ?>
 
 <div class="phpinfowp-pro-page">
-    <div class="phpinfowp-page-header" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="phpinfowp-page-header">
         <div>
-            <h1>API Monitor <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span></h1>
-            <p class="phpinfowp-page-subtitle"><?php _e('Track slow outbound API requests that silently block page loads (last 24 hours). This monitor runs globally in the background across all frontend and admin traffic.', 'phpinfo-wp'); ?></p>
-        </div>
-        <?php if ($is_pro && $stats): ?>
-            <button id="phpinfowp-clear-api-stats" class="button button-secondary"><?php _e('Reset Stats', 'phpinfo-wp'); ?></button>
-        <?php endif; ?>
-    </div>
-
-
-
-    <!-- Summary Cards (Visible to all users) -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin-bottom:24px;">
-        <div style="background:#fff; border:1px solid #ccd0d4; border-left:4px solid #007cba; padding:16px; border-radius:4px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
-            <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;"><?php _e('Total Waiting Time', 'phpinfo-wp'); ?></div>
-            <div style="font-size:28px; font-weight:300; color:#1d2327;">
-                <?php echo number_format($total_time, 2); ?>s
-            </div>
-            <div style="font-size:12px; color:#777; margin-top:4px;">Across <?php echo number_format($total_reqs); ?> outbound requests</div>
-        </div>
-
-        <div style="background:#fff; border:1px solid #ccd0d4; border-left:4px solid <?php echo $slowest_max > 2.0 ? '#d63638' : ($slowest_max > 0 ? '#dba617' : '#00a32a'); ?>; padding:16px; border-radius:4px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
-            <div style="font-size:13px; color:#555; font-weight:600; text-transform:uppercase; margin-bottom:6px;"><?php _e('Slowest API Response', 'phpinfo-wp'); ?></div>
-            <div style="font-size:28px; font-weight:300; color:#1d2327;">
-                <?php echo $slowest_max > 0 ? number_format($slowest_max, 2) . 's' : '0.00s'; ?>
-            </div>
-            <div style="font-size:12px; color:#777; margin-top:4px;">Domain: <code><?php echo esc_html($slowest_domain ?: 'None recorded'); ?></code></div>
+            <h1>
+                <?php _e('API Monitor', 'phpinfo-wp'); ?>
+                <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span>
+                <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Track slow outbound API requests that silently block page loads across all frontend and admin traffic.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
+            </h1>
         </div>
     </div>
 
     <?php if ($is_free_preview): ?>
-        <!-- Free preview: compact skeleton rows + centered upgrade card (fits in single viewpoint) -->
-        <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:10px; min-height:260px; display:flex; align-items:center; justify-content:center;">
+        <!-- Free preview: contextual preview table + centered upgrade card -->
+        <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:12px; min-height:380px; display:flex; align-items:center; justify-content:center;">
             
-            <!-- Skeleton content -->
-            <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.5;">
-                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">
-                        <div style="height:11px; width:30%; background:#cbd5e1; border-radius:4px;"></div>
-                        <div style="height:11px; width:15%; background:#cbd5e1; border-radius:4px;"></div>
-                        <div style="height:11px; width:15%; background:#cbd5e1; border-radius:4px;"></div>
-                    </div>
-                    <?php for ($sk = 0; $sk < 3; $sk++): ?>
-                    <div style="display:flex; justify-content:space-between; padding:6px 0;">
-                        <div style="height:10px; width:<?php echo [45, 55, 38][$sk]; ?>%; background:#e2e8f0; border-radius:4px;"></div>
-                        <div style="height:10px; width:12%; background:#e2e8f0; border-radius:4px;"></div>
-                        <div style="height:10px; width:12%; background:#e2e8f0; border-radius:4px;"></div>
-                    </div>
-                    <?php endfor; ?>
+            <!-- Background contextual preview table -->
+            <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.65; filter:blur(0.5px); display:flex; flex-direction:column; gap:10px;">
+                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+                    <table style="width:100%; border-collapse:collapse; font-size:12.5px; text-align:left;">
+                        <thead>
+                            <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#475569; font-size:11px; text-transform:uppercase; font-weight:700;">
+                                <th style="padding:10px 14px;"><?php _e('Domain (Endpoint)', 'phpinfo-wp'); ?></th>
+                                <th style="padding:10px 14px;"><?php _e('Requests', 'phpinfo-wp'); ?></th>
+                                <th style="padding:10px 14px;"><?php _e('Avg Time', 'phpinfo-wp'); ?></th>
+                                <th style="padding:10px 14px;"><?php _e('Max Time', 'phpinfo-wp'); ?></th>
+                                <th style="padding:10px 14px;"><?php _e('Errors/Timeouts', 'phpinfo-wp'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $preview_stats = [];
+                            if (!empty($stats)) {
+                                $count = 0;
+                                foreach ($stats as $host => $data) {
+                                    $avg = $data['count'] > 0 ? ($data['total_time'] / $data['count']) : 0;
+                                    $preview_stats[] = [
+                                        'host'    => $host,
+                                        'count'   => $data['count'],
+                                        'avg'     => number_format($avg, 2) . 's',
+                                        'max'     => number_format($data['max_time'], 2) . 's',
+                                        'errors'  => (int) ($data['errors'] ?? 0),
+                                    ];
+                                    if (++$count >= 3) break;
+                                }
+                            }
+                            if (empty($preview_stats)) {
+                                $preview_stats = [
+                                    ['host' => 'api.wordpress.org', 'count' => 14, 'avg' => '0.42s', 'max' => '1.18s', 'errors' => 0],
+                                    ['host' => 'downloads.wordpress.org', 'count' => 6, 'avg' => '0.65s', 'max' => '1.42s', 'errors' => 0],
+                                    ['host' => 'wordpress.org', 'count' => 8, 'avg' => '0.31s', 'max' => '0.78s', 'errors' => 0],
+                                ];
+                            }
+                            foreach ($preview_stats as $ps):
+                            ?>
+                                <tr style="border-bottom:1px solid #f1f5f9;">
+                                    <td style="padding:10px 14px;"><strong><code><?php echo esc_html($ps['host']); ?></code></strong></td>
+                                    <td style="padding:10px 14px;"><?php echo (int) $ps['count']; ?></td>
+                                    <td style="padding:10px 14px;"><?php echo esc_html($ps['avg']); ?></td>
+                                    <td style="padding:10px 14px; color:<?php echo (float)$ps['max'] > 1.5 ? '#d63638' : '#00a32a'; ?>; font-weight:600;"><?php echo esc_html($ps['max']); ?></td>
+                                    <td style="padding:10px 14px; color:<?php echo $ps['errors'] > 0 ? '#d63638' : '#64748b'; ?>; font-weight:<?php echo $ps['errors'] > 0 ? '700' : '400'; ?>;"><?php echo $ps['errors'] > 0 ? sprintf(__('%d Errors', 'phpinfo-wp'), $ps['errors']) : '0'; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- Gradient fade-out overlay -->
-            <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(246,249,252,0.4) 0%, rgba(246,249,252,0.95) 40%, #f6f9fc 100%); pointer-events:none;"></div>
+            <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(248,250,252,0.3) 0%, rgba(248,250,252,0.94) 38%, #f8fafc 100%); pointer-events:none;"></div>
 
-            <!-- Upgrade card floating over skeleton -->
-            <div style="position:relative; z-index:2; width:100%; max-width:480px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; box-shadow:0 6px 20px -4px rgba(0,0,0,0.07); text-align:center; margin:12px auto;">
-                <span class="dashicons dashicons-lock" style="font-size:30px; width:30px; height:30px; color:#777BB3; display:inline-block; margin-bottom:6px;"></span>
-                <h3 style="margin:0 0 6px; font-size:18px; font-weight:600; color:#1d2327;"><?php _e('External API Bottleneck Breakdown Locked', 'phpinfo-wp'); ?></h3>
-                <p style="margin:0 0 4px; font-size:13px; color:#475569; line-height:1.5; max-width:400px; margin-left:auto; margin-right:auto;">
-                    <?php _e('Unlock per-domain latency metrics, timeout warnings, failure logs, and 24-hour API call profiles that slow down TTFB.', 'phpinfo-wp'); ?>
+            <!-- Floating Upgrade Card -->
+            <div style="position:relative; z-index:2; width:100%; max-width:540px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.09); text-align:center; margin:16px auto;">
+                <span class="dashicons dashicons-rest-api" style="font-size:36px; width:36px; height:36px; color:#6366f1; display:inline-block; margin-bottom:10px;"></span>
+                <h3 style="margin:0 0 8px; font-size:19px; font-weight:700; color:#0f172a;"><?php _e('External API Bottleneck Monitor Locked', 'phpinfo-wp'); ?></h3>
+                <p style="margin:0 0 16px; font-size:13.5px; color:#475569; line-height:1.5;">
+                    <?php _e('Identify slow 3rd-party HTTP requests and silent timeouts that secretly block page loads and degrade TTFB.', 'phpinfo-wp'); ?>
                 </p>
-                <p style="margin:0 0 16px; font-size:12px; color:#94a3b8;">
-                    <?php _e('Your total outbound API request time above is real — upgrade to identify slow 3rd-party services.', 'phpinfo-wp'); ?>
-                </p>
-                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary button-large" style="background:#777BB3; border-color:#777BB3; height:38px; line-height:36px; font-size:13.5px; font-weight:600; padding:0 22px; border-radius:6px; text-decoration:none; display:inline-block;">
-                    <?php _e('Upgrade to Pro &rarr;', 'phpinfo-wp'); ?>
+                <div style="text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px; margin:0 0 20px; font-size:12.5px; color:#334155; line-height:1.6; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; align-items:flex-start; gap:8px;">
+                        <span style="color:#6366f1; font-size:15px; line-height:1;">⏱️</span>
+                        <span><strong><?php _e('Outbound Latency Profiler:', 'phpinfo-wp'); ?></strong> <?php _e('Tracks real-time HTTP response times for 3rd-party services that block synchronous PHP execution.', 'phpinfo-wp'); ?></span>
+                    </div>
+                    <div style="display:flex; align-items:flex-start; gap:8px;">
+                        <span style="color:#6366f1; font-size:15px; line-height:1;">⚠️</span>
+                        <span><strong><?php _e('Timeout & Error Diagnostics:', 'phpinfo-wp'); ?></strong> <?php _e('Logs silent connection timeouts and HTTP 5xx failures across plugins and themes.', 'phpinfo-wp'); ?></span>
+                    </div>
+                    <div style="display:flex; align-items:flex-start; gap:8px;">
+                        <span style="color:#6366f1; font-size:15px; line-height:1;">📊</span>
+                        <span><strong><?php _e('24-Hour Domain Call Breakdown:', 'phpinfo-wp'); ?></strong> <?php _e('Pinpoints exactly which external services consume the most page load execution time.', 'phpinfo-wp'); ?></span>
+                    </div>
+                </div>
+                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary button-large" style="background:#6366f1; border-color:#6366f1; height:40px; line-height:38px; font-size:14px; font-weight:600; padding:0 26px; border-radius:6px; text-decoration:none; display:inline-block; box-shadow:0 2px 6px rgba(99,102,241,0.25);">
+                    <?php _e('Unlock API Monitor with Pro &rarr;', 'phpinfo-wp'); ?>
                 </a>
             </div>
         </div>
@@ -99,15 +129,10 @@ foreach ($stats as $host => $data) {
 
         <?php if (!$stats): ?>
             <div class="notice notice-info inline">
-                <p><strong><?php _e('Monitoring Active.', 'phpinfo-wp'); ?></strong> We are now tracking outbound HTTP requests. No external API calls have been made yet.</p>
+                <p><strong><?php _e('Monitoring Active.', 'phpinfo-wp'); ?></strong> <?php _e('We are tracking outbound HTTP requests across your site. No external API calls have been recorded in the last 24 hours yet.', 'phpinfo-wp'); ?></p>
             </div>
-            <p><?php _e('To test this, you can trigger a plugin update check or wait for normal site traffic to generate API calls.', 'phpinfo-wp'); ?></p>
-            <button id="phpinfowp-test-api" class="button button-primary"><?php _e('Trigger Dummy Slow Request (1.5s)', 'phpinfo-wp'); ?></button>
+            <p style="color:#555; font-size:13px; margin-top:10px;"><?php _e('You can trigger a plugin update check or click "Test Slow API" in the sidebar to generate test requests.', 'phpinfo-wp'); ?></p>
         <?php else: ?>
-
-            <div style="margin-bottom:16px;">
-                <button id="phpinfowp-test-api" class="button button-secondary"><?php _e('Trigger Dummy Slow Request (1.5s)', 'phpinfo-wp'); ?></button>
-            </div>
 
             <!-- Details Table -->
             <table class="wp-list-table widefat fixed striped">
@@ -122,7 +147,7 @@ foreach ($stats as $host => $data) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($stats as $host => $data):
+                    <?php foreach ($paged_stats as $host => $data):
                         $avg = $data['count'] > 0 ? $data['total_time'] / $data['count'] : 0;
                         $err_color = $data['errors'] > 0 ? '#d63638' : '#555';
                         $max_color = $data['max_time'] > 2.0 ? '#d63638' : ($data['max_time'] > 1.0 ? '#dba617' : '#00a32a');
@@ -140,6 +165,37 @@ foreach ($stats as $host => $data) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+
+            <!-- Pagination Controls -->
+            <?php if ($total_pages > 1): ?>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; flex-wrap:wrap; gap:12px;">
+                    <div style="font-size:13px; color:#64748b;">
+                        <?php printf(
+                            __('Showing %1$d &ndash; %2$d of %3$s API endpoints', 'phpinfo-wp'),
+                            ($paged - 1) * $per_page + 1,
+                            min($total, $paged * $per_page),
+                            number_format($total)
+                        ); ?>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <?php if ($paged > 2): ?>
+                            <a href="<?php echo esc_url(add_query_arg(['paged' => 1])); ?>" class="button button-secondary" title="<?php esc_attr_e('First page', 'phpinfo-wp'); ?>">&laquo;&laquo;</a>
+                        <?php endif; ?>
+                        <?php if ($paged > 1): ?>
+                            <a href="<?php echo esc_url(add_query_arg(['paged' => $paged - 1])); ?>" class="button button-secondary">&laquo; <?php _e('Previous', 'phpinfo-wp'); ?></a>
+                        <?php endif; ?>
+                        <span style="font-size:13px; line-height:30px; padding:0 8px; color:#334155; font-weight:600;">
+                            <?php printf(__('Page %d of %d', 'phpinfo-wp'), $paged, $total_pages); ?>
+                        </span>
+                        <?php if ($paged < $total_pages): ?>
+                            <a href="<?php echo esc_url(add_query_arg(['paged' => $paged + 1])); ?>" class="button button-secondary"><?php _e('Next', 'phpinfo-wp'); ?> &raquo;</a>
+                        <?php endif; ?>
+                        <?php if ($paged < $total_pages - 1): ?>
+                            <a href="<?php echo esc_url(add_query_arg(['paged' => $total_pages])); ?>" class="button button-secondary" title="<?php esc_attr_e('Last page', 'phpinfo-wp'); ?>">&raquo;&raquo;</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
             
             <p class="description" style="margin-top:12px;">
                 This table tracks all external HTTP requests made via <code>wp_remote_get</code>, <code>wp_remote_post</code>, and the core HTTP API. 
@@ -159,26 +215,31 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnClear) {
         btnClear.addEventListener('click', function(e) {
             e.preventDefault();
-            if (!confirm('Clear all API stats? This cannot be undone.')) return;
-            
-            btnClear.disabled = true;
-            btnClear.textContent = 'Clearing...';
-            
-            var data = new FormData();
-            data.append('action', 'phpinfowp_clear_api_stats');
-            data.append('nonce', '<?php echo wp_create_nonce("phpinfowp_api_nonce"); ?>');
-            
-            fetch(ajaxurl, {
-                method: 'POST',
-                body: data
-            }).then(res => res.json()).then(function(res) {
-                if (res.success) {
-                    window.location.reload();
-                } else {
-                    alert('Failed to clear stats.');
-                    btnClear.disabled = false;
-                    btnClear.textContent = 'Reset Stats';
-                }
+            window.phpinfowpConfirm({
+                title: '<?php echo esc_js(__('Clear API Statistics', 'phpinfo-wp')); ?>',
+                message: '<?php echo esc_js(__('Clear all API stats? This cannot be undone.', 'phpinfo-wp')); ?>',
+                confirmText: '<?php echo esc_js(__('Clear Stats', 'phpinfo-wp')); ?>',
+                isDanger: true
+            }).then(function(confirmed) {
+                if (!confirmed) return;
+                btnClear.disabled = true;
+                btnClear.textContent = '<?php echo esc_js(__('Clearing...', 'phpinfo-wp')); ?>';
+                
+                var data = new FormData();
+                data.append('action', 'phpinfowp_clear_api_stats');
+                data.append('nonce', '<?php echo wp_create_nonce("phpinfowp_api_nonce"); ?>');
+                
+                fetch(ajaxurl, {
+                    method: 'POST',
+                    body: data
+                }).then(res => res.json()).then(function(res) {
+                    if (res.success) {
+                        window.location.reload();
+                    } else {
+                        btnClear.disabled = false;
+                        btnClear.textContent = '<?php echo esc_js(__('Reset Stats', 'phpinfo-wp')); ?>';
+                    }
+                });
             });
         });
     }

@@ -18,46 +18,16 @@ $status_labels = [
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1><?php _e('PHP EOL Timeline', 'phpinfo-wp'); ?></h1>
-            <p class="phpinfowp-page-subtitle"><?php _e('End-of-life dates and support status for every PHP version', 'phpinfo-wp'); ?></p>
+            <h1>
+                <?php _e('PHP EOL Timeline', 'phpinfo-wp'); ?>
+                <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Official end-of-life dates and security support schedules for every PHP runtime version.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
+            </h1>
         </div>
     </div>
 
-    <?php
-    $eol_cfg = [
-        'eol'     => ['bg' => '#fff4f4', 'border' => '#d63638', 'badge_bg' => '#d63638', 'label' => __('END OF LIFE', 'phpinfo-wp')],
-        'warning' => ['bg' => '#fffbf0', 'border' => '#dba617', 'badge_bg' => '#dba617', 'label' => __('EXPIRING SOON', 'phpinfo-wp')],
-        'ok'      => ['bg' => '#f0faf2', 'border' => '#00a32a', 'badge_bg' => '#00a32a', 'label' => __('SUPPORTED', 'phpinfo-wp')],
-        'unknown' => ['bg' => '#f6f7f7', 'border' => '#888',    'badge_bg' => '#888',    'label' => __('UNKNOWN', 'phpinfo-wp')],
-    ];
-    $cfg = $eol_cfg[$current['status']] ?? $eol_cfg['unknown'];
-    ?>
 
-    <!-- Current version hero card -->
-    <div style="background:<?php echo $cfg['bg']; ?>;border:1px solid <?php echo $cfg['border']; ?>;border-left:5px solid <?php echo $cfg['border']; ?>;border-radius:8px;padding:24px 28px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;margin-bottom:32px">
-        <div style="text-align:center;flex-shrink:0">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;margin-bottom:4px"><?php _e('Running on', 'phpinfo-wp'); ?></div>
-            <div style="font-size:42px;font-weight:800;line-height:1;color:#1d2327"><?php printf( __('PHP %s', 'phpinfo-wp'), esc_html($current['minor']) ); ?></div>
-            <div style="font-size:12px;color:#666;margin-top:4px"><?php echo esc_html(PHP_VERSION); ?></div>
-        </div>
-        <div style="flex:1;min-width:220px">
-            <span style="display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px;background:<?php echo $cfg['badge_bg']; ?>;color:#fff;margin-bottom:10px">
-                <?php echo esc_html($cfg['label']); ?>
-            </span>
-            <?php if ($current['status'] === 'eol'): ?>
-                <p style="margin:0;font-size:14px"><?php printf( __('Reached end-of-life on <strong>%s</strong>. No security patches are being issued. Contact your host and request a PHP upgrade to 8.2 or newer immediately.', 'phpinfo-wp'), esc_html($current['eol']) ); ?></p>
-            <?php elseif ($current['status'] === 'warning'): ?>
-                <p style="margin:0;font-size:14px"><?php printf( __('Reaches end-of-life on <strong>%1$s</strong> — <strong>%2$s days</strong> from now. Plan your PHP upgrade before that date.', 'phpinfo-wp'), esc_html($current['eol']), esc_html($current['days']) ); ?></p>
-            <?php elseif ($current['status'] === 'ok'): ?>
-                <p style="margin:0;font-size:14px"><?php printf( __('Actively supported until <strong>%1$s</strong> — <strong>%2$s days</strong> from now. You\'re good.', 'phpinfo-wp'), esc_html($current['eol']), esc_html($current['days']) ); ?></p>
-            <?php else: ?>
-                <p style="margin:0;font-size:14px"><?php printf( __('EOL date not found for PHP %s. Check <a href="https://www.php.net/supported-versions.php" target="_blank">php.net/supported-versions</a>.', 'phpinfo-wp'), esc_html($current['minor']) ); ?></p>
-            <?php endif; ?>
-        </div>
-    </div>
 
     <!-- Version timeline -->
-    <h2 class="phpinfowp-section-heading"><?php _e('Version Lifecycle', 'phpinfo-wp'); ?></h2>
     <table class="wp-list-table widefat fixed striped phpinfowp-eol-table">
         <thead>
             <tr>

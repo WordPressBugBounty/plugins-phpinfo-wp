@@ -5,10 +5,72 @@ class Phpinfo_WP_Mail_Check {
 
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
+    public static function register(): void {
+        add_action('wp_ajax_phpinfowp_mail_scan',  [__CLASS__, 'ajax_scan']);
+        add_action('wp_ajax_phpinfowp_mail_clear', [__CLASS__, 'ajax_clear']);
+        add_action('wp_ajax_phpinfowp_mail_test',  [__CLASS__, 'ajax_test']);
+    }
+
+    private static function _get_domain(): string {
+        $from   = get_option('admin_email', '');
+        $parts  = explode('@', $from);
+        return isset($parts[1]) ? strtolower(trim($parts[1])) : '';
+    }
+
+    /**
+     * Non-blocking cached lookup for DNS & mail deliverability status.
+     */
+    public static function get_result(): ?array {
+        $domain = self::_get_domain();
+        if (!$domain) return null;
+        $transient_key = 'phpinfowp_mail_audit_' . md5($domain);
+        $cached = get_transient($transient_key);
+        if (is_array($cached)) {
+            $cached['smtp_plugin']    = self::_detect_smtp_plugin();
+            $cached['using_php_mail'] = empty($cached['smtp_plugin']);
+            return $cached;
+        }
+        return null;
+    }
+
+    /**
+     * Non-blocking cached lookup for discovered routing emails.
+     */
+    public static function get_routing_cached(): ?array {
+        $admin_email = get_option('admin_email', '');
+        if (!$admin_email) return null;
+        $transient_key = 'phpinfowp_mail_routing_' . md5($admin_email);
+        $cached = get_transient($transient_key);
+        return is_array($cached) ? $cached : null;
+    }
+
+    /**
+     * Comprehensive scan executing DNS queries and routing discovery.
+     */
+    public static function scan(bool $force_refresh = false): array {
+        $audit   = self::audit($force_refresh);
+        $routing = self::discover_routing_emails($force_refresh);
+        return [
+            'audit'   => $audit,
+            'routing' => $routing,
+        ];
+    }
+
+    public static function bust_cache(): void {
+        $domain = self::_get_domain();
+        if ($domain) {
+            delete_transient('phpinfowp_mail_audit_' . md5($domain));
+        }
+        $admin_email = get_option('admin_email', '');
+        if ($admin_email) {
+            delete_transient('phpinfowp_mail_routing_' . md5($admin_email));
+        }
+    }
+
     public static function audit(bool $force_refresh = false): array {
         $from   = get_option('admin_email', '');
         $parts  = explode('@', $from);
-        $domain = isset($parts[1]) ? strtolower($parts[1]) : '';
+        $domain = isset($parts[1]) ? strtolower(trim($parts[1])) : '';
 
         $transient_key = 'phpinfowp_mail_audit_' . md5($domain);
         if (!$force_refresh) {
@@ -115,7 +177,8 @@ class Phpinfo_WP_Mail_Check {
     public static function discover_routing_emails(bool $force_refresh = false): array {
         if (!self::_pro()) return [];
 
-        $transient_key = 'phpinfowp_mail_routing_' . md5(get_option('admin_email'));
+        $admin_email = get_option('admin_email', '');
+        $transient_key = 'phpinfowp_mail_routing_' . md5($admin_email);
         if (!$force_refresh) {
             $cached = get_transient($transient_key);
             if (is_array($cached)) {
@@ -124,7 +187,6 @@ class Phpinfo_WP_Mail_Check {
         }
 
         $emails = [];
-        $admin_email = get_option('admin_email');
 
         // 1. WordPress Admin Email
         if (is_email($admin_email)) {
@@ -143,7 +205,6 @@ class Phpinfo_WP_Mail_Check {
                     $recs = explode(',', $mail['recipient']);
                     foreach ($recs as $rec) {
                         $rec = trim($rec);
-                        // Try to extract if it's "Name <email@example.com>"
                         if (preg_match('/<([^>]+)>/', $rec, $m)) {
                             $rec = $m[1];
                         }
@@ -252,8 +313,8 @@ class Phpinfo_WP_Mail_Check {
     }
 
     public static function send_test(string $to): array {
-        if (!self::_pro()) return ['ok' => false, 'error' => 'Pro license required.'];
-        if (!is_email($to)) return ['ok' => false, 'error' => 'Invalid recipient email.'];
+        if (!self::_pro()) return ['ok' => false, 'error' => __('Pro license required.', 'phpinfo-wp')];
+        if (!is_email($to)) return ['ok' => false, 'error' => __('Invalid recipient email.', 'phpinfo-wp')];
 
         $errors = [];
         $listener = function($wp_error) use (&$errors) {
@@ -275,5 +336,35 @@ class Phpinfo_WP_Mail_Check {
             'errors'   => $errors,
             'method'   => self::_detect_smtp_plugin() ?: 'PHP mail()',
         ];
+    }
+
+    /* ── AJAX Endpoints ─────────────────────────────────────────────────── */
+
+    public static function ajax_scan(): void {
+        check_ajax_referer('phpinfowp_mail_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized.', 'phpinfo-wp')]);
+        }
+        $data = self::scan(true);
+        wp_send_json_success($data);
+    }
+
+    public static function ajax_clear(): void {
+        check_ajax_referer('phpinfowp_mail_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized.', 'phpinfo-wp')]);
+        }
+        self::bust_cache();
+        wp_send_json_success();
+    }
+
+    public static function ajax_test(): void {
+        check_ajax_referer('phpinfowp_mail_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized.', 'phpinfo-wp')]);
+        }
+        $to = sanitize_email($_POST['test_to'] ?? '');
+        $result = self::send_test($to);
+        wp_send_json_success($result);
     }
 }

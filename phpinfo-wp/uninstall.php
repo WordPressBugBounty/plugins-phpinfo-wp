@@ -58,3 +58,4 @@ $wpdb->query("DROP TABLE IF EXISTS {$table}");
 // 6. Clear scheduled events.
 wp_clear_scheduled_hook('phpinfowp_license_ping');
 wp_clear_scheduled_hook('phpinfowp_weekly_maintenance');
+wp_clear_scheduled_hook('phpinfowp_daily_monitoring');

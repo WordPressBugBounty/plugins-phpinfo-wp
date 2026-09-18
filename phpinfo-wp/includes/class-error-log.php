@@ -5,11 +5,113 @@ class Phpinfo_WP_Error_Log {
 
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
 
-    public static function find_path(): ?string {
-        foreach (self::candidate_paths() as $c) {
-            if (@file_exists($c)) return $c;
+    public static function mask_path(string $path): string {
+        $norm_path = wp_normalize_path($path);
+        $norm_abs  = wp_normalize_path(ABSPATH);
+        if (strpos($norm_path, $norm_abs) === 0) {
+            return substr($norm_path, strlen($norm_abs));
         }
-        return null;
+        $parts = explode('/', trim($norm_path, '/'));
+        if (count($parts) > 3) {
+            return '.../' . implode('/', array_slice($parts, -3));
+        }
+        return basename($norm_path);
+    }
+
+    public static function line_count(string $path): int {
+        if (!@file_exists($path) || !@is_readable($path)) return 0;
+        try {
+            $file = new SplFileObject($path, 'r');
+            $file->seek(PHP_INT_MAX);
+            return (int) $file->key();
+        } catch (Throwable $e) {
+            return 0;
+        }
+    }
+
+    public static function get_available_logs(): array {
+        $candidates = self::candidate_paths();
+        $logs       = [];
+        $wp_log     = (defined('WP_DEBUG_LOG') && is_string(WP_DEBUG_LOG) && WP_DEBUG_LOG !== '1' && WP_DEBUG_LOG !== 'true') ? WP_DEBUG_LOG : (WP_CONTENT_DIR . '/debug.log');
+
+        $wp_count     = 0;
+        $server_count = 0;
+
+        foreach ($candidates as $p) {
+            if (@file_exists($p) && @is_readable($p)) {
+                $is_wp       = ($p === $wp_log || strpos($p, 'debug.log') !== false);
+                $size        = (int) @filesize($p);
+                $lines_count = self::line_count($p);
+                $type        = $is_wp ? 'wp' : 'server';
+                $label       = $is_wp ? __('WordPress Debug Log', 'phpinfo-wp') : __('PHP Server Error Log', 'phpinfo-wp');
+
+                if ($is_wp) {
+                    $key = $wp_count === 0 ? 'wp' : ('wp_' . ($wp_count + 1));
+                    $wp_count++;
+                } else {
+                    $key = $server_count === 0 ? 'server' : ('server_' . ($server_count + 1));
+                    $server_count++;
+                }
+
+                $logs[$key] = [
+                    'key'         => $key,
+                    'path'        => $p,
+                    'name'        => basename($p),
+                    'type'        => $type,
+                    'label'       => $label,
+                    'size'        => $size,
+                    'size_human'  => self::format_bytes($size),
+                    'lines_count' => $lines_count,
+                ];
+            }
+        }
+        return $logs;
+    }
+
+    public static function get_active_log_path(?string $requested = null): ?string {
+        $available = self::get_available_logs();
+        if (empty($available)) {
+            return null;
+        }
+
+        // 1. Explicitly requested via key or path
+        $req = $requested ?? (!empty($_GET['log']) ? sanitize_key($_GET['log']) : (!empty($_GET['log_file']) ? sanitize_text_field(wp_unslash($_GET['log_file'])) : null));
+        if ($req) {
+            if (isset($available[$req])) {
+                return $available[$req]['path'];
+            }
+            foreach ($available as $info) {
+                if ($info['path'] === $req) {
+                    return $info['path'];
+                }
+            }
+        }
+
+        // 2. Prioritize a log that actually has recorded errors
+        foreach ($available as $info) {
+            if ($info['lines_count'] > 0) {
+                return $info['path'];
+            }
+        }
+
+        // 3. Fallback to first available log
+        $first = reset($available);
+        return $first['path'] ?? null;
+    }
+
+    public static function get_active_log_key(?string $requested = null): string {
+        $available   = self::get_available_logs();
+        $active_path = self::get_active_log_path($requested);
+        foreach ($available as $key => $info) {
+            if ($info['path'] === $active_path) {
+                return $key;
+            }
+        }
+        return array_key_first($available) ?: 'wp';
+    }
+
+    public static function find_path(?string $requested = null): ?string {
+        return self::get_active_log_path($requested);
     }
 
     // List of every path the plugin considers a possible PHP error log. Used
@@ -57,6 +159,8 @@ class Phpinfo_WP_Error_Log {
         $checks     = [];
         $found      = null;
 
+        $target_log = (defined('WP_DEBUG_LOG') && is_string(WP_DEBUG_LOG) && WP_DEBUG_LOG !== '1' && WP_DEBUG_LOG !== 'true') ? WP_DEBUG_LOG : (WP_CONTENT_DIR . '/debug.log');
+
         foreach ($candidates as $p) {
             $entry = ['path' => $p, 'status' => 'missing', 'note' => ''];
             if (@file_exists($p)) {
@@ -69,11 +173,16 @@ class Phpinfo_WP_Error_Log {
                     $entry['mtime']  = (int) @filemtime($p);
                     if ($found === null) $found = $p;
                 }
+            } elseif ($debug_log_const && $p === $target_log) {
+                $entry['status'] = 'target_pending';
+                $entry['note']   = __('Active destination — WordPress will create this file automatically on the first PHP error.', 'phpinfo-wp');
             } else {
                 $entry['note'] = 'Not found.';
             }
             $checks[] = $entry;
         }
+
+        $found = self::get_active_log_path();
 
         // Build a one-line summary
         if ($found) {
@@ -83,7 +192,7 @@ class Phpinfo_WP_Error_Log {
             $summary = 'WP_DEBUG_LOG is off, so WordPress is not writing a log. If your host writes PHP errors somewhere else, point WP_DEBUG_LOG at that path (or check your host control panel).';
             $verdict = 'disabled';
         } else {
-            $summary = "WP_DEBUG_LOG is on but no log file has been created — your site hasn't logged any PHP errors recently. That's usually a good thing. If you expected errors and don't see them, your host may be writing logs to a path we don't check (check your hosting control panel for an error_log location).";
+            $summary = "WP_DEBUG_LOG is on and actively monitoring. No log file has been created because your site hasn't logged any PHP errors or warnings yet — your site is running cleanly.";
             $verdict = 'empty';
         }
 
@@ -102,15 +211,15 @@ class Phpinfo_WP_Error_Log {
         ];
     }
 
-    // Returns last $lines lines, newest first
-    public static function tail(string $path, int $lines = 150): array {
+    // Returns lines, newest first. If $lines <= 0, reads all lines.
+    public static function tail(string $path, int $lines = 0): array {
         if (!@file_exists($path) || !@is_readable($path)) return [];
 
         $file = new SplFileObject($path, 'r');
         $file->seek(PHP_INT_MAX);
         $total = $file->key();
 
-        $start  = max(0, $total - $lines);
+        $start  = ($lines > 0) ? max(0, $total - $lines) : 0;
         $result = [];
 
         $file->seek($start);
@@ -174,5 +283,170 @@ class Phpinfo_WP_Error_Log {
         if (strpos($l, 'notice') !== false || strpos($l, 'deprecated') !== false)              return 'log-notice';
         if (strpos($l, 'wp_debug') !== false || strpos($l, '[debug]') !== false)               return 'log-debug';
         return 'log-default';
+    }
+
+    /**
+     * Locate wp-config.php whether in ABSPATH or parent directory.
+     */
+    public static function get_wp_config_path(): ?string {
+        if (@file_exists(ABSPATH . 'wp-config.php')) {
+            return ABSPATH . 'wp-config.php';
+        }
+        if (@file_exists(dirname(ABSPATH) . '/wp-config.php') && !@file_exists(dirname(ABSPATH) . '/wp-settings.php')) {
+            return dirname(ABSPATH) . '/wp-config.php';
+        }
+        return null;
+    }
+
+    /**
+     * Check if WordPress error logging is active.
+     */
+    public static function is_logging_enabled(): bool {
+        $mu = (defined('WPMU_PLUGIN_DIR') ? WPMU_PLUGIN_DIR : WP_CONTENT_DIR . '/mu-plugins') . '/phpinfowp-error-logger.php';
+        if (@file_exists($mu)) return true;
+
+        $debug_log = defined('WP_DEBUG_LOG') && WP_DEBUG_LOG !== false;
+        $debug     = defined('WP_DEBUG') && WP_DEBUG;
+        return $debug && $debug_log;
+    }
+
+    /**
+     * Safely enable WordPress error logging without displaying errors to visitors.
+     */
+    public static function enable_logging(): array {
+        if (!self::_pro()) {
+            return [
+                'success' => false,
+                'message' => __('PRO license required to enable error logging.', 'phpinfo-wp'),
+            ];
+        }
+
+        $config_path    = self::get_wp_config_path();
+        $config_written = false;
+
+        if ($config_path && @is_writable($config_path)) {
+            $content = (string) @file_get_contents($config_path);
+            if (!empty($content)) {
+                @copy($config_path, $config_path . '.bak');
+
+                // Strip any previous phpinfowp block
+                $content = preg_replace("/\/\/\s*BEGIN PHPINFO_WP_DEBUG.*?\/\/\s*END PHPINFO_WP_DEBUG\s*/s", "", $content);
+
+                $has_debug   = preg_match("/define\s*\(\s*['\"]WP_DEBUG['\"]\s*,\s*[^)]+\);/i", $content);
+                $has_log     = preg_match("/define\s*\(\s*['\"]WP_DEBUG_LOG['\"]\s*,\s*[^)]+\);/i", $content);
+                $has_display = preg_match("/define\s*\(\s*['\"]WP_DEBUG_DISPLAY['\"]\s*,\s*[^)]+\);/i", $content);
+
+                if ($has_debug) {
+                    $content = preg_replace("/define\s*\(\s*['\"]WP_DEBUG['\"]\s*,\s*[^)]+\);/i", "define( 'WP_DEBUG', true );", $content, 1);
+                }
+                if ($has_log) {
+                    $content = preg_replace("/define\s*\(\s*['\"]WP_DEBUG_LOG['\"]\s*,\s*[^)]+\);/i", "define( 'WP_DEBUG_LOG', true );", $content, 1);
+                }
+                if ($has_display) {
+                    $content = preg_replace("/define\s*\(\s*['\"]WP_DEBUG_DISPLAY['\"]\s*,\s*[^)]+\);/i", "define( 'WP_DEBUG_DISPLAY', false );", $content, 1);
+                }
+
+                // If any constant was missing, inject managed block
+                if (!$has_debug || !$has_log || !$has_display) {
+                    $block = "\n// BEGIN PHPINFO_WP_DEBUG\n";
+                    if (!$has_debug)   $block .= "define( 'WP_DEBUG', true );\n";
+                    if (!$has_log)     $block .= "define( 'WP_DEBUG_LOG', true );\n";
+                    if (!$has_display) $block .= "define( 'WP_DEBUG_DISPLAY', false );\n";
+                    $block .= "@ini_set( 'display_errors', '0' );\n";
+                    $block .= "// END PHPINFO_WP_DEBUG\n";
+
+                    $needle = "/* That's all, stop editing!";
+                    $pos = strpos($content, $needle);
+                    if ($pos !== false) {
+                        $content = substr($content, 0, $pos) . $block . substr($content, $pos);
+                    } else {
+                        $content .= $block;
+                    }
+                }
+
+                if (@file_put_contents($config_path, $content)) {
+                    $config_written = true;
+                }
+            }
+        }
+
+        // If wp-config.php was not writable, fallback to an MU-plugin logger
+        if (!$config_written) {
+            $mu_dir = defined('WPMU_PLUGIN_DIR') ? WPMU_PLUGIN_DIR : WP_CONTENT_DIR . '/mu-plugins';
+            if (!@is_dir($mu_dir)) {
+                @wp_mkdir_p($mu_dir);
+            }
+            $mu_file = $mu_dir . '/phpinfowp-error-logger.php';
+            $mu_code = "<?php\n// Generated by phpinfo() WP - Safe Error Logging\ndefined('ABSPATH') or die();\nif (!defined('WP_DEBUG')) define('WP_DEBUG', true);\nif (!defined('WP_DEBUG_LOG')) define('WP_DEBUG_LOG', true);\nif (!defined('WP_DEBUG_DISPLAY')) define('WP_DEBUG_DISPLAY', false);\n@ini_set('log_errors', '1');\n@ini_set('error_log', WP_CONTENT_DIR . '/debug.log');\n@ini_set('display_errors', '0');\n";
+            if (!@file_put_contents($mu_file, $mu_code)) {
+                return [
+                    'success' => false,
+                    'message' => __('Could not update wp-config.php or create mu-plugins logger. Check file permissions.', 'phpinfo-wp'),
+                ];
+            }
+        }
+
+        self::protect_debug_log();
+
+        // Create empty debug.log file if not present so viewer immediately attaches to it
+        $target_log = WP_CONTENT_DIR . '/debug.log';
+        if (!@file_exists($target_log) && @is_writable(WP_CONTENT_DIR)) {
+            @touch($target_log);
+        }
+
+        return [
+            'success' => true,
+            'message' => __('Safe error logging enabled! Errors will be logged to wp-content/debug.log without leaking to site visitors.', 'phpinfo-wp'),
+        ];
+    }
+
+    /**
+     * Safely disable WordPress error logging.
+     */
+    public static function disable_logging(): array {
+        if (!self::_pro()) {
+            return [
+                'success' => false,
+                'message' => __('PRO license required to manage error logging.', 'phpinfo-wp'),
+            ];
+        }
+
+        $config_path = self::get_wp_config_path();
+        if ($config_path && @is_writable($config_path)) {
+            $content = (string) @file_get_contents($config_path);
+            if (!empty($content)) {
+                $content = preg_replace("/\/\/\s*BEGIN PHPINFO_WP_DEBUG.*?\/\/\s*END PHPINFO_WP_DEBUG\s*/s", "", $content);
+                $content = preg_replace("/define\s*\(\s*['\"]WP_DEBUG['\"]\s*,\s*[^)]+\);/i", "define( 'WP_DEBUG', false );", $content);
+                $content = preg_replace("/define\s*\(\s*['\"]WP_DEBUG_LOG['\"]\s*,\s*[^)]+\);/i", "define( 'WP_DEBUG_LOG', false );", $content);
+
+                @file_put_contents($config_path, $content);
+            }
+        }
+
+        $mu_file = (defined('WPMU_PLUGIN_DIR') ? WPMU_PLUGIN_DIR : WP_CONTENT_DIR . '/mu-plugins') . '/phpinfowp-error-logger.php';
+        if (@file_exists($mu_file)) {
+            @unlink($mu_file);
+        }
+
+        return [
+            'success' => true,
+            'message' => __('WordPress error logging has been disabled.', 'phpinfo-wp'),
+        ];
+    }
+
+    /**
+     * Ensure web server denies direct HTTP access to debug.log.
+     */
+    public static function protect_debug_log(): void {
+        $htaccess = WP_CONTENT_DIR . '/.htaccess';
+        $rule = "\n# BEGIN PHPINFO_WP_LOG_PROTECT\n<Files \"debug.log\">\n    Require all denied\n</Files>\n# END PHPINFO_WP_LOG_PROTECT\n";
+        if (@file_exists($htaccess)) {
+            $c = (string) @file_get_contents($htaccess);
+            if (strpos($c, 'PHPINFO_WP_LOG_PROTECT') === false && @is_writable($htaccess)) {
+                @file_put_contents($htaccess, $c . $rule);
+            }
+        } elseif (@is_writable(WP_CONTENT_DIR)) {
+            @file_put_contents($htaccess, $rule);
+        }
     }
 }

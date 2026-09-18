@@ -2,8 +2,8 @@
 Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
-Tested up to: 7.1
-Stable tag: 7.2.7
+Tested up to: 7.1.1
+Stable tag: 8.0.0
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -26,6 +26,8 @@ Think of it as the official **"Health Check & Troubleshooting"** plugin, but bui
 *   **PHP EOL Timeline**: Every PHP version's end-of-life date, current status, and days remaining.
 *   **Config Grader summary**: Overall A-F grade of your PHP config against WordPress best practices.
 *   **PHP Config editor (.htaccess / .user.ini)**: Set or change php.ini directives safely from your dashboard, with automatic backups and safety rollback.
+*   **Full Admin Security Activity Log**: Real-time security audit trail tracking user logins, failed authentication attempts (with real IP detection), plugin/theme changes, and core settings updates with 1-click CSV export.
+*   **Live Server Telemetry Dashboard**: Instant overview of peak RAM consumption, memory ceilings, database engine stats, and OPcache health right from your dashboard.
 *   **Admin bar health scoreboard**: Live grade and most-urgent issue on every admin page, like PageSpeed for your server.
 *   **Dashboard widget**: Site health at a glance the moment you log in.
 *   **Activity log, Extensions, and Basic info**: Everything the original plugin did, completely restyled.
@@ -38,6 +40,7 @@ Think of it as the official **"Health Check & Troubleshooting"** plugin, but bui
 
 *   **1-Click Auto-Fix with Rollback**: Fix config issues instantly. Writes optimization rules to .htaccess or .user.ini and auto-reverts if the server hits a 500 error.
 *   **Pre-Update PHP check**: Scan plugin updates before upgrading to verify they do not require a PHP version you do not have.
+*   **Smart PHP 7.4–8.4 Scanner (Zero False Alarms)**: Scans deep for real breaking changes in your plugins and themes while ignoring harmless backward-compatibility polyfills.
 *   **Update Guard Pro**: Automatic interception on the WordPress Updates page, changelog breaking-change risk analysis, WP.org abandonment alerts, post-update diagnostic health checks (loopback, error log delta, cron), and AI-written remediation steps.
 *   **Config Snapshots**: Weekly automatic snapshots of every php.ini directive, with visual diffs.
 *   **Security Headers Auditor**: Grade your HTTP response headers (CSP, HSTS, X-Frame-Options) with fix suggestions.
@@ -47,6 +50,8 @@ Think of it as the official **"Health Check & Troubleshooting"** plugin, but bui
 **Insight: Know what is wrong before clients call**
 
 *   **Full Config Grader**: Detailed grading with the exact recommended values and why each directive matters.
+*   **Native AI Plain-English Fix Explanations**: Instant plain-language explanations of failing server directives and PHP error logs, with exact steps to resolve them.
+*   **Autoload Bloat & Database Index Scanner**: Scan wp_options for bloated autoloaded entries and missing MySQL indexes that slow down your database queries.
 *   **Database Health**: Engine version, EOL status, size, and autoload bloat detection.
 *   **External API Monitor**: Track response times, status codes, and SSL expiry for third-party endpoints your site depends on.
 *   **Permissions Audit**: Recursive file and directory permission auditor.
@@ -72,9 +77,9 @@ phpinfo() WP gives you **one in-admin plugin** that covers all of it, with a sin
 
 = Pricing =
 
-*   **Single Site**: $29/year (1 site, essential Pro features, branded PDF, 3 snapshots, 1 API monitor)
+*   **Single Site**: $39/year (1 site, essential Pro features, branded PDF, 3 snapshots, 1 API monitor)
 *   **Unlimited Sites**: $69/year (the popular pick, works on every site, fully white-labeled, unlimited snapshots and API monitors)
-*   **Lifetime**: $149 once (founders pricing, first 50 buyers, unlimited sites, fully white-labeled)
+*   **Lifetime**: $149 once (founders pricing, limited spots, unlimited sites, fully white-labeled forever)
 
 14-day money-back guarantee. Instant license delivery. Site-locked license keys.
 
@@ -149,40 +154,51 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 
 == Screenshots ==
 
-1. Dashboard widget: PHP version, EOL status, and Config Grade at a glance.
-2. phpinfo() viewer: clean, searchable, and modern.
-3. Config Grader summary: your site's A-F grade across Performance, Security, and OPcache.
-4. PHP EOL Timeline: every PHP version's end-of-life date and days remaining.
-5. Troubleshooting Mode: per-user safe-mode that disables plugins only for your admin session, with a one-click "End and restore" button.
-6. Config Grader full breakdown (Pro): every failing directive with the exact recommended value and a one-click "Fix this" button.
-7. Audit Report (Pro): single-page white-label PDF you can hand to clients.
+1. Server Overview Dashboard: Real-time server telemetry, peak RAM consumption, memory limits, database size, and overall health grade at a glance.
+2. Update Guard Suite: Pre-update risk analysis across plugins and themes, plus automated 60-second post-update health diagnostics to stop silent site crashes.
+3. PHP Compatibility Scanner (PHP 7.4–8.4): Host-friendly static scanner checking plugins and themes for compatibility before you upgrade, built for strict managed hosts.
+4. Zero-Downtime Troubleshooting Mode: Isolate plugin conflicts in a private, per-user admin session while live visitors and customers browse normally without downtime.
+5. phpinfo() Viewer & Server Info: Full phpinfo() output inside wp-admin — searchable, colour-coded, and safe. Includes .htaccess editor and raw server variable browser.
+6. In-Admin PHP Multi-File Error Log (Pro): Real-time filterable error log viewer with stack traces and instant plain-English explanations of failing code.
+7. Config Grader & 1-Click Auto-Fix (Pro): A-F configuration scoring with instant directive optimization and automated rollback if the server triggers a 500 error.
+8. Database Health & Autoload Bloat Scanner (Pro): Detect TTFB-killing autoload data bloat in wp_options, identify missing MySQL indexes, and clean expired transients.
+9. Executive White-Label PDF Audit Report (Pro): Generate client-ready site audit reports with your agency logo, custom accent branding, and server health breakdown.
 
 == Changelog ==
 
+= 8.0.0 =
+* New: Server Overview Dashboard — Live look at peak RAM usage, memory limits, database autoload size, and OPcache health right inside wp-admin.
+* New: Admin Security Activity Log — Track logins, failed login attempts (with real IP detection behind Cloudflare and proxies), plugin/theme changes, and settings updates. Includes automatic log cleanup and 1-click CSV export.
+* New: Smarter PHP Compatibility Scanner — Scan plugins and themes for compatibility up to PHP 8.4 without false alarms from old fallback code.
+* New: Autoload Bloat & MySQL Index Scanner — Quickly check your database for oversized autoloaded options and missing table indexes that cause slow queries.
+* New: Plain-English AI Explanations — Failing server checks now include instant, easy-to-understand explanations of what went wrong and how to fix it.
+* Improved: 1-Click Server Directive Fixes now intelligently detect your server environment (.htaccess or .user.ini) and automatically roll back if anything goes wrong.
+* Improved: Cleaner screens by hiding distracting third-party plugin notices on phpinfo() WP diagnostic pages.
+* Improved: Security Headers audit now makes it much easier to spot and fix missing protections like CSP, HSTS, and X-Frame-Options.
+* Compatibility: Confirmed full compatibility with WordPress 7.1.1.
+
 = 7.2.7 =
-* **Feature**: Enriched Update Guard — Added Plugin & Theme pre-update compatibility scanning (PHP/WP floors, changelog risk parsing, abandonment checks), automated 60-second post-update health diagnostics (loopback, admin reachability, error log delta, cron integrity), and per-component stability tracking.
-* **Fix**: Renamed admin page query string slugs to `piwp-*` to prevent 403 Forbidden false-positives caused by 8G/7G Firewalls, BBQ (Block Bad Queries), and LiteSpeed rules blocklisting the `phpinfo` token in URL parameters. Special thanks to **Simon Richards** for discovering and reporting this.
-* **Enhancement**: Added seamless AJAX license activation and deactivation with instant inline validation and loading feedback.
-* **Enhancement**: Made Technical Support & Server Diagnostics accessible to all users with live environment signals.
-* **Fix**: Fixed button text vertical alignment across admin screens.
-* **Fix**: Corrected whitespace formatting and line wrapping in PHP error log viewer.
+* Improved: Update Guard now checks plugins and themes for breaking changes before you update, and runs health diagnostics 60 seconds after updating to make sure your site is still running smoothly.
+* Fix: Renamed admin URL parameters to prevent false-positive blocks from security firewalls and LiteSpeed rules. Special thanks to Simon Richards for reporting this.
+* Improved: License activation now validates instantly without reloading the page.
+* Improved: Made technical diagnostics and support tools accessible with live server signals.
+* Fix: Corrected button alignment and error log line wrapping across admin screens.
 
 = 7.2.6 =
-* **Compatibility**: Tested up to WordPress 7.1.
+* Compatibility: Confirmed compatibility with WordPress 7.1.
 
 = 7.2.5 =
-* **Improved**: Price increase reminder — Single Site plan increases from $29 to $39/year on August 31st. Lock in the current rate before then.
-* **Improved**: Enhanced upgrade prompts now surface your site's real config issues so you know exactly what Pro will fix on your site.
-* **Improved**: Minor UI polish across the admin dashboard and feature gate screens.
+* Improved: Added advance reminder for the Single Site price update to $39/year.
+* Improved: Upgrade prompts now highlight your site's actual server issues so you know exactly what Pro fixes.
+* Improved: Visual polish across dashboard and feature screens.
 
 = 7.2.4 =
-*   **NEW**: Complete visual plugin localization and translation files for French, German, Spanish, Italian, and Dutch.
-*   **Improved**: Optimized server EOL lifecycle gauges and HTTP header audits.
+* New: Added translation files for French, German, Spanish, Italian, and Dutch.
+* Improved: Cleaner PHP end-of-life status badges and HTTP security header checks.
 
 = 7.2.3 =
-*   **Pro**: Aligned Single Site plan feature restrictions with pricing tier limits. Capped Outbound API Monitors at 1, Config Snapshots at 3, locked Slack/Discord webhooks and Weekly digests, and set PDF audit reports to default branded styling.
-*   **Pro**: Added license grandfathering to ensure existing Single Site license holders retain unlimited access to all features.
-*   **Improved**: Standardized and optimized CSS layout margins and vertical padding on the landing page for visual consistency across desktop and mobile screens.
+* Improved: Updated Single Site tier limits (1 Outbound API Monitor, 3 Config Snapshots, branded PDF reports). Existing license holders retain unlimited access.
+* Improved: Layout alignment and mobile responsiveness across the landing page.
 
 == Upgrade Notice ==
 

@@ -22,7 +22,10 @@ sort($missing);
 
   <div class="phpinfowp-page-header">
     <div>
-      <h1><?php _e('PHP Extensions', 'phpinfo-wp'); ?></h1>
+      <h1>
+        <?php _e('PHP Extensions', 'phpinfo-wp'); ?>
+        <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Inspect active and recommended PHP extensions installed on your server runtime.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
+      </h1>
       <p class="phpinfowp-page-subtitle">
         <strong><?php echo count($loaded); ?></strong> <?php _e('loaded', 'phpinfo-wp'); ?>
         <?php if ($missing): ?>&nbsp;&middot;&nbsp;

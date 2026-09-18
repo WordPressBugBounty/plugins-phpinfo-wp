@@ -36,8 +36,6 @@ class Phpinfo_WP_Update_Audit {
     const TRANSIENT_RULESET = 'phpinfowp_ua_ruleset';   // cloud ruleset cache (Pro)
     const RULESET_URL    = 'https://exeebit.com/api/update-guard/ruleset';
     const MAX_FILE_SIZE  = 1048576;                     // 1 MB — skip bigger files
-    const FREE_MAX_FILES = 1500;
-    const PRO_MAX_FILES  = 8000;
     const META_TTL       = 12 * HOUR_IN_SECONDS;
     const META_MAX_LOOKUPS = 40;                        // cap WP.org calls per run
 
@@ -161,19 +159,19 @@ class Phpinfo_WP_Update_Audit {
      */
     private static function baked_js_rules(): array {
         return [
-            ['re' => '/\.live\s*\(/',                 'name' => '.live()',                 'since' => '5.7', 'fix' => 'Use .on() with delegation'],
-            ['re' => '/\.die\s*\(/',                  'name' => '.die()',                  'since' => '5.7', 'fix' => 'Use .off()'],
-            ['re' => '/\.size\s*\(\s*\)/',            'name' => '.size()',                 'since' => '5.7', 'fix' => 'Use .length'],
-            ['re' => '/\bjQuery\.browser\b/',         'name' => 'jQuery.browser',          'since' => '5.7', 'fix' => 'Feature-detect instead'],
-            ['re' => '/\$\.browser\b/',               'name' => '$.browser',               'since' => '5.7', 'fix' => 'Feature-detect instead'],
-            ['re' => '/\.andSelf\s*\(/',              'name' => '.andSelf()',              'since' => '5.7', 'fix' => 'Use .addBack()'],
-            ['re' => '/\.toggle\s*\(\s*function/',    'name' => '.toggle(handler, handler)', 'since' => '5.7', 'fix' => 'Bind click handlers manually'],
-            ['re' => '/\bjQuery\.sub\s*\(/',          'name' => 'jQuery.sub()',            'since' => '5.7', 'fix' => 'No replacement — refactor'],
-            ['re' => '/\bjQuery\.fn\.error\s*\(/',    'name' => '.error() event',          'since' => '5.7', 'fix' => "Use .on('error', …)"],
-            ['re' => '/\bjQuery\.parseJSON\s*\(/',    'name' => 'jQuery.parseJSON()',      'since' => '5.7', 'fix' => 'Use JSON.parse()'],
-            ['re' => '/\b\$\.parseJSON\s*\(/',        'name' => '$.parseJSON()',           'since' => '5.7', 'fix' => 'Use JSON.parse()'],
-            ['re' => '/\bjQuery\.isArray\s*\(/',      'name' => 'jQuery.isArray()',        'since' => '5.7', 'fix' => 'Use Array.isArray()'],
-            ['re' => '/\bjQuery\.trim\s*\(/',         'name' => 'jQuery.trim()',           'since' => '5.7', 'fix' => 'Use String.prototype.trim()'],
+            ['re' => '/(?:\$|jQuery)\s*\([^)]*\)[^;]*\.live\s*\(/',              'name' => 'jQuery(...).live()',              'since' => '5.7', 'fix' => 'Use .on() with delegation'],
+            ['re' => '/(?:\$|jQuery)\s*\([^)]*\)[^;]*\.die\s*\(/',               'name' => 'jQuery(...).die()',               'since' => '5.7', 'fix' => 'Use .off()'],
+            ['re' => '/(?:\$|jQuery)\s*\([^)]*\)[^;]*\.size\s*\(\s*\)/',         'name' => 'jQuery(...).size()',              'since' => '5.7', 'fix' => 'Use .length'],
+            ['re' => '/\bjQuery\.browser\b/',                                    'name' => 'jQuery.browser',                   'since' => '5.7', 'fix' => 'Feature-detect instead'],
+            ['re' => '/\$\.browser\b/',                                          'name' => '$.browser',                        'since' => '5.7', 'fix' => 'Feature-detect instead'],
+            ['re' => '/(?:\$|jQuery)\s*\([^)]*\)[^;]*\.andSelf\s*\(/',           'name' => 'jQuery(...).andSelf()',           'since' => '5.7', 'fix' => 'Use .addBack()'],
+            ['re' => '/(?:\$|jQuery)\s*\([^)]*\)[^;]*\.toggle\s*\(\s*function/', 'name' => 'jQuery(...).toggle(fn, fn)',      'since' => '5.7', 'fix' => 'Bind click handlers manually'],
+            ['re' => '/\bjQuery\.sub\s*\(/',                                     'name' => 'jQuery.sub()',                     'since' => '5.7', 'fix' => 'No replacement — refactor'],
+            ['re' => '/\bjQuery\.fn\.error\s*\(/',                               'name' => '.error() event',                   'since' => '5.7', 'fix' => "Use .on('error', …)"],
+            ['re' => '/\bjQuery\.parseJSON\s*\(/',                               'name' => 'jQuery.parseJSON()',               'since' => '5.7', 'fix' => 'Use JSON.parse()'],
+            ['re' => '/\b\$\.parseJSON\s*\(/',                                   'name' => '$.parseJSON()',                    'since' => '5.7', 'fix' => 'Use JSON.parse()'],
+            ['re' => '/\bjQuery\.isArray\s*\(/',                                 'name' => 'jQuery.isArray()',                 'since' => '5.7', 'fix' => 'Use Array.isArray()'],
+            ['re' => '/\bjQuery\.trim\s*\(/',                                    'name' => 'jQuery.trim()',                    'since' => '5.7', 'fix' => 'Use String.prototype.trim()'],
         ];
     }
 
@@ -286,6 +284,42 @@ class Phpinfo_WP_Update_Audit {
     // Scan
     // -------------------------------------------------------------------------
 
+    /**
+     * Determine if a JavaScript file is compiled or bundled output.
+     * Bundles (Webpack, Rollup, Vite, Gutenberg blocks) contain polyfills,
+     * Map/Set implementations, and minified code that produce false positive
+     * regex hits (e.g. Map.prototype.size or Set.prototype.size).
+     */
+    public static function is_bundled_js(string $abs, string $rel, string $filename): bool {
+        // 1. Minified, chunk, or bundle filename extensions
+        if (preg_match('/(\.min|\.bundle|\.chunk|\.pack)\.js$/i', $filename)) {
+            return true;
+        }
+        // 2. Hash-based filenames like index.a7b9c3.js or app.28e93892.chunk.js
+        if (preg_match('/[\.-][a-f0-9]{8,}\.js$/i', $filename)) {
+            return true;
+        }
+        // 3. Bundled or build directory paths
+        $bundle_dirs = [
+            '/dist/', '\\dist\\',
+            '/build/', '\\build\\',
+            '/builds/', '\\builds\\',
+            '/chunks/', '\\chunks\\',
+            '/bundle/', '\\bundle\\',
+            '/bundles/', '\\bundles\\',
+            '/assets/client/', '\\assets\\client\\',
+            '/assets/dist/', '\\assets\\dist\\',
+            '/assets/js/dist/', '\\assets\\js\\dist\\',
+            '/assets/build/', '\\assets\\build\\',
+            '/compiled/', '\\compiled\\',
+            '/min/', '\\min\\',
+        ];
+        foreach ($bundle_dirs as $d) {
+            if (stripos($abs, $d) !== false) return true;
+        }
+        return false;
+    }
+
     public static function scan(string $target): array {
         @set_time_limit(180);
         $started = microtime(true);
@@ -296,7 +330,7 @@ class Phpinfo_WP_Update_Audit {
 
         $current   = self::current_wp();
         $is_pro    = self::_pro();
-        $max_files = $is_pro ? self::PRO_MAX_FILES : self::FREE_MAX_FILES;
+        $mode      = version_compare($target, $current, '>') ? 'forward_dry_run' : 'in_place_audit';
 
         // Pre-filter rules to those that apply at/under the target core.
         $php_rules = array_filter(self::php_rules(), function ($r) use ($target) {
@@ -308,8 +342,7 @@ class Phpinfo_WP_Update_Audit {
 
         // jQuery removals only *break* when jQuery Migrate isn't loaded. Migrate
         // still ships with WordPress and many themes/plugins re-enqueue it, so we
-        // check the live front end once and downgrade "breaks" → "deprecated"
-        // when Migrate is present. Honest beats alarmist.
+        // check the live front end once and classify as mitigated when Migrate is present.
         $jqm = $js_rules ? self::jquery_migrate_status() : 'unknown';
 
         $issues_by_owner = [];
@@ -319,9 +352,29 @@ class Phpinfo_WP_Update_Audit {
 
         // Don't audit ourselves: this plugin's own source lists every WP
         // deprecated function name (as rule patterns + labels), so scanning it
-        // produces a comically false "21 deprecations" report on us.
+        // produces a comically false report on us.
         $self_dir   = basename(rtrim(PHPINFOWP_DIR, '/\\'));
         $self_owner = 'plugin/' . $self_dir;
+
+        // Target active plugins, active theme, and parent theme to avoid scanning dormant/inactive code
+        $active_plugins = (array) get_option('active_plugins', []);
+        if (is_multisite()) {
+            $sitewide = (array) get_site_option('active_sitewide_plugins', []);
+            $active_plugins = array_merge($active_plugins, array_keys($sitewide));
+        }
+        $active_owners = [];
+        foreach ($active_plugins as $ap) {
+            $dir = dirname($ap);
+            $slug = ($dir === '.' || $dir === '') ? pathinfo($ap, PATHINFO_FILENAME) : $dir;
+            $active_owners['plugin/' . $slug] = true;
+        }
+        if (function_exists('wp_get_theme')) {
+            $theme = wp_get_theme();
+            $active_owners['theme/' . $theme->get_stylesheet()] = true;
+            if ($theme->parent()) {
+                $active_owners['theme/' . $theme->parent()->get_template()] = true;
+            }
+        }
 
         $roots = [
             'plugin'    => WP_PLUGIN_DIR,
@@ -339,54 +392,69 @@ class Phpinfo_WP_Update_Audit {
             } catch (Throwable $e) { continue; }
 
             foreach ($it as $file) {
-                if ($files_scanned + $files_skipped >= $max_files) break 2;
                 if (!$file->isFile()) continue;
                 $ext = strtolower($file->getExtension());
                 if ($ext !== 'php' && $ext !== 'js') continue;
-                if ($ext === 'js' && substr($file->getFilename(), -7) === '.min.js') { continue; }
                 if ($file->getSize() > self::MAX_FILE_SIZE) { $files_skipped++; continue; }
 
-                $abs   = $file->getPathname();
+                $abs = $file->getPathname();
+                // Exclude compiled/bundled JS (dist/, build/, assets/client/, .min.js, hash names)
+                if ($ext === 'js' && self::is_bundled_js($abs, '', $file->getFilename())) {
+                    $files_skipped++;
+                    continue;
+                }
+
+                // Skip third-party vendor and dependency bundles to avoid noise and excessive memory usage
+                if (strpos($abs, '/vendor/') !== false || strpos($abs, '\\vendor\\') !== false ||
+                    strpos($abs, '/node_modules/') !== false || strpos($abs, '\\node_modules\\') !== false) {
+                    continue;
+                }
+
                 $rel   = ltrim(str_replace($root, '', $abs), '/\\');
                 $owner = self::owner_of($type, $rel);
                 if ($owner === null || $owner === $self_owner) continue;
 
+                // Limit plugin and theme scanning to active items (mu-plugins are always active)
+                if (($type === 'plugin' || $type === 'theme') && !isset($active_owners[$owner])) {
+                    continue;
+                }
+
                 $content = @file_get_contents($abs);
                 if ($content === false) { $files_skipped++; continue; }
+                if ($ext === 'php' && strpos($content, '<?') === false) { $files_scanned++; continue; }
+
                 $files_scanned++;
                 $owners_seen[$owner] = true;
 
-                $rules = $ext === 'php' ? $php_rules : $js_rules;
-                $kind  = $ext === 'php' ? 'php' : 'js';
-                // JS only counts as a hard break when Migrate is confirmed absent;
-                // otherwise it's "deprecated but currently working".
-                $js_sev = $jqm === 'absent' ? 'breaks' : 'deprecated';
-                foreach ($rules as $rule) {
-                    if (preg_match_all($rule['re'], $content, $m, PREG_OFFSET_CAPTURE)) {
-                        foreach ($m[0] as $hit) {
-                            // Skip false positives on a plugin's OWN code: a function
-                            // definition (`function get_settings(`) or a static/scoped
-                            // call (`Foo::get_settings(`) isn't a call to the core fn.
-                            // Rules flagged 'def' deliberately match a definition (the
-                            // PHP4 constructor), so they're exempt from this guard.
-                            if ($kind === 'php' && empty($rule['def'])) {
-                                if ($hit[1] > 0 && $content[$hit[1] - 1] === ':') continue;
-                                $pre = substr($content, max(0, $hit[1] - 12), min(12, $hit[1]));
-                                if (preg_match('/function\s+$/', $pre)) continue;
+                if ($ext === 'php') {
+                    // Token-stream state machine analysis (zero comment/docblock/string false positives)
+                    $file_issues = self::scan_php_tokens($content, $php_rules, $current, $rel);
+                    if (!empty($file_issues)) {
+                        if (!isset($issues_by_owner[$owner])) $issues_by_owner[$owner] = [];
+                        $issues_by_owner[$owner] = array_merge($issues_by_owner[$owner], $file_issues);
+                    }
+                } else {
+                    // JS scanner with jQuery Migrate awareness and two-axis classification
+                    $impact = ($jqm === 'present') ? 'mitigated' : (($jqm === 'absent') ? 'breaking' : 'latent');
+                    $js_sev = ($impact === 'breaking') ? 'breaks' : 'deprecated';
+                    foreach ($js_rules as $rule) {
+                        if (preg_match_all($rule['re'], $content, $m, PREG_OFFSET_CAPTURE)) {
+                            foreach ($m[0] as $hit) {
+                                $line = substr_count((string) substr($content, 0, $hit[1]), "\n") + 1;
+                                $issues_by_owner[$owner][] = [
+                                    'kind'             => 'js',
+                                    'file'             => $rel,
+                                    'line'             => $line,
+                                    'name'             => $rule['name'],
+                                    'fix'              => $rule['fix'],
+                                    'since'            => $rule['since'],
+                                    'severity'         => $js_sev,
+                                    'confirmed_impact' => $impact,
+                                    'evidence_type'    => 'static_pattern',
+                                    'migrate'          => true,
+                                    'new_now'          => version_compare($rule['since'], $current, '>'),
+                                ];
                             }
-                            $line = substr_count((string) substr($content, 0, $hit[1]), "\n") + 1;
-                            $issues_by_owner[$owner][] = [
-                                'kind'     => $kind,
-                                'file'     => $rel,
-                                'line'     => $line,
-                                'name'     => $rule['name'],
-                                'fix'      => $rule['fix'],
-                                'since'    => $rule['since'],
-                                'severity' => $kind === 'js' ? $js_sev : 'deprecated',
-                                'migrate'  => $kind === 'js',
-                                // True when this rule only becomes relevant *because* of this update.
-                                'new_now'  => version_compare($rule['since'], $current, '>'),
-                            ];
                         }
                     }
                 }
@@ -402,39 +470,65 @@ class Phpinfo_WP_Update_Audit {
         // ---- Per-owner rollup + verdict ----
         $owners = [];
         foreach ($owners_seen as $owner => $_) {
-            $list   = $issues_by_owner[$owner] ?? [];
-            $breaks = 0; $depr = 0;
+            $list      = $issues_by_owner[$owner] ?? [];
+            $breaking  = 0;
+            $latent    = 0;
+            $mitigated = 0;
             foreach ($list as $i) {
-                if ($i['severity'] === 'breaks') $breaks++; else $depr++;
+                $imp = $i['confirmed_impact'] ?? ($i['severity'] === 'breaks' ? 'breaking' : 'latent');
+                if ($imp === 'breaking') {
+                    $breaking++;
+                } elseif ($imp === 'mitigated') {
+                    $mitigated++;
+                } else {
+                    $latent++;
+                }
             }
             $m = $meta[$owner] ?? null;
             $owners[$owner] = [
-                'breaks'   => $breaks,
-                'depr'     => $depr,
-                'meta'     => $m,
-                'verdict'  => self::owner_verdict($breaks, $depr, $m),
-                'issues'   => $list,
+                'breaks'    => $breaking,
+                'depr'      => $latent,
+                'mitigated' => $mitigated,
+                'meta'      => $m,
+                'verdict'   => self::owner_verdict($breaking, $latent, $mitigated, $m, $mode),
+                'issues'    => $list,
             ];
         }
 
+        $total_breaking  = array_sum(array_map(function ($o) { return $o['breaks']; }, $owners));
+        $total_latent    = array_sum(array_map(function ($o) { return $o['depr']; }, $owners));
+        $total_mitigated = array_sum(array_map(function ($o) { return $o['mitigated'] ?? 0; }, $owners));
+
+        // Active owners with non-clean verdict (mitigated findings do not count as broken)
+        $with_issues = count(array_filter($owners, function ($o) use ($mode) {
+            if ($mode === 'in_place_audit') {
+                return $o['verdict'] !== 'clean';
+            }
+            return $o['verdict'] !== 'safe' && $o['verdict'] !== 'likely_safe';
+        }));
+
         $result = [
-            'target'        => $target,
-            'current'       => $current,
-            'verdict'       => self::overall_verdict($owners),
-            'owners'        => $owners,
-            'owner_count'   => count($owners_seen),
-            'with_issues'   => count($issues_by_owner),
-            'total_breaks'  => array_sum(array_map(function ($o) { return $o['breaks']; }, $owners)),
-            'total_depr'    => array_sum(array_map(function ($o) { return $o['depr']; }, $owners)),
-            'files'         => $files_scanned,
-            'skipped'       => $files_skipped,
-            'max_files'     => $max_files,
-            'truncated'     => ($files_scanned + $files_skipped) >= $max_files,
-            'duration'      => round(microtime(true) - $started, 2),
-            'scanned_at'    => time(),
-            'is_pro_result' => $is_pro,
-            'meta_checked'  => $is_pro,
-            'jquery_migrate'=> $jqm,
+            'mode'            => $mode,
+            'target'          => $target,
+            'current'         => $current,
+            'verdict'         => self::overall_verdict($owners, $mode),
+            'owners'          => $owners,
+            'owner_count'     => count($owners_seen),
+            'with_issues'     => $with_issues,
+            'total_breaks'    => $total_breaking,
+            'total_depr'      => $total_latent,
+            'total_breaking'  => $total_breaking,
+            'total_latent'    => $total_latent,
+            'total_mitigated' => $total_mitigated,
+            'files'           => $files_scanned,
+            'skipped'         => $files_skipped,
+            'max_files'       => 0,
+            'truncated'       => false,
+            'duration'        => round(microtime(true) - $started, 2),
+            'scanned_at'      => time(),
+            'is_pro_result'   => $is_pro,
+            'meta_checked'    => $is_pro,
+            'jquery_migrate'  => $jqm,
         ];
 
         update_option(self::OPT_RESULT, $result, false);
@@ -487,27 +581,57 @@ class Phpinfo_WP_Update_Audit {
     // Verdict logic
     // -------------------------------------------------------------------------
 
-    // A single plugin/theme: risky if it has hard breaks or looks abandoned on
-    // a major jump; caution on deprecations or a meaningful tested-up-to gap.
-    private static function owner_verdict(int $breaks, int $depr, ?array $meta): string {
-        if ($breaks > 0) return 'risky';
-        if ($meta) {
-            // Hard signals: abandoned, or needs a PHP the site doesn't have.
-            if (!empty($meta['abandoned']))  return 'risky';
-            if (!empty($meta['php_blocks'])) return 'risky';
-            // "Tested up to" lag is a soft signal — caution at most, never risky
-            // on its own (authors routinely lag the header without breaking).
-            if ((int) ($meta['tested_gap'] ?? 0) >= 1) return 'caution';
+    // A single plugin/theme:
+    // In in_place_audit mode:
+    //   - 'active_issue' if confirmed breaking, hard fatal, or PHP floor blocker
+    //   - 'latent_debt' if latent/unmitigated deprecations exist
+    //   - 'clean' if running cleanly or only mitigated findings
+    // In forward_dry_run mode:
+    //   - 'risky' if breaking issues, abandoned, or PHP blocker
+    //   - 'caution' if meaningful tested gap or deprecations with no shim
+    //   - 'likely_safe' if only latent/mitigated findings
+    //   - 'safe' if no findings
+    private static function owner_verdict(int $breaks, int $depr, int $mitigated, ?array $meta, string $mode = 'forward_dry_run'): string {
+        if ($mode === 'in_place_audit') {
+            if ($breaks > 0 || !empty($meta['php_blocks'])) {
+                return 'active_issue';
+            }
+            if ($depr > 0) {
+                return 'latent_debt';
+            }
+            // Mitigated findings (e.g. jQuery Migrate covering jQuery calls) or 0 issues
+            return 'clean';
         }
-        if ($depr > 0) return 'caution';
+
+        // Forward dry run (target > current)
+        if ($breaks > 0 || !empty($meta['abandoned']) || !empty($meta['php_blocks'])) {
+            return 'risky';
+        }
+        if ($depr > 0 || ((int) ($meta['tested_gap'] ?? 0) >= 1)) {
+            return 'caution';
+        }
+        if ($mitigated > 0) {
+            return 'likely_safe';
+        }
         return 'safe';
     }
 
-    private static function overall_verdict(array $owners): string {
+    private static function overall_verdict(array $owners, string $mode = 'forward_dry_run'): string {
+        if ($mode === 'in_place_audit') {
+            $worst = 'clean';
+            foreach ($owners as $o) {
+                if ($o['verdict'] === 'active_issue') return 'active_issue';
+                if ($o['verdict'] === 'latent_debt')  $worst = 'latent_debt';
+            }
+            return $worst;
+        }
+
+        // Forward dry run
         $worst = 'safe';
         foreach ($owners as $o) {
             if ($o['verdict'] === 'risky')   return 'risky';
             if ($o['verdict'] === 'caution') $worst = 'caution';
+            elseif ($o['verdict'] === 'likely_safe' && $worst === 'safe') $worst = 'likely_safe';
         }
         return $worst;
     }
@@ -528,7 +652,14 @@ class Phpinfo_WP_Update_Audit {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
         $plugins = function_exists('get_plugins') ? get_plugins() : [];
-        foreach ($plugins as $file => $data) {
+        $active_plugins = (array) get_option('active_plugins', []);
+        if (is_multisite()) {
+            $sitewide = (array) get_site_option('active_sitewide_plugins', []);
+            $active_plugins = array_merge($active_plugins, array_keys($sitewide));
+        }
+        foreach ($active_plugins as $file) {
+            if (!isset($plugins[$file])) continue;
+            $data = $plugins[$file];
             if ($lookups >= self::META_MAX_LOOKUPS || microtime(true) > $deadline) break;
             $slug  = self::plugin_slug($file);
             $owner = 'plugin/' . dirname($file);
@@ -663,6 +794,54 @@ class Phpinfo_WP_Update_Audit {
 
     public static function register(): void {
         add_action('admin_notices', [self::class, 'maybe_intercept']);
+        add_action('wp_ajax_phpinfowp_ua_scan',  [self::class, 'ajax_scan']);
+        add_action('wp_ajax_phpinfowp_ua_clear', [self::class, 'ajax_clear']);
+    }
+
+    public static function ajax_scan(): void {
+        check_ajax_referer('phpinfowp_ua_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized.', 'phpinfo-wp')]);
+        }
+
+        $target = sanitize_text_field($_POST['target'] ?? '');
+        if (!preg_match('/^\d+\.\d+(\.\d+)?$/', $target)) {
+            $target = self::default_target();
+        }
+
+        if (class_exists('Phpinfo_WP_Background_Scan')) {
+            Phpinfo_WP_Background_Scan::start('core_audit', ['target' => $target]);
+        }
+
+        $result = self::scan($target);
+        if (isset($result['error'])) {
+            if (class_exists('Phpinfo_WP_Background_Scan')) {
+                Phpinfo_WP_Background_Scan::clear('core_audit');
+            }
+            wp_send_json_error(['message' => $result['error']]);
+        }
+
+        if (class_exists('Phpinfo_WP_Background_Scan')) {
+            Phpinfo_WP_Background_Scan::complete('core_audit', [
+                'target' => $target,
+                'files'  => $result['files'] ?? 0,
+            ]);
+        }
+
+        wp_send_json_success($result);
+    }
+
+    public static function ajax_clear(): void {
+        check_ajax_referer('phpinfowp_ua_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized.', 'phpinfo-wp')]);
+        }
+
+        self::clear();
+        if (class_exists('Phpinfo_WP_Background_Scan')) {
+            Phpinfo_WP_Background_Scan::clear('core_audit');
+        }
+        wp_send_json_success();
     }
 
     public static function maybe_intercept(): void {
@@ -685,7 +864,7 @@ class Phpinfo_WP_Update_Audit {
         if (!self::_pro()) {
             if ($base !== 'update-core') return;
             printf(
-                '<div class="notice notice-info"><p><strong>phpinfo() WP:</strong> WordPress %s is available. '
+                '<div class="notice notice-info piwp-notice"><p><strong>phpinfo() WP:</strong> WordPress %s is available. '
                 . '<a href="%s">Run a pre-update audit</a> to see which plugins/themes may break. '
                 . '<a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank">Pro</a> warns you here automatically before every core update.</p></div>',
                 esc_html($avail), esc_url($audit_url)
@@ -695,7 +874,7 @@ class Phpinfo_WP_Update_Audit {
 
         if (!$fresh) {
             printf(
-                '<div class="notice notice-warning"><p><strong>Update Guard:</strong> WordPress %s is available but you haven\'t audited for it yet. '
+                '<div class="notice notice-warning piwp-notice"><p><strong>Update Guard:</strong> WordPress %s is available but you haven\'t audited for it yet. '
                 . '<a href="%s">Run the pre-update audit →</a></p></div>',
                 esc_html($avail), esc_url($audit_url)
             );
@@ -705,18 +884,177 @@ class Phpinfo_WP_Update_Audit {
         $v = $result['verdict'];
         if ($v === 'safe') {
             printf(
-                '<div class="notice notice-success"><p><strong>Update Guard:</strong> audited against WordPress %s — no breakages detected across %d plugins/themes. Safe to update. <a href="%s">View report</a></p></div>',
+                '<div class="notice notice-success piwp-notice"><p><strong>Update Guard:</strong> audited against WordPress %s — no breakages detected across %d plugins/themes. Safe to update. <a href="%s">View report</a></p></div>',
                 esc_html($avail), (int) $result['owner_count'], esc_url($audit_url)
             );
         } else {
             $color = $v === 'risky' ? 'error' : 'warning';
             $word  = $v === 'risky' ? 'likely to break' : 'may need attention';
             printf(
-                '<div class="notice notice-%s"><p><strong>Update Guard:</strong> %d plugin(s)/theme(s) are %s on WordPress %s '
+                '<div class="notice notice-%s piwp-notice"><p><strong>Update Guard:</strong> %d plugin(s)/theme(s) are %s on WordPress %s '
                 . '(%d hard breaks, %d deprecations). <a href="%s">Review before updating →</a></p></div>',
                 esc_attr($color), (int) $result['with_issues'], esc_html($word), esc_html($avail),
                 (int) $result['total_breaks'], (int) $result['total_depr'], esc_url($audit_url)
             );
         }
+    }
+
+    /**
+     * Token-stream state machine scanner for PHP files.
+     * Uses native ext-tokenizer (token_get_all) to accurately audit PHP code
+     * without false positives from comments, docblocks, strings, or object methods.
+     */
+    private static function scan_php_tokens(string $content, array $php_rules, string $current_wp, string $rel): array {
+        $issues = [];
+        $tokens = @token_get_all($content);
+        if (!is_array($tokens)) return [];
+
+        // Build fast symbol lookup tables
+        $func_lookup = [];
+        $def_lookup  = [];
+
+        foreach ($php_rules as $r) {
+            if (!empty($r['def'])) {
+                if (preg_match('/function(?:\\\\s\+|[\s\t]+)([A-Za-z0-9_]+)/i', $r['re'], $m)) {
+                    $def_lookup[strtolower($m[1])] = $r;
+                }
+            } else {
+                $clean = strtolower(rtrim($r['name'], '()'));
+                $func_lookup[$clean] = $r;
+            }
+        }
+
+        $count = count($tokens);
+        $prev_token_id  = null;
+        $brace_depth    = 0;
+        $guard_depth    = null;
+        $in_func_exists = false;
+
+        for ($i = 0; $i < $count; $i++) {
+            $t = $tokens[$i];
+
+            if (is_string($t)) {
+                if ($t === '{') {
+                    $brace_depth++;
+                } elseif ($t === '}') {
+                    $brace_depth--;
+                    if ($guard_depth !== null && $brace_depth < $guard_depth) {
+                        $guard_depth = null; // Exited polyfill guard block
+                    }
+                }
+                $prev_token_id = $t;
+                continue;
+            }
+
+            $id   = $t[0];
+            $text = $t[1];
+            $line = $t[2];
+
+            // Ignore whitespace, comments, docblocks, and inline HTML (kills 100% of docblock false alarms)
+            if ($id === T_WHITESPACE || $id === T_COMMENT || $id === T_DOC_COMMENT || $id === T_INLINE_HTML) {
+                continue;
+            }
+
+            // Track polyfill detection: if (!function_exists('...'))
+            if ($id === T_STRING && strtolower($text) === 'function_exists') {
+                $in_func_exists = true;
+            } elseif ($in_func_exists && $id === T_CONSTANT_ENCAPSED_STRING) {
+                $fn_name = strtolower(trim($text, "'\""));
+                if (isset($func_lookup[$fn_name])) {
+                    $guard_depth = $brace_depth + 1;
+                }
+                $in_func_exists = false;
+            } elseif ($id === T_STRING || (defined('T_NAME_FULLY_QUALIFIED') && $id === T_NAME_FULLY_QUALIFIED)) {
+                $lower = strtolower(ltrim($text, '\\'));
+
+                // 1. Check for function definition rules (e.g. PHP4 WP_Widget constructor)
+                if (isset($def_lookup[$lower]) && $prev_token_id === T_FUNCTION) {
+                    $next_idx = self::next_meaningful_token($tokens, $i + 1, $count);
+                    if ($next_idx !== null && $tokens[$next_idx] === '(') {
+                        $rule = $def_lookup[$lower];
+                        $issues[] = [
+                            'kind'             => 'php',
+                            'file'             => $rel,
+                            'line'             => $line,
+                            'name'             => $rule['name'],
+                            'fix'              => $rule['fix'],
+                            'since'            => $rule['since'],
+                            'severity'         => 'breaks',
+                            'confirmed_impact' => 'breaking',
+                            'evidence_type'    => 'static_pattern',
+                            'migrate'          => false,
+                            'new_now'          => version_compare($rule['since'], $current_wp, '>'),
+                        ];
+                    }
+                }
+
+                // 2. Check for deprecated global function calls
+                if (isset($func_lookup[$lower])) {
+                    // Skip if inside a polyfill guard block
+                    if ($guard_depth === null || $brace_depth < $guard_depth) {
+                        $is_definition  = ($prev_token_id === T_FUNCTION);
+                        $is_method      = ($prev_token_id === T_OBJECT_OPERATOR || (defined('T_NULLSAFE_OBJECT_OPERATOR') && $prev_token_id === T_NULLSAFE_OBJECT_OPERATOR));
+                        $is_static      = ($prev_token_id === T_DOUBLE_COLON);
+                        $is_non_root_ns = false;
+
+                        if ($prev_token_id === T_NS_SEPARATOR) {
+                            $before_ns = self::prev_meaningful_token($tokens, $i - 1);
+                            if ($before_ns !== null && is_array($tokens[$before_ns]) && $tokens[$before_ns][0] === T_STRING) {
+                                $is_non_root_ns = true;
+                            }
+                        }
+
+                        if (!$is_definition && !$is_method && !$is_static && !$is_non_root_ns) {
+                            $next_idx = self::next_meaningful_token($tokens, $i + 1, $count);
+                            if ($next_idx !== null && $tokens[$next_idx] === '(') {
+                                $rule = $func_lookup[$lower];
+                                $issues[] = [
+                                    'kind'             => 'php',
+                                    'file'             => $rel,
+                                    'line'             => $line,
+                                    'name'             => $rule['name'],
+                                    'fix'              => $rule['fix'],
+                                    'since'            => $rule['since'],
+                                    'severity'         => 'deprecated',
+                                    'confirmed_impact' => 'latent',
+                                    'evidence_type'    => 'static_pattern',
+                                    'migrate'          => false,
+                                    'new_now'          => version_compare($rule['since'], $current_wp, '>'),
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+
+            $prev_token_id = $id;
+        }
+
+        unset($tokens);
+        return $issues;
+    }
+
+    private static function next_meaningful_token(array &$tokens, int $start, int $count): ?int {
+        for ($j = $start; $j < $count; $j++) {
+            $t = $tokens[$j];
+            if (is_array($t)) {
+                $id = $t[0];
+                if ($id === T_WHITESPACE || $id === T_COMMENT || $id === T_DOC_COMMENT) continue;
+            }
+            return $j;
+        }
+        return null;
+    }
+
+    private static function prev_meaningful_token(array &$tokens, int $start): ?int {
+        for ($j = $start - 1; $j >= 0; $j--) {
+            $t = $tokens[$j];
+            if (is_array($t)) {
+                $id = $t[0];
+                if ($id === T_WHITESPACE || $id === T_COMMENT || $id === T_DOC_COMMENT) continue;
+            }
+            return $j;
+        }
+        return null;
     }
 }

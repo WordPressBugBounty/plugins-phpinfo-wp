@@ -13,7 +13,12 @@ function phpinfowp_fmt_bytes(int $bytes): string {
 
 function phpinfowp_dirsize_safe(string $path): string {
     if (!is_dir($path)) return '—';
-    $size = get_dirsize($path);
+    $cache_key = 'phpinfowp_dirsize_' . md5($path);
+    $size = get_transient($cache_key);
+    if ($size === false) {
+        $size = (int) get_dirsize($path);
+        set_transient($cache_key, $size, 12 * HOUR_IN_SECONDS);
+    }
     return $size ? phpinfowp_fmt_bytes((int)$size) : '—';
 }
 
@@ -47,82 +52,13 @@ $server_soft = $_SERVER['SERVER_SOFTWARE'] ?? '—';
 
   <div class="phpinfowp-page-header">
     <div>
-      <h1><?php _e('Server Overview', 'phpinfo-wp'); ?></h1>
-      <p class="phpinfowp-page-subtitle"><?php _e('PHP, WordPress, server, and database environment at a glance', 'phpinfo-wp'); ?></p>
+      <h1>
+        <?php _e('Server Overview', 'phpinfo-wp'); ?>
+        <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('PHP, WordPress, server, and database environment details', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
+      </h1>
     </div>
   </div>
 
-  <div class="phpinfowp-info-grid">
-
-    <!-- PHP -->
-    <div class="phpinfowp-info-card" style="border-top:3px solid <?php echo $eol_color; ?>">
-      <div class="phpinfowp-info-card-label"><?php _e('PHP Version', 'phpinfo-wp'); ?></div>
-      <div class="phpinfowp-info-card-value"><?php echo esc_html(PHP_VERSION); ?></div>
-      <div class="phpinfowp-info-card-sub">
-        <span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.4px;background:<?php echo $eol_color; ?>;color:#fff">
-          <?php
-          if ($eol['status'] === 'eol')     echo esc_html__('END OF LIFE', 'phpinfo-wp');
-          elseif ($eol['status'] === 'warning') echo esc_html__('EOL SOON', 'phpinfo-wp');
-          else echo esc_html__('SUPPORTED', 'phpinfo-wp');
-          ?>
-        </span>
-        <div style="margin-top:4px;color:<?php echo $eol_color; ?>">
-          <?php
-          if ($eol['status'] === 'eol') echo esc_html__('Upgrade immediately', 'phpinfo-wp');
-          elseif ($eol['status'] === 'warning') printf(esc_html__('EOL in %sd — %s', 'phpinfo-wp'), $eol['days'], $eol['eol']);
-          elseif ($eol['status'] === 'ok') printf(esc_html__('Until %s', 'phpinfo-wp'), $eol['eol']);
-          else echo esc_html__('EOL date unknown', 'phpinfo-wp');
-          ?>
-        </div>
-      </div>
-    </div>
-
-    <!-- WordPress -->
-    <div class="phpinfowp-info-card" style="border-top:3px solid #2271b1">
-      <div class="phpinfowp-info-card-label"><?php _e('WordPress', 'phpinfo-wp'); ?></div>
-      <div class="phpinfowp-info-card-value"><?php echo esc_html(get_bloginfo('version')); ?></div>
-      <div class="phpinfowp-info-card-sub">
-        <?php echo is_multisite() ? esc_html__('Multisite network', 'phpinfo-wp') : esc_html__('Single site', 'phpinfo-wp'); ?><br>
-        <?php
-        $active_plugins_count = count(get_option('active_plugins'));
-        printf(
-            _n('%s active plugin', '%s active plugins', $active_plugins_count, 'phpinfo-wp'),
-            number_format_i18n($active_plugins_count)
-        );
-        ?>
-      </div>
-    </div>
-
-    <!-- Memory -->
-    <div class="phpinfowp-info-card" style="border-top:3px solid <?php echo $mem_pct > 85 ? '#d63638' : '#777BB3'; ?>">
-      <div class="phpinfowp-info-card-label"><?php _e('Memory Usage', 'phpinfo-wp'); ?></div>
-      <div class="phpinfowp-info-card-value"><?php echo esc_html(phpinfowp_fmt_bytes($mem_used)); ?></div>
-      <div class="phpinfowp-info-card-sub">
-        <?php printf(
-            /* translators: 1: memory limit, 2: percentage value */
-            __('of %1$s limit (%2$s%%)', 'phpinfo-wp'),
-            esc_html($mem_limit),
-            $mem_pct
-        ); ?>
-        <div class="phpinfowp-mini-bar-wrap">
-          <div class="phpinfowp-mini-bar" style="width:<?php echo min(100,$mem_pct); ?>%;background:<?php echo $mem_pct > 85 ? '#d63638' : '#777BB3'; ?>"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Database -->
-    <div class="phpinfowp-info-card" style="border-top:3px solid #00a32a">
-      <div class="phpinfowp-info-card-label"><?php _e('Database', 'phpinfo-wp'); ?></div>
-      <div class="phpinfowp-info-card-value" style="font-size:18px"><?php echo esc_html($db_version); ?></div>
-      <div class="phpinfowp-info-card-sub">
-        <?php echo esc_html(DB_NAME); ?><br>
-        <?php printf(esc_html__('%s total size', 'phpinfo-wp'), esc_html($db_size)); ?>
-      </div>
-    </div>
-
-  </div>
-
-  <h2 class="phpinfowp-section-heading"><?php _e('Environment Details', 'phpinfo-wp'); ?></h2>
   <table class="wp-list-table widefat fixed striped phpinfowp-info-table">
     <tbody>
 

@@ -3,6 +3,8 @@ defined('ABSPATH') or die('Unauthorized Access');
 
 class Phpinfo_WP_DB_Health {
 
+    const OPT_CACHE = 'phpinfowp_db_health_cache';
+
     // MySQL EOL dates — https://endoflife.date/mysql
     /**
      * @var mixed[]
@@ -38,6 +40,56 @@ class Phpinfo_WP_DB_Health {
     ];
 
     private static function _pro(): bool { return Phpinfo_WP_License::is_valid(); }
+
+    public static function register(): void {
+        add_action('wp_ajax_phpinfowp_db_scan',             [__CLASS__, 'ajax_scan']);
+        add_action('wp_ajax_phpinfowp_db_clear',            [__CLASS__, 'ajax_clear']);
+        add_action('wp_ajax_phpinfowp_db_purge_transients', [__CLASS__, 'ajax_purge_transients']);
+    }
+
+    /**
+     * Non-blocking cached lookup for database health report.
+     */
+    public static function get_result(): ?array {
+        $cached = get_transient(self::OPT_CACHE);
+        return is_array($cached) ? $cached : null;
+    }
+
+    /**
+     * Executes deep database analysis and caches results.
+     */
+    public static function scan(bool $force_refresh = false): array {
+        if (!$force_refresh) {
+            $cached = self::get_result();
+            if ($cached !== null) return $cached;
+        }
+
+        $server           = self::server_info();
+        $autoload         = self::autoload_size();
+        $transients       = self::transients();
+        $tables           = self::tables();
+        $db_size          = self::db_size();
+        $missing_idx      = self::_pro() ? self::missing_indexes() : [];
+        $has_autoload_idx = self::_pro() ? self::check_autoload_index() : true;
+
+        $result = [
+            'server'           => $server,
+            'autoload'         => $autoload,
+            'transients'       => $transients,
+            'tables'           => $tables,
+            'db_size'          => $db_size,
+            'missing_idx'      => $missing_idx,
+            'has_autoload_idx' => $has_autoload_idx,
+            'scanned_at'       => current_time('timestamp'),
+        ];
+
+        set_transient(self::OPT_CACHE, $result, 6 * HOUR_IN_SECONDS);
+        return $result;
+    }
+
+    public static function bust_cache(): void {
+        delete_transient(self::OPT_CACHE);
+    }
 
     public static function server_info(): array {
         global $wpdb;
@@ -130,6 +182,7 @@ class Phpinfo_WP_DB_Health {
             if (delete_option($timeout_name))           $deleted++;
             if (delete_option('_transient_' . $key))    $deleted++;
         }
+        self::bust_cache();
         return (int) ($deleted / 2);
     }
 
@@ -143,18 +196,20 @@ class Phpinfo_WP_DB_Health {
             DB_NAME
         ));
         $out = [];
-        foreach ($rows as $r) {
-            $total = (int) $r->DATA_LENGTH + (int) $r->INDEX_LENGTH;
-            $out[] = [
-                'name'   => $r->TABLE_NAME,
-                'rows'   => (int) $r->TABLE_ROWS,
-                'data'   => (int) $r->DATA_LENGTH,
-                'index'  => (int) $r->INDEX_LENGTH,
-                'free'   => (int) $r->DATA_FREE,
-                'total'  => $total,
-                'engine' => $r->ENGINE,
-                'overhead_pct' => $total > 0 ? round((int)$r->DATA_FREE / $total * 100, 1) : 0,
-            ];
+        if (is_array($rows)) {
+            foreach ($rows as $r) {
+                $total = (int) $r->DATA_LENGTH + (int) $r->INDEX_LENGTH;
+                $out[] = [
+                    'name'   => $r->TABLE_NAME,
+                    'rows'   => (int) $r->TABLE_ROWS,
+                    'data'   => (int) $r->DATA_LENGTH,
+                    'index'  => (int) $r->INDEX_LENGTH,
+                    'free'   => (int) $r->DATA_FREE,
+                    'total'  => $total,
+                    'engine' => $r->ENGINE,
+                    'overhead_pct' => $total > 0 ? round((int)$r->DATA_FREE / $total * 100, 1) : 0,
+                ];
+            }
         }
         return $out;
     }
@@ -197,7 +252,7 @@ class Phpinfo_WP_DB_Health {
             ORDER BY t.TABLE_ROWS DESC
         ";
         
-        return $wpdb->get_results($wpdb->prepare($query, $db, $db), ARRAY_A);
+        return $wpdb->get_results($wpdb->prepare($query, $db, $db), ARRAY_A) ?: [];
     }
 
     public static function check_autoload_index(): bool {
@@ -211,5 +266,34 @@ class Phpinfo_WP_DB_Health {
               AND INDEX_NAME = 'autoload'
         ", DB_NAME, $wpdb->options));
         return (bool) $has_index;
+    }
+
+    /* ── AJAX Endpoints ─────────────────────────────────────────────────── */
+
+    public static function ajax_scan(): void {
+        check_ajax_referer('phpinfowp_db_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized.', 'phpinfo-wp')]);
+        }
+        $data = self::scan(true);
+        wp_send_json_success($data);
+    }
+
+    public static function ajax_clear(): void {
+        check_ajax_referer('phpinfowp_db_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized.', 'phpinfo-wp')]);
+        }
+        self::bust_cache();
+        wp_send_json_success();
+    }
+
+    public static function ajax_purge_transients(): void {
+        check_ajax_referer('phpinfowp_db_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized.', 'phpinfo-wp')]);
+        }
+        $purged = self::purge_expired_transients();
+        wp_send_json_success(['purged' => $purged, 'message' => sprintf(__('Purged %d expired transients.', 'phpinfo-wp'), $purged)]);
     }
 }

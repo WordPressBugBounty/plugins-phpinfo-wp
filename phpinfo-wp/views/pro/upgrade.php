@@ -63,7 +63,7 @@ $pillars = [
         <div class="phpinfowp-upgrade-pricing">
             <div class="phpinfowp-upgrade-price-tier">
                 <div class="phpinfowp-upgrade-price-name"><?php _e('Single', 'phpinfo-wp'); ?></div>
-                <div class="phpinfowp-upgrade-price-value">$29<small>/yr</small></div>
+                <div class="phpinfowp-upgrade-price-value">$39<small>/yr</small></div>
                 <div class="phpinfowp-upgrade-price-sub"><?php _e('1 site · Essential features · Branded reports', 'phpinfo-wp'); ?></div>
             </div>
             <div class="phpinfowp-upgrade-price-tier is-featured">

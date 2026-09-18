@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     7.2.7
+Version:     8.0.0
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com/phpinfo-wp
@@ -15,7 +15,7 @@ Domain Path: /languages
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '7.2.7');
+define('PHPINFOWP_VERSION', '8.0.0');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 define('PHPINFOWP_SLUG_PREFIX', 'piwp');
@@ -52,6 +52,8 @@ require_once PHPINFOWP_DIR . 'includes/class-deactivate-modal.php';
 require_once PHPINFOWP_DIR . 'includes/class-api-monitor.php';
 require_once PHPINFOWP_DIR . 'includes/class-permissions.php';
 require_once PHPINFOWP_DIR . 'includes/class-whats-new-notice.php';
+require_once PHPINFOWP_DIR . 'includes/class-activity-log.php';
+require_once PHPINFOWP_DIR . 'includes/class-background-scan.php';
 require_once PHPINFOWP_DIR . 'includes/fn-feature-lock.php';
 
 if (!class_exists('Phpinfo_wp')):
@@ -59,6 +61,8 @@ if (!class_exists('Phpinfo_wp')):
 class Phpinfo_wp {
 
     public function register(): void {
+        Phpinfo_WP_Activity_Log::init();
+        Phpinfo_WP_Background_Scan::init();
         add_action('admin_menu',                  [$this, 'add_admin_pages']);
         add_action('admin_bar_menu',              [$this, 'admin_bar_indicator'], 100);
         add_action('admin_enqueue_scripts',       [$this, 'enqueue']);
@@ -68,7 +72,9 @@ class Phpinfo_wp {
         add_action('phpinfowp_license_ping_async',['Phpinfo_WP_License', 'cron_ping']);
         add_action('wp_ajax_phpinfowp_activate_license',   ['Phpinfo_WP_License', 'ajax_activate']);
         add_action('wp_ajax_phpinfowp_deactivate_license', ['Phpinfo_WP_License', 'ajax_deactivate']);
+        add_action('wp_ajax_phpinfowp_dismiss_server_bottleneck', ['Phpinfo_WP_Config_Grader', 'ajax_dismiss_bottleneck']);
         add_action('phpinfowp_weekly_maintenance',['Phpinfo_WP_Alerts', 'cron_weekly']);
+        add_action('phpinfowp_daily_monitoring',  ['Phpinfo_WP_Alerts', 'cron_daily']);
         add_filter('clean_url',                   [$this, 'script_async'], 11, 1);
         add_filter('plugin_row_meta',             [$this, 'meta'], 10, 2);
         add_filter('plugin_action_links',         [$this, 'action_links'], 10, 2);
@@ -84,12 +90,15 @@ class Phpinfo_wp {
         // Leaf-hiding CSS must load early (not in admin_footer) because WP 7.0
         // View Transitions can skip footer scripts on cross-doc navigations.
         add_action('admin_enqueue_scripts',       [$this, 'enqueue_sidebar_css']);
+        // Suppress 3rd-party notices on our admin screens
+        add_action('in_admin_header',             [$this, 'clean_third_party_notices'], 1);
+        add_action('admin_print_styles',          [$this, 'clean_third_party_notices'], 1);
         // Topbar (logo + page title + CTA) above every plugin page.
         add_action('in_admin_header',             [$this, 'render_topbar']);
         Phpinfo_WP_Site_Health::register();
         Phpinfo_WP_Network::register();
         Phpinfo_WP_Safemode::register();
-        Phpinfo_WP_Compat::register_update_warnings();
+        Phpinfo_WP_Compat::register();
         Phpinfo_WP_Update_Audit::register();
         Phpinfo_WP_Update_Guard::register();
         Phpinfo_WP_Update_History::register();
@@ -99,12 +108,18 @@ class Phpinfo_wp {
         Phpinfo_WP_Deactivate_Modal::register();
         Phpinfo_WP_API_Monitor::register();
         Phpinfo_WP_Permissions::register();
+        Phpinfo_WP_Security_Headers::register();
+        Phpinfo_WP_SSL::register();
+        Phpinfo_WP_DB_Health::register();
+        Phpinfo_WP_Mail_Check::register();
+        Phpinfo_WP_Report::register();
         Phpinfo_WP_Whats_New_Notice::register();
 
         // Auto-render the tab bar above every grouped page (priority 5 so
         // it sits at the top of the .wrap before any other admin notices).
         add_action('admin_notices', ['Phpinfo_WP_Admin_Nav', 'auto_render'], 5);
 
+        Phpinfo_WP_Admin_Bar::init();
         if (is_admin()) {
             register_shutdown_function(['Phpinfo_WP_Admin_Bar', 'record_memory_peak']);
         }
@@ -188,17 +203,17 @@ class Phpinfo_wp {
     }
 
     public function show_update_notice(array $plugin_data, object $response): void {
-        echo '<div style="margin-top: 10px; padding: 12px 14px; background: #f6f9fc; border-left: 4px solid #777BB3; font-size: 13px; color: #2c3338; border-radius: 0 4px 4px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">';
-        echo '<p style="margin: 0 0 6px; font-weight: 600; color: #1d2327;">';
+        echo '<span style="display: block; margin-top: 10px; padding: 12px 14px; background: #f6f9fc; border-left: 4px solid #777BB3; font-size: 13px; color: #2c3338; border-radius: 0 4px 4px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">';
+        echo '<span style="display: block; margin: 0 0 6px; font-weight: 600; color: #1d2327;">';
         echo '✨ ' . esc_html__('What you are unlocking in this version:', 'phpinfo-wp');
-        echo '</p>';
-        echo '<p style="margin: 0 0 8px; color: #475569; line-height: 1.4;">';
+        echo '</span>';
+        echo '<span style="display: block; margin: 0 0 8px; color: #475569; line-height: 1.4;">';
         echo esc_html__('Includes new translation packs (German, French, Spanish, Italian, Dutch) and optimized PHP server lifecycle audits.', 'phpinfo-wp');
-        echo '</p>';
-        echo '<p style="margin: 0; font-size: 12px; color: #64748b; font-style: italic;">';
+        echo '</span>';
+        echo '<span style="display: block; margin: 0; font-size: 12px; color: #64748b; font-style: italic;">';
         echo esc_html__('💡 Note: Since this is a system diagnostics tool, standard backup practices are always recommended before upgrading.', 'phpinfo-wp');
-        echo '</p>';
-        echo '</div>';
+        echo '</span>';
+        echo '</span>';
     }
 
     public function add_admin_pages(): void {
@@ -264,7 +279,8 @@ class Phpinfo_wp {
             ['piwp-mail',              'Mail',              'view_mail'],
             ['piwp-error-log',         'Error Log',         'view_error_log'],
             // Reports group
-            ['piwp-log',               'Activity Log',      'view_log'],
+            ['piwp-log',               'Operations Log',    'view_log'],
+            ['piwp-admin-log',         'Admin Log',         'view_admin_log'],
             ['piwp-report',            'Audit Report',      'view_report'],
             ['piwp-alerts',            'Alerts',            'view_alerts'],
         ];
@@ -291,6 +307,7 @@ class Phpinfo_wp {
     public function view_extensions(): void { require PHPINFOWP_DIR . 'views/extension.php'; }
     public function view_info(): void     { require PHPINFOWP_DIR . 'views/info.php'; }
     public function view_log(): void      { require PHPINFOWP_DIR . 'views/log.php'; }
+    public function view_admin_log(): void { require PHPINFOWP_DIR . 'views/admin-log.php'; }
     public function view_safemode(): void { require PHPINFOWP_DIR . 'views/safemode.php'; }
 
     // --- Pro views ---
@@ -393,24 +410,41 @@ class Phpinfo_wp {
             $grade_summary = $is_pro
                 ? Phpinfo_WP_Config_Grader::run()
                 : Phpinfo_WP_Config_Grader::summary();
-            $grade_score = $grade_summary['score'] ?? 0;
-            $grade_letter = $grade_summary['grade'] ?? 'F';
-            switch (true) {
-                case $grade_score >= 85:
-                    $grade_color = '#00a32a';
-                    break;
-                case $grade_score >= 60:
-                    $grade_color = '#dba617';
-                    break;
-                default:
-                    $grade_color = '#d63638';
-                    break;
+            // Server Telemetry grade & score: letter and numeric score stay in mathematical agreement
+            $grade_score      = (int) ($grade_summary['score_controllable'] ?? ($grade_summary['score'] ?? 0));
+            $grade_letter     = $grade_summary['grade_controllable'] ?? ($grade_summary['grade'] ?? 'F');
+            $grade_score_raw  = (int) ($grade_summary['score'] ?? $grade_score);
+            $grade_letter_raw = $grade_summary['grade'] ?? $grade_letter;
+            $is_capped        = !empty($grade_summary['is_capped']);
+            $grade_eff        = $grade_summary['grade_effective'] ?? $grade_letter;
+            $score_eff        = (int) ($grade_summary['score_effective'] ?? $grade_score);
+            $widget_show_dual = ($grade_score !== $grade_score_raw);
+
+            if ($is_capped) {
+                $grade_display = $grade_eff . '*';
+                $grade_num     = $score_eff;
+                $grade_color   = ($score_eff >= 85) ? '#00a32a' : (($score_eff >= 70) ? '#dba617' : '#d63638');
+                $widget_title  = sprintf(
+                    __('Server Telemetry %1$s* (%2$d/100): Balanced average with host-locked settings. Site: %3$s (%4$d/100), Server: %5$s (%6$d/100)', 'phpinfo-wp'),
+                    $grade_eff, $score_eff, $grade_letter, $grade_score, $grade_letter_raw, $grade_score_raw
+                );
+            } else {
+                $grade_display = $grade_eff;
+                $grade_num     = $score_eff;
+                $grade_color   = ($grade_num >= 85) ? '#00a32a' : (($grade_num >= 60) ? '#dba617' : '#d63638');
+                $widget_title  = $widget_show_dual
+                    ? sprintf(__('Site: %1$s (%2$d/100). Server: %3$s (%4$d/100)', 'phpinfo-wp'), $grade_letter, $grade_score, $grade_letter_raw, $grade_score_raw)
+                    : sprintf(__('Server Telemetry: %1$s (%2$d/100)', 'phpinfo-wp'), $grade_letter, $grade_num);
             }
+            $widget_sub = $widget_show_dual ? sprintf(__('server: %s', 'phpinfo-wp'), $grade_letter_raw) : '';
             ?>
             <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0">
-                <span style="color:#555">Config Grade</span>
-                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-config-grader')); ?>" style="text-decoration:none;font-weight:700;font-size:16px;color:<?php echo $grade_color; ?>">
-                    <?php echo esc_html($grade_letter); ?> <span style="font-size:11px;font-weight:400;color:#666"><?php echo (int)$grade_score; ?>/100</span>
+                <span style="color:#555"><?php _e('Config Grade', 'phpinfo-wp'); ?></span>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-config-grader')); ?>" style="text-decoration:none;font-weight:700;font-size:16px;color:<?php echo $grade_color; ?>;text-align:right" title="<?php echo esc_attr($widget_title); ?>">
+                    <?php echo esc_html($grade_display); ?> <span style="font-size:11px;font-weight:400;color:#666"><?php echo (int)$grade_num; ?>/100</span>
+                    <?php if (!empty($widget_sub)): ?>
+                    <span style="font-size:10px;font-weight:400;color:#999;display:block;line-height:1.2"><?php echo esc_html($widget_sub); ?></span>
+                    <?php endif; ?>
                 </a>
             </div>
 
@@ -524,19 +558,29 @@ class Phpinfo_wp {
 
     public function enqueue(string $hook): void {
         if (!class_exists('Phpinfo_WP_Admin_Nav') || (!Phpinfo_WP_Admin_Nav::is_plugin_page() && $hook !== 'plugins.php')) return;
-        // Use filemtime as the cache key so any CSS/JS edit auto-busts browser
-        // caches without bumping PHPINFOWP_VERSION. Falls back to plugin version.
-        $css_path = PHPINFOWP_DIR . 'css/style.css';
-        $js_path  = PHPINFOWP_DIR . 'js/scripts.js';
+
+        $suffix = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
+
+        $css_file = "css/style{$suffix}.css";
+        $js_file  = "js/scripts{$suffix}.js";
+
+        if (!file_exists(PHPINFOWP_DIR . $css_file)) $css_file = 'css/style.css';
+        if (!file_exists(PHPINFOWP_DIR . $js_file))  $js_file  = 'js/scripts.js';
+
+        $css_path = PHPINFOWP_DIR . $css_file;
+        $js_path  = PHPINFOWP_DIR . $js_file;
         $css_ver  = file_exists($css_path) ? (string) filemtime($css_path) : PHPINFOWP_VERSION;
         $js_ver   = file_exists($js_path)  ? (string) filemtime($js_path)  : PHPINFOWP_VERSION;
-        wp_enqueue_style('phpinfowp', PHPINFOWP_URL . 'css/style.css', ['dashicons'], $css_ver);
-        wp_enqueue_script('phpinfowp', PHPINFOWP_URL . 'js/scripts.js#async', [], $js_ver, true);
+
+        wp_enqueue_style('phpinfowp', PHPINFOWP_URL . $css_file, ['dashicons'], $css_ver);
+        wp_enqueue_script('phpinfowp', PHPINFOWP_URL . $js_file . '#async', [], $js_ver, true);
 
         if (Phpinfo_WP_AI_Explain::available()) {
-            $ai_path = PHPINFOWP_DIR . 'js/ai-explain.js';
+            $ai_file = "js/ai-explain{$suffix}.js";
+            if (!file_exists(PHPINFOWP_DIR . $ai_file)) $ai_file = 'js/ai-explain.js';
+            $ai_path = PHPINFOWP_DIR . $ai_file;
             $ai_ver  = file_exists($ai_path) ? (string) filemtime($ai_path) : PHPINFOWP_VERSION;
-            wp_enqueue_script('phpinfowp-ai-explain', PHPINFOWP_URL . 'js/ai-explain.js', [], $ai_ver, true);
+            wp_enqueue_script('phpinfowp-ai-explain', PHPINFOWP_URL . $ai_file, [], $ai_ver, true);
             wp_localize_script('phpinfowp-ai-explain', 'phpinfowpAI', Phpinfo_WP_AI_Explain::js_config());
         }
     }
@@ -782,7 +826,7 @@ FLYOUT;
     //   .phpinfowp-has-sidenav  — only on grouped pages (Audit/Tools/Reports)
     public function admin_body_class(string $classes): string {
         if ($this->is_plugin_page()) {
-            $classes .= ' phpinfowp-page';
+            $classes .= ' phpinfowp-page piwp-admin-page';
         }
         if (Phpinfo_WP_Admin_Nav::is_group_page()) {
             $classes .= ' phpinfowp-has-sidenav';
@@ -801,10 +845,35 @@ FLYOUT;
     }
 
     // True when we're on any phpinfo() WP admin page (toplevel, group, or
-    // hidden leaf). Cheap — just inspects $_GET['page'].
-    private function is_plugin_page(): bool {
+    // hidden leaf). Checks $_GET['page'] and current screen ID.
+    public function is_plugin_page(): bool {
         $page = sanitize_key($_GET['page'] ?? '');
-        return $page === PHPINFOWP_SLUG_PREFIX || strncmp($page, PHPINFOWP_SLUG_PREFIX . '-', strlen(PHPINFOWP_SLUG_PREFIX . '-')) === 0;
+        if (!$page && function_exists('get_current_screen')) {
+            $screen = get_current_screen();
+            if ($screen && !empty($screen->id)) {
+                $page = $screen->id;
+            }
+        }
+        return strpos($page, 'piwp') !== false || strpos($page, 'phpinfowp') !== false;
+    }
+
+    /**
+     * Suppress 3rd-party theme & plugin notices on phpinfo() WP admin screens
+     * to keep our dashboard and audit screens clean and professional.
+     */
+    public function clean_third_party_notices(): void {
+        if (!$this->is_plugin_page()) return;
+
+        remove_all_actions('admin_notices');
+        remove_all_actions('all_admin_notices');
+        remove_all_actions('user_admin_notices');
+        remove_all_actions('network_admin_notices');
+
+        // Re-register our own plugin notices
+        add_action('admin_notices', ['Phpinfo_WP_Admin_Nav', 'auto_render'], 5);
+        add_action('admin_notices', ['Phpinfo_WP_Whats_New_Notice', 'render'], 10);
+        add_action('admin_notices', ['Phpinfo_WP_Update_History', 'maybe_show_health_alert'], 10);
+        add_action('admin_notices', [$this, 'eol_admin_notice'], 10);
     }
 
     // Render the dark topbar above every plugin page: logo + plugin name +
@@ -919,9 +988,13 @@ FLYOUT;
     public function activate(): void {
         flush_rewrite_rules();
         Phpinfo_WP_Snapshots::install_table();
+        Phpinfo_WP_Activity_Log::maybe_create_table();
         Phpinfo_WP_License::schedule_remote_check_event();
         if (!wp_next_scheduled('phpinfowp_weekly_maintenance')) {
             wp_schedule_event(time() + DAY_IN_SECONDS, 'weekly', 'phpinfowp_weekly_maintenance');
+        }
+        if (!wp_next_scheduled('phpinfowp_daily_monitoring')) {
+            wp_schedule_event(time() + 60, 'daily', 'phpinfowp_daily_monitoring');
         }
     }
 
@@ -929,6 +1002,7 @@ FLYOUT;
         flush_rewrite_rules();
         wp_clear_scheduled_hook('phpinfowp_license_ping');
         wp_clear_scheduled_hook('phpinfowp_weekly_maintenance');
+        wp_clear_scheduled_hook('phpinfowp_daily_monitoring');
         wp_clear_scheduled_hook('phpinfowp_deferred_health_check');
         // Clean up safemode artifacts — leaving an orphaned mu-plugin behind
         // could keep filtering plugins even after this one is gone.

@@ -56,7 +56,7 @@ function phpinfowp_render_feature_lock(array $args = []): void {
                     font-size:9px;font-weight:700;letter-spacing:.5px;
                     padding:2px 5px;border-radius:3px;
                     line-height:1.5;
-                "><?php _e('PRO', 'piwp'); ?></span>
+                "><?php _e('PRO', 'phpinfo-wp'); ?></span>
             </div>
 
             <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#1d2327;">
@@ -93,7 +93,7 @@ function phpinfowp_render_feature_lock(array $args = []): void {
                 <?php endforeach; ?>
             </div>
             <p style="margin:-16px 0 20px;font-size:12px;color:#888;font-style:italic;">
-                ↑ Sample data — unlock to see your real numbers
+                <?php _e('↑ Sample data — unlock to see your real numbers', 'phpinfo-wp'); ?>
             </p>
             <?php endif; ?>
 
@@ -107,16 +107,16 @@ function phpinfowp_render_feature_lock(array $args = []): void {
                        font-size:14px;font-weight:600;text-decoration:none;
                        box-sizing:border-box;
                    ">
-                    Unlock <?php echo esc_html($feature); ?> — from $29/yr
+                    <?php printf(__('Unlock %s — from $39/yr', 'phpinfo-wp'), esc_html($feature)); ?>
                 </a>
                 <a href="<?php echo esc_url($lic_url); ?>"
                    style="font-size:12.5px;color:#777;text-decoration:underline;">
-                    I already have a license
+                    <?php _e('I already have a license', 'phpinfo-wp'); ?>
                 </a>
             </div>
 
             <p style="margin:20px 0 0;font-size:11.5px;color:#aaa;">
-                14-day refund · Instant delivery · All Pro features included
+                <?php _e('14-day refund · Instant delivery · All Pro features included', 'phpinfo-wp'); ?>
             </p>
         </div>
     </div>

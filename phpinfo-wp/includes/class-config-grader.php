@@ -77,12 +77,23 @@ class Phpinfo_WP_Config_Grader {
 
     public static function context(): array {
         if (self::$ctx_cache !== null) return self::$ctx_cache;
+        
+        $remote_ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        $http_host = strtolower($_SERVER['HTTP_HOST'] ?? '');
+        $is_local  = in_array($remote_ip, ['127.0.0.1', '::1'], true)
+            || strpos($http_host, 'localhost') !== false
+            || strpos($http_host, '.local') !== false
+            || strpos($http_host, '.test') !== false
+            || strpos($http_host, '.ddev') !== false
+            || (defined('WP_ENVIRONMENT_TYPE') && in_array(WP_ENVIRONMENT_TYPE, ['local', 'development'], true));
+
         return self::$ctx_cache = [
             'php_major'      => PHP_MAJOR_VERSION,
             'php_minor'      => PHP_MINOR_VERSION,
             'php_full'       => PHP_VERSION,
             'is_https'       => is_ssl(),
-            'is_production'  => !(defined('WP_DEBUG') && WP_DEBUG),
+            'is_production'  => !(defined('WP_DEBUG') && WP_DEBUG) && !$is_local,
+            'is_local'       => $is_local,
             'plugins'        => self::detect_plugins(),
             'host'           => self::detect_host(),
             'server'         => self::detect_server(),
@@ -417,13 +428,14 @@ class Phpinfo_WP_Config_Grader {
             // ── Security & Error Handling ──
             [
                 'key' => 'display_errors', 'label' => 'Display Errors', 'category' => 'Security',
-                'severity' => $ctx['is_production'] ? self::SEV_CRITICAL : self::SEV_LOW,
-                'target' => '0',
-                'target_label' => 'Off (production) — leaks code paths to attackers',
-                'pass' => function ($v) {
+                'severity' => ($ctx['is_production'] && empty($ctx['is_local'])) ? self::SEV_CRITICAL : self::SEV_LOW,
+                'target' => ($ctx['is_production'] && empty($ctx['is_local'])) ? '0' : '1',
+                'target_label' => ($ctx['is_production'] && empty($ctx['is_local'])) ? 'Off (production) — leaks code paths to attackers' : 'On (local development / debugging)',
+                'pass' => function ($v) use ($ctx) {
+                    if (!empty($ctx['is_local'])) return true;
                     return in_array(strtolower($v), ['0', 'off', ''], true);
                 },
-                'note' => 'When on, PHP errors print to the response. Stack traces leak credentials, paths, and table prefixes.',
+                'note' => !empty($ctx['is_local']) ? 'Local environment detected: display_errors is acceptable for development debugging.' : 'When on, PHP errors print to the response. Stack traces leak credentials, paths, and table prefixes.',
             ],
             [
                 'key' => 'expose_php', 'label' => 'Expose PHP Version', 'category' => 'Security',
@@ -647,23 +659,89 @@ class Phpinfo_WP_Config_Grader {
         $values  = []; // for cross-checks
         $total_w = 0;
         $earned  = 0;
+        $total_w_controllable = 0;
+        $earned_controllable  = 0;
         $cats    = [];
         $sev_counts = [self::SEV_CRITICAL => 0, self::SEV_HIGH => 0, self::SEV_MEDIUM => 0, self::SEV_LOW => 0];
 
+        $fix_map         = class_exists('Phpinfo_WP_Config_Grader_Fixer') ? Phpinfo_WP_Config_Grader_Fixer::fix_map() : [];
+        $managed_on_disk = class_exists('Phpinfo_WP_Config_Grader_Fixer') ? Phpinfo_WP_Config_Grader_Fixer::get_managed_directives() : [];
+        $settle_left     = class_exists('Phpinfo_WP_Config_Grader_Fixer') ? Phpinfo_WP_Config_Grader_Fixer::settle_remaining() : 0;
+
+        // Build a lookup of host-blocked keys: we WROTE this, but the host rejected it.
+        // Classify by OBSERVED OUTCOME not by PHP INI type declaration.
+        $host_blocked_keys = [];
+        if (class_exists('Phpinfo_WP_Config_Grader_Fixer') && $settle_left === 0) {
+            foreach (Phpinfo_WP_Config_Grader_Fixer::detect_overrides() as $ov) {
+                $host_blocked_keys[$ov['key']] = [
+                    'attempted' => $ov['expected'],
+                    'actual'    => $ov['actual'],
+                ];
+            }
+        }
+
+        // Query PHP's built-in access level metadata via ini_get_all() as authoritative ground truth
+        static $ini_access_map = null;
+        if ($ini_access_map === null && function_exists('ini_get_all')) {
+            $all_ini = @ini_get_all(null, false);
+            if (is_array($all_ini)) {
+                $ini_access_map = [];
+                foreach ($all_ini as $k => $info) {
+                    if (isset($info['access'])) {
+                        $ini_access_map[$k] = (int) $info['access'];
+                    }
+                }
+            }
+        }
+
+        $t_info = class_exists('Phpinfo_WP_Config_Grader_Fixer') ? Phpinfo_WP_Config_Grader_Fixer::detect_target() : ['mode' => '', 'file' => ''];
+
         foreach (self::checks($ctx) as $c) {
-            $raw      = ini_get($c['key']);
-            $cur      = $raw === false ? '' : (string) $raw;
-            $target   = $c['target'];
-            $pass     = (bool) ($c['pass'])($cur, $target);
-            $warn_fn  = $c['warn'] ?? null;
-            $warn     = !$pass && is_callable($warn_fn) ? (bool) $warn_fn($cur, $target) : false;
-            $status   = $pass ? 'pass' : ($warn ? 'warn' : 'fail');
-            $weight   = self::SEV_WEIGHT[$c['severity']] ?? 2;
+            $raw       = ini_get($c['key']);
+            $cur       = $raw === false ? '' : (string) $raw;
+            $target    = $c['target'];
+            $pass      = (bool) ($c['pass'])($cur, $target);
+            $warn_fn   = $c['warn'] ?? null;
+            $warn      = !$pass && is_callable($warn_fn) ? (bool) $warn_fn($cur, $target) : false;
+
+            // Ground truth: PHP_INI_SYSTEM (access === 4) or explicitly requires master php.ini
+            $ini_access    = $ini_access_map[$c['key']] ?? null;
+            $is_ini_system = ($ini_access !== null && $ini_access === 4);
+            $is_system     = $is_ini_system || !empty($fix_map[$c['key']]['requires_php_ini']);
+
+            $is_managed = isset($managed_on_disk[$c['key']]);
+            $is_propagating = (!$pass && $is_managed && $settle_left > 0);
+            // Observed host block: we wrote it, host rejected it (empirical, not theoretical)
+            $is_host_blocked = !$pass && isset($host_blocked_keys[$c['key']]);
+            $block_data      = $host_blocked_keys[$c['key']] ?? null;
+
+            // 2D Decoupled State Model: Controllability vs Health
+            $is_host_locked  = ($is_system || $is_host_blocked);
+            $controllability = $is_host_locked ? 'host_locked' : 'actionable';
+            $health_status   = $pass ? 'pass' : ($warn ? 'warn' : 'fail');
+            $status          = $is_host_locked ? 'host_locked' : $health_status;
+
+            $weight = self::SEV_WEIGHT[$c['severity']] ?? 2;
 
             $total_w += $weight;
-            if ($pass)      $earned += $weight;
-            elseif ($warn)  $earned += $weight * 0.5;
-            else            $sev_counts[$c['severity']]++;
+            if ($pass) {
+                $earned += $weight;
+            } elseif ($warn) {
+                $earned += $weight * 0.5;
+            }
+            if ($status === 'fail' || $status === 'warn') {
+                $sev_counts[$c['severity']]++;
+            }
+
+            // host_locked directives (either type) are excluded from controllable scoring
+            if (!$is_host_locked) {
+                $total_w_controllable += $weight;
+                if ($pass || $is_propagating) {
+                    $earned_controllable += $weight;
+                } elseif ($warn) {
+                    $earned_controllable += $weight * 0.5;
+                }
+            }
 
             $values[$c['key']] = $cur;
             $cats[$c['category']] = true;
@@ -679,6 +757,18 @@ class Phpinfo_WP_Config_Grader {
                 'target_label'   => $c['target_label'],
                 'value'          => $cur === '' ? '(not set)' : $cur,
                 'status'         => $status,
+                'health_status'  => $health_status,
+                'controllability'=> $controllability,
+                'is_system'      => $is_system,
+                'is_host_blocked'=> $is_host_blocked,    // empirical: we wrote it and host rejected
+                'block_diagnostic' => $is_host_blocked ? [
+                    'key'         => $c['key'],
+                    'attempted'   => $block_data['attempted'] ?? $target,
+                    'actual'      => $block_data['actual'] ?? $cur,
+                    'method'      => $t_info['mode'] === 'htaccess' ? '.htaccess (php_value)' : '.user.ini',
+                    'file'        => $t_info['file'] ?? '',
+                    'timestamp'   => gmdate('Y-m-d H:i:s') . ' UTC',
+                ] : null,
                 'note'           => $c['note'],
                 'why'            => $c['note'],          // backward-compat
                 'live_evidence'  => null,                 // filled by corroborate()
@@ -690,29 +780,89 @@ class Phpinfo_WP_Config_Grader {
         self::corroborate($results, $ctx);
 
         // Cross-directive consistency checks
-        $cross = self::consistency_checks($values);
-        foreach ($cross as $x) {
+        $cross_all = self::consistency_checks($values);
+        $cross     = [];
+        foreach ($cross_all as $x) {
             $sev_counts[$x['severity']]++;
             $weight = self::SEV_WEIGHT[$x['severity']] ?? 2;
             $total_w += $weight;
-            // Cross-checks always count as failing if present (they exist BECAUSE inconsistency was found)
+            $cross[] = $x;
         }
 
         $score = $total_w > 0 ? (int) round($earned / $total_w * 100) : 0;
         $grade = self::grade($score);
 
+        $score_controllable = $total_w_controllable > 0 ? (int) round($earned_controllable / $total_w_controllable * 100) : 100;
+        $grade_controllable = self::grade($score_controllable);
+
+        // Grade Capping (Approach 1): Unresolved server-locked issues cap the max achievable grade.
+        // A site cannot get an unqualified A or A+ when the server environment has locked security/performance flaws.
+        $locked_keys     = [];
+        $critical_locked = false;
+        foreach ($results as $c_res) {
+            if ($c_res['status'] === 'host_locked') {
+                $locked_keys[$c_res['key']] = true;
+                if (($c_res['severity'] ?? '') === self::SEV_CRITICAL) {
+                    $critical_locked = true;
+                }
+            }
+        }
+        if (class_exists('Phpinfo_WP_Config_Grader_Fixer')) {
+            foreach (Phpinfo_WP_Config_Grader_Fixer::detect_overrides() as $ov) {
+                $locked_keys[$ov['key']] = true;
+                foreach ($results as $c_res) {
+                    if ($c_res['key'] === $ov['key'] && ($c_res['severity'] ?? '') === self::SEV_CRITICAL) {
+                        $critical_locked = true;
+                    }
+                }
+            }
+        }
+        $locked_count = count($locked_keys);
+
+        $is_capped       = false;
+        $grade_effective = $grade_controllable;
+        $score_effective = $score_controllable;
+        $cap_reason      = '';
+
+        if ($locked_count > 0 && $score !== $score_controllable) {
+            // Model 1: 50/50 Balanced Average of Site Controllable and Server Reality
+            $score_effective = (int) round(($score_controllable + $score) / 2);
+            $grade_effective = self::grade($score_effective);
+            $is_capped       = ($score_effective < $score_controllable);
+            $cap_reason      = sprintf(
+                _n(
+                    'Overall grade %1$s (%2$d/100): Balanced average of Site (%3$s) and Server (%4$s) with %5$d host-locked setting.',
+                    'Overall grade %1$s (%2$d/100): Balanced average of Site (%3$s) and Server (%4$s) with %5$d host-locked settings.',
+                    $locked_count,
+                    'phpinfo-wp'
+                ),
+                $grade_effective,
+                $score_effective,
+                $grade_controllable,
+                $grade,
+                $locked_count
+            );
+        }
+
         // Record + load trend
         $trend = self::record_and_load_trend($score);
 
         return [
-            'checks'          => $results,
-            'cross'           => $cross,
-            'score'           => $score,
-            'grade'           => $grade,
-            'categories'      => array_keys($cats),
-            'severity_counts' => $sev_counts,
-            'context'         => $ctx,
-            'trend'           => $trend,
+            'checks'             => $results,
+            'cross'              => $cross,
+            'score'              => $score,
+            'grade'              => $grade,
+            'score_controllable' => $score_controllable,
+            'grade_controllable' => $grade_controllable,
+            'is_capped'          => $is_capped,
+            'grade_effective'    => $grade_effective,
+            'score_effective'    => $score_effective,
+            'cap_reason'         => $cap_reason,
+            'locked_count'       => $locked_count,
+            'categories'         => array_keys($cats),
+            'severity_counts'    => $sev_counts,
+            'context'            => $ctx,
+            'trend'              => $trend,
         ];
     }
 
@@ -723,15 +873,23 @@ class Phpinfo_WP_Config_Grader {
         foreach ($r['checks'] as $c) {
             if ($c['status'] === 'pass') $passes++;
             elseif ($c['status'] === 'warn') $warns++;
-            else $fails++;
+            elseif ($c['status'] === 'fail') $fails++;
         }
         return [
-            'score'  => $r['score'],
-            'grade'  => $r['grade'],
-            'passes' => $passes,
-            'warns'  => $warns,
-            'fails'  => $fails + count($r['cross']),
-            'total'  => count($r['checks']) + count($r['cross']),
+            'score'              => $r['score'],
+            'grade'              => $r['grade'],
+            'score_controllable' => $r['score_controllable'] ?? $r['score'],
+            'grade_controllable' => $r['grade_controllable'] ?? $r['grade'],
+            'is_capped'          => $r['is_capped'] ?? false,
+            'grade_effective'    => $r['grade_effective'] ?? ($r['grade_controllable'] ?? $r['grade']),
+            'score_effective'    => $r['score_effective'] ?? ($r['score_controllable'] ?? $r['score']),
+            'cap_reason'         => $r['cap_reason'] ?? '',
+            'locked_count'       => $r['locked_count'] ?? 0,
+            'passes'             => $passes,
+            'warns'              => $warns,
+            'fails'              => $fails,
+            'cross'              => count($r['cross']),
+            'total'              => count($r['checks']) + count($r['cross']),
         ];
     }
 
@@ -744,6 +902,8 @@ class Phpinfo_WP_Config_Grader {
         $sigs = $ctx['error_signals'] ?? [];
 
         foreach ($results as &$r) {
+            $is_locked = (($r['controllability'] ?? '') === 'host_locked') || !empty($r['is_system']) || !empty($r['is_host_blocked']) || ($r['status'] === 'host_locked');
+
             switch ($r['key']) {
                 case 'memory_limit':
                     if (!empty($sigs['memory_exhausted'])) {
@@ -752,10 +912,11 @@ class Phpinfo_WP_Config_Grader {
                             (int) $sigs['memory_exhausted'],
                             $sigs['memory_exhausted'] === 1 ? 'y' : 'ies'
                         );
-                        if ($r['status'] !== 'fail') {
-                            $r['status']         = 'fail';
-                            $r['severity']       = self::SEV_CRITICAL;
-                            $r['severity_label'] = self::severity_label(self::SEV_CRITICAL);
+                        $r['health_status']  = 'fail';
+                        $r['severity']       = self::SEV_CRITICAL;
+                        $r['severity_label'] = self::severity_label(self::SEV_CRITICAL);
+                        if (!$is_locked) {
+                            $r['status'] = 'fail';
                         }
                     }
                     break;
@@ -767,8 +928,10 @@ class Phpinfo_WP_Config_Grader {
                             (int) $sigs['max_time_exceeded'],
                             $sigs['max_time_exceeded'] === 1 ? 'y' : 'ies'
                         );
-                        if ($r['status'] === 'pass') $r['status'] = 'warn';
-                        elseif ($r['status'] === 'warn') $r['status'] = 'fail';
+                        $r['health_status']  = ($r['health_status'] === 'pass') ? 'warn' : 'fail';
+                        if (!$is_locked) {
+                            $r['status'] = $r['health_status'];
+                        }
                     }
                     break;
 
@@ -779,9 +942,12 @@ class Phpinfo_WP_Config_Grader {
                             (int) $sigs['max_input_vars_exceeded'],
                             $sigs['max_input_vars_exceeded'] === 1 ? 'y' : 'ies'
                         );
-                        $r['status']         = 'fail';
+                        $r['health_status']  = 'fail';
                         $r['severity']       = self::SEV_CRITICAL;
                         $r['severity_label'] = self::severity_label(self::SEV_CRITICAL);
+                        if (!$is_locked) {
+                            $r['status'] = 'fail';
+                        }
                     }
                     break;
 
@@ -793,10 +959,12 @@ class Phpinfo_WP_Config_Grader {
                             'OPcache memory is currently FULL (%s used). New scripts can\'t be cached — they recompile every hit.',
                             size_format($used)
                         );
-                        if ($r['status'] !== 'fail') {
-                            $r['status']         = 'fail';
-                            $r['severity']       = self::SEV_HIGH;
-                            $r['severity_label'] = self::severity_label(self::SEV_HIGH);
+                        $r['health_status']  = 'fail';
+                        $r['severity']       = self::SEV_HIGH;
+                        $r['severity_label'] = self::severity_label(self::SEV_HIGH);
+                        // Controllability is host_locked — status remains host_locked!
+                        if (!$is_locked) {
+                            $r['status'] = 'fail';
                         }
                     } elseif (is_array($op)) {
                         $stats  = $op['opcache_statistics'] ?? [];
@@ -804,11 +972,14 @@ class Phpinfo_WP_Config_Grader {
                         $misses = is_array($stats) ? (int) ($stats['misses'] ?? 0) : 0;
                         if (($hits + $misses) > 0) {
                             $rate = $hits / ($hits + $misses) * 100;
-                            if ($rate < 90 && $r['status'] === 'pass') {
+                            if ($rate < 90 && ($r['health_status'] ?? $r['status']) === 'pass') {
                                 $r['live_evidence'] = sprintf('OPcache hit rate is %.1f%% (target: 95%%+). Memory is probably undersized.', $rate);
-                                $r['status']         = 'warn';
+                                $r['health_status']  = 'warn';
                                 $r['severity']       = self::SEV_HIGH;
                                 $r['severity_label'] = self::severity_label(self::SEV_HIGH);
+                                if (!$is_locked) {
+                                    $r['status'] = 'warn';
+                                }
                             }
                         }
                     }
@@ -818,10 +989,11 @@ class Phpinfo_WP_Config_Grader {
                 case 'post_max_size':
                     if (!empty($sigs['upload_too_large'])) {
                         $r['live_evidence'] = 'Error log shows recent "POST Content-Length exceeds the limit" entries — uploads are being rejected.';
-                        if ($r['status'] !== 'fail') {
-                            $r['status']         = 'fail';
-                            $r['severity']       = self::SEV_HIGH;
-                            $r['severity_label'] = self::severity_label(self::SEV_HIGH);
+                        $r['health_status']  = 'fail';
+                        $r['severity']       = self::SEV_HIGH;
+                        $r['severity_label'] = self::severity_label(self::SEV_HIGH);
+                        if (!$is_locked) {
+                            $r['status'] = 'fail';
                         }
                     }
                     break;
@@ -867,7 +1039,7 @@ class Phpinfo_WP_Config_Grader {
                     'memory_limit is %s and post_max_size is %s. PHP needs memory_limit ≥ post_max_size + parsing headroom or large uploads OOM mid-request.',
                     size_format($mem), size_format($post)
                 ),
-                'fix'      => sprintf('Raise memory_limit to at least %s.', size_format($post + 128 * MB_IN_BYTES)),
+                'fix'      => sprintf('Raise memory_limit to %s in hosting panel, or lower post_max_size to %s.', size_format($post + 128 * MB_IN_BYTES), size_format(max(32 * MB_IN_BYTES, (int)($mem / 2)))),
             ];
         }
         if ($mit > 0 && $met > 0 && $mit > $met) {
@@ -995,12 +1167,12 @@ class Phpinfo_WP_Config_Grader {
     //  Utility helpers
     // ─────────────────────────────────────────────────────────────────
 
-    private static function grade(int $score): string {
+    public static function grade(int $score): string {
         if ($score >= 95) return 'A+';
-        if ($score >= 85) return 'A';
-        if ($score >= 75) return 'B';
-        if ($score >= 60) return 'C';
-        if ($score >= 45) return 'D';
+        if ($score >= 90) return 'A';
+        if ($score >= 80) return 'B';
+        if ($score >= 70) return 'C';
+        if ($score >= 60) return 'D';
         return 'F';
     }
 
@@ -1046,5 +1218,16 @@ class Phpinfo_WP_Config_Grader {
             case 'k': return $num * KB_IN_BYTES;
         }
         return $num;
+    }
+
+    /**
+     * AJAX handler to persist dismissal of the server bottleneck advisory banner.
+     */
+    public static function ajax_dismiss_bottleneck(): void {
+        check_ajax_referer('phpinfowp_dismiss_bottleneck', 'nonce');
+        if (current_user_can('manage_options')) {
+            update_user_meta(get_current_user_id(), 'phpinfowp_dismiss_server_bottleneck', 1);
+        }
+        wp_send_json_success();
     }
 }

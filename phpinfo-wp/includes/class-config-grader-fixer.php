@@ -193,6 +193,11 @@ class Phpinfo_WP_Config_Grader_Fixer {
             ];
         }
 
+        // If memory_limit is being fixed, also ensure WP_MEMORY_LIMIT in wp-config.php isn't capping WordPress
+        if (isset($to_write['memory_limit'])) {
+            self::sync_wp_config_memory((string) $to_write['memory_limit']);
+        }
+
         // Mark the propagation window. A .user.ini change never affects the
         // current request and is then cached for user_ini.cache_ttl seconds;
         // .htaccess applies on the *next* request. Either way, checking
@@ -211,6 +216,44 @@ class Phpinfo_WP_Config_Grader_Fixer {
             'mode'    => $mode,
             'file'    => $file,
         ];
+    }
+
+    /**
+     * Safely updates or injects WP_MEMORY_LIMIT into wp-config.php so WordPress core doesn't cap memory.
+     */
+    public static function sync_wp_config_memory(string $target_limit = '256M'): bool {
+        $config_path = ABSPATH . 'wp-config.php';
+        if (!@file_exists($config_path)) {
+            $config_path = dirname(ABSPATH) . '/wp-config.php';
+        }
+        if (!@file_exists($config_path) || !@is_writable($config_path)) {
+            return false;
+        }
+
+        $content = (string) @file_get_contents($config_path);
+        if (preg_match("/define\s*\(\s*['\"]WP_MEMORY_LIMIT['\"]\s*,\s*['\"]([^'\"]+)['\"]\s*\)/i", $content, $m)) {
+            $current_val = $m[1];
+            if (self::to_bytes($current_val) < self::to_bytes($target_limit)) {
+                $new_content = preg_replace(
+                    "/define\s*\(\s*['\"]WP_MEMORY_LIMIT['\"]\s*,\s*['\"][^'\"]+['\"]\s*\)/i",
+                    "define( 'WP_MEMORY_LIMIT', '{$target_limit}' )",
+                    $content,
+                    1
+                );
+                if ($new_content && $new_content !== $content) {
+                    return (bool) @file_put_contents($config_path, $new_content);
+                }
+            }
+        } else {
+            $needle = "/* That's all, stop editing!";
+            $pos = strpos($content, $needle);
+            if ($pos !== false) {
+                $insert = "define( 'WP_MEMORY_LIMIT', '{$target_limit}' );\n";
+                $new_content = substr($content, 0, $pos) . $insert . substr($content, $pos);
+                return (bool) @file_put_contents($config_path, $new_content);
+            }
+        }
+        return false;
     }
 
     // Compare the autofix block on disk against what PHP actually reports.
@@ -235,6 +278,11 @@ class Phpinfo_WP_Config_Grader_Fixer {
         return 10;
     }
 
+    public static function schedule_recheck(): int {
+        self::mark_settle();
+        return self::settle_remaining();
+    }
+
     private static function mark_settle(): void {
         $w = self::settle_window();
         set_transient(self::OPT_SETTLE, time() + $w, $w + 60);
@@ -254,9 +302,15 @@ class Phpinfo_WP_Config_Grader_Fixer {
         $t = self::detect_target();
         if (!@file_exists($t['file'])) return [];
 
+        $ctx = class_exists('Phpinfo_WP_Config_Grader') ? Phpinfo_WP_Config_Grader::context() : [];
+        $is_local = !empty($ctx['is_local']);
+
         $managed = self::extract_managed((string) @file_get_contents($t['file']), $t['mode']);
         $out = [];
         foreach ($managed as $key => $expected) {
+            // In local development, display_errors On is intended
+            if ($key === 'display_errors' && $is_local) continue;
+
             $actual = ini_get($key);
             if ($actual === false) continue;
             if (!self::values_match($key, $expected, (string) $actual)) {
@@ -290,6 +344,44 @@ class Phpinfo_WP_Config_Grader_Fixer {
         return $n;
     }
 
+    /**
+     * Selectively reverts only specific directives from the autofix block on disk.
+     */
+    public static function revert_keys(array $keys_to_revert): array {
+        if (!self::_pro()) return ['ok' => false, 'error' => 'Pro license required.'];
+        $t = self::detect_target();
+        if (!@is_writable($t['file'])) return ['ok' => false, 'error' => 'Config file not writable.'];
+
+        $current = @file_exists($t['file']) ? @file_get_contents($t['file']) : '';
+        if (!preg_match('/' . self::MARK_RE_BEGIN . '/', $current)) {
+            return ['ok' => true, 'reverted' => false, 'message' => 'No autofix block to revert.'];
+        }
+
+        $managed = self::extract_managed($current, $t['mode']);
+        foreach ($keys_to_revert as $k) {
+            unset($managed[$k]);
+        }
+
+        $base = self::strip_managed_block($current);
+        if (!empty($managed)) {
+            $block = self::render_block($managed, $t['mode']);
+            $new   = rtrim($base) . "\n\n" . $block . "\n";
+        } else {
+            $new   = rtrim($base) . "\n";
+        }
+
+        @file_put_contents($t['file'], $new);
+        $verify = self::verify_site();
+        if (!$verify['ok']) {
+            @file_put_contents($t['file'], $current);
+            return ['ok' => false, 'error' => 'Reverting caused HTTP ' . $verify['code'] . '.'];
+        }
+
+        delete_transient(self::OPT_SETTLE);
+        self::log_change('reverted directive(s): ' . implode(', ', $keys_to_revert));
+        return ['ok' => true, 'reverted' => true, 'keys' => $keys_to_revert];
+    }
+
     public static function revert_all(): array {
         if (!self::_pro()) return ['ok' => false, 'error' => 'Pro license required.'];
         $t = self::detect_target();
@@ -311,7 +403,30 @@ class Phpinfo_WP_Config_Grader_Fixer {
         return ['ok' => true, 'reverted' => true];
     }
 
-    private static function extract_managed(string $content, string $mode): array {
+    /**
+     * Return map of directives currently written in the autofix block on disk.
+     */
+    public static function get_managed_directives(): array {
+        $t = self::detect_target();
+        if (!@file_exists($t['file'])) return [];
+        return self::extract_managed((string) @file_get_contents($t['file']), $t['mode']);
+    }
+
+    /**
+     * Filter fixable keys down to only those NOT yet written in the autofix block on disk.
+     */
+    public static function get_unwritten_keys(array $fixable_keys): array {
+        $managed = self::get_managed_directives();
+        $unwritten = [];
+        foreach ($fixable_keys as $k) {
+            if (!isset($managed[$k])) {
+                $unwritten[] = $k;
+            }
+        }
+        return $unwritten;
+    }
+
+    public static function extract_managed(string $content, string $mode): array {
         if (!preg_match('/' . self::MARK_RE_BEGIN . '\s*(.*?)\s*' . self::MARK_RE_END . '/s', $content, $m)) {
             return [];
         }
@@ -369,9 +484,13 @@ class Phpinfo_WP_Config_Grader_Fixer {
         $log_dir  = WP_CONTENT_DIR . '/logs/phpinfo-WP';
         $log_file = $log_dir . '/log.txt';
         if (!@file_exists($log_dir)) @wp_mkdir_p($log_dir);
-        $user = wp_get_current_user();
-        $line = sprintf("Config %s on %s by %s<br />",
-            $msg, current_time('mysql'), $user->user_login ?: 'unknown');
+        $user     = wp_get_current_user();
+        $line     = sprintf(
+            "[%s] Config: %s | User: %s\n",
+            current_time('mysql'),
+            wp_strip_all_tags($msg),
+            sanitize_user($user->user_login ?: 'unknown', true)
+        );
         @file_put_contents($log_file, $line, FILE_APPEND);
     }
 }

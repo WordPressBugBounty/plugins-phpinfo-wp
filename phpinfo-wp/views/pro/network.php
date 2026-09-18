@@ -12,8 +12,11 @@ $db       = $is_pro ? Phpinfo_WP_DB_Health::server_info() : null;
 
     <div class="phpinfowp-page-header">
         <div>
-            <h1><?php _e('phpinfo() WP — Network', 'phpinfo-wp'); ?></h1>
-            <p class="phpinfowp-page-subtitle"><?php _e('Server-level info applies to all sites in the network. Per-site stats appear below.', 'phpinfo-wp'); ?></p>
+            <h1>
+                <?php _e('Network Dashboard', 'phpinfo-wp'); ?>
+                <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span>
+                <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Server-level info and per-site environment statistics across your WordPress Multisite network.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
+            </h1>
         </div>
     </div>
 
@@ -55,6 +58,14 @@ $db       = $is_pro ? Phpinfo_WP_DB_Health::server_info() : null;
         <div class="notice notice-info inline"><p>Per-site autoload analysis requires a Pro license. <a href="<?php echo esc_url(network_admin_url('admin.php?page=piwp-network')); ?>">Activate one</a>.</p></div>
     <?php endif; ?>
 
+    <?php
+    $net_per_page    = 15;
+    $net_total       = count($sites);
+    $net_total_pages = max(1, (int) ceil($net_total / $net_per_page));
+    $net_paged       = max(1, min($net_total_pages, (int) ($_GET['paged'] ?? 1)));
+    $paged_sites     = array_slice($sites, ($net_paged - 1) * $net_per_page, $net_per_page);
+    ?>
+
     <table class="wp-list-table widefat fixed striped">
         <thead>
             <tr>
@@ -65,7 +76,7 @@ $db       = $is_pro ? Phpinfo_WP_DB_Health::server_info() : null;
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($sites as $site):
+            <?php foreach ($paged_sites as $site):
                 $color = '#888';
                 if ($site['autoload_status'] === 'warning') $color = '#dba617';
                 if ($site['autoload_status'] === 'fail')    $color = '#d63638';
@@ -88,4 +99,39 @@ $db       = $is_pro ? Phpinfo_WP_DB_Health::server_info() : null;
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+        <?php if ($net_total > 0): ?>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; flex-wrap:wrap; gap:12px;">
+                <div style="font-size:13px; color:#64748b;">
+                    <?php printf(
+                        __("Showing %1\$d &ndash; %2\$d of %3\$s sites", "phpinfo-wp"),
+                        ($net_paged - 1) * $net_per_page + 1,
+                        min($net_total, $net_paged * $net_per_page),
+                        number_format($net_total)
+                    ); ?>
+                </div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <?php if ($net_paged > 2): ?>
+                        <a href="<?php echo esc_url(add_query_arg(["paged" => 1])); ?>" class="button button-secondary" title="<?php esc_attr_e("First page", "phpinfo-wp"); ?>">&laquo;&laquo;</a>
+                    <?php endif; ?>
+                    <?php if ($net_paged > 1): ?>
+                        <a href="<?php echo esc_url(add_query_arg(["paged" => $net_paged - 1])); ?>" class="button button-secondary">&laquo; <?php _e("Previous", "phpinfo-wp"); ?></a>
+                    <?php else: ?>
+                        <span class="button button-secondary disabled" style="opacity:0.4; cursor:not-allowed;">&laquo; <?php _e("Previous", "phpinfo-wp"); ?></span>
+                    <?php endif; ?>
+                    <span style="font-size:13px; line-height:30px; padding:0 8px; color:#334155; font-weight:600;">
+                        <?php printf(__("Page %d of %d", "phpinfo-wp"), $net_paged, max(1, $net_total_pages)); ?>
+                    </span>
+                    <?php if ($net_paged < $net_total_pages): ?>
+                        <a href="<?php echo esc_url(add_query_arg(["paged" => $net_paged + 1])); ?>" class="button button-secondary"><?php _e("Next", "phpinfo-wp"); ?> &raquo;</a>
+                    <?php else: ?>
+                        <span class="button button-secondary disabled" style="opacity:0.4; cursor:not-allowed;"><?php _e("Next", "phpinfo-wp"); ?> &raquo;</span>
+                    <?php endif; ?>
+                    <?php if ($net_paged < $net_total_pages - 1): ?>
+                        <a href="<?php echo esc_url(add_query_arg(["paged" => $net_total_pages])); ?>" class="button button-secondary" title="<?php esc_attr_e("Last page", "phpinfo-wp"); ?>">&raquo;&raquo;</a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
 </div>

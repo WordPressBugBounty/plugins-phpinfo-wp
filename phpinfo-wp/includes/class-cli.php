@@ -91,11 +91,11 @@ class Phpinfo_WP_CLI {
      *
      * ## OPTIONS
      * [--target=<version>]
-     * : Target PHP version (default 8.2).
+     * : Target PHP version (default 8.4).
      */
     public function compat($args, $assoc): void {
         if (!Phpinfo_WP_License::is_valid()) WP_CLI::error('Pro license required.');
-        $target = $assoc['target'] ?? '8.2';
+        $target = $assoc['target'] ?? '8.4';
         WP_CLI::log("Scanning against PHP {$target}...");
         $r = Phpinfo_WP_Compat::scan($target);
         if (isset($r['error'])) WP_CLI::error($r['error']);

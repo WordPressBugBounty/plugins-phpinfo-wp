@@ -25,6 +25,18 @@ class Phpinfo_WP_Snapshots {
         return $wpdb->prefix . 'phpinfowp_snapshots';
     }
 
+    public static function maybe_install_table(): void {
+        global $wpdb;
+        $table = self::table();
+        static $checked = false;
+        if ($checked) return;
+        $checked = true;
+
+        if ($wpdb->get_var("SHOW TABLES LIKE '{$table}'") !== $table) {
+            self::install_table();
+        }
+    }
+
     public static function install_table(): void {
         global $wpdb;
         $charset = $wpdb->get_charset_collate();
@@ -49,11 +61,30 @@ class Phpinfo_WP_Snapshots {
         }
         // Also record PHP version itself
         $data['__php_version'] = PHP_VERSION;
+        
+        // Expanded environment data
+        $exts = get_loaded_extensions();
+        if ($exts) {
+            natcasesort($exts);
+            $data['__php_extensions'] = implode(', ', $exts);
+        }
+        $data['__server_software'] = $_SERVER['SERVER_SOFTWARE'] ?? null;
+        $data['__server_os'] = php_uname('s') . ' ' . php_uname('r') . ' ' . php_uname('m');
+        $data['__server_sapi'] = php_sapi_name();
+        $data['__wp_version'] = get_bloginfo('version');
+        $data['__wp_memory_limit'] = defined('WP_MEMORY_LIMIT') ? WP_MEMORY_LIMIT : null;
+        $data['__wp_max_memory_limit'] = defined('WP_MAX_MEMORY_LIMIT') ? WP_MAX_MEMORY_LIMIT : null;
+        $data['__wp_debug'] = defined('WP_DEBUG') ? (WP_DEBUG ? 'true' : 'false') : null;
+        
+        global $wpdb;
+        $data['__db_version'] = $wpdb ? $wpdb->db_version() : null;
+        
         return $data;
     }
 
     public static function take(string $label = '', int $user_id = 0): int {
         if (!self::_pro()) return 0;
+        self::maybe_install_table();
         global $wpdb;
         $data = self::capture();
         $wpdb->insert(self::table(), [
@@ -62,19 +93,41 @@ class Phpinfo_WP_Snapshots {
             'created_at'    => current_time('mysql', true),
             'snapshot_data' => wp_json_encode($data),
         ]);
-        return (int) $wpdb->insert_id;
+        $snap_id = (int) $wpdb->insert_id;
+        if ($snap_id && class_exists('Phpinfo_WP_Activity_Log')) {
+            Phpinfo_WP_Activity_Log::log(
+                'server',
+                'snapshot_created',
+                sprintf(__('Created configuration snapshot "%s"', 'phpinfo-wp'), $label ?: 'Manual snapshot'),
+                ['snapshot_id' => $snap_id, 'label' => $label ?: 'Manual snapshot'],
+                'info',
+                $user_id ?: null,
+                (string) $snap_id
+            );
+        }
+        return $snap_id;
     }
 
     public static function list(int $limit = 50): array {
+        self::maybe_install_table();
         global $wpdb;
-        return $wpdb->get_results($wpdb->prepare(
-            "SELECT id, label, created_by, created_at FROM " . self::table() . " ORDER BY created_at DESC LIMIT %d",
+        $rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT id, label, created_by, created_at, snapshot_data FROM " . self::table() . " ORDER BY created_at DESC LIMIT %d",
             $limit
         ));
+        if ($rows) {
+            foreach ($rows as $row) {
+                if (isset($row->snapshot_data) && is_string($row->snapshot_data)) {
+                    $row->snapshot_data = json_decode($row->snapshot_data, true) ?? [];
+                }
+            }
+        }
+        return $rows ?: [];
     }
 
     public static function get(int $id): ?object {
         if (!self::_pro()) return null;
+        self::maybe_install_table();
         global $wpdb;
         $row = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM " . self::table() . " WHERE id = %d LIMIT 1", $id
@@ -86,12 +139,27 @@ class Phpinfo_WP_Snapshots {
 
     public static function delete(int $id): void {
         if (!self::_pro()) return;
+        self::maybe_install_table();
         global $wpdb;
+        $snap = self::get($id);
+        $label = $snap ? $snap->label : "ID #{$id}";
         $wpdb->delete(self::table(), ['id' => $id], ['%d']);
+        if (class_exists('Phpinfo_WP_Activity_Log')) {
+            Phpinfo_WP_Activity_Log::log(
+                'server',
+                'snapshot_deleted',
+                sprintf(__('Deleted configuration snapshot "%s"', 'phpinfo-wp'), $label),
+                ['snapshot_id' => $id, 'label' => $label],
+                'warning',
+                null,
+                (string) $id
+            );
+        }
     }
 
     public static function get_latest(): ?object {
         if (!self::_pro()) return null;
+        self::maybe_install_table();
         global $wpdb;
         $row = $wpdb->get_row(
             "SELECT * FROM " . self::table() . " ORDER BY created_at DESC LIMIT 1"
@@ -103,6 +171,7 @@ class Phpinfo_WP_Snapshots {
 
     public static function get_previous_to(int $id): ?object {
         if (!self::_pro()) return null;
+        self::maybe_install_table();
         global $wpdb;
         $row = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM " . self::table() . " WHERE id < %d ORDER BY id DESC LIMIT 1", $id

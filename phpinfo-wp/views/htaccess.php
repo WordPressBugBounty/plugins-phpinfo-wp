@@ -188,9 +188,7 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             }
 
             $current = file_exists("$root_dir.htaccess") ? file_get_contents("$root_dir.htaccess") : '';
-            $base    = preg_replace('/\n?# BEGIN phpinfo-wp\n.*?# END phpinfo-wp\n?/s', '', $current); // Fixed regex
-            // If the old regex left it without END, let's just append
-            $base = str_replace('# BEGIN phpinfo-wp', '', $base); 
+            $base    = preg_replace('/\n?# BEGIN phpinfo-wp(?!\-autofix)\b.*?\n# END phpinfo-wp(?!\-autofix)\b\n?/s', '', $current);
             $new     = rtrim($base) . "\n\n# BEGIN phpinfo-wp\n" . $php_lines . "# END phpinfo-wp\n";
 
             file_put_contents("$root_dir.htaccess", $new);
@@ -227,7 +225,7 @@ if ($writable && isset($_POST['phpinfo_nonce']) && wp_verify_nonce($_POST['phpin
             }
 
             $current = file_exists($target_file) ? file_get_contents($target_file) : '';
-            $base    = preg_replace('/\n?; BEGIN phpinfo-wp.*?; END phpinfo-wp\n?/s', '', $current);
+            $base    = preg_replace('/\n?; BEGIN phpinfo-wp(?!\-autofix)\b.*?\n; END phpinfo-wp(?!\-autofix)\b\n?/s', '', $current);
             $new     = rtrim($base) . "\n\n; BEGIN phpinfo-wp\n" . $ini_lines . "; END phpinfo-wp\n";
 
             file_put_contents($target_file, $new);

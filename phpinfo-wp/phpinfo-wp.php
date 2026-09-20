@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     8.0.0
+Version:     8.0.2
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com/phpinfo-wp
@@ -15,7 +15,7 @@ Domain Path: /languages
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '8.0.0');
+define('PHPINFOWP_VERSION', '8.0.2');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 define('PHPINFOWP_SLUG_PREFIX', 'piwp');
@@ -127,7 +127,6 @@ class Phpinfo_wp {
         add_action('admin_init', [$this, 'admin_init_migrations']);
         add_action('admin_init', [$this, 'redirect_group_landings']);
         add_filter('admin_footer_text', [$this, 'custom_admin_footer_text']);
-        add_filter('update_footer', [$this, 'custom_update_footer'], 20);
         add_action('in_plugin_update_message-' . plugin_basename(__FILE__), [$this, 'show_update_notice'], 10, 2);
     }
 
@@ -666,8 +665,8 @@ FLYOUT;
         wp_add_inline_style('common', $css);
     }
 
-    public function script_async(string $url): string {
-        if (strpos($url, '#async') === false) return $url;
+    public function script_async($url = '') {
+        if (!is_string($url) || strpos($url, '#async') === false) return $url;
         return str_replace('#async', '', $url) . "' async='async";
     }
 
@@ -824,7 +823,8 @@ FLYOUT;
     // Body classes for layout:
     //   .phpinfowp-page         — on every plugin admin page (topbar + margins)
     //   .phpinfowp-has-sidenav  — only on grouped pages (Audit/Tools/Reports)
-    public function admin_body_class(string $classes): string {
+    public function admin_body_class($classes = ''): string {
+        $classes = (string) $classes;
         if ($this->is_plugin_page()) {
             $classes .= ' phpinfowp-page piwp-admin-page';
         }
@@ -924,7 +924,7 @@ FLYOUT;
         return '';
     }
 
-    public function custom_admin_footer_text(string $text): string {
+    public function custom_admin_footer_text($text = '') {
         if (!$this->is_plugin_page()) {
             return $text;
         }
@@ -953,31 +953,6 @@ FLYOUT;
             esc_html__('Unlock 1-Click Fixes, SSL Monitor & White-Label PDF Reports.', 'phpinfo-wp'),
             'https://exeebit.com/phpinfo-wp#pricing',
             esc_html__('Buy Pro License', 'phpinfo-wp')
-        );
-    }
-
-    public function custom_update_footer(string $text): string {
-        if (!$this->is_plugin_page()) {
-            return $text;
-        }
-
-        $is_pro = Phpinfo_WP_License::is_valid();
-        $ver = 'v' . PHPINFOWP_VERSION;
-        
-        if ($is_pro) {
-            return sprintf(
-                '<span><strong>%s %s</strong> · <span style="color:#00a32a;font-weight:700;">&#10003; %s</span></span>',
-                esc_html__('phpinfo() WP Pro', 'phpinfo-wp'),
-                esc_html($ver),
-                esc_html__('Pro Active', 'phpinfo-wp')
-            );
-        }
-
-        return sprintf(
-            '<span><strong>phpinfo() WP %s</strong> · <a href="%s" target="_blank" rel="noopener" style="color:#777BB3;font-weight:600;text-decoration:none;">⭐ %s</a></span>',
-            esc_html($ver),
-            'https://wordpress.org/support/plugin/phpinfo-wp/reviews/#new-post',
-            esc_html__('Rate 5-Stars on WP.org', 'phpinfo-wp')
         );
     }
 

@@ -736,7 +736,7 @@ class Phpinfo_WP_Config_Grader {
             // host_locked directives (either type) are excluded from controllable scoring
             if (!$is_host_locked) {
                 $total_w_controllable += $weight;
-                if ($pass || $is_propagating) {
+                if ($pass) {
                     $earned_controllable += $weight;
                 } elseif ($warn) {
                     $earned_controllable += $weight * 0.5;

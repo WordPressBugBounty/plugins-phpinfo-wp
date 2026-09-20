@@ -305,7 +305,7 @@ class Phpinfo_WP_Config_Grader_Fixer {
         $ctx = class_exists('Phpinfo_WP_Config_Grader') ? Phpinfo_WP_Config_Grader::context() : [];
         $is_local = !empty($ctx['is_local']);
 
-        $managed = self::extract_managed((string) @file_get_contents($t['file']), $t['mode']);
+        $managed = self::extract_all_configured((string) @file_get_contents($t['file']), $t['mode']);
         $out = [];
         foreach ($managed as $key => $expected) {
             // In local development, display_errors On is intended
@@ -409,7 +409,7 @@ class Phpinfo_WP_Config_Grader_Fixer {
     public static function get_managed_directives(): array {
         $t = self::detect_target();
         if (!@file_exists($t['file'])) return [];
-        return self::extract_managed((string) @file_get_contents($t['file']), $t['mode']);
+        return self::extract_all_configured((string) @file_get_contents($t['file']), $t['mode']);
     }
 
     /**
@@ -426,11 +426,28 @@ class Phpinfo_WP_Config_Grader_Fixer {
         return $unwritten;
     }
 
+    public static function extract_all_configured(string $content, string $mode): array {
+        $manual  = self::extract_manual($content, $mode);
+        $autofix = self::extract_managed($content, $mode);
+        return array_merge($manual, $autofix);
+    }
+
+    public static function extract_manual(string $content, string $mode): array {
+        $c = $mode === 'htaccess' ? '#' : ';';
+        if (!preg_match('/' . preg_quote($c, '/') . ' BEGIN phpinfo-wp(?!\-autofix)\b\s*\n(.*?)\n\s*' . preg_quote($c, '/') . ' END phpinfo-wp(?!\-autofix)\b/s', $content, $m)) {
+            return [];
+        }
+        return self::parse_directives_block($m[1], $mode);
+    }
+
     public static function extract_managed(string $content, string $mode): array {
         if (!preg_match('/' . self::MARK_RE_BEGIN . '\s*(.*?)\s*' . self::MARK_RE_END . '/s', $content, $m)) {
             return [];
         }
-        $block = $m[1];
+        return self::parse_directives_block($m[1], $mode);
+    }
+
+    private static function parse_directives_block(string $block, string $mode): array {
         $out   = [];
         foreach (explode("\n", $block) as $line) {
             $line = trim($line);

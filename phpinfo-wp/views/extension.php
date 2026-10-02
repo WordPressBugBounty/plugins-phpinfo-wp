@@ -22,7 +22,7 @@ sort($missing);
 
   <div class="phpinfowp-page-header">
     <div>
-      <h1>
+      <h1 style="margin-bottom:10px">
         <?php _e('PHP Extensions', 'phpinfo-wp'); ?>
         <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Inspect active and recommended PHP extensions installed on your server runtime.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
       </h1>

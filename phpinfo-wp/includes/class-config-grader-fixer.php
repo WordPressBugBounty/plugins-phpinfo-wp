@@ -3,17 +3,6 @@ defined('ABSPATH') or die('Unauthorized Access');
 
 /**
  * One-click Config Grader auto-fix engine.
- *
- * Maps each Grader check to a recommended runtime value, writes it via
- * .htaccess (`php_value`) on Apache+mod_php or .user.ini on FPM/CGI, then
- * verifies the site still returns 200. On 500 we restore the backup —
- * the user can't break their own site.
- *
- * Directives that require PHP_INI_SYSTEM (only settable in php.ini, not
- * per-directory) are detected and surfaced as "Can't auto-fix — copy this
- * line into your php.ini." Honest is better than a silent failure.
- *
- * Pro only.
  */
 class Phpinfo_WP_Config_Grader_Fixer {
 
@@ -23,7 +12,8 @@ class Phpinfo_WP_Config_Grader_Fixer {
 
     // Transient holding the timestamp until which a just-written change is
     // still "propagating" — see settle_remaining() / detect_overrides().
-    const OPT_SETTLE = 'phpinfowp_autofix_settle_until';
+    const OPT_SETTLE        = 'phpinfowp_autofix_settle_until';
+    const OPT_SETTLE_NOTICE = 'phpinfowp_autofix_settle_notice';
 
     private static function mark_begin(string $mode): string {
         return ($mode === 'htaccess' ? '#' : ';') . ' BEGIN phpinfo-wp-autofix';
@@ -184,13 +174,22 @@ class Phpinfo_WP_Config_Grader_Fixer {
         // Verify site still responds
         $verify = self::verify_site();
         if (!$verify['ok']) {
-            // Restore
-            @file_put_contents($file, $current);
-            return [
-                'ok' => false,
-                'error' => 'Configuration caused HTTP ' . $verify['code'] . ' — original config restored.',
-                'rolled_back' => true,
-            ];
+            // Only roll back if the server actually returned an HTTP 500+ error,
+            // or if an .htaccess modification failed verification.
+            // On .user.ini, directives configure PHP-FPM and cannot crash the web server.
+            // If it is code 0 (host loopback connection failure/timeout), let the changes succeed.
+            $is_fatal_server_error = $verify['code'] >= 500;
+            $should_rollback       = $is_fatal_server_error || ($mode === 'htaccess' && $verify['code'] === 0);
+
+            if ($should_rollback) {
+                // Restore
+                @file_put_contents($file, $current);
+                return [
+                    'ok'          => false,
+                    'error'       => 'Configuration caused HTTP ' . $verify['code'] . ' — original config restored.',
+                    'rolled_back' => true,
+                ];
+            }
         }
 
         // If memory_limit is being fixed, also ensure WP_MEMORY_LIMIT in wp-config.php isn't capping WordPress
@@ -204,6 +203,13 @@ class Phpinfo_WP_Config_Grader_Fixer {
         // ini_get() right now is guaranteed stale — so we suppress the
         // override panel until the window passes (see detect_overrides()).
         self::mark_settle();
+        self::set_settle_notice([
+            'action'  => 'autofix',
+            'applied' => array_keys($to_write),
+            'mode'    => $mode,
+            'file'    => basename($file),
+        ]);
+        delete_user_meta(get_current_user_id(), 'phpinfowp_dismissed_autofix_until');
 
         // Log to activity log
         self::log_change('autofix applied: ' . implode(', ', array_keys($to_write)));
@@ -280,7 +286,73 @@ class Phpinfo_WP_Config_Grader_Fixer {
 
     public static function schedule_recheck(): int {
         self::mark_settle();
+        self::set_settle_notice([
+            'action' => 'recheck',
+        ]);
+        delete_user_meta(get_current_user_id(), 'phpinfowp_dismissed_autofix_until');
         return self::settle_remaining();
+    }
+
+    public static function set_settle_notice(array $data): void {
+        $w = self::settle_window();
+        $until = time() + $w;
+        $data['until'] = $until;
+        set_transient(self::OPT_SETTLE_NOTICE, $data, $w + 60);
+    }
+
+    public static function get_active_settle_notice(): ?array {
+        $remaining = self::settle_remaining();
+        if ($remaining <= 0) {
+            delete_transient(self::OPT_SETTLE_NOTICE);
+            return null;
+        }
+        $data = get_transient(self::OPT_SETTLE_NOTICE);
+        if (!is_array($data)) {
+            $t = self::detect_target();
+            $managed = self::get_managed_directives();
+            if (empty($managed)) {
+                return null;
+            }
+            $data = [
+                'action'  => 'autofix',
+                'applied' => array_keys($managed),
+                'mode'    => $t['mode'],
+                'file'    => basename($t['file']),
+                'until'   => (int) get_transient(self::OPT_SETTLE),
+            ];
+        }
+        $data['remaining'] = $remaining;
+        if (empty($data['until'])) {
+            $data['until'] = (int) get_transient(self::OPT_SETTLE);
+        }
+        return $data;
+    }
+
+    public static function is_notice_dismissed(int $until): bool {
+        $user_id = get_current_user_id();
+        if (!$user_id) return false;
+        $dismissed_until = (int) get_user_meta($user_id, 'phpinfowp_dismissed_autofix_until', true);
+        return $dismissed_until >= $until;
+    }
+
+    public static function dismiss_active_notice(?int $until = null): void {
+        $user_id = get_current_user_id();
+        if (!$user_id) return;
+        if ($until === null || $until <= 0) {
+            $until = (int) get_transient(self::OPT_SETTLE);
+        }
+        if ($until > 0) {
+            update_user_meta($user_id, 'phpinfowp_dismissed_autofix_until', $until);
+        }
+    }
+
+    public static function ajax_dismiss_notice(): void {
+        check_ajax_referer('phpinfowp_dismiss_autofix_notice', 'nonce');
+        if (current_user_can('manage_options')) {
+            $until = isset($_POST['until']) ? (int) $_POST['until'] : null;
+            self::dismiss_active_notice($until);
+        }
+        wp_send_json_success();
     }
 
     private static function mark_settle(): void {
@@ -372,12 +444,13 @@ class Phpinfo_WP_Config_Grader_Fixer {
 
         @file_put_contents($t['file'], $new);
         $verify = self::verify_site();
-        if (!$verify['ok']) {
+        if (!$verify['ok'] && ($verify['code'] >= 500 || ($t['mode'] === 'htaccess' && $verify['code'] === 0))) {
             @file_put_contents($t['file'], $current);
             return ['ok' => false, 'error' => 'Reverting caused HTTP ' . $verify['code'] . '.'];
         }
 
         delete_transient(self::OPT_SETTLE);
+        delete_transient(self::OPT_SETTLE_NOTICE);
         self::log_change('reverted directive(s): ' . implode(', ', $keys_to_revert));
         return ['ok' => true, 'reverted' => true, 'keys' => $keys_to_revert];
     }
@@ -394,11 +467,12 @@ class Phpinfo_WP_Config_Grader_Fixer {
         $base = self::strip_managed_block($current);
         @file_put_contents($t['file'], rtrim($base) . "\n");
         $verify = self::verify_site();
-        if (!$verify['ok']) {
+        if (!$verify['ok'] && ($verify['code'] >= 500 || ($t['mode'] === 'htaccess' && $verify['code'] === 0))) {
             @file_put_contents($t['file'], $current);
             return ['ok' => false, 'error' => 'Reverting caused HTTP ' . $verify['code'] . '.'];
         }
         delete_transient(self::OPT_SETTLE);
+        delete_transient(self::OPT_SETTLE_NOTICE);
         self::log_change('autofix block reverted');
         return ['ok' => true, 'reverted' => true];
     }
@@ -487,9 +561,13 @@ class Phpinfo_WP_Config_Grader_Fixer {
 
     private static function verify_site(): array {
         $url = get_site_url();
-        $resp = wp_remote_get($url, ['timeout' => 8, 'sslverify' => false, 'redirection' => 1]);
+        $resp = wp_remote_get($url, [
+            'timeout'     => 10,
+            'sslverify'   => false,
+            'redirection' => 5,
+        ]);
         if (is_wp_error($resp)) {
-            // If we can't reach the site at all, treat as failure
+            // Loopback request failed (firewall, hairpin NAT, DNS, or timeout on host)
             return ['ok' => false, 'code' => 0, 'err' => $resp->get_error_message()];
         }
         $code = (int) wp_remote_retrieve_response_code($resp);

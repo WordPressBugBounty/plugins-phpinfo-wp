@@ -68,13 +68,13 @@ $pillars = [
             </div>
             <div class="phpinfowp-upgrade-price-tier is-featured">
                 <div class="phpinfowp-upgrade-price-name"><?php _e('Unlimited', 'phpinfo-wp'); ?></div>
-                <div class="phpinfowp-upgrade-price-value">$69<small>/yr</small></div>
+                <div class="phpinfowp-upgrade-price-value">$79<small>/yr</small></div>
                 <div class="phpinfowp-upgrade-price-sub"><?php _e('Unlimited sites · White-labeled · Weekly digests', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-upgrade-price-best"><?php _e('Best value', 'phpinfo-wp'); ?></div>
             </div>
             <div class="phpinfowp-upgrade-price-tier">
                 <div class="phpinfowp-upgrade-price-name"><?php _e('Lifetime', 'phpinfo-wp'); ?></div>
-                <div class="phpinfowp-upgrade-price-value">$149<small>once</small></div>
+                <div class="phpinfowp-upgrade-price-value">$249<small>once</small></div>
                 <div class="phpinfowp-upgrade-price-sub"><?php _e('Unlimited sites · Lifetime updates · White-labeled', 'phpinfo-wp'); ?></div>
             </div>
         </div>

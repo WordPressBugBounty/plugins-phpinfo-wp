@@ -58,7 +58,18 @@ if ($is_pro && $view_snap_id > 0) {
 
 
     <?php if ($message): ?>
-        <div class="notice notice-<?php echo $msg_type; ?> inline is-dismissible"><p><?php echo esc_html($message); ?></p></div>
+        <?php
+        $is_err = ($msg_type === 'error');
+        $cls    = $is_err ? 'is-error' : 'is-success';
+        $icon   = $is_err ? 'dashicons-dismiss' : 'dashicons-yes-alt';
+        ?>
+        <div class="phpinfowp-custom-alert <?php echo $cls; ?>" style="margin:0 0 20px">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                <span class="dashicons <?php echo $icon; ?>"></span>
+                <div class="phpinfowp-custom-alert-body"><p><?php echo esc_html($message); ?></p></div>
+            </div>
+            <button type="button" class="phpinfowp-alert-dismiss-btn" onclick="this.closest('.phpinfowp-custom-alert').remove();" title="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-no-alt"></span></button>
+        </div>
     <?php endif; ?>
 
     <?php if ($is_free_preview): ?>
@@ -134,49 +145,56 @@ if ($is_pro && $view_snap_id > 0) {
 
     <?php else: ?>
 
-        <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+        <div style="display:flex;gap:16px;margin-bottom:24px;align-items:stretch;flex-wrap:wrap">
 
             <!-- Take snapshot -->
-            <div class="phpinfowp-snap-card">
+            <div class="phpinfowp-snap-card" style="flex:0 0 280px; display:flex; flex-direction:column; box-sizing:border-box;">
                 <h3 style="margin-top:0"><?php _e('Take Snapshot Now', 'phpinfo-wp'); ?></h3>
                 <?php if (!Phpinfo_WP_License::is_unlimited() && count($snapshots) >= 3): ?>
-                    <div style="background:#fff9e6;border:1px solid #ffe599;border-radius:4px;padding:12px;font-size:13px;color:#7f6000;margin-bottom:8px;max-width:280px">
-                        Single Site tier limit reached (3/3 snapshots). Delete older snapshots or <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" style="font-weight:600;color:#777BB3;text-decoration:none"><?php _e('Upgrade to Unlimited', 'phpinfo-wp'); ?></a> for unlimited snapshot history.
-                    </div>
+                    <div class="notice notice-warning inline" style="margin:0;"><p><?php printf(__('Single Site limit reached (%d/%d). Delete old snapshots or <a href="%s" target="_blank">Upgrade to Unlimited</a> for full history.', 'phpinfo-wp'), count($snapshots), 3, 'https://exeebit.com/phpinfo-wp#pricing'); ?></p></div>
                 <?php else: ?>
-                    <form method="post">
+                    <form method="post" style="display:flex; flex-direction:column; justify-content:space-between; flex:1;">
                         <?php wp_nonce_field('phpinfowp_snap_nonce'); ?>
                         <input type="hidden" name="phpinfowp_snap_action" value="take">
-                        <input type="text" name="snap_label" placeholder="<?php echo esc_attr__('Label (optional)', 'phpinfo-wp'); ?>" class="regular-text" style="margin-bottom:8px;display:block">
-                        <button type="submit" class="button button-primary"><?php _e('Take Snapshot', 'phpinfo-wp'); ?></button>
+                        <div style="margin-bottom:8px;">
+                            <label style="display:block;font-size:12px;margin-bottom:3px;visibility:hidden;">&nbsp;</label>
+                            <input type="text" name="snap_label" placeholder="<?php echo esc_attr__('Label (optional)', 'phpinfo-wp'); ?>" class="regular-text" style="max-width:100%;width:100%;margin-bottom:0;display:block">
+                        </div>
+                        <div>
+                            <button type="submit" class="button button-primary"><?php _e('Take Snapshot', 'phpinfo-wp'); ?></button>
+                        </div>
                     </form>
                 <?php endif; ?>
             </div>
 
             <!-- Diff picker -->
             <?php if (count($snapshots) >= 2): ?>
-            <div class="phpinfowp-snap-card">
+            <div class="phpinfowp-snap-card" style="flex:1;max-width:720px; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
                 <h3 style="margin-top:0"><?php _e('Compare Two Snapshots', 'phpinfo-wp'); ?></h3>
-                <form method="post" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                <form method="post" style="display:flex; flex-direction:column; justify-content:space-between; flex:1;">
                     <?php wp_nonce_field('phpinfowp_snap_nonce'); ?>
                     <input type="hidden" name="phpinfowp_snap_action" value="diff">
-                    <div>
-                        <label style="display:block;font-size:12px;margin-bottom:3px"><?php _e('From (older)', 'phpinfo-wp'); ?></label>
-                        <select name="snap_a" class="phpinfowp-snap-select">
-                            <?php foreach ($snapshots as $s): ?>
-                                <option value="<?php echo esc_attr($s->id); ?>"><?php echo esc_html("#{$s->id} {$s->label} — {$s->created_at}"); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                    <div style="display:flex;gap:12px;margin-bottom:8px;">
+                        <div style="flex:1;min-width:0;">
+                            <label style="display:block;font-size:12px;margin-bottom:3px"><?php _e('From (older)', 'phpinfo-wp'); ?></label>
+                            <select name="snap_a" class="phpinfowp-snap-select" style="width:100%;max-width:100%;padding-right:32px;">
+                                <?php foreach ($snapshots as $s): ?>
+                                    <option value="<?php echo esc_attr($s->id); ?>"><?php echo esc_html("#{$s->id} {$s->label} — {$s->created_at}"); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <label style="display:block;font-size:12px;margin-bottom:3px"><?php _e('To (newer)', 'phpinfo-wp'); ?></label>
+                            <select name="snap_b" class="phpinfowp-snap-select" style="width:100%;max-width:100%;padding-right:32px;">
+                                <?php foreach ($snapshots as $i => $s): ?>
+                                    <option value="<?php echo esc_attr($s->id); ?>" <?php selected($i, 0); ?>><?php echo esc_html("#{$s->id} {$s->label} — {$s->created_at}"); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
                     <div>
-                        <label style="display:block;font-size:12px;margin-bottom:3px"><?php _e('To (newer)', 'phpinfo-wp'); ?></label>
-                        <select name="snap_b" class="phpinfowp-snap-select">
-                            <?php foreach ($snapshots as $i => $s): ?>
-                                <option value="<?php echo esc_attr($s->id); ?>" <?php selected($i, 0); ?>><?php echo esc_html("#{$s->id} {$s->label} — {$s->created_at}"); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <button type="submit" class="button button-secondary"><?php _e('Compare →', 'phpinfo-wp'); ?></button>
                     </div>
-                    <button type="submit" class="button button-secondary" style="margin-bottom:1px"><?php _e('Compare →', 'phpinfo-wp'); ?></button>
                 </form>
             </div>
             <?php endif; ?>
@@ -191,7 +209,12 @@ if ($is_pro && $view_snap_id > 0) {
                     &rarr; <em><?php echo esc_html("#{$snap_b->id} {$snap_b->label}"); ?></em>
                 </h2>
                 <?php if (empty($diff)): ?>
-                    <div class="notice notice-success inline"><p><?php _e('No changes detected between these two snapshots.', 'phpinfo-wp'); ?></p></div>
+                    <div class="phpinfowp-custom-alert is-success" style="margin:0 0 20px">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span class="dashicons dashicons-yes-alt"></span>
+                            <div class="phpinfowp-custom-alert-body"><p><?php _e('No changes detected between these two snapshots.', 'phpinfo-wp'); ?></p></div>
+                        </div>
+                    </div>
                 <?php else: ?>
                     <table class="wp-list-table widefat fixed striped phpinfowp-diff-table">
                         <thead><tr><th style="width:120px"><?php _e('Change', 'phpinfo-wp'); ?></th><th><?php _e('Directive', 'phpinfo-wp'); ?></th><th><?php _e('Old Value', 'phpinfo-wp'); ?></th><th><?php _e('New Value', 'phpinfo-wp'); ?></th></tr></thead>

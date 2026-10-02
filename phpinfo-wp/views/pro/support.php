@@ -109,7 +109,7 @@ foreach ($sysinfo as $k => $v) {
             <p style="color:#475569; font-size:14px; line-height:1.6; margin-bottom:14px;">
                 <?php _e('Real-time server environment specs. Copy and attach this when requesting technical support or debugging server issues.', 'phpinfo-wp'); ?>
             </p>
-            <textarea readonly style="width:100%; height:230px; min-height:230px; font-family:monospace; font-size:12.5px; background:#f8fafc; color:#334155; border:1px solid #cbd5e1; border-radius:6px; padding:14px; margin-bottom:16px; line-height:1.55; resize:none; box-sizing:border-box;" onclick="this.select();"><?php echo esc_textarea($sysinfo_str); ?></textarea>
+            <textarea readonly style="width:100%; height:240px; min-height:230px; font-family:monospace; font-size:12.5px; background:#f8fafc; color:#334155; border:1px solid #cbd5e1; border-radius:6px; padding:14px; margin-bottom:16px; line-height:1.55; resize:none; box-sizing:border-box;" onclick="this.select();"><?php echo esc_textarea($sysinfo_str); ?></textarea>
             <div>
                 <button type="button" class="button button-secondary" onclick="var t=this.parentNode.previousElementSibling; t.select(); document.execCommand('copy'); this.innerText='Copied!'; setTimeout(()=>this.innerText='<?php _e('Copy System Info', 'phpinfo-wp'); ?>', 2000);">
                     <?php _e('Copy System Info', 'phpinfo-wp'); ?>

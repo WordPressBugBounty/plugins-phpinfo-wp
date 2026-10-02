@@ -649,11 +649,14 @@ Phpinfo_wp::thankyou();
           </p>
       </div>
   <?php elseif ($notice): ?>
-      <div class="phpinfowp-custom-alert" style="background: <?php echo $notice_type === 'success' ? '#f0fdf4' : '#fef2f2'; ?>; border: 1px solid <?php echo $notice_type === 'success' ? '#bbf7d0' : '#fca5a5'; ?>; border-left: 4px solid <?php echo $notice_type === 'success' ? '#22c55e' : '#ef4444'; ?>;">
-          <span class="dashicons <?php echo $notice_type === 'success' ? 'dashicons-yes' : 'dashicons-dismiss'; ?>" style="color: <?php echo $notice_type === 'success' ? '#22c55e' : '#ef4444'; ?>; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0;"></span>
-          <p style="color: <?php echo $notice_type === 'success' ? '#166534' : '#991b1b'; ?>;">
-              <?php echo wp_kses($notice, ['code' => [], 'strong' => [], 'br' => []]); ?>
-          </p>
+      <div class="phpinfowp-custom-alert <?php echo $notice_type === 'success' ? 'is-success' : 'is-error'; ?>">
+          <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+              <span class="dashicons <?php echo $notice_type === 'success' ? 'dashicons-yes-alt' : 'dashicons-dismiss'; ?>"></span>
+              <div class="phpinfowp-custom-alert-body">
+                  <p><?php echo wp_kses($notice, ['code' => [], 'strong' => [], 'br' => [], 'span' => ['style' => []]]); ?></p>
+              </div>
+          </div>
+          <button type="button" class="phpinfowp-alert-dismiss-btn" onclick="this.closest('.phpinfowp-custom-alert').remove();" title="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-no-alt"></span></button>
       </div>
   <?php endif; ?>
 

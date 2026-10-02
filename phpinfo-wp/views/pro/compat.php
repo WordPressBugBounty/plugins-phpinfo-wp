@@ -110,7 +110,12 @@ if (class_exists('Phpinfo_WP_Background_Scan')) {
                 </p>
             </div>
         <?php elseif (isset($result['error'])): ?>
-            <div class="notice notice-error inline"><p><?php echo esc_html($result['error']); ?></p></div>
+            <div class="phpinfowp-custom-alert is-error" style="margin:0 0 20px">
+                <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                    <span class="dashicons dashicons-dismiss"></span>
+                    <div class="phpinfowp-custom-alert-body"><p><?php echo esc_html($result['error']); ?></p></div>
+                </div>
+            </div>
         <?php elseif (!$result): ?>
             <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:36px 24px; text-align:center; margin-top:20px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
                 <span class="dashicons dashicons-search" style="font-size:36px; width:36px; height:36px; color:#64748b; display:inline-block; margin-bottom:14px;"></span>
@@ -170,25 +175,40 @@ if (class_exists('Phpinfo_WP_Background_Scan')) {
                 </div>
             <?php else: ?>
                 <?php if ($is_already_on_target): ?>
-                    <div class="notice notice-info inline" style="margin:0 0 24px; border-left-color: #2271b1; padding: 12px 16px;">
-                        <p style="font-size: 14.5px; margin: 0 0 6px;"><strong>ℹ️ <?php printf(__('Active Server PHP: %s (Legacy / Historical Check)', 'phpinfo-wp'), esc_html(explode('-', $current_php)[0])); ?></strong></p>
-                        <p style="margin: 0; color: #475569; font-size: 13px; line-height: 1.45;">
-                            <?php printf(__('You scanned against PHP %s, which is lower than or equal to your current server PHP. Any flagged items below are legacy compatibility shims or dormant diagnostic branches. Because your site is running normally right now on PHP %s, these do not cause active runtime crashes.', 'phpinfo-wp'), esc_html($result['target']), esc_html(explode('-', $current_php)[0])); ?>
-                        </p>
+                    <div class="phpinfowp-custom-alert is-info" style="margin:0 0 24px;">
+                        <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                            <span class="dashicons dashicons-info-outline"></span>
+                            <div class="phpinfowp-custom-alert-body">
+                                <p style="font-size: 14px; margin: 0 0 4px;"><strong><?php printf(__('Active Server PHP: %s (Legacy / Historical Check)', 'phpinfo-wp'), esc_html(explode('-', $current_php)[0])); ?></strong></p>
+                                <p style="margin: 0; color: #475569; font-size: 13px; line-height: 1.5;">
+                                    <?php printf(__('You scanned against PHP %s, which is lower than or equal to your current server PHP. Any flagged items below are legacy compatibility shims or dormant diagnostic branches. Because your site is running normally right now on PHP %s, these do not cause active runtime crashes.', 'phpinfo-wp'), esc_html($result['target']), esc_html(explode('-', $current_php)[0])); ?>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 <?php elseif ($total_removed > 0): ?>
-                    <div class="notice notice-error inline" style="margin:0 0 24px; border-left-color: #d63638; padding: 12px 16px;">
-                        <p style="font-size: 14.5px; margin: 0 0 6px;"><strong>🚨 <?php printf(__('Upgrade Delta Alert: %d Breaking Issue(s) on PHP %s', 'phpinfo-wp'), $total_removed, esc_html($result['target'])); ?></strong></p>
-                        <p style="margin: 0; color: #7f1d1d; font-size: 13px; line-height: 1.45;">
-                            <?php printf(__('Your plugins contain %d function call(s) that are completely removed in PHP %s. Upgrading to PHP %s before updating these plugins will trigger fatal errors.', 'phpinfo-wp'), $total_removed, esc_html($result['target']), esc_html($result['target'])); ?>
-                        </p>
+                    <div class="phpinfowp-custom-alert is-error" style="margin:0 0 24px;">
+                        <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                            <span class="dashicons dashicons-dismiss"></span>
+                            <div class="phpinfowp-custom-alert-body">
+                                <p style="font-size: 14px; margin: 0 0 4px;"><strong><?php printf(__('Upgrade Delta Alert: %d Breaking Issue(s) on PHP %s', 'phpinfo-wp'), $total_removed, esc_html($result['target'])); ?></strong></p>
+                                <p style="margin: 0; color: #7f1d1d; font-size: 13px; line-height: 1.5;">
+                                    <?php printf(__('Your plugins contain %d function call(s) that are completely removed in PHP %s. Upgrading to PHP %s before updating these plugins will trigger fatal errors.', 'phpinfo-wp'), $total_removed, esc_html($result['target']), esc_html($result['target'])); ?>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 <?php else: ?>
-                    <div class="notice notice-warning inline" style="margin:0 0 24px; border-left-color: #dba617; padding: 12px 16px;">
-                        <p style="font-size: 14.5px; margin: 0 0 6px;"><strong>⚠️ <?php printf(__('Upgrade Safe (Deprecation Notices): %d Notice(s) on PHP %s', 'phpinfo-wp'), $total_deprecated, esc_html($result['target'])); ?></strong></p>
-                        <p style="margin: 0; color: #78350f; font-size: 13px; line-height: 1.45;">
-                            <?php printf(__('Zero breaking removals detected. Your plugins will continue to run normally after upgrading to PHP %1$s. We detected %2$d function call(s) deprecated upstream in PHP %1$s. While they do not crash your site, they may output non-fatal notices into your debug log.', 'phpinfo-wp'), esc_html($result['target']), $total_deprecated); ?>
-                        </p>
+                    <div class="phpinfowp-custom-alert is-warning" style="margin:0 0 24px;">
+                        <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                            <span class="dashicons dashicons-warning"></span>
+                            <div class="phpinfowp-custom-alert-body">
+                                <p style="font-size: 14px; margin: 0 0 4px;"><strong><?php printf(__('Upgrade Safe (Deprecation Notices): %d Notice(s) on PHP %s', 'phpinfo-wp'), $total_deprecated, esc_html($result['target'])); ?></strong></p>
+                                <p style="margin: 0; color: #78350f; font-size: 13px; line-height: 1.5;">
+                                    <?php printf(__('Zero breaking removals detected. Your plugins will continue to run normally after upgrading to PHP %1$s. We detected %2$d function call(s) deprecated upstream in PHP %1$s. While they do not crash your site, they may output non-fatal notices into your debug log.', 'phpinfo-wp'), esc_html($result['target']), $total_deprecated); ?>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 <?php endif; ?>
 

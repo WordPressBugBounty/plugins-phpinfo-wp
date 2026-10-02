@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="485 525 1645 1475" fill="none" aria-label="Cyber ElePHPant Mascot">
+  <g transform="translate(0, 2560) scale(1, -1)">
+    <!-- Mascot Body & Stepped Cyber Trunk (White #FFFFFF for dark backgrounds) -->
+    <path d="M1305 1996 c174 -26 314 -92 416 -197 55 -55 119 -164 119 -201 0 -13 8 -18 30 -18 28 0 30 -3 30 -35 0 -41 3 -42 40 -15 l28 20 72 -97 73 -96 -27 -24 -27 -23 35 0 36 0 0 -100 0 -100 -36 0 c-38 0 -39 -4 -19 -52 5 -14 -11 -26 -84 -62 -50 -26 -95 -46 -100 -46 -5 0 -14 14 -21 31 l-13 30 -29 -27 -28 -28 -50 49 -50 49 27 28 27 28 -27 28 -27 28 48 47 48 47 27 -27 27 -27 28 27 28 27 23 -24 23 -25 -47 -55 c-26 -31 -45 -56 -41 -56 3 0 30 12 61 27 l55 27 0 61 c0 59 -2 64 -57 138 -54 72 -83 95 -83 63 0 -37 -74 -156 -130 -210 l-60 -57 0 -295 0 -294 -145 0 -145 0 0 225 0 225 -205 0 -205 0 0 -225 0 -225 -150 0 -150 0 0 316 0 316 -40 48 c-89 107 -125 236 -96 349 24 92 52 139 130 216 160 159 406 230 661 191z" fill="#FFFFFF"/>
+    <!-- Lavender Ear Parenthesis (#A78BFA) -->
+    <path d="M1042 1797 c-51 -16 -127 -91 -159 -155 -25 -51 -28 -68 -28 -157 0 -93 2 -105 33 -167 45 -92 113 -146 205 -163 l37 -7 0 65 c0 63 -1 65 -28 70 -108 22 -163 191 -102 312 21 41 35 54 78 75 l52 25 0 58 c0 56 -1 57 -27 56 -16 -1 -43 -6 -61 -12z" fill="#A78BFA" stroke="#A78BFA" stroke-width="24" stroke-linejoin="round"/>
+    <!-- Radiating Live Radar Wave (Neon Emerald #10B981) -->
+    <circle cx="1550" cy="1710" r="80" stroke="#10B981" stroke-width="44" fill="none">
+      <animate attributeName="r" values="80;280" dur="1.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0" dur="1.8s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-width" values="44;12" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Radar Beacon Core Eye -->
+    <circle cx="1550" cy="1710" r="95" fill="#10B981">
+      <animate attributeName="r" values="95;120;95" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="1550" cy="1710" r="32" fill="#FFFFFF"/>
+  </g>
+</svg>

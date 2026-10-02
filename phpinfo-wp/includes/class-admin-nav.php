@@ -2,13 +2,7 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 /**
- * Admin navigation — collapses 18+ submenu items into 5 logical groups.
- *
- * The sidebar shows only: Dashboard, Audit, Tools, Reports, License.
- * Within Audit / Tools / Reports, a horizontal tab bar lets users move
- * between related screens. All legacy slugs (?page=piwp-eol etc.)
- * still work for backward compatibility — direct links from the admin
- * bar, dashboard widget, and admin notices keep functioning.
+ * Admin navigation menu groups and tabs.
  */
 class Phpinfo_WP_Admin_Nav {
 
@@ -938,8 +932,8 @@ class Phpinfo_WP_Admin_Nav {
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="color:#334155; font-weight:600;"><?php _e('Score:', 'phpinfo-wp'); ?></span>
                         <?php if ($is_pro): ?>
-                            <span style="color:<?php echo ($score >= 80) ? '#15803d' : (($score >= 50) ? '#b45309' : '#b91c1c'); ?>; font-weight:800; font-size:13.5px;">
-                                <?php echo (int) $score; ?> / 100
+                            <span style="color:<?php echo !$audit ? '#64748b' : (($score >= 80) ? '#15803d' : (($score >= 50) ? '#b45309' : '#b91c1c')); ?>; font-weight:800; font-size:13.5px;">
+                                <?php echo $audit ? ((int) $score . ' / 100') : '—'; ?>
                             </span>
                         <?php else: ?>
                             <span style="color:#777BB3; font-weight:700; font-size:11.5px;"><?php _e('Pro Only 🔒', 'phpinfo-wp'); ?></span>
@@ -948,8 +942,8 @@ class Phpinfo_WP_Admin_Nav {
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="color:#334155; font-weight:600;"><?php _e('Headers Set:', 'phpinfo-wp'); ?></span>
                         <?php if ($is_pro): ?>
-                            <span style="color:#15803d; font-weight:800; font-size:13.5px;">
-                                <?php echo (int) $passed; ?> / <?php echo (int) $total; ?>
+                            <span style="color:<?php echo !$audit ? '#64748b' : '#15803d'; ?>; font-weight:800; font-size:13.5px;">
+                                <?php echo $audit ? sprintf('%d / %d', (int) $passed, (int) $total) : '—'; ?>
                             </span>
                         <?php else: ?>
                             <span style="color:#777BB3; font-weight:700; font-size:11.5px;"><?php _e('Pro Only 🔒', 'phpinfo-wp'); ?></span>
@@ -958,8 +952,8 @@ class Phpinfo_WP_Admin_Nav {
 
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="color:#334155; font-weight:600;"><?php _e('Missing Headers:', 'phpinfo-wp'); ?></span>
-                        <span style="color:<?php echo $missing > 0 ? '#b91c1c' : '#15803d'; ?>; font-weight:800; font-size:13.5px;">
-                            <?php echo (int) $missing; ?>
+                        <span style="color:<?php echo !$audit ? '#64748b' : ($missing > 0 ? '#b91c1c' : '#15803d'); ?>; font-weight:800; font-size:13.5px;">
+                            <?php echo $audit ? (int) $missing : '—'; ?>
                         </span>
                     </div>
 

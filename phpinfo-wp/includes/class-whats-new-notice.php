@@ -2,13 +2,7 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 /**
- * One-time "What's New" admin notice for Pro.
- *
- * Fires once per admin user the first time they load the WP admin after
- * the plugin updates to a version listed in $catalog below. Dismissed state
- * is stored in user meta so it never re-appears.
- *
- * To add copy for a future release, add an entry to $catalog in render().
+ * Admin notice for new version features.
  */
 class Phpinfo_WP_Whats_New_Notice {
 
@@ -81,6 +75,9 @@ class Phpinfo_WP_Whats_New_Notice {
             '8.0.2' => [
                 'headline' => 'phpinfo() WP 8.0.2 — Server Intelligence & Security Suite',
             ],
+            '8.0.3' => [
+                'headline' => 'phpinfo() WP 8.0.3 — Server Intelligence & Security Suite',
+            ],
         ];
 
         if (!isset($catalog[PHPINFOWP_VERSION])) return;
@@ -91,16 +88,7 @@ class Phpinfo_WP_Whats_New_Notice {
             'phpinfowp_dismiss_notice'
         );
         // Pull real site data + Pro v8.0 features to drive conversions.
-        $deadline    = strtotime('2026-09-30 23:59:59');
-        $days_left   = (int) ceil(($deadline - time()) / DAY_IN_SECONDS);
-        $urgency_txt = ($days_left > 0)
-            ? sprintf(
-                /* translators: %d: days remaining, %s: plural s */
-                __(' <strong>Lock in early-bird rates before prices rise Sept 30 (%d day%s left).</strong>', 'phpinfo-wp'),
-                $days_left,
-                $days_left === 1 ? '' : 's'
-            )
-            : '';
+        $urgency_txt = '';
 
         // 1. Live Memory Analysis
         $mem_limit_raw   = ini_get('memory_limit') ?: '128M';
@@ -146,10 +134,8 @@ class Phpinfo_WP_Whats_New_Notice {
                 esc_html($mem_used_label),
                 esc_html($mem_limit_raw),
                 $mem_pct
-            ) . $urgency_txt;
-            $cta_label = ($days_left > 0)
-                ? sprintf(__('1-Click Memory Fix (%dd left) →', 'phpinfo-wp'), $days_left)
-                : __('1-Click Memory Fix with Pro →', 'phpinfo-wp');
+            );
+            $cta_label = __('1-Click Memory Fix with Pro →', 'phpinfo-wp');
 
         } elseif ($is_eol) {
             // Case 2: PHP End of Life
@@ -159,31 +145,25 @@ class Phpinfo_WP_Whats_New_Notice {
                 __('⚠️ <strong>Security Risk:</strong> Running PHP %1$s which reached <strong>End-Of-Life on %2$s</strong> and receives zero security patches. Use <strong>PHP Compatibility Scanner</strong> to safely audit plugins for PHP 8.3/8.4 before upgrading.', 'phpinfo-wp'),
                 esc_html($eol['minor'] ?? PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION),
                 esc_html($eol['eol'] ?? 'past')
-            ) . $urgency_txt;
-            $cta_label = ($days_left > 0)
-                ? sprintf(__('Scan PHP Compatibility (%dd left) →', 'phpinfo-wp'), $days_left)
-                : __('Scan PHP Compatibility with Pro →', 'phpinfo-wp');
+            );
+            $cta_label = __('Scan PHP Compatibility with Pro →', 'phpinfo-wp');
 
         } elseif ($err_count > 0) {
             // Case 3: Live PHP errors recorded today
-            $badge_text = sprintf(__('v%s · %d Errors Today', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION), $err_count);
+            $badge_text = sprintf(__('v%s · %d Errors Today', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION), esc_html((string) $err_count));
             $site_msg   = sprintf(
                 /* translators: 1: error count, 2: plural s */
                 __('🚨 <strong>%1$d PHP error%2$s logged today</strong> silently degrading site stability. Inspect stack traces and get instant <strong>Native AI Plain-English Fix Explanations</strong> to resolve bottlenecks before clients notice.', 'phpinfo-wp'),
                 $err_count,
                 $err_count === 1 ? '' : 's'
-            ) . $urgency_txt;
-            $cta_label = ($days_left > 0)
-                ? sprintf(__('Explain & Fix by One Click (%dd left) →', 'phpinfo-wp'), $days_left)
-                : __('Explain & Fix by One Click →', 'phpinfo-wp');
+            );
+            $cta_label = __('Explain & Fix by One Click →', 'phpinfo-wp');
 
         } elseif ($opcache_off) {
             // Case 4: OPcache disabled
             $badge_text = sprintf(__('v%s · OPcache Off', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION));
-            $site_msg   = __('⚡ <strong>Performance Bottleneck:</strong> OPcache bytecode caching is disabled. PHP recompiles scripts on every hit, adding heavy server latency. Unlock <strong>Live OPcache Telemetry</strong> and 1-click server snippets to restore full speed.', 'phpinfo-wp') . $urgency_txt;
-            $cta_label  = ($days_left > 0)
-                ? sprintf(__('Optimize Server Speed (%dd left) →', 'phpinfo-wp'), $days_left)
-                : __('Optimize Server Speed with Pro →', 'phpinfo-wp');
+            $site_msg   = __('⚡ <strong>Performance Bottleneck:</strong> OPcache bytecode caching is disabled. PHP recompiles scripts on every hit, adding heavy server latency. Unlock <strong>Live OPcache Telemetry</strong> and 1-click server snippets to restore full speed.', 'phpinfo-wp');
+            $cta_label  = __('Optimize Server Speed with Pro →', 'phpinfo-wp');
 
         } elseif ($mem_limit_bytes > 0 && $mem_limit_bytes <= 134217728) {
             // Case 5: Low memory ceiling (<= 128M)
@@ -192,10 +172,8 @@ class Phpinfo_WP_Whats_New_Notice {
                 /* translators: 1: current limit */
                 __('💾 <strong>Low Memory Limit:</strong> <code>memory_limit</code> is capped at <strong>%s</strong> (WordPress recommends 256M+). Prevent out-of-memory crashes with <strong>1-Click Directive Fixes</strong> and protect updates with <strong>Update Guard</strong>.', 'phpinfo-wp'),
                 esc_html($mem_limit_raw)
-            ) . $urgency_txt;
-            $cta_label = ($days_left > 0)
-                ? sprintf(__('1-Click Memory Fix (%dd left) →', 'phpinfo-wp'), $days_left)
-                : __('1-Click Memory Fix with Pro →', 'phpinfo-wp');
+            );
+            $cta_label = __('1-Click Memory Fix with Pro →', 'phpinfo-wp');
 
         } elseif ($expose_php_on) {
             // Case 6: Expose PHP leaking version
@@ -204,10 +182,8 @@ class Phpinfo_WP_Whats_New_Notice {
                 /* translators: 1: PHP version */
                 __('🛡️ <strong>Security Header Leak:</strong> <code>expose_php</code> is active, broadcasting your exact PHP version (%s) to bot scanners in every HTTP response. Turn it off in 1 click and audit headers with Pro.', 'phpinfo-wp'),
                 esc_html(PHP_VERSION)
-            ) . $urgency_txt;
-            $cta_label = ($days_left > 0)
-                ? sprintf(__('1-Click Security Fix (%dd left) →', 'phpinfo-wp'), $days_left)
-                : __('1-Click Security Fix with Pro →', 'phpinfo-wp');
+            );
+            $cta_label = __('1-Click Security Fix with Pro →', 'phpinfo-wp');
 
         } elseif ($is_upload_tight) {
             // Case 7: Upload limit is <= 2M
@@ -216,10 +192,8 @@ class Phpinfo_WP_Whats_New_Notice {
                 /* translators: 1: upload limit */
                 __('⚠️ <strong>Restricted Upload Limit:</strong> <code>upload_max_filesize</code> is restricted to <strong>%s</strong>, causing media and plugin installations to fail. Auto-raise upload & POST limits with <strong>1-Click Directive Fixes</strong>.', 'phpinfo-wp'),
                 esc_html($upload_raw)
-            ) . $urgency_txt;
-            $cta_label = ($days_left > 0)
-                ? sprintf(__('1-Click Upload Fix (%dd left) →', 'phpinfo-wp'), $days_left)
-                : __('1-Click Upload Fix with Pro →', 'phpinfo-wp');
+            );
+            $cta_label = __('1-Click Upload Fix with Pro →', 'phpinfo-wp');
 
         } elseif ($fails > 0 && $grade) {
             // Case 8: General Config Grader fails
@@ -230,18 +204,14 @@ class Phpinfo_WP_Whats_New_Notice {
                 esc_html($grade),
                 $fails,
                 $fails === 1 ? '' : 's'
-            ) . $urgency_txt;
-            $cta_label = ($days_left > 0)
-                ? sprintf(__('1-Click Fix with Pro (%dd left) →', 'phpinfo-wp'), $days_left)
-                : sprintf(__('Resolve %d Issue%s with Pro →', 'phpinfo-wp'), $fails, $fails === 1 ? '' : 's');
+            );
+            $cta_label = sprintf(__('Resolve %d Issue%s with Pro →', 'phpinfo-wp'), $fails, $fails === 1 ? '' : 's');
 
         } else {
             // Case 9: Pre-Update Risk Sentinel (Never generic "running cleanly")
             $badge_text = sprintf(__('v%s · Pre-Update Sentinel', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION));
-            $site_msg   = __('🛡️ <strong>WordPress 7.1.1 Pre-Update Sentinel:</strong> Prevent white-screen crashes before updating core or plugins. Simulate updates with <strong>Update Guard</strong>, scan for abandoned plugins, and generate <strong>White-Label PDF Reports</strong>.', 'phpinfo-wp') . $urgency_txt;
-            $cta_label  = ($days_left > 0)
-                ? sprintf(__('Audit Before Updating (%dd left) →', 'phpinfo-wp'), $days_left)
-                : __('Audit Before Updating with Pro →', 'phpinfo-wp');
+            $site_msg   = __('🛡️ <strong>WordPress 7.1.2 Pre-Update Sentinel:</strong> Prevent white-screen crashes before updating core or plugins. Simulate updates with <strong>Update Guard</strong>, scan for abandoned plugins, and generate <strong>White-Label PDF Reports</strong>.', 'phpinfo-wp');
+            $cta_label  = __('Audit Before Updating with Pro →', 'phpinfo-wp');
         }
 
         ?>

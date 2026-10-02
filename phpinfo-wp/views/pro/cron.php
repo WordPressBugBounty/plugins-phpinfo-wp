@@ -51,12 +51,23 @@ $paged_events = array_slice($events, ($paged - 1) * $per_page, $per_page);
 
 
     <?php if (isset($msg)): ?>
-        <div class="notice notice-success inline" style="margin:0 0 20px"><p><?php echo esc_html($msg); ?></p></div>
+        <div class="phpinfowp-custom-alert is-success" style="margin:0 0 20px">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                <span class="dashicons dashicons-yes-alt"></span>
+                <div class="phpinfowp-custom-alert-body"><p><?php echo esc_html($msg); ?></p></div>
+            </div>
+            <button type="button" class="phpinfowp-alert-dismiss-btn" onclick="this.closest('.phpinfowp-custom-alert').remove();" title="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-no-alt"></span></button>
+        </div>
     <?php endif; ?>
 
     <?php if ($summary['disabled']): ?>
-        <div class="notice notice-warning inline" style="margin:0 0 20px">
-            <p><strong>WP_CRON is disabled</strong> via the <code>DISABLE_WP_CRON</code> constant. Make sure a real system cron is calling <code>wp-cron.php</code>, or scheduled tasks will never run.</p>
+        <div class="phpinfowp-custom-alert is-warning" style="margin:0 0 20px">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                <span class="dashicons dashicons-warning"></span>
+                <div class="phpinfowp-custom-alert-body">
+                    <p><strong><?php _e('WP_CRON is disabled', 'phpinfo-wp'); ?></strong> <?php _e('via the <code>DISABLE_WP_CRON</code> constant. Make sure a real system cron is calling <code>wp-cron.php</code>, or scheduled tasks will never run.', 'phpinfo-wp'); ?></p>
+                </div>
+            </div>
         </div>
     <?php endif; ?>
 
@@ -171,11 +182,16 @@ $paged_events = array_slice($events, ($paged - 1) * $per_page, $per_page);
     <?php else: ?>
 
         <?php if ($summary['orphan']): ?>
-            <div class="notice notice-info inline" style="margin:20px 0 0">
-                <p style="margin:8px 0">
-                    <strong><?php _e('Why orphan events come back after you delete them:', 'phpinfo-wp'); ?></strong>
-                    "Delete" removes a single instance at one timestamp, but recurring events reschedule the next instance when WP processes cron — even with no callback. Use <strong><?php _e('Purge hook', 'phpinfo-wp'); ?></strong> on orphan rows to remove every instance of that hook in one shot (<code>wp_unschedule_hook()</code>). If it still reappears, an active plugin is re-registering it on every page load — check that plugin or fully uninstall it.
-                </p>
+            <div class="phpinfowp-custom-alert is-info" style="margin:20px 0 0">
+                <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                    <span class="dashicons dashicons-info-outline"></span>
+                    <div class="phpinfowp-custom-alert-body">
+                        <p style="margin:0">
+                            <strong><?php _e('Why orphan events come back after you delete them:', 'phpinfo-wp'); ?></strong>
+                            <?php _e('"Delete" removes a single instance at one timestamp, but recurring events reschedule the next instance when WP processes cron — even with no callback. Use <strong>Purge hook</strong> on orphan rows to remove every instance of that hook in one shot (<code>wp_unschedule_hook()</code>). If it still reappears, an active plugin is re-registering it on every page load — check that plugin or fully uninstall it.', 'phpinfo-wp'); ?>
+                        </p>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
 
@@ -196,14 +212,15 @@ $paged_events = array_slice($events, ($paged - 1) * $per_page, $per_page);
             <tbody>
                 <?php foreach ($paged_events as $e):
                     $row_class = '';
-                    if ($e['overdue'])      $row_class = 'phpinfowp-cron-overdue';
-                    elseif ($e['imminent']) $row_class = 'phpinfowp-cron-imminent';
+                    if ($e['overdue'])           $row_class = 'phpinfowp-cron-overdue';
+                    elseif (!$e['has_callback']) $row_class = 'phpinfowp-cron-orphan';
+                    elseif ($e['imminent'])      $row_class = 'phpinfowp-cron-imminent';
                 ?>
                     <tr class="<?php echo $row_class; ?>">
                         <td>
                             <code><?php echo esc_html($e['hook']); ?></code>
                             <?php if (!$e['has_callback']): ?>
-                                <span class="phpinfowp-cron-orphan-badge" title="No PHP callback registered for this hook — it will run with no effect"><?php _e('orphan', 'phpinfo-wp'); ?></span>
+                                <span class="phpinfowp-cron-orphan-badge" title="<?php esc_attr_e('No PHP callback registered for this hook — it will run with no effect', 'phpinfo-wp'); ?>"><?php _e('orphan', 'phpinfo-wp'); ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -218,7 +235,9 @@ $paged_events = array_slice($events, ($paged - 1) * $per_page, $per_page);
                         </td>
                         <td><?php echo esc_html($e['schedule_label']); ?></td>
                         <td>
-                            <?php if ($e['overdue']): ?>
+                            <?php if (!$e['has_callback']): ?>
+                                <span style="color:#b45309;font-weight:600"><?php echo $e['overdue'] ? __('Orphan (Overdue)', 'phpinfo-wp') : __('Orphan', 'phpinfo-wp'); ?></span>
+                            <?php elseif ($e['overdue']): ?>
                                 <span style="color:#d63638;font-weight:600"><?php _e('Overdue', 'phpinfo-wp'); ?></span>
                             <?php elseif ($e['imminent']): ?>
                                 <span style="color:#dba617;font-weight:600"><?php _e('Soon', 'phpinfo-wp'); ?></span>

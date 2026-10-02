@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     8.0.2
+Version:     8.0.3
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com/phpinfo-wp
@@ -15,7 +15,7 @@ Domain Path: /languages
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '8.0.2');
+define('PHPINFOWP_VERSION', '8.0.3');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 define('PHPINFOWP_SLUG_PREFIX', 'piwp');
@@ -67,12 +67,13 @@ class Phpinfo_wp {
         add_action('admin_bar_menu',              [$this, 'admin_bar_indicator'], 100);
         add_action('admin_enqueue_scripts',       [$this, 'enqueue']);
         add_action('admin_notices',               [$this, 'eol_admin_notice']);
-        add_action('wp_dashboard_setup',          [$this, 'register_dashboard_widget']);
+        add_action('wp_dashboard_setup',          [$this, 'register_dashboard_widget'], 999);
         add_action('phpinfowp_license_ping',      ['Phpinfo_WP_License', 'cron_ping']);
         add_action('phpinfowp_license_ping_async',['Phpinfo_WP_License', 'cron_ping']);
         add_action('wp_ajax_phpinfowp_activate_license',   ['Phpinfo_WP_License', 'ajax_activate']);
         add_action('wp_ajax_phpinfowp_deactivate_license', ['Phpinfo_WP_License', 'ajax_deactivate']);
         add_action('wp_ajax_phpinfowp_dismiss_server_bottleneck', ['Phpinfo_WP_Config_Grader', 'ajax_dismiss_bottleneck']);
+        add_action('wp_ajax_phpinfowp_dismiss_autofix_notice',    ['Phpinfo_WP_Config_Grader_Fixer', 'ajax_dismiss_notice']);
         add_action('phpinfowp_weekly_maintenance',['Phpinfo_WP_Alerts', 'cron_weekly']);
         add_action('phpinfowp_daily_monitoring',  ['Phpinfo_WP_Alerts', 'cron_daily']);
         add_filter('clean_url',                   [$this, 'script_async'], 11, 1);
@@ -202,15 +203,16 @@ class Phpinfo_wp {
     }
 
     public function show_update_notice(array $plugin_data, object $response): void {
-        echo '<span style="display: block; margin-top: 10px; padding: 12px 14px; background: #f6f9fc; border-left: 4px solid #777BB3; font-size: 13px; color: #2c3338; border-radius: 0 4px 4px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">';
+        echo '<style>.update-message p:empty, .update-message p:empty:before, .piwp-update-notice *::before { display: none !important; content: none !important; }</style>';
+        echo '<span class="piwp-update-notice" style="display: block; margin-top: 10px; padding: 12px 14px; background: #f6f9fc; border-left: 4px solid #777BB3; font-size: 13px; color: #2c3338; border-radius: 0 4px 4px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">';
         echo '<span style="display: block; margin: 0 0 6px; font-weight: 600; color: #1d2327;">';
-        echo '✨ ' . esc_html__('What you are unlocking in this version:', 'phpinfo-wp');
+        echo '✨ ' . esc_html__('What’s new in this release:', 'phpinfo-wp');
         echo '</span>';
-        echo '<span style="display: block; margin: 0 0 8px; color: #475569; line-height: 1.4;">';
-        echo esc_html__('Includes new translation packs (German, French, Spanish, Italian, Dutch) and optimized PHP server lifecycle audits.', 'phpinfo-wp');
+        echo '<span style="display: block; margin: 0 0 8px; color: #475569; line-height: 1.45;">';
+        echo esc_html__('Live Server Overview Dashboard to monitor peak memory and stop silent slowdowns, Update Guard to catch plugin conflict risks before you update, smart PHP 8.4 compatibility checks, and instant 1-Click server optimizations with automatic rollback safety.', 'phpinfo-wp');
         echo '</span>';
         echo '<span style="display: block; margin: 0; font-size: 12px; color: #64748b; font-style: italic;">';
-        echo esc_html__('💡 Note: Since this is a system diagnostics tool, standard backup practices are always recommended before upgrading.', 'phpinfo-wp');
+        echo esc_html__('💡 Safe & Seamless: Tested for 100% backward compatibility with WordPress 7.1+. As a standard best practice, keeping a fresh backup ensures total peace of mind.', 'phpinfo-wp');
         echo '</span>';
         echo '</span>';
     }
@@ -338,8 +340,64 @@ class Phpinfo_wp {
         wp_add_dashboard_widget(
             'phpinfowp_health',
             'PHP Health — phpinfo() WP',
-            [$this, 'render_dashboard_widget']
+            [$this, 'render_dashboard_widget'],
+            null,
+            null,
+            'normal',
+            'high'
         );
+
+        // Position the widget as #1 at the top of the dashboard.
+        // 1. Array order in $wp_meta_boxes (for default/unset dashboard layouts).
+        global $wp_meta_boxes;
+        if (isset($wp_meta_boxes['dashboard']['normal']['high']['phpinfowp_health'])) {
+            $ours = ['phpinfowp_health' => $wp_meta_boxes['dashboard']['normal']['high']['phpinfowp_health']];
+            unset($wp_meta_boxes['dashboard']['normal']['high']['phpinfowp_health']);
+            $wp_meta_boxes['dashboard']['normal']['high'] = $ours + $wp_meta_boxes['dashboard']['normal']['high'];
+        }
+
+        // 2. Force it first once in the user's saved meta-box-order so it appears at
+        // the very top even if the user had previously rearranged their dashboard.
+        // After this initial placement, the user is free to drag & drop reorganize it.
+        $user_id = get_current_user_id();
+        if ($user_id && !get_user_meta($user_id, 'phpinfowp_dashboard_widget_forced', true)) {
+            $order = get_user_option('meta-box-order_dashboard', $user_id);
+            if (is_array($order)) {
+                // Strip from all columns to avoid duplicate IDs
+                foreach ($order as $col => $items) {
+                    if (is_string($items)) {
+                        $list = array_filter(array_map('trim', explode(',', $items)));
+                        $list = array_values(array_diff($list, ['phpinfowp_health']));
+                        $order[$col] = implode(',', $list);
+                    } elseif (is_array($items)) {
+                        $order[$col] = array_values(array_diff($items, ['phpinfowp_health']));
+                    }
+                }
+                // Prepend to the normal column
+                if (isset($order['normal'])) {
+                    if (is_string($order['normal'])) {
+                        $normal = array_filter(array_map('trim', explode(',', $order['normal'])));
+                        array_unshift($normal, 'phpinfowp_health');
+                        $order['normal'] = implode(',', $normal);
+                    } elseif (is_array($order['normal'])) {
+                        array_unshift($order['normal'], 'phpinfowp_health');
+                    }
+                } else {
+                    $order['normal'] = 'phpinfowp_health';
+                }
+                update_user_option($user_id, 'meta-box-order_dashboard', $order, true);
+            }
+
+            // Ensure the widget is visible (not hidden in Screen Options)
+            $hidden = get_user_option('metaboxhidden_dashboard', $user_id);
+            if (is_array($hidden) && in_array('phpinfowp_health', $hidden, true)) {
+                $hidden = array_values(array_diff($hidden, ['phpinfowp_health']));
+                update_user_option($user_id, 'metaboxhidden_dashboard', $hidden, true);
+            }
+
+            // Mark as forced so user's subsequent manual reorganizations are preserved
+            update_user_meta($user_id, 'phpinfowp_dashboard_widget_forced', 1);
+        }
     }
 
     public function render_dashboard_widget(): void {
@@ -522,16 +580,11 @@ class Phpinfo_wp {
         <?php
     }
 
-    // Custom SVG menu icon: phpinfo() — bold parens with center dot.
-    // WP applies admin color scheme via CSS mask, so a single-color SVG is correct here.
+    // Custom SVG menu icon: Cyber ElePHPant Mascot with live radar beacon (from phpinfo-frontend)
     public static function menu_icon(): string {
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="black">'
-             . '<path d="M7.4 2.6 C 3.4 6.2 3.4 13.8 7.4 17.4 L 9 16 C 5.8 12.8 5.8 7.2 9 4 Z"/>'
-             . '<path d="M12.6 2.6 C 16.6 6.2 16.6 13.8 12.6 17.4 L 11 16 C 14.2 12.8 14.2 7.2 11 4 Z"/>'
-             . '<circle cx="10" cy="10" r="1.6"/>'
-             . '</svg>';
-        return 'data:image/svg+xml;base64,' . base64_encode($svg);
+        return PHPINFOWP_URL . 'images/icon.svg';
     }
+
 
     private static function _parse_bytes(string $val): int {
         $val  = trim($val);
@@ -555,7 +608,8 @@ class Phpinfo_wp {
         Phpinfo_WP_EOL::admin_notice();
     }
 
-    public function enqueue(string $hook): void {
+    public function enqueue($hook = ''): void {
+        $hook = (string) $hook;
         if (!class_exists('Phpinfo_WP_Admin_Nav') || (!Phpinfo_WP_Admin_Nav::is_plugin_page() && $hook !== 'plugins.php')) return;
 
         $suffix = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
@@ -651,6 +705,22 @@ class Phpinfo_wp {
     padding: 1px 5px; border-radius: 3px;
 }
 body.folded #toplevel_page_piwp .phpinfowp-wpnav-flyout { display: none !important; }
+#toplevel_page_piwp .wp-menu-image {
+    background-image: none !important;
+}
+#toplevel_page_piwp .wp-menu-image img {
+    width: 20px !important;
+    height: 20px !important;
+    padding: 7px 0 0 !important;
+    opacity: 0.95 !important;
+    transition: opacity 0.15s ease;
+}
+#toplevel_page_piwp:hover .wp-menu-image img,
+#toplevel_page_piwp.current .wp-menu-image img,
+#toplevel_page_piwp.wp-has-current-submenu .wp-menu-image img {
+    opacity: 1 !important;
+}
+
 
 #toplevel_page_piwp .wp-submenu > li > a:hover,
 #toplevel_page_piwp .wp-submenu > li > a:focus,
@@ -888,11 +958,7 @@ FLYOUT;
         <div class="phpinfowp-topbar" role="banner">
             <div class="phpinfowp-topbar-brand">
                 <span class="phpinfowp-topbar-logo" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#ffffff" width="22" height="22">
-                        <path d="M7.4 2.6 C 3.4 6.2 3.4 13.8 7.4 17.4 L 9 16 C 5.8 12.8 5.8 7.2 9 4 Z"/>
-                        <path d="M12.6 2.6 C 16.6 6.2 16.6 13.8 12.6 17.4 L 11 16 C 14.2 12.8 14.2 7.2 11 4 Z"/>
-                        <circle cx="10" cy="10" r="1.6"/>
-                    </svg>
+                    <img src="<?php echo esc_url(PHPINFOWP_URL . 'images/icon.svg'); ?>" width="24" height="22" alt="" class="phpinfowp-topbar-logo-img">
                 </span>
                 <span class="phpinfowp-topbar-name">phpinfo() WP</span>
                 <?php if ($title): ?>
@@ -929,13 +995,13 @@ FLYOUT;
             return $text;
         }
 
-        $logo_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#777BB3" width="16" height="16" style="vertical-align:-3px;display:inline-block;margin-right:5px;" aria-hidden="true"><path d="M7.4 2.6 C 3.4 6.2 3.4 13.8 7.4 17.4 L 9 16 C 5.8 12.8 5.8 7.2 9 4 Z"/><path d="M12.6 2.6 C 16.6 6.2 16.6 13.8 12.6 17.4 L 11 16 C 14.2 12.8 14.2 7.2 11 4 Z"/><circle cx="10" cy="10" r="1.6"/></svg>';
+        $logo_img = '<img src="' . esc_url(PHPINFOWP_URL . 'images/icon-purple.svg') . '" width="18" height="16" alt="" style="vertical-align:-3px;display:inline-block;margin-right:6px;" aria-hidden="true">';
 
         $is_pro = Phpinfo_WP_License::is_valid();
         if ($is_pro) {
             return sprintf(
                 '<span>%s<strong>%s</strong> — <span style="color:#00a32a;font-weight:600;">&#10003; %s</span> %s · <a href="%s" target="_blank" rel="noopener" style="color:#777BB3;text-decoration:none;font-weight:500;">%s</a></span>',
-                $logo_svg,
+                $logo_img,
                 esc_html__('phpinfo() WP Pro', 'phpinfo-wp'),
                 esc_html__('Active & Protected:', 'phpinfo-wp'),
                 esc_html__('Your server health, security headers, and automated audits are running smoothly.', 'phpinfo-wp'),
@@ -946,7 +1012,7 @@ FLYOUT;
 
         return sprintf(
             '<span>%s<strong><a href="%s" target="_blank" rel="noopener" style="color:#777BB3;font-weight:700;text-decoration:none;">%s</a></strong> — %s %s <a href="%s" target="_blank" rel="noopener" style="display:inline-block;margin-left:8px;background:#777BB3;color:#fff;padding:3px 10px;border-radius:4px;font-size:11.5px;font-weight:700;text-decoration:none;letter-spacing:0.2px;box-shadow:0 1px 2px rgba(119,123,179,0.25);">%s &rarr;</a></span>',
-            $logo_svg,
+            $logo_img,
             'https://exeebit.com/phpinfo-wp#pricing',
             esc_html__('phpinfo() WP Pro', 'phpinfo-wp'),
             esc_html__('Boost server speed & audit security.', 'phpinfo-wp'),

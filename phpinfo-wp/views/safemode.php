@@ -187,9 +187,12 @@ $active_plugins = (array) get_option('active_plugins', []);
 
     <!-- Notices bar -->
     <?php if ($notice): ?>
-        <div class="phpinfowp-custom-alert" style="background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #22c55e; padding:12px 16px; margin-bottom:20px; border-radius:4px; display:flex; align-items:center; gap:8px;">
-            <span class="dashicons dashicons-yes" style="color: #22c55e; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0;"></span>
-            <p style="color: #166534; font-weight: 500; margin: 0;"><?php echo esc_html($notice); ?></p>
+        <div class="phpinfowp-custom-alert is-success" style="margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                <span class="dashicons dashicons-yes-alt"></span>
+                <div class="phpinfowp-custom-alert-body"><p style="font-weight: 500; margin: 0;"><?php echo esc_html($notice); ?></p></div>
+            </div>
+            <button type="button" class="phpinfowp-alert-dismiss-btn" onclick="this.closest('.phpinfowp-custom-alert').remove();" title="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-no-alt"></span></button>
         </div>
     <?php endif; ?>
 

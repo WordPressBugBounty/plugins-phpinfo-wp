@@ -2,23 +2,7 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 /**
- * Plugin/Theme Update Guard — pre-update compatibility scanner for individual
- * plugin and theme updates (not just core).
- *
- * Where Phpinfo_WP_Update_Audit answers "will my code survive a core upgrade?",
- * this class answers "will THIS specific plugin/theme update break my site?"
- *
- * Signals per pending update:
- *   1. PHP floor — new version needs a PHP the site doesn't have
- *   2. WP floor  — new version needs a WP the site doesn't run
- *   3. Major version jump — e.g. 8.x→9.x carries more risk than 9.1→9.2
- *   4. Changelog risk keywords — "breaking", "removed", "deprecated" etc.  (Pro)
- *   5. Abandonment / closure on WP.org                                     (Pro)
- *   6. Cross-dependency — Requires Plugins header references missing items  (Pro)
- *   7. Stability history — past update track record on THIS site           (Pro)
- *
- * Free shows signals 1-3 + overall verdict.
- * Pro  adds 4-7 + AI explanations + email/webhook alerts.
+ * Plugin/Theme Update Guard — pre-update compatibility scanner.
  */
 class Phpinfo_WP_Update_Guard {
 
@@ -1241,8 +1225,8 @@ class Phpinfo_WP_Update_Guard {
         $cached = get_option('phpinfowp_update_audit_cache', null);
         $audit_url = admin_url('admin.php?page=piwp-update-audit');
 
-        echo '<div class="notice notice-info piwp-core-preamble" style="padding:14px 16px;margin:15px 0;background:#fff;border-left:4px solid #3b82f6;box-shadow:0 1px 3px rgba(0,0,0,0.06);border-radius:2px;">';
-        echo '<h4 style="margin:0 0 6px 0;font-size:14px;color:#1e293b;"><span class="dashicons dashicons-shield" style="color:#3b82f6;vertical-align:text-top;margin-right:4px;"></span> ' . esc_html__('Update Guard — Core Readiness Audit', 'phpinfo-wp') . '</h4>';
+        echo '<div class="phpinfowp-custom-alert is-info piwp-core-preamble" style="margin:15px 0;display:block;">';
+        echo '<h4 style="margin:0 0 8px 0;font-size:14px;color:#1e293b;"><span class="dashicons dashicons-shield" style="color:#777BB3;vertical-align:text-top;margin-right:4px;"></span> ' . esc_html__('Update Guard — Core Readiness Audit', 'phpinfo-wp') . '</h4>';
 
         if ($cached && !empty($cached['summary'])) {
             $removals     = (int) ($cached['summary']['removals'] ?? 0);

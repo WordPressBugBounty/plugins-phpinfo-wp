@@ -588,8 +588,16 @@ html {
    Surface: #f8f8fc | Border: #d8daeb | Text: #2c2f48
    ========================================================= */
 
+/* Respect WordPress core .hidden and .hide-if-js contracts */
+body.phpinfowp-page .hidden,
+body.piwp-admin-page .hidden,
+body.phpinfowp-page .hide-if-js,
+body.piwp-admin-page .hide-if-js {
+  display: none !important;
+}
+
 /* Every button in the plugin gets modern 6px rounded corners */
-body.phpinfowp-page .button,
+body.phpinfowp-page .button:not(.hidden),
 body.phpinfowp-page .button-primary,
 body.phpinfowp-page .button-secondary,
 body.phpinfowp-page .button-small,
@@ -608,7 +616,7 @@ body.phpinfowp-page .button-hero,
 }
 
 /* Secondary / Default Outline Buttons (e.g. White-label, Clear, Reset, Backup, etc.) */
-body.phpinfowp-page .button:not(.button-primary):not(.button-link):not(.button-link-delete):not(.phpinfowp-btn-danger):not(.phpinfowp-btn-primary),
+body.phpinfowp-page .button:not(.hidden):not(.button-primary):not(.button-link):not(.button-link-delete):not(.phpinfowp-btn-danger):not(.phpinfowp-btn-primary),
 body.phpinfowp-page .button-secondary,
 .phpinfowp-btn-secondary {
   background: #ffffff !important;
@@ -1048,6 +1056,182 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Unified Plugin Alerts & Notice Banners */
+.phpinfowp-custom-alert,
+.phpinfowp-theme-alert {
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin: 0 0 20px;
+  font-size: 13px;
+  line-height: 1.55;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  animation: phpinfowp-fadein 0.2s ease-in-out;
+}
+
+.phpinfowp-custom-alert .dashicons,
+.phpinfowp-theme-alert .dashicons {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.phpinfowp-custom-alert-body,
+.phpinfowp-theme-alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.phpinfowp-custom-alert-body p,
+.phpinfowp-theme-alert-body p,
+.phpinfowp-custom-alert p,
+.phpinfowp-theme-alert p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.phpinfowp-custom-alert-body p + p,
+.phpinfowp-theme-alert-body p + p {
+  margin-top: 6px;
+}
+
+/* Success theme */
+.phpinfowp-custom-alert.is-success,
+.phpinfowp-theme-alert.is-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #22c55e;
+  color: #166534;
+}
+.phpinfowp-custom-alert.is-success .dashicons,
+.phpinfowp-theme-alert.is-success .dashicons {
+  color: #16a34a;
+}
+.phpinfowp-custom-alert.is-success code,
+.phpinfowp-theme-alert.is-success code {
+  background: rgba(22, 101, 52, 0.08) !important;
+  color: #14532d !important;
+  border: 1px solid rgba(22, 101, 52, 0.2) !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+  line-height: 1.4 !important;
+}
+
+/* Warning theme */
+.phpinfowp-custom-alert.is-warning,
+.phpinfowp-theme-alert.is-warning {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-left: 4px solid #f59e0b;
+  color: #92400e;
+}
+.phpinfowp-custom-alert.is-warning .dashicons,
+.phpinfowp-theme-alert.is-warning .dashicons {
+  color: #d97706;
+}
+.phpinfowp-custom-alert.is-warning code,
+.phpinfowp-theme-alert.is-warning code {
+  background: rgba(146, 64, 14, 0.08) !important;
+  color: #78350f !important;
+  border: 1px solid rgba(146, 64, 14, 0.2) !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+  line-height: 1.4 !important;
+}
+
+/* Error theme */
+.phpinfowp-custom-alert.is-error,
+.phpinfowp-theme-alert.is-error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-left: 4px solid #ef4444;
+  color: #991b1b;
+}
+.phpinfowp-custom-alert.is-error .dashicons,
+.phpinfowp-theme-alert.is-error .dashicons {
+  color: #dc2626;
+}
+.phpinfowp-custom-alert.is-error code,
+.phpinfowp-theme-alert.is-error code {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #991b1b !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+  line-height: 1.4 !important;
+}
+
+/* Info theme */
+.phpinfowp-custom-alert.is-info,
+.phpinfowp-theme-alert.is-info {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #777BB3;
+  color: #334155;
+}
+.phpinfowp-custom-alert.is-info .dashicons,
+.phpinfowp-theme-alert.is-info .dashicons {
+  color: #777BB3;
+}
+.phpinfowp-custom-alert.is-info code,
+.phpinfowp-theme-alert.is-info code {
+  background: rgba(119, 123, 179, 0.1) !important;
+  color: #1e293b !important;
+  border: 1px solid rgba(119, 123, 179, 0.25) !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+  line-height: 1.4 !important;
+}
+
+/* Dismiss button */
+.phpinfowp-alert-dismiss-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  line-height: 1;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: inherit;
+  opacity: 0.7;
+}
+.phpinfowp-alert-dismiss-btn:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
+}
+.phpinfowp-alert-dismiss-btn .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  color: inherit !important;
+}
+
 /* Features grid */
 .phpinfowp-license-features-grid {
   display: grid;
@@ -1267,8 +1451,9 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
 }
 
 .phpinfowp-snap-select {
-  max-width: 340px;
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 32px 0 12px !important;
 }
 
 .phpinfowp-diff-table td {
@@ -2107,8 +2292,12 @@ body.phpinfowp-page .phpinfowp-topbar {
   flex-shrink: 0;
 }
 
-.phpinfowp-topbar-logo svg {
-  fill: #ffffff !important;
+.phpinfowp-topbar-logo svg,
+.phpinfowp-topbar-logo img,
+.phpinfowp-topbar-logo-img {
+  display: block;
+  width: 24px;
+  height: 22px;
 }
 
 .phpinfowp-topbar-name {
@@ -3379,6 +3568,10 @@ a.phpinfowp-cg-chip-php:hover {
 
 .phpinfowp-cron-overdue td {
   background: #fff4f4 !important;
+}
+
+.phpinfowp-cron-orphan td {
+  background: #fffdf2 !important;
 }
 
 .phpinfowp-cron-imminent td {
@@ -5304,7 +5497,7 @@ table.phpinfowp-compare {
 }
 
 /* Visual break between the three pillars and the three price tiers so users
-   don't read them as paired columns (Safeguard=$29, Insight=$69, etc.). */
+   don't read them as paired columns (Safeguard=$29, Insight=$79, etc.). */
 .phpinfowp-upgrade-plans-header {
   margin: 36px 0 14px;
   padding-top: 28px;
@@ -5913,6 +6106,7 @@ table.phpinfowp-compare {
   border-left: 3px solid #00a32a;
 }
 
+
 /* Notice Isolation — suppress top-level 3rd-party theme & plugin banners on phpinfo() WP pages */
 body.phpinfowp-page #wpbody-content>.notice:not([class*="phpinfowp"]):not([class*="piwp"]):not(.inline),
 body.phpinfowp-page #wpbody-content>.updated:not([class*="phpinfowp"]):not([class*="piwp"]):not(.inline),
@@ -5943,6 +6137,57 @@ body.piwp-admin-page .phpinfowp-pro-page div[class*="notice"],
 body.piwp-admin-page .wrap .notice,
 body.piwp-admin-page .wrap div[class*="notice"] {
   display: block !important;
+}
+
+/* Style any notice with .piwp-notice or inside our plugin containers into the unified theme */
+body.phpinfowp-page .notice.inline,
+body.piwp-admin-page .notice.inline,
+body.phpinfowp-page .notice.piwp-notice,
+body.piwp-admin-page .notice.piwp-notice,
+body.phpinfowp-page .phpinfowp-pro-page .notice,
+body.piwp-admin-page .phpinfowp-pro-page .notice,
+body.phpinfowp-page .wrap .notice,
+body.piwp-admin-page .wrap .notice {
+  border-radius: 8px !important;
+  border-width: 1px 1px 1px 4px !important;
+  padding: 12px 18px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  margin: 0 0 20px !important;
+}
+
+body.phpinfowp-page .notice.notice-success,
+body.piwp-admin-page .notice.notice-success,
+.notice.notice-success.piwp-notice {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  border-left-color: #22c55e !important;
+  color: #166534 !important;
+}
+body.phpinfowp-page .notice.notice-warning,
+body.piwp-admin-page .notice.notice-warning,
+.notice.notice-warning.piwp-notice {
+  background: #fffbeb !important;
+  border-color: #fef3c7 !important;
+  border-left-color: #f59e0b !important;
+  color: #92400e !important;
+}
+body.phpinfowp-page .notice.notice-error,
+body.piwp-admin-page .notice.notice-error,
+.notice.notice-error.piwp-notice {
+  background: #fef2f2 !important;
+  border-color: #fca5a5 !important;
+  border-left-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+body.phpinfowp-page .notice.notice-info,
+body.piwp-admin-page .notice.notice-info,
+.notice.notice-info.piwp-notice {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  border-left-color: #777BB3 !important;
+  color: #334155 !important;
 }
 
 /* =========================================================
@@ -6113,6 +6358,12 @@ body.piwp-admin-page .wrap div[class*="notice"] {
   background-color: #ffffff !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
   transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.phpinfowp-pro-page select,
+#phpinfo-info select,
+.phpinfowp-toolbar select {
+  padding-right: 32px !important;
 }
 
 .phpinfowp-pro-page textarea,
@@ -6475,4 +6726,12 @@ select {
 
 .notice.phpinfowp-bg-complete-notice .notice-dismiss:hover:before {
   color: #d63638 !important;
+}
+
+/* Suppress extra reload Dashicons in plugin update notices */
+.update-message p:empty,
+.update-message p:empty:before,
+.piwp-update-notice *::before {
+  display: none !important;
+  content: none !important;
 }

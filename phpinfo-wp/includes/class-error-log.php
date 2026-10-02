@@ -211,25 +211,37 @@ class Phpinfo_WP_Error_Log {
         ];
     }
 
-    // Returns lines, newest first. If $lines <= 0, reads all lines.
-    public static function tail(string $path, int $lines = 0): array {
+    // Returns lines, newest first. Safe against huge log files (reads from EOF).
+    public static function tail(string $path, int $lines = 200): array {
         if (!@file_exists($path) || !@is_readable($path)) return [];
+        if ($lines <= 0) $lines = 200;
 
-        $file = new SplFileObject($path, 'r');
-        $file->seek(PHP_INT_MAX);
-        $total = $file->key();
+        $fp = @fopen($path, 'rb');
+        if (!$fp) return [];
 
-        $start  = ($lines > 0) ? max(0, $total - $lines) : 0;
-        $result = [];
-
-        $file->seek($start);
-        while (!$file->eof()) {
-            $line = rtrim((string) $file->current(), "\r\n");
-            if ($line !== '') $result[] = $line;
-            $file->next();
+        $size = @filesize($path) ?: 0;
+        $max_bytes = 2 * 1024 * 1024;
+        if ($size > $max_bytes) {
+            fseek($fp, -$max_bytes, SEEK_END);
+            fgets($fp);
         }
 
-        return array_reverse($result);
+        $buffer = [];
+        while (!feof($fp)) {
+            $line = fgets($fp);
+            if ($line === false) break;
+            $line = rtrim($line, "\r\n");
+            if ($line !== '') {
+                $buffer[] = $line;
+            }
+        }
+        fclose($fp);
+
+        if (count($buffer) > $lines) {
+            $buffer = array_slice($buffer, -$lines);
+        }
+
+        return array_reverse($buffer);
     }
 
     public static function size(string $path): int {
@@ -239,7 +251,7 @@ class Phpinfo_WP_Error_Log {
     public static function clear(string $path): bool {
         if (!self::_pro()) return false;
         if (!@file_exists($path) || !@is_writable($path)) return false;
-        return (bool) @file_put_contents($path, '');
+        return @file_put_contents($path, '') !== false;
     }
 
     public static function format_bytes(int $bytes): string {
@@ -248,41 +260,211 @@ class Phpinfo_WP_Error_Log {
         return $bytes . ' B';
     }
 
-    // Counts PHP error log lines stamped with today's date.
-    // Free-safe: returns 0 if no log discovered. Reads only the tail (~512 KB) to stay cheap on huge logs.
-    public static function today_count(?string $path = null): int {
+    /**
+     * Determines semantic severity of a log line.
+     * Accurately isolates real PHP runtime errors/warnings from arbitrary plugin telemetry.
+     */
+    public static function get_line_severity(string $line): string {
+        $l = strtolower(trim($line));
+        if ($l === '') return 'info';
+
+        // 1. Critical / Fatal Errors
+        if (preg_match('/\bphp\s+(?:fatal error|parse error|catchable fatal error|recoverable fatal error|core error|compile error)\b|^(?:fatal error|parse error):|\buncaught\s+[a-z0-9_\\\\]*(?:exception|error)\b|allowed memory size of \d+ bytes exhausted|maximum execution time of \d+ seconds exceeded|\[(?:critical|emergency|alert|error)\]/i', $l)) {
+            return 'fatal';
+        }
+
+        // 2. Warnings & DB Errors
+        if (preg_match('/\bphp\s+(?:warning|core warning|compile warning)\b|^warning:|\bwordpress database error\b|\[warning\]/i', $l)) {
+            return 'warning';
+        }
+
+        // 3. Notices & Deprecated
+        if (preg_match('/\bphp\s+(?:notice|deprecated)\b|^(?:notice|deprecated):|\[notice\]/i', $l)) {
+            return 'notice';
+        }
+
+        // 4. Debug / Trace
+        if (preg_match('/\[debug\]|\[trace\]|\bwp_debug\b/i', $l)) {
+            return 'debug';
+        }
+
+        // 5. Default / Application telemetry (e.g. [INFO] or plain plugin error_log strings)
+        return 'info';
+    }
+
+    // Classifies a log line for color-coding
+    public static function classify(string $line): string {
+        $sev = self::get_line_severity($line);
+        switch ($sev) {
+            case 'fatal':
+                return 'log-fatal';
+            case 'warning':
+                return 'log-warning';
+            case 'notice':
+            case 'deprecated':
+                return 'log-notice';
+            case 'debug':
+                return 'log-debug';
+            default:
+                return 'log-default';
+        }
+    }
+
+    /**
+     * Returns structured error counts for today, separating real PHP errors from plugin logs.
+     * Free-safe: returns 0s if no log discovered. Reads only tail (~512 KB) to stay fast on huge logs.
+     */
+    public static function today_breakdown(?string $path = null): array {
         $path = $path ?? self::find_path();
-        if (!$path || !@is_readable($path)) return 0;
+        $default = [
+            'critical'     => 0,
+            'warning'      => 0,
+            'notice'       => 0,
+            'deprecated'   => 0,
+            'info'         => 0,
+            'total_errors' => 0,
+        ];
+        if (!$path || !@is_readable($path)) return $default;
 
         $size = (int) @filesize($path);
-        if ($size <= 0) return 0;
+        if ($size <= 0) return $default;
 
         $chunk  = 512 * 1024;
         $offset = max(0, $size - $chunk);
 
         $fh = @fopen($path, 'rb');
-        if (!$fh) return 0;
+        if (!$fh) return $default;
         @fseek($fh, $offset);
         $data = @fread($fh, $chunk);
         @fclose($fh);
-        if ($data === false || $data === '') return 0;
+        if ($data === false || $data === '') return $default;
 
-        // PHP error log lines start with: "[DD-Mon-YYYY HH:MM:SS TZ] ..."
-        // Use local date — error_log writes timestamps in PHP's configured timezone.
-        $today = date('d-M-Y');
-        $count = preg_match_all('/^\[' . preg_quote($today, '/') . ' /m', $data);
-        return (int) $count;
+        // PHP writes timestamps in local or UTC timezone: [DD-Mon-YYYY HH:MM:SS TZ]
+        $today_dates = array_unique([
+            date('d-M-Y'),
+            gmdate('d-M-Y'),
+            date('Y-m-d'),
+            gmdate('Y-m-d'),
+        ]);
+
+        $date_regex = implode('|', array_map('preg_quote', $today_dates));
+
+        if (!preg_match_all('/^\[(?:' . $date_regex . ')[^\]]*\]\s*(.*)$/m', $data, $matches)) {
+            return $default;
+        }
+
+        $lines      = $matches[1];
+        $critical   = 0;
+        $warning    = 0;
+        $notice     = 0;
+        $deprecated = 0;
+        $info       = 0;
+
+        foreach ($lines as $line) {
+            $sev = self::get_line_severity($line);
+            switch ($sev) {
+                case 'fatal':
+                    $critical++;
+                    break;
+                case 'warning':
+                    $warning++;
+                    break;
+                case 'notice':
+                    $notice++;
+                    break;
+                case 'deprecated':
+                    $deprecated++;
+                    break;
+                default:
+                    $info++;
+                    break;
+            }
+        }
+
+        return [
+            'critical'     => $critical,
+            'warning'      => $warning,
+            'notice'       => $notice,
+            'deprecated'   => $deprecated,
+            'info'         => $info,
+            'total_errors' => $critical + $warning + $notice + $deprecated,
+        ];
     }
 
-    // Classifies a log line for color-coding
-    public static function classify(string $line): string {
-        $l = strtolower($line);
-        if (strpos($l, 'fatal error') !== false || strpos($l, 'uncaught') !== false)          return 'log-fatal';
-        if (strpos($l, 'parse error') !== false)                                            return 'log-fatal';
-        if (strpos($l, 'warning') !== false)                                                return 'log-warning';
-        if (strpos($l, 'notice') !== false || strpos($l, 'deprecated') !== false)              return 'log-notice';
-        if (strpos($l, 'wp_debug') !== false || strpos($l, '[debug]') !== false)               return 'log-debug';
-        return 'log-default';
+    // Counts genuine PHP runtime errors stamped with today's date (excludes benign plugin logs).
+    // Set $actionable_only = true to count only fatal crashes + warnings.
+    public static function today_count(?string $path = null, bool $actionable_only = false): int {
+        $b = self::today_breakdown($path);
+        return $actionable_only ? ($b['critical'] + $b['warning']) : $b['total_errors'];
+    }
+
+    /**
+     * Scan a byte slice of the log file (from $offset_before to current EOF) to detect
+     * genuine runtime errors that occurred during an update window.
+     */
+    public static function detect_new_errors(int $offset_before, ?string $path = null): array {
+        $path = $path ?? self::find_path();
+        $result = [
+            'count'    => 0,
+            'critical' => 0,
+            'warning'  => 0,
+            'details'  => [],
+        ];
+        if (!$path || !@is_readable($path)) return $result;
+
+        $current_size = (int) @filesize($path);
+        if ($current_size <= 0) return $result;
+
+        // If file was cleared or rotated, read up to last 256KB
+        if ($offset_before <= 0 || $current_size < $offset_before) {
+            $read_bytes = min($current_size, 256 * 1024);
+            $start_pos  = max(0, $current_size - $read_bytes);
+        } else {
+            // Read newly appended slice, capped at 512KB max
+            $read_bytes = min($current_size - $offset_before, 512 * 1024);
+            $start_pos  = $offset_before;
+        }
+
+        if ($read_bytes <= 0) return $result;
+
+        $fp = @fopen($path, 'rb');
+        if (!$fp) return $result;
+        @fseek($fp, $start_pos);
+        $data = (string) @fread($fp, $read_bytes);
+        @fclose($fp);
+
+        if ($data === '') return $result;
+
+        $lines   = preg_split('/[\r\n]+/', $data);
+        $count   = 0;
+        $crit    = 0;
+        $warn    = 0;
+        $details = [];
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') continue;
+            $sev = self::get_line_severity($line);
+            if ($sev === 'fatal' || $sev === 'warning') {
+                $count++;
+                if ($sev === 'fatal') {
+                    $crit++;
+                } else {
+                    $warn++;
+                }
+                if (count($details) < 3) {
+                    $clean = preg_replace('/^\[[^\]]+\]\s*/', '', $line);
+                    $details[] = wp_strip_all_tags(substr($clean, 0, 120));
+                }
+            }
+        }
+
+        return [
+            'count'    => $count,
+            'critical' => $crit,
+            'warning'  => $warn,
+            'details'  => $details,
+        ];
     }
 
     /**

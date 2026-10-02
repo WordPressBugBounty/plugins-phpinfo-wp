@@ -2,17 +2,7 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 /**
- * Phpinfo_WP_Admin_Bar
- *
- * Enterprise-grade real-time server telemetry HUD (Heads-Up Display) and sentinel
- * cockpit in the WordPress Admin Bar.
- *
- * Designed to seamlessly match phpinfo() WP v8 design system:
- * - Clean white card surface with 12px border radius
- * - Generous 16px inner padding across all sections
- * - 6px/8px component radius with crisp #e2e8f0 borders
- * - Brand indigo/purple primary buttons (#6366f1) and clean secondary buttons
- * - Zero SaaS tracking & zero-runtime database overhead
+ * Admin bar telemetry indicator and HUD.
  */
 class Phpinfo_WP_Admin_Bar {
 
@@ -1035,10 +1025,12 @@ class Phpinfo_WP_Admin_Bar {
         }
 
         // --- Error Log Count ---
-        $err_count = Phpinfo_WP_Error_Log::today_count();
+        $err_breakdown = class_exists('Phpinfo_WP_Error_Log') ? Phpinfo_WP_Error_Log::today_breakdown() : null;
+        $err_count     = $err_breakdown ? $err_breakdown['total_errors'] : 0;
         if ($err_count > 0) {
+            $is_crit = ($err_breakdown['critical'] ?? 0) > 0 || $err_count >= 50;
             $issues[] = [
-                'level'  => $err_count >= 100 ? 'critical' : 'warning',
+                'level'  => $is_crit ? 'critical' : 'warning',
                 'label'  => $err_count . ' error' . ($err_count === 1 ? '' : 's') . ' today',
                 'detail' => $err_count . ' PHP errors logged',
                 'href'   => admin_url('admin.php?page=piwp-error-log'),

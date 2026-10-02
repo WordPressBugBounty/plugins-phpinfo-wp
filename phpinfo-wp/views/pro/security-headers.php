@@ -13,9 +13,6 @@ if (isset($_POST['phpinfowp_sec_scan']) && check_admin_referer('phpinfowp_sec_no
     $audit = null;
 } else {
     $audit = Phpinfo_WP_Security_Headers::get_result();
-    if ($audit === null && $is_pro) {
-        $audit = Phpinfo_WP_Security_Headers::scan();
-    }
 }
 ?>
 
@@ -56,8 +53,13 @@ if (isset($_POST['phpinfowp_sec_scan']) && check_admin_referer('phpinfowp_sec_no
 
     <div id="phpinfowp-sec-result-area">
         <?php if (isset($audit['error'])): ?>
-            <div class="notice notice-error inline" style="margin-bottom:20px;">
-                <p><?php printf(__('Could not fetch headers: %s', 'phpinfo-wp'), '<strong>' . esc_html($audit['error']) . '</strong>'); ?></p>
+            <div class="phpinfowp-custom-alert is-error" style="margin-bottom:20px;">
+                <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                    <span class="dashicons dashicons-dismiss"></span>
+                    <div class="phpinfowp-custom-alert-body">
+                        <p><?php printf(__('Could not fetch headers: %s', 'phpinfo-wp'), '<strong>' . esc_html($audit['error']) . '</strong>'); ?></p>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
 
@@ -164,8 +166,14 @@ if (isset($_POST['phpinfowp_sec_scan']) && check_admin_referer('phpinfowp_sec_no
                 </div>
                 <h3 style="margin:0 0 8px; font-size:18px; font-weight:700; color:#0f172a;"><?php _e('Ready to Audit Security Headers', 'phpinfo-wp'); ?></h3>
                 <p style="margin:0 0 20px; color:#64748b; font-size:14px; max-width:520px; margin-left:auto; margin-right:auto; line-height:1.5;">
-                    <?php _e('Click "Run Header Audit" above to asynchronously inspect your live HTTP response headers against OWASP security standards.', 'phpinfo-wp'); ?>
+                    <?php _e('Click "Run Header Audit" to asynchronously inspect your live HTTP response headers against OWASP security standards.', 'phpinfo-wp'); ?>
                 </p>
+                <div style="margin-bottom:20px;">
+                    <button type="button" class="button button-primary phpinfowp-sec-card-audit-btn" style="background:#6366f1; border-color:#6366f1; color:#fff; height:38px; line-height:36px; border-radius:6px; font-weight:600; font-size:14px; padding:0 22px; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 6px rgba(99,102,241,0.25);">
+                        <span class="dashicons dashicons-shield" style="font-size:17px; width:17px; height:17px; margin-top:2px;"></span>
+                        <span><?php _e('Run Header Audit Now', 'phpinfo-wp'); ?></span>
+                    </button>
+                </div>
                 <div style="display:inline-flex; align-items:center; gap:8px; font-size:12px; color:#94a3b8;">
                     <span class="dashicons dashicons-yes-alt" style="color:#10b981; font-size:16px; width:16px; height:16px;"></span>
                     <?php _e('Zero Page Lag — Runs via non-blocking asynchronous AJAX loopback.', 'phpinfo-wp'); ?>
@@ -372,6 +380,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(function(r) { return r.json(); })
                 .then(function() { window.location.reload(); })
                 .catch(function() { window.location.reload(); });
+        });
+    }
+
+    var cardAuditBtn = document.querySelector('.phpinfowp-sec-card-audit-btn');
+    if (cardAuditBtn && recheckBtn) {
+        cardAuditBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            recheckBtn.click();
         });
     }
 });

@@ -510,7 +510,12 @@ $inplace_verdict_meta = [
                     </p>
                 </div>
             <?php elseif (isset($core_result['error'])): ?>
-                <div class="notice notice-error inline"><p><?php echo esc_html($core_result['error']); ?></p></div>
+                <div class="phpinfowp-custom-alert is-error" style="margin:0 0 20px;">
+                    <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                        <span class="dashicons dashicons-dismiss"></span>
+                        <div class="phpinfowp-custom-alert-body"><p><?php echo esc_html($core_result['error']); ?></p></div>
+                    </div>
+                </div>
             <?php elseif (!$core_result): ?>
                 <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:36px 24px; text-align:center; margin-top:20px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
                     <span class="dashicons dashicons-shield" style="font-size:36px; width:36px; height:36px; color:#64748b; display:inline-block; margin-bottom:14px;"></span>
@@ -536,9 +541,14 @@ $inplace_verdict_meta = [
 
             ?>
                 <?php if (!empty($core_result['truncated'])): ?>
-                    <div class="notice notice-warning inline" style="margin:0 0 16px"><p>
-                        <?php printf(__('Previous scan hit an earlier file limit (%d files). Click "Run Core Audit" to scan all files without limits.', 'phpinfo-wp'), (int) ($core_result['max_files'] ?? 8000)); ?>
-                    </p></div>
+                    <div class="phpinfowp-custom-alert is-warning" style="margin:0 0 16px">
+                        <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                            <span class="dashicons dashicons-warning"></span>
+                            <div class="phpinfowp-custom-alert-body">
+                                <p><?php printf(__('Previous scan hit an earlier file limit (%d files). Click "Run Core Audit" to scan all files without limits.', 'phpinfo-wp'), (int) ($core_result['max_files'] ?? 8000)); ?></p>
+                            </div>
+                        </div>
+                    </div>
                 <?php endif; ?>
 
                 <!-- Top Verdict Summary Banner -->
@@ -637,13 +647,23 @@ $inplace_verdict_meta = [
 
                 <?php $jqm = $core_result['jquery_migrate'] ?? 'unknown';
                 if ($jqm === 'present'): ?>
-                    <div class="notice notice-info inline" style="margin:0 0 16px"><p>
-                        <strong><?php _e('jQuery Migrate is loaded on this site', 'phpinfo-wp'); ?></strong> — <?php _e('Deprecated jQuery APIs are actively shimmed and mitigated.', 'phpinfo-wp'); ?>
-                    </p></div>
+                    <div class="phpinfowp-custom-alert is-info" style="margin:0 0 16px">
+                        <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                            <span class="dashicons dashicons-info-outline"></span>
+                            <div class="phpinfowp-custom-alert-body">
+                                <p><strong><?php _e('jQuery Migrate is loaded on this site', 'phpinfo-wp'); ?></strong> — <?php _e('Deprecated jQuery APIs are actively shimmed and mitigated.', 'phpinfo-wp'); ?></p>
+                            </div>
+                        </div>
+                    </div>
                 <?php elseif ($jqm === 'absent'): ?>
-                    <div class="notice notice-error inline" style="margin:0 0 16px"><p>
-                        <strong><?php _e('jQuery Migrate is not loaded', 'phpinfo-wp'); ?></strong> — <?php _e('Calls to removed jQuery APIs will fail on WordPress 5.7+.', 'phpinfo-wp'); ?>
-                    </p></div>
+                    <div class="phpinfowp-custom-alert is-warning" style="margin:0 0 16px">
+                        <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                            <span class="dashicons dashicons-warning"></span>
+                            <div class="phpinfowp-custom-alert-body">
+                                <p><strong><?php _e('jQuery Migrate is not loaded', 'phpinfo-wp'); ?></strong> — <?php _e('Calls to removed jQuery APIs will fail on WordPress 5.7+.', 'phpinfo-wp'); ?></p>
+                            </div>
+                        </div>
+                    </div>
                 <?php endif; ?>
             <?php endif; ?>
         </div>

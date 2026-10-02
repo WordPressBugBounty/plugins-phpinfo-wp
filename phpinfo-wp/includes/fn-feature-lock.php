@@ -3,25 +3,6 @@ defined('ABSPATH') or die('Unauthorized Access');
 
 /**
  * Inline feature-lock teaser.
- *
- * Usage — replace the hard redirect at the top of any Pro view with:
- *
- *   if (!Phpinfo_WP_License::is_valid()) {
- *       phpinfowp_render_feature_lock([
- *           'feature'  => 'OPcache Dashboard',
- *           'icon'     => 'dashicons-performance',
- *           'tagline'  => 'Hit rate, memory usage, cached scripts, one-click clear.',
- *           'previews' => [
- *               'Hit rate: <strong>—</strong>',
- *               'Memory used: <strong>—</strong>',
- *               'Cached scripts: <strong>—</strong>',
- *           ],
- *       ]);
- *       return;
- *   }
- *
- * The function is defined once and guarded so it can be required from
- * multiple views without a fatal redeclaration error.
  */
 
 if (!function_exists('phpinfowp_render_feature_lock')):

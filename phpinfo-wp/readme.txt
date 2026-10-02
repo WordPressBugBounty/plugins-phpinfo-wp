@@ -2,8 +2,8 @@
 Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
-Tested up to: 7.1.1
-Stable tag: 8.0.2
+Tested up to: 7.1.2
+Stable tag: 8.0.3
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -78,8 +78,8 @@ phpinfo() WP gives you **one in-admin plugin** that covers all of it, with a sin
 = Pricing =
 
 *   **Single Site**: $39/year (1 site, essential Pro features, branded PDF, 3 snapshots, 1 API monitor)
-*   **Unlimited Sites**: $69/year (the popular pick, works on every site, fully white-labeled, unlimited snapshots and API monitors)
-*   **Lifetime**: $149 once (founders pricing, limited spots, unlimited sites, fully white-labeled forever)
+*   **Unlimited Sites**: $79/year (the popular pick, works on every site, fully white-labeled, unlimited snapshots and API monitors)
+*   **Lifetime**: $249 once (unlimited sites, lifetime updates & priority support, fully white-labeled forever)
 
 14-day money-back guarantee. Instant license delivery. Site-locked license keys.
 
@@ -165,6 +165,12 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 9. Executive White-Label PDF Audit Report (Pro): Generate client-ready site audit reports with your agency logo, custom accent branding, and server health breakdown.
 
 == Changelog ==
+
+= 8.0.3 =
+* Compatibility: Confirmed full compatibility with WordPress 7.1.2.
+* Fix: Resolved false-positive rollback errors during 1-Click server optimizations.
+* Improved: UX enhancements and prioritized orphan hook visibility in WP Cron Monitor.
+* Improved: General stability and safety check reliability.
 
 = 8.0.2 =
 * Fix: Minor bug fixes.

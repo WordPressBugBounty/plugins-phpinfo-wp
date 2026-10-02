@@ -3,48 +3,6 @@ defined('ABSPATH') or die('Unauthorized Access');
 
 /**
  * Config Grader — context-aware PHP/WordPress configuration audit.
- *
- * Sophistication levers (vs the prior static-threshold version):
- *
- *  1. Context-aware thresholds. We detect active plugins (WooCommerce, Elementor,
- *     LearnDash, BuddyPress, page builders, big-import tools), the hosting
- *     environment (Kinsta / WP Engine / SiteGround / Cloudways / Pantheon /
- *     Flywheel / LiquidWeb / LiteSpeed), PHP version, and HTTPS state, then
- *     adjust recommended values per directive accordingly. A WooCommerce site
- *     wants 512M of memory; a blog wants 256M; we now recommend the right one.
- *
- *  2. Cross-directive consistency checks. post_max_size must be ≥
- *     upload_max_filesize. memory_limit must be ≥ post_max_size + headroom.
- *     max_input_time must not exceed max_execution_time. Each is its own
- *     check run after the per-directive pass.
- *
- *  3. Live-data corroboration. We read the OPcache live stats and the recent
- *     error-log tail. If memory_limit "passes" the static threshold but the
- *     error log shows recent OOM kills, we escalate. If opcache.memory looks
- *     fine but the cache is currently full, we escalate. The static rule is
- *     a starting point; reality overrides it.
- *
- *  4. PHP 8.x modern directives. Added opcache.jit, opcache.jit_buffer_size,
- *     opcache.huge_code_pages, realpath_cache_size, realpath_cache_ttl,
- *     date.timezone, output_buffering, max_file_uploads.
- *
- *  5. Host-aware remediation. For directives that can't be changed by the
- *     user on managed hosts, point them at the host's panel instead of
- *     telling them to edit php.ini.
- *
- *  6. Severity matrix. Critical / High / Medium / Low replaces the old
- *     weight 1/2/3 + pass/warn/fail combo. Severity is the per-check
- *     attribute; status (pass/warn/fail) is derived from current value.
- *
- *  7. Trend tracking. Each Pro page-load on a site records the current
- *     score in a rolling 30-day option. We compute delta from previous
- *     recording and surface it so weekly reports can say "B (-3 since
- *     last week — memory_limit regressed)".
- *
- * The return shape of run() is backward-compatible with the audit-report
- * consumer: `checks` is still an array of per-check rows with at least
- * `key/label/value/good/status`. New fields (severity, live_evidence,
- * host_fix, target_value) are additive.
  */
 class Phpinfo_WP_Config_Grader {
 

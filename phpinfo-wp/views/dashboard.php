@@ -35,6 +35,8 @@ if ($passes === 0 && $warns === 0 && $fails === 0 && !empty($full_grader['checks
     $total_directives = count($full_grader['checks']);
 }
 
+$locked_n = $grader_summary['locked_count'] ?? max(0, (int)($grader_summary['total'] ?? $total_directives) - (int)($grader_summary['passes'] ?? $passes) - (int)($grader_summary['fails'] ?? $fails) - (int)($grader_summary['warns'] ?? $warns));
+
 $has_autofixable = false;
 if (class_exists('Phpinfo_WP_Config_Grader_Fixer') && !empty($full_grader['checks'])) {
     foreach ($full_grader['checks'] as $c) {
@@ -58,6 +60,15 @@ $grade_slug  = strtolower(str_replace('+', 'plus', $grade_eff));
 // Dynamic colors for Server Reality badge
 $score_server_bg    = ($score >= 90) ? '#dcfce7' : (($score >= 80) ? '#fef9c3' : (($score >= 70) ? '#ffedd5' : '#fee2e2'));
 $score_server_color = ($score >= 90) ? '#15803d' : (($score >= 80) ? '#dba617' : (($score >= 70) ? '#ea580c' : '#dc2626'));
+
+// Dynamic colors for Site Controllable badge & bar
+$score_ctl_bg    = ($score_ctl >= 90) ? '#dcfce7' : (($score_ctl >= 80) ? '#fef9c3' : (($score_ctl >= 70) ? '#ffedd5' : '#fee2e2'));
+$score_ctl_color = ($score_ctl >= 90) ? '#15803d' : (($score_ctl >= 80) ? '#dba617' : (($score_ctl >= 70) ? '#ea580c' : '#dc2626'));
+$score_ctl_bar   = ($score_ctl >= 90) ? '#16a34a' : (($score_ctl >= 80) ? '#dba617' : (($score_ctl >= 70) ? '#ea580c' : '#dc2626'));
+$actionable_issues = (int)($grader_summary['fails'] ?? 0) + (int)($grader_summary['warns'] ?? 0);
+if ($actionable_issues === 0 && ($fails > 0 || $warns > 0)) {
+    $actionable_issues = $fails + $warns;
+}
 
 // 2. Memory & Admin Bar Status
 $bar        = class_exists('Phpinfo_WP_Admin_Bar') ? Phpinfo_WP_Admin_Bar::status() : [];
@@ -238,10 +249,12 @@ if (count($triage_items) < 3 && !empty($full_grader['cross'])) {
 }
 
 // Check F: Runtime PHP Errors Today
-$today_errs = class_exists('Phpinfo_WP_Error_Log') ? Phpinfo_WP_Error_Log::today_count() : 0;
+$today_breakdown = class_exists('Phpinfo_WP_Error_Log') ? Phpinfo_WP_Error_Log::today_breakdown() : null;
+$today_errs      = $today_breakdown ? $today_breakdown['total_errors'] : 0;
 if ($today_errs > 0 && count($triage_items) < 3) {
+    $is_critical = ($today_breakdown['critical'] ?? 0) > 0 || $today_errs >= 50;
     $triage_items[] = [
-        'type'     => $today_errs >= 50 ? 'danger' : 'warning',
+        'type'     => $is_critical ? 'danger' : 'warning',
         'icon'     => 'dashicons-warning',
         'title'    => sprintf(__('%d PHP Errors Logged Today', 'phpinfo-wp'), $today_errs),
         'desc'     => __('Active runtime notices or errors were recorded today. Check stack traces to locate problematic code.', 'phpinfo-wp'),
@@ -361,16 +374,22 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
                                 <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;">
                                     <div style="display:flex; align-items:center; gap:8px;">
                                         <span style="font-size:13px; font-weight:700; color:#0f172a;"><?php _e('Site Controllable', 'phpinfo-wp'); ?></span>
-                                        <span style="font-size:11px; font-weight:800; padding:1px 7px; border-radius:10px; background:#dcfce7; color:#15803d;"><?php echo esc_html($grade_ctl); ?></span>
+                                        <span style="font-size:11px; font-weight:800; padding:1px 7px; border-radius:10px; background:<?php echo esc_attr($score_ctl_bg); ?>; color:<?php echo esc_attr($score_ctl_color); ?>;"><?php echo esc_html($grade_ctl); ?></span>
                                     </div>
                                     <div style="display:flex; align-items:baseline; gap:4px;">
                                         <span style="font-size:18px; font-weight:800; color:#0f172a;"><?php echo (int)$score_ctl; ?></span>
                                         <span style="font-size:12px; color:#64748b;">/ 100</span>
-                                        <span style="font-size:12px; font-weight:600; color:#16a34a; margin-left:6px;"><?php _e('Fully Optimized ✓', 'phpinfo-wp'); ?></span>
+                                        <?php if ($actionable_issues > 0): ?>
+                                            <span style="font-size:12px; font-weight:600; color:<?php echo esc_attr($score_ctl_color); ?>; margin-left:6px;"><?php printf(_n('%d Actionable Setting ⚠️', '%d Actionable Settings ⚠️', $actionable_issues, 'phpinfo-wp'), (int)$actionable_issues); ?></span>
+                                        <?php elseif ($score_ctl >= 90): ?>
+                                            <span style="font-size:12px; font-weight:600; color:#16a34a; margin-left:6px;"><?php _e('Fully Optimized ✓', 'phpinfo-wp'); ?></span>
+                                        <?php else: ?>
+                                            <span style="font-size:12px; font-weight:600; color:<?php echo esc_attr($score_ctl_color); ?>; margin-left:6px;"><?php _e('Needs Optimization', 'phpinfo-wp'); ?></span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="phpinfowp-progress-track" style="height:9px; background:#e2e8f0; border-radius:5px; overflow:hidden;">
-                                    <div class="phpinfowp-progress-fill" style="width:<?php echo min(100, $score_ctl); ?>%; height:100%; background:#16a34a; border-radius:5px;"></div>
+                                    <div class="phpinfowp-progress-fill" style="width:<?php echo min(100, $score_ctl); ?>%; height:100%; background:<?php echo esc_attr($score_ctl_bar); ?>; border-radius:5px;"></div>
                                 </div>
                             </div>
 
@@ -397,10 +416,14 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
                         <div style="font-size:11.5px; color:#92400e; background:#fffbeb; border:1px solid #fef3c7; border-radius:6px; padding:8px 12px; margin-top:10px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
                             <span>
                                 <strong><?php printf(__('Overall %s* (%d/100)', 'phpinfo-wp'), esc_html($grade_eff), (int)$score_eff); ?>:</strong>
-                                <?php printf(__('Site settings are fully optimal (%1$s). Some server-level settings (%2$d) require a hosting plan upgrade to resolve (Server: %3$s).', 'phpinfo-wp'), esc_html($grade_ctl), (int)$locked_n, esc_html($grade)); ?>
+                                <?php if ($actionable_issues > 0): ?>
+                                    <?php printf(__('Site has %1$d actionable setting(s) to optimize (%2$s). In addition, %3$d server setting(s) require host intervention (Server: %4$s).', 'phpinfo-wp'), (int)$actionable_issues, esc_html($grade_ctl), (int)$locked_n, esc_html($grade)); ?>
+                                <?php else: ?>
+                                    <?php printf(__('Site settings are fully optimal (%1$s). Some server-level settings (%2$d) require a hosting plan upgrade to resolve (Server: %3$s).', 'phpinfo-wp'), esc_html($grade_ctl), (int)$locked_n, esc_html($grade)); ?>
+                                <?php endif; ?>
                             </span>
-                            <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-config-grader&tab=locked')); ?>" style="font-weight:700; color:#b45309; text-decoration:none; white-space:nowrap;">
-                                <?php printf(__('View %d Settings &rarr;', 'phpinfo-wp'), (int)$locked_n); ?>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-config-grader' . ($actionable_issues > 0 ? '&tab=issues' : '&tab=locked'))); ?>" style="font-weight:700; color:#b45309; text-decoration:none; white-space:nowrap;">
+                                <?php echo $actionable_issues > 0 ? sprintf(__('Resolve %d Issues &rarr;', 'phpinfo-wp'), (int)$actionable_issues) : sprintf(__('View %d Settings &rarr;', 'phpinfo-wp'), (int)$locked_n); ?>
                             </a>
                         </div>
                     <?php else: ?>
@@ -604,7 +627,7 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
             </div>
 
             <div class="phpinfowp-tel-footer">
-                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-tools')); ?>" class="phpinfowp-tel-link">
+                <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-htaccess')); ?>" class="phpinfowp-tel-link">
                     <?php _e('Tune in PHP Config Editor', 'phpinfo-wp'); ?> &rarr;
                 </a>
             </div>

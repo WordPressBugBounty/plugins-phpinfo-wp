@@ -128,8 +128,13 @@ $paged_stats = array_slice($stats, ($paged - 1) * $per_page, $per_page, true);
     <?php else: ?>
 
         <?php if (!$stats): ?>
-            <div class="notice notice-info inline">
-                <p><strong><?php _e('Monitoring Active.', 'phpinfo-wp'); ?></strong> <?php _e('We are tracking outbound HTTP requests across your site. No external API calls have been recorded in the last 24 hours yet.', 'phpinfo-wp'); ?></p>
+            <div class="phpinfowp-custom-alert is-info" style="margin-bottom:20px;">
+                <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                    <span class="dashicons dashicons-info-outline"></span>
+                    <div class="phpinfowp-custom-alert-body">
+                        <p><strong><?php _e('Monitoring Active.', 'phpinfo-wp'); ?></strong> <?php _e('We are tracking outbound HTTP requests across your site. No external API calls have been recorded in the last 24 hours yet.', 'phpinfo-wp'); ?></p>
+                    </div>
+                </div>
             </div>
             <p style="color:#555; font-size:13px; margin-top:10px;"><?php _e('You can trigger a plugin update check or click "Test Slow API" in the sidebar to generate test requests.', 'phpinfo-wp'); ?></p>
         <?php else: ?>

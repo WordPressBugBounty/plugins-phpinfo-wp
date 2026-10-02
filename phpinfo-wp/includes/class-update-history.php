@@ -2,20 +2,7 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 /**
- * Update History — persistent log of every plugin, theme, and core update
- * with automated post-update health checks.
- *
- * Hooks into `upgrader_process_complete` to capture every update event. After
- * recording, schedules a 60-second deferred health check that verifies:
- *   1. Site loopback (HTTP 200?)
- *   2. Admin reachable (wp-admin loads?)
- *   3. Error log growth (new fatal errors?)
- *   4. Cron integrity (events still registered?)
- *
- * If health degrades, surfaces an admin notice and (Pro) sends alerts.
- *
- * Data is stored in wp_options (no custom tables) as a capped JSON array.
- * Free: last 30 entries. Pro: last 200.
+ * Update History — persistent log of plugin, theme, and core updates.
  */
 class Phpinfo_WP_Update_History {
 
@@ -92,13 +79,16 @@ class Phpinfo_WP_Update_History {
 
         if (empty($entries)) return;
 
-        // Snapshot error log line count BEFORE saving (we compare after 60s)
-        $error_count = self::count_error_log_lines();
+        // Snapshot error log offset and line count BEFORE saving (we compare after 60s)
+        $error_path   = class_exists('Phpinfo_WP_Error_Log') ? Phpinfo_WP_Error_Log::find_path() : null;
+        $error_offset = ($error_path && @file_exists($error_path)) ? (int) @filesize($error_path) : 0;
+        $error_count  = self::count_error_log_lines();
 
         $history = self::all();
         foreach ($entries as &$entry) {
-            $entry['error_lines_before'] = $error_count;
-            $entry['health']             = null; // will be filled by deferred check
+            $entry['error_log_offset_before'] = $error_offset;
+            $entry['error_lines_before']      = $error_count;
+            $entry['health']                  = null; // will be filled by deferred check
         }
         unset($entry);
 
@@ -216,14 +206,18 @@ class Phpinfo_WP_Update_History {
         // Run the health checks once
         $health = self::run_health_checks();
 
-        // Count error log lines now
-        $error_lines_after = self::count_error_log_lines();
-
         // Apply to all unchecked entries
         $any_issues = false;
         foreach ($unchecked as $i) {
-            $lines_before = $history[$i]['error_lines_before'] ?? 0;
-            $new_errors   = max(0, $error_lines_after - $lines_before);
+            $offset_before = $history[$i]['error_log_offset_before'] ?? null;
+            $new_errors    = 0;
+            $err_details   = [];
+
+            if ($offset_before !== null && class_exists('Phpinfo_WP_Error_Log') && method_exists('Phpinfo_WP_Error_Log', 'detect_new_errors')) {
+                $detected    = Phpinfo_WP_Error_Log::detect_new_errors((int) $offset_before);
+                $new_errors  = (int) ($detected['count'] ?? 0);
+                $err_details = $detected['details'] ?? [];
+            }
 
             $entry_health = [
                 'status'        => 'ok',
@@ -244,7 +238,13 @@ class Phpinfo_WP_Update_History {
             if (isset($health['rest_ok']) && !$health['rest_ok']) $problems[] = __('REST API (/wp-json/) returned 500 error', 'phpinfo-wp');
             if (isset($health['singular_ok']) && !$health['singular_ok']) $problems[] = __('Singular page/post template failed to render', 'phpinfo-wp');
             if (isset($health['ecommerce_ok']) && $health['ecommerce_ok'] === false) $problems[] = __('E-commerce shop/checkout endpoint returned 500 error', 'phpinfo-wp');
-            if ($new_errors > 0)      $problems[] = sprintf(__('%d new error(s) in log', 'phpinfo-wp'), $new_errors);
+            if ($new_errors > 0) {
+                if (!empty($err_details)) {
+                    $problems[] = sprintf(__('%1$d new error(s) in log: %2$s', 'phpinfo-wp'), $new_errors, esc_html($err_details[0]));
+                } else {
+                    $problems[] = sprintf(__('%d new error(s) in log', 'phpinfo-wp'), $new_errors);
+                }
+            }
             if (!$health['cron_ok'])  $problems[] = __('WP-Cron events may be disrupted', 'phpinfo-wp');
 
             if (!empty($problems)) {
@@ -254,8 +254,8 @@ class Phpinfo_WP_Update_History {
             }
 
             $history[$i]['health'] = $entry_health;
-            // Clean up temp field
-            unset($history[$i]['error_lines_before']);
+            // Clean up temp fields
+            unset($history[$i]['error_lines_before'], $history[$i]['error_log_offset_before']);
         }
 
         update_option(self::OPT, array_values($history), false);

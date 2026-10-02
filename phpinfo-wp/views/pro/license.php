@@ -449,8 +449,8 @@ $pillars = [
         $compare_cols = [
             ['name' => __('Free', 'phpinfo-wp'),         'price' => '$0',   'cadence' => 'WP.org'],
             ['name' => __('Single Site', 'phpinfo-wp'),  'price' => '$39',  'cadence' => __('/year', 'phpinfo-wp')],
-            ['name' => __('Unlimited', 'phpinfo-wp'),    'price' => '$69',  'cadence' => __('/1st yr', 'phpinfo-wp'), 'featured' => true],
-            ['name' => __('Lifetime', 'phpinfo-wp'),     'price' => '$149', 'cadence' => __('once', 'phpinfo-wp')],
+            ['name' => __('Unlimited', 'phpinfo-wp'),    'price' => '$79',  'cadence' => __('/year', 'phpinfo-wp'), 'featured' => true],
+            ['name' => __('Lifetime', 'phpinfo-wp'),     'price' => '$249', 'cadence' => __('once', 'phpinfo-wp')],
         ];
 
         $render_cell = static function ($v) {
@@ -548,15 +548,10 @@ $pillars = [
 
             <!-- Tier 2: Unlimited (Featured) -->
             <div class="phpinfowp-pricing-tier is-featured">
-                <div class="phpinfowp-pricing-flag"><?php _e('Most Popular · Increases Sept 30', 'phpinfo-wp'); ?></div>
+                <div class="phpinfowp-pricing-flag"><?php _e('Most Popular', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-pricing-name"><?php _e('Unlimited', 'phpinfo-wp'); ?></div>
-                <div class="phpinfowp-pricing-price">
-                    <del>$79</del> $69<span>/1st yr</span>
-                </div>
+                <div class="phpinfowp-pricing-price">$79<span>/year</span></div>
                 <p class="phpinfowp-pricing-blurb"><?php _e('You manage multiple sites. One license covers every one of them.', 'phpinfo-wp'); ?></p>
-                <div class="phpinfowp-pricing-alert is-purple">
-                    <strong>⚡ <?php _e('Price Increases Sept 30:', 'phpinfo-wp'); ?></strong> <?php _e('Get Unlimited at $69 for your first year before it increases to $79/year on September 30. Subsequent renewals at $79/year.', 'phpinfo-wp'); ?>
-                </div>
                 <ul class="phpinfowp-pricing-list">
                     <li><?php _e('All Pro v8.0 features on unlimited sites', 'phpinfo-wp'); ?></li>
                     <li><?php _e('Fully white-labeled PDF reports (Custom Logo)', 'phpinfo-wp'); ?></li>
@@ -569,24 +564,10 @@ $pillars = [
 
             <!-- Tier 3: Lifetime -->
             <div class="phpinfowp-pricing-tier">
-                <div class="phpinfowp-pricing-flag is-warn"><?php _e('52 of 55 Claimed · $249 After 55 Filled', 'phpinfo-wp'); ?></div>
+                <div class="phpinfowp-pricing-flag"><?php _e('One-Time Payment', 'phpinfo-wp'); ?></div>
                 <div class="phpinfowp-pricing-name"><?php _e('Lifetime', 'phpinfo-wp'); ?></div>
-                <div class="phpinfowp-pricing-price">
-                    <del>$249</del> $149<span><?php _e('once', 'phpinfo-wp'); ?></span>
-                </div>
+                <div class="phpinfowp-pricing-price">$249<span><?php _e('once', 'phpinfo-wp'); ?></span></div>
                 <p class="phpinfowp-pricing-blurb"><?php _e('One payment. Updates and support forever. Zero renewal fees.', 'phpinfo-wp'); ?></p>
-                <div class="phpinfowp-pricing-alert is-amber">
-                    <strong>⚡ <?php _e('Price increases to $249 after 55 spots:', 'phpinfo-wp'); ?></strong> <?php _e('Only 3 spots remaining at $149 before price jumps to $249. One payment, zero renewal fees forever.', 'phpinfo-wp'); ?>
-                </div>
-                <div class="phpinfowp-pricing-progress-wrap">
-                    <div class="phpinfowp-pricing-progress-labels">
-                        <span><?php _e('52 SOLD', 'phpinfo-wp'); ?></span>
-                        <span><?php _e('3 LEFT AT $149', 'phpinfo-wp'); ?></span>
-                    </div>
-                    <div class="phpinfowp-pricing-progress-bar">
-                        <div class="phpinfowp-pricing-progress-fill" style="width: 94.5%;"></div>
-                    </div>
-                </div>
                 <ul class="phpinfowp-pricing-list">
                     <li><?php _e('All Pro v8.0 features on unlimited sites', 'phpinfo-wp'); ?></li>
                     <li><?php _e('Fully white-labeled PDF reports (Custom Logo)', 'phpinfo-wp'); ?></li>

@@ -17,7 +17,7 @@ if (isset($_POST['phpinfowp_report_branding']) && check_admin_referer('phpinfowp
         'logo_id'     => (int) ($_POST['branding_logo_id']  ?? 0),
         'logo_url'    => $_POST['branding_logo_url']  ?? '',
     ]);
-    echo '<div class="notice notice-success inline" style="margin:0 0 20px"><p>Report branding saved.</p></div>';
+    echo '<div class="phpinfowp-custom-alert is-success" style="margin:0 0 20px"><div style="display:flex;align-items:center;gap:12px;flex:1"><span class="dashicons dashicons-yes-alt"></span><div class="phpinfowp-custom-alert-body"><p>' . esc_html__('Report branding saved.', 'phpinfo-wp') . '</p></div></div><button type="button" class="phpinfowp-alert-dismiss-btn" onclick="this.closest(\'.phpinfowp-custom-alert\').remove();" title="' . esc_attr__('Dismiss', 'phpinfo-wp') . '"><span class="dashicons dashicons-no-alt"></span></button></div>';
 }
 
 // Media library is needed for the logo picker. Only loaded on this view.
@@ -41,8 +41,14 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
 <div class="phpinfowp-pro-page">
 
     <?php if (isset($_GET['trial_activated']) && $_GET['trial_activated'] == 1): ?>
-        <div class="notice notice-success inline is-dismissible" style="margin:0 0 20px">
-            <p><strong><?php _e('Success!', 'phpinfo-wp'); ?></strong> <?php _e('Your 7-day Pro Trial is now active. All Pro features are unlocked.', 'phpinfo-wp'); ?></p>
+        <div class="phpinfowp-custom-alert is-success" style="margin:0 0 20px">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                <span class="dashicons dashicons-yes-alt"></span>
+                <div class="phpinfowp-custom-alert-body">
+                    <p><strong><?php _e('Success!', 'phpinfo-wp'); ?></strong> <?php _e('Your 7-day Pro Trial is now active. All Pro features are unlocked.', 'phpinfo-wp'); ?></p>
+                </div>
+            </div>
+            <button type="button" class="phpinfowp-alert-dismiss-btn" onclick="this.closest('.phpinfowp-custom-alert').remove();" title="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-no-alt"></span></button>
         </div>
     <?php endif; ?>
 

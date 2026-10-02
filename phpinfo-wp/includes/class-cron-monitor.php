@@ -50,6 +50,13 @@ class Phpinfo_WP_Cron_Monitor {
         }
 
         usort($out, function ($a, $b) {
+            $a_orphan = empty($a['has_callback']) ? 1 : 0;
+            $b_orphan = empty($b['has_callback']) ? 1 : 0;
+
+            if ($a_orphan !== $b_orphan) {
+                return $b_orphan <=> $a_orphan; // Orphans first
+            }
+
             return $a['timestamp'] <=> $b['timestamp'];
         });
         return $out;

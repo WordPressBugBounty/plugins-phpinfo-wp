@@ -2,13 +2,7 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 /**
- * Enterprise Leave-Anytime Background Scan Manager.
- *
- * Provides non-blocking execution resilience via ignore_user_abort(true),
- * lock management, status polling, and global admin completion alerts across:
- *  - PHP Compatibility Scanner (piwp-compat)
- *  - Permissions & Ownership Auditor (piwp-permissions)
- *  - Update Guard (piwp-update-audit)
+ * Background Scan Manager.
  */
 class Phpinfo_WP_Background_Scan {
 

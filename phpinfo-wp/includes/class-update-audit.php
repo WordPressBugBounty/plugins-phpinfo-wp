@@ -3,31 +3,6 @@ defined('ABSPATH') or die('Unauthorized Access');
 
 /**
  * Update Guard — pre-update WordPress core readiness audit.
- *
- * Sibling of Phpinfo_WP_Compat, but where that one targets a PHP version,
- * this one targets a WordPress *core* version and answers "what in my
- * plugins/themes will break (or start whining) when I click Update".
- *
- * Three signals are blended into one verdict (Safe / Caution / Risky):
- *
- *   A. Static code scan (on-server, no network) — the FREE headline engine.
- *      - PHP: calls to WordPress core functions that core has deprecated
- *        (they still run but emit _deprecated_function notices and are on the
- *        path to removal).
- *      - JS: jQuery APIs removed from the jQuery bundled with modern core
- *        (WP 5.7 dropped jQuery Migrate's default load). These break only when
- *        Migrate isn't loaded, so we check the live front end once and label
- *        them "breaks" (Migrate absent) vs "deprecated" (Migrate still present)
- *        rather than crying wolf.
- *
- *   B. Metadata risk (WP.org API) — PRO. Per installed plugin/theme:
- *      "Tested up to" gap vs the target core, abandonment (last-updated age,
- *      closed listing), and requires_php vs the PHP the new core needs.
- *
- * Free vs Pro split mirrors Phpinfo_WP_Compat: the scan engine and a verdict
- * are FREE (capture demand); Pro raises the file cap, adds the WP.org metadata
- * layer, the per-item AI explanation, the pre-update interception banner on
- * the core update screen, and per-file/line drill-down.
  */
 class Phpinfo_WP_Update_Audit {
 

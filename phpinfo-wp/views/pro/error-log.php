@@ -54,9 +54,26 @@ $search         = sanitize_text_field($_GET['log_search'] ?? '');
                 <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span>
                 <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Browse, live stream, filter, and clear your PHP error log — without FTP, SSH, or host cPanels.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
             </h1>
-            <?php if ($path): ?>
-                <div style="margin:4px 0 0; font-size:12px; color:#64748b;">
-                    <?php printf(__('Active log: %s &middot; %s', 'phpinfo-wp'), '<code style="font-size:11px; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">' . esc_html(Phpinfo_WP_Error_Log::mask_path($path)) . '</code>', '<strong>' . esc_html($size) . '</strong>'); ?>
+            <?php if ($path): 
+                $today_breakdown = class_exists('Phpinfo_WP_Error_Log') ? Phpinfo_WP_Error_Log::today_breakdown($path) : null;
+            ?>
+                <div style="margin:4px 0 0; font-size:12px; color:#64748b; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <span><?php printf(__('Active log: %s &middot; %s', 'phpinfo-wp'), '<code style="font-size:11px; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">' . esc_html(Phpinfo_WP_Error_Log::mask_path($path)) . '</code>', '<strong>' . esc_html($size) . '</strong>'); ?></span>
+                    <?php if ($today_breakdown): ?>
+                        <?php if ($today_breakdown['total_errors'] > 0): ?>
+                            <span style="background:#fee2e2; color:#991b1b; padding:1px 8px; border-radius:10px; font-weight:700; font-size:11px;">
+                                🚨 <?php echo (int) $today_breakdown['total_errors']; ?> <?php echo _n('error today', 'errors today', $today_breakdown['total_errors'], 'phpinfo-wp'); ?>
+                            </span>
+                        <?php elseif ($today_breakdown['info'] > 0): ?>
+                            <span style="background:#f0fdf4; color:#166534; padding:1px 8px; border-radius:10px; font-weight:600; font-size:11px;">
+                                ✓ 0 errors today &middot; <?php echo (int) $today_breakdown['info']; ?> info <?php echo _n('log', 'logs', $today_breakdown['info'], 'phpinfo-wp'); ?>
+                            </span>
+                        <?php else: ?>
+                            <span style="background:#f0fdf4; color:#166534; padding:1px 8px; border-radius:10px; font-weight:600; font-size:11px;">
+                                ✓ 0 errors today
+                            </span>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -139,7 +156,7 @@ $search         = sanitize_text_field($_GET['log_search'] ?? '');
     ?>
         <div style="background:<?php echo $bg_col; ?>; border:1px solid <?php echo $border_col; ?>; border-left:4px solid <?php echo $accent_col; ?>; border-radius:8px; padding:12px 16px; margin:0 0 20px 0; display:flex; align-items:center; gap:10px; color:<?php echo $text_col; ?>; font-size:13.5px; font-weight:500; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
             <span class="dashicons <?php echo $icon; ?>" style="color:<?php echo $accent_col; ?>; font-size:20px; width:20px; height:20px; flex-shrink:0;"></span>
-            <div style="flex:1;"><?php echo esc_html($message); ?></div>
+            <div style="flex:1;"><?php echo wp_kses($message, ['strong' => [], 'code' => []]); ?></div>
         </div>
     <?php endif; ?>
 

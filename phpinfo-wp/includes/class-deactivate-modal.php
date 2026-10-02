@@ -2,16 +2,7 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 /**
- * Renders a retention modal when the user clicks "Deactivate" on the
- * phpinfo() WP row in the WordPress Plugins screen. Shows them which
- * features they'd lose so they don't blindly deactivate a plugin that
- * was protecting them (PHP EOL warnings, Config Grader, SSL monitor, etc.).
- *
- * The modal HTML + JS are injected only on /wp-admin/plugins.php to keep
- * the rest of the admin clean. The "Deactivate anyway" button just lets
- * the original deactivate link follow through.
- *
- * Free users see the free feature list; Pro users see both.
+ * Retention modal for plugin deactivation.
  */
 class Phpinfo_WP_Deactivate_Modal {
 

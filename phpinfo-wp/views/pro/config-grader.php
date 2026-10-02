@@ -244,6 +244,41 @@ $target_info     = Phpinfo_WP_Config_Grader_Fixer::detect_target();
 $target_writable = Phpinfo_WP_Config_Grader_Fixer::target_writable();
 $settle_left     = Phpinfo_WP_Config_Grader_Fixer::settle_remaining();
 $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
+
+$active_settle_notice = Phpinfo_WP_Config_Grader_Fixer::get_active_settle_notice();
+$settle_until_ts      = $active_settle_notice ? (int) $active_settle_notice['until'] : 0;
+$is_settle_dismissed  = $active_settle_notice ? Phpinfo_WP_Config_Grader_Fixer::is_notice_dismissed($settle_until_ts) : false;
+
+$show_settle_banner   = false;
+$settle_banner_html   = '';
+
+if ($active_settle_notice && !$is_settle_dismissed && $fix_notice_type !== 'error') {
+    $show_settle_banner = true;
+    $remaining_sec      = (int) $active_settle_notice['remaining'];
+    $mins_str           = $remaining_sec > 60 ? ceil($remaining_sec / 60) . ' minute' . (ceil($remaining_sec / 60) === 1.0 ? '' : 's') : $remaining_sec . ' seconds';
+
+    if (($active_settle_notice['action'] ?? '') === 'recheck') {
+        $settle_banner_html = sprintf(
+            __('Scheduled server re-check. PHP-FPM reloads configuration in about <strong><span class="piwp-autofix-countdown-time">%s</span></strong>. We\'ll automatically evaluate runtime values once the cache clears.', 'phpinfo-wp'),
+            esc_html($mins_str)
+        );
+    } else {
+        $applied_count = isset($active_settle_notice['applied']) ? count($active_settle_notice['applied']) : 0;
+        $applied_names = isset($active_settle_notice['applied']) ? esc_html(implode(', ', $active_settle_notice['applied'])) : '';
+        $file_name     = esc_html($active_settle_notice['file'] ?? '.user.ini');
+        $mode          = $active_settle_notice['mode'] ?? 'userini';
+
+        $settle_banner_html = sprintf(__('Wrote %d directive(s) to <code>%s</code>: %s.', 'phpinfo-wp'), $applied_count, $file_name, $applied_names);
+        if ($mode === 'userini') {
+            $settle_banner_html .= '<br>' . sprintf(
+                __('New values activate once the <code>.user.ini</code> cache clears — about <strong><span class="piwp-autofix-countdown-time">%s</span></strong>. We\'ll automatically re-check for host overrides after that; nothing to do until then.', 'phpinfo-wp'),
+                esc_html($mins_str)
+            );
+        } else {
+            $settle_banner_html .= '<br>' . __('New values activate on the next page load. We\'ll re-check for host overrides shortly.', 'phpinfo-wp');
+        }
+    }
+}
 ?>
 
 <div class="phpinfowp-pro-page">
@@ -258,8 +293,113 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
         </div>
     </div>
 
-    <?php if ($fix_notice): ?>
-        <div class="notice notice-<?php echo esc_attr($fix_notice_type); ?> is-dismissible inline piwp-notice" style="margin:0 0 18px;padding:12px 16px"><p><?php echo $fix_notice; ?></p></div>
+    <?php if ($show_settle_banner): ?>
+        <div id="phpinfowp-autofix-status-banner" class="phpinfowp-custom-alert phpinfowp-theme-alert" style="background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #22c55e; border-radius:8px; padding:13px 18px; margin:0 0 20px; display:flex; justify-content:space-between; align-items:flex-start; gap:14px; box-shadow:0 1px 3px rgba(0,0,0,0.02); transition:opacity 0.2s ease, transform 0.2s ease;">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                <span class="dashicons dashicons-yes-alt" style="color:#16a34a; font-size:22px; width:22px; height:22px; flex-shrink:0; margin-top:2px;"></span>
+                <div style="flex:1; color:#166534; font-size:13px; line-height:1.6;">
+                    <?php echo $settle_banner_html; ?>
+                </div>
+            </div>
+            <button type="button" id="phpinfowp-autofix-dismiss-btn" title="<?php esc_attr_e('Dismiss notice', 'phpinfo-wp'); ?>" aria-label="<?php esc_attr_e('Dismiss notice', 'phpinfo-wp'); ?>" style="background:transparent; border:none; color:#166534; cursor:pointer; padding:4px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; line-height:1; transition:all 0.15s ease; flex-shrink:0; margin-top:1px;" onmouseover="this.style.background='rgba(22,101,52,0.12)'; this.style.color='#14532d';" onmouseout="this.style.background='transparent'; this.style.color='#166534';">
+                <span class="dashicons dashicons-no-alt" style="font-size:18px; width:18px; height:18px;"></span>
+            </button>
+        </div>
+        <script>
+        (function() {
+            var banner = document.getElementById('phpinfowp-autofix-status-banner');
+            if (!banner) return;
+
+            var settleUntil = <?php echo (int) $settle_until_ts; ?>;
+            var storageKey  = 'piwp_dismiss_autofix_until';
+
+            var savedUntil = parseInt(localStorage.getItem(storageKey) || '0', 10);
+            if (savedUntil >= settleUntil) {
+                banner.style.display = 'none';
+                return;
+            }
+
+            var dismissBtn = document.getElementById('phpinfowp-autofix-dismiss-btn');
+            if (dismissBtn) {
+                dismissBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    banner.style.opacity = '0';
+                    banner.style.transform = 'translateY(-4px)';
+                    setTimeout(function() {
+                        if (banner.parentNode) banner.parentNode.removeChild(banner);
+                    }, 200);
+
+                    localStorage.setItem(storageKey, String(settleUntil));
+
+                    if (window.fetch && typeof ajaxurl !== 'undefined') {
+                        var formData = new FormData();
+                        formData.append('action', 'phpinfowp_dismiss_autofix_notice');
+                        formData.append('until', String(settleUntil));
+                        formData.append('nonce', '<?php echo esc_js(wp_create_nonce("phpinfowp_dismiss_autofix_notice")); ?>');
+                        fetch(ajaxurl, { method: 'POST', body: formData, credentials: 'same-origin' });
+                    }
+                });
+            }
+
+            var remaining = <?php echo (int) $settle_left; ?>;
+            var timerEls  = banner.querySelectorAll('.piwp-autofix-countdown-time');
+            if (timerEls.length && remaining > 0) {
+                var countdownTimer = setInterval(function() {
+                    remaining--;
+                    if (remaining <= 0) {
+                        clearInterval(countdownTimer);
+                        timerEls.forEach(function(el) {
+                            el.textContent = 'clearing now...';
+                        });
+                    } else {
+                        var text = remaining > 60
+                            ? Math.ceil(remaining / 60) + ' minutes'
+                            : remaining + ' seconds';
+                        timerEls.forEach(function(el) {
+                            el.textContent = text;
+                        });
+                    }
+                }, 1000);
+            }
+        })();
+        </script>
+    <?php elseif ($fix_notice): ?>
+        <?php
+        $is_err = ($fix_notice_type === 'error');
+        $bg_c   = $is_err ? '#fef2f2' : '#f0fdf4';
+        $brd_c  = $is_err ? '#fca5a5' : '#bbf7d0';
+        $lft_c  = $is_err ? '#ef4444' : '#22c55e';
+        $txt_c  = $is_err ? '#991b1b' : '#166534';
+        $icn_c  = $is_err ? '#ef4444' : '#16a34a';
+        $icon   = $is_err ? 'dashicons-dismiss' : 'dashicons-yes-alt';
+        ?>
+        <div id="phpinfowp-onetime-notice" class="phpinfowp-custom-alert phpinfowp-theme-alert <?php echo $is_err ? 'is-error' : ''; ?>" style="background:<?php echo $bg_c; ?>; border:1px solid <?php echo $brd_c; ?>; border-left:4px solid <?php echo $lft_c; ?>; border-radius:8px; padding:13px 18px; margin:0 0 20px; display:flex; justify-content:space-between; align-items:flex-start; gap:14px; box-shadow:0 1px 3px rgba(0,0,0,0.02); transition:opacity 0.2s ease, transform 0.2s ease;">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                <span class="dashicons <?php echo $icon; ?>" style="color:<?php echo $icn_c; ?>; font-size:22px; width:22px; height:22px; flex-shrink:0; margin-top:2px;"></span>
+                <div style="flex:1; color:<?php echo $txt_c; ?>; font-size:13px; line-height:1.6;">
+                    <?php echo $fix_notice; ?>
+                </div>
+            </div>
+            <button type="button" id="phpinfowp-onetime-dismiss-btn" title="<?php esc_attr_e('Dismiss notice', 'phpinfo-wp'); ?>" aria-label="<?php esc_attr_e('Dismiss notice', 'phpinfo-wp'); ?>" style="background:transparent; border:none; color:<?php echo $txt_c; ?>; cursor:pointer; padding:4px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; line-height:1; transition:all 0.15s ease; flex-shrink:0; margin-top:1px;" onmouseover="this.style.background='rgba(0,0,0,0.06)';" onmouseout="this.style.background='transparent';">
+                <span class="dashicons dashicons-no-alt" style="font-size:18px; width:18px; height:18px;"></span>
+            </button>
+        </div>
+        <script>
+        (function() {
+            var btn = document.getElementById('phpinfowp-onetime-dismiss-btn');
+            var banner = document.getElementById('phpinfowp-onetime-notice');
+            if (btn && banner) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    banner.style.opacity = '0';
+                    banner.style.transform = 'translateY(-4px)';
+                    setTimeout(function() {
+                        if (banner.parentNode) banner.parentNode.removeChild(banner);
+                    }, 200);
+                });
+            }
+        })();
+        </script>
     <?php endif; ?>
 
     <?php
@@ -329,9 +469,12 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
             </div>
         <?php endif; ?>
     <?php elseif (!empty($unwritten_keys) && !$target_writable): ?>
-        <div class="notice notice-warning inline piwp-notice" style="margin:0 0 18px"><p>
-            <strong><?php _e('Auto-fix unavailable:', 'phpinfo-wp'); ?></strong> Your site root or <code><?php echo esc_html(basename($target_info['file'])); ?></code> is not writable by PHP. Fix permissions, or apply the recommended values manually via the <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-htaccess')); ?>">PHP Config editor</a>.
-        </p></div>
+        <div class="phpinfowp-custom-alert phpinfowp-theme-alert" style="background:#fffbeb; border:1px solid #fef3c7; border-left:4px solid #f59e0b; border-radius:8px; padding:12px 18px; margin:0 0 20px; display:flex; align-items:flex-start; gap:12px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+            <span class="dashicons dashicons-warning" style="color:#d97706; font-size:22px; width:22px; height:22px; flex-shrink:0; margin-top:2px;"></span>
+            <div style="flex:1; color:#92400e; font-size:13px; line-height:1.6;">
+                <strong><?php _e('Auto-fix unavailable:', 'phpinfo-wp'); ?></strong> <?php printf(__('Your site root or <code>%s</code> is not writable by PHP. Fix permissions, or apply the recommended values manually via the <a href="%s" style="color:#b45309; font-weight:600; text-decoration:underline;">PHP Config editor</a>.', 'phpinfo-wp'), esc_html(basename($target_info['file'])), esc_url(admin_url('admin.php?page=piwp-htaccess'))); ?>
+            </div>
+        </div>
     <?php endif; ?>
 
 
@@ -985,6 +1128,22 @@ $overrides       = Phpinfo_WP_Config_Grader_Fixer::detect_overrides();
 </div>
 
 <style>
+.phpinfowp-theme-alert code {
+    background: rgba(22, 101, 52, 0.08) !important;
+    color: #14532d !important;
+    border: 1px solid rgba(22, 101, 52, 0.2) !important;
+    padding: 1px 6px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    display: inline-block !important;
+    line-height: 1.4 !important;
+}
+.phpinfowp-theme-alert.is-error code {
+    background: rgba(239, 68, 68, 0.08) !important;
+    color: #991b1b !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+}
 .phpinfowp-modal {
     opacity: 0;
     pointer-events: none;

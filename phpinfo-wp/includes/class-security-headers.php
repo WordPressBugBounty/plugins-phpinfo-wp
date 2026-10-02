@@ -182,7 +182,7 @@ class Phpinfo_WP_Security_Headers {
         }
         $result = self::audit();
         if (!isset($result['error'])) {
-            set_transient('phpinfowp_sec_headers', $result, HOUR_IN_SECONDS);
+            set_transient('phpinfowp_sec_headers', $result, DAY_IN_SECONDS);
         }
         return $result;
     }
@@ -304,24 +304,32 @@ class Phpinfo_WP_Security_Headers {
         // 4. VERIFY SITE SAFETY VIA LOOPBACK HTTP TEST
         $verify = self::verify_site();
         if (!$verify['ok']) {
-            // AUTOMATIC ROLLBACK
-            if ($wrote_htaccess && $orig_htaccess !== null && $htaccess_path) {
-                @file_put_contents($htaccess_path, $orig_htaccess);
-            } elseif ($wrote_htaccess && $orig_htaccess === null && $htaccess_path) {
-                @unlink($htaccess_path);
-            }
-            update_option(self::OPT_ENABLED, $orig_option);
-            self::bust_cache();
+            $is_fatal_server_error = $verify['code'] >= 500;
+            $should_rollback       = $is_fatal_server_error || ($wrote_htaccess && $verify['code'] === 0);
 
-            return [
-                'ok' => false,
-                'error' => sprintf(__('Site safety check failed (HTTP %s). All security header rules were automatically rolled back to prevent downtime.', 'phpinfo-wp'), esc_html($verify['code'] ?? 'Error')),
-            ];
+            if ($should_rollback) {
+                // AUTOMATIC ROLLBACK
+                if ($wrote_htaccess && $orig_htaccess !== null && $htaccess_path) {
+                    @file_put_contents($htaccess_path, $orig_htaccess);
+                } elseif ($wrote_htaccess && $orig_htaccess === null && $htaccess_path) {
+                    @unlink($htaccess_path);
+                }
+                update_option(self::OPT_ENABLED, $orig_option);
+                self::bust_cache();
+
+                return [
+                    'ok' => false,
+                    'error' => sprintf(__('Site safety check failed (HTTP %s). All security header rules were automatically rolled back to prevent downtime.', 'phpinfo-wp'), esc_html((string) $verify['code'])),
+                ];
+            }
         }
 
         // 5. Success! Bust cache and re-audit
         self::bust_cache();
-        $audit = self::get_cached();
+        $audit = self::audit();
+        if (!isset($audit['error'])) {
+            set_transient('phpinfowp_sec_headers', $audit, DAY_IN_SECONDS);
+        }
 
         return [
             'ok'      => true,
@@ -347,6 +355,10 @@ class Phpinfo_WP_Security_Headers {
 
         delete_option(self::OPT_ENABLED);
         self::bust_cache();
+        $audit = self::audit();
+        if (!isset($audit['error'])) {
+            set_transient('phpinfowp_sec_headers', $audit, DAY_IN_SECONDS);
+        }
 
         return [
             'ok'      => true,
@@ -357,29 +369,27 @@ class Phpinfo_WP_Security_Headers {
     private static function verify_site(): array {
         $url = home_url('/');
         $resp = wp_remote_head($url, [
-            'timeout'     => 8,
+            'timeout'     => 10,
             'sslverify'   => false,
-            'redirection' => 3,
+            'redirection' => 5,
         ]);
 
         if (is_wp_error($resp)) {
             $resp = wp_remote_get($url, [
-                'timeout'     => 8,
+                'timeout'     => 10,
                 'sslverify'   => false,
-                'redirection' => 3,
+                'redirection' => 5,
             ]);
         }
 
         if (is_wp_error($resp)) {
-            return ['ok' => false, 'code' => $resp->get_error_message()];
+            // Loopback request failed (firewall, hairpin NAT, DNS, or timeout on host)
+            return ['ok' => false, 'code' => 0, 'err' => $resp->get_error_message()];
         }
 
         $code = (int) wp_remote_retrieve_response_code($resp);
-        if ($code >= 500 || $code === 0) {
-            return ['ok' => false, 'code' => (string) $code];
-        }
-
-        return ['ok' => true, 'code' => (string) $code];
+        // 500-range is fatal; anything else (200, 3xx, even 401/403) is fine
+        return ['ok' => $code < 500, 'code' => $code];
     }
 
     /* ── AJAX Endpoints ─────────────────────────────────────────────────── */

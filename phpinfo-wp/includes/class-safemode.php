@@ -2,25 +2,7 @@
 defined('ABSPATH') or die('Unauthorized Access');
 
 /**
- * Troubleshooting Mode (Safemode) — the Health Check killer feature.
- *
- * - Per-user: only the admin who started a session sees plugins disabled
- *   (cookie scoped to them). Other visitors see the site normally.
- * - Time-limited: cookies and transients expire after the chosen duration.
- *   Default 1 hour, max 4 hours.
- * - Fully reversible: nothing in the database is ever modified. The actual
- *   active_plugins option is never touched. Filters do the work at runtime.
- * - mu-plugin drop: installs a tiny must-use plugin at session start so the
- *   filter fires before regular plugins load (true code-level isolation).
- *   Without the mu-plugin we fall back to "admin-pages only" isolation which
- *   is still useful for debugging the dashboard.
- * - Explicit exit: an "End and restore" button kills the cookie + transient.
- *   Even if the user closes the browser, the session expires on its own.
- *
- * The famous Health Check bug — "exited troubleshooting and all my plugins
- * stayed disabled" — cannot happen here because we never deactivate plugins
- * in the database. Worst-case (cookie stuck, no UI access) the user clears
- * cookies and everything is back to normal.
+ * Troubleshooting Mode (Safemode).
  */
 class Phpinfo_WP_Safemode {
 

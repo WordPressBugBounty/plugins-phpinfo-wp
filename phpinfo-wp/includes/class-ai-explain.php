@@ -74,28 +74,39 @@ class Phpinfo_WP_AI_Explain {
                     $context
                 );
             case 'config_issue':
+            case 'config_grader':
                 return sprintf(
                     'A WordPress site has the PHP directive `%s` currently set to `%s`. Explain in 3–4 short sentences why this value is below the recommended setting, the user-visible symptom (e.g. uploads failing, builder breaking), and the safest way to fix it on a shared host. Plain text, no markdown.',
                     $context, $value !== '' ? $value : '(not set)'
                 );
             case 'header':
+            case 'security_header':
                 return sprintf(
                     'Explain the HTTP security header `%s` for a WordPress site. Cover: what it protects against, a sensible recommended value, and the realistic risk of leaving it off. Use 3–4 short sentences. Plain text, no markdown.',
                     $context
                 );
             case 'extension':
+            case 'php_extension':
                 return sprintf(
                     'Explain the PHP extension `%s` in the context of a WordPress site. Cover: what it provides, common plugins that need it, and the symptom when it is missing. Use 3–4 short sentences. Plain text, no markdown.',
                     $context
                 );
+            case 'update_guard':
             case 'core_deprecation':
             case 'update_break':
-                // $context = API name / component, $value = file:line or target version.
+                // $context = API name or risk signal, $value = file:line, label or detail.
                 return sprintf(
-                    'A WordPress plugin or theme calls `%s` (referenced at `%s`), which is flagged when auditing against modern WordPress. Explain in 3–4 short sentences: what this API was, why it is deprecated or removed in modern WordPress, the realistic symptom on the site after an update, and the modern replacement. Plain text, no markdown.',
-                    $context, $value !== '' ? $value : 'plugin code'
+                    'A WordPress update risk was flagged for "%s"%s. Explain in 3–4 short sentences: what this risk means for the site, the realistic symptom if an update proceeds (e.g. fatal error, broken layout, or white screen), and the safest recommended action. Plain text, no markdown.',
+                    $context, $value !== '' ? ' (' . $value . ')' : ''
                 );
             default:
+                if (!empty($context)) {
+                    return sprintf(
+                        'In the context of WordPress site health and server configuration, explain "%s"%s. Explain in 3–4 short sentences what this means, why it matters, and what action (if any) the site administrator should take. Plain text, no markdown.',
+                        $context,
+                        $value !== '' ? ' (details: ' . $value . ')' : ''
+                    );
+                }
                 return '';
         }
     }

@@ -55,7 +55,14 @@ $db       = $is_pro ? Phpinfo_WP_DB_Health::server_info() : null;
     <h2 class="phpinfowp-section-heading" style="margin-top:28px"><?php _e('Per-site health', 'phpinfo-wp'); ?></h2>
 
     <?php if (!$is_pro): ?>
-        <div class="notice notice-info inline"><p>Per-site autoload analysis requires a Pro license. <a href="<?php echo esc_url(network_admin_url('admin.php?page=piwp-network')); ?>">Activate one</a>.</p></div>
+        <div class="phpinfowp-custom-alert is-info" style="margin-bottom:20px;">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                <span class="dashicons dashicons-info-outline"></span>
+                <div class="phpinfowp-custom-alert-body">
+                    <p><?php printf(__('Per-site autoload analysis requires a Pro license. <a href="%s" style="font-weight:600; text-decoration:underline;">Activate one</a>.', 'phpinfo-wp'), esc_url(network_admin_url('admin.php?page=piwp-network'))); ?></p>
+                </div>
+            </div>
+        </div>
     <?php endif; ?>
 
     <?php

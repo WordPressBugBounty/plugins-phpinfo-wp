@@ -53,7 +53,18 @@ $next_cron = wp_next_scheduled('phpinfowp_weekly_maintenance');
 
 
     <?php if ($message): ?>
-        <div class="notice notice-<?php echo $msg_type; ?> inline is-dismissible" style="margin:0 0 20px"><p><?php echo esc_html($message); ?></p></div>
+        <?php
+        $is_err = ($msg_type === 'error');
+        $cls    = $is_err ? 'is-error' : 'is-success';
+        $icon   = $is_err ? 'dashicons-dismiss' : 'dashicons-yes-alt';
+        ?>
+        <div class="phpinfowp-custom-alert <?php echo $cls; ?>" style="margin:0 0 20px">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex:1;">
+                <span class="dashicons <?php echo $icon; ?>"></span>
+                <div class="phpinfowp-custom-alert-body"><p><?php echo esc_html($message); ?></p></div>
+            </div>
+            <button type="button" class="phpinfowp-alert-dismiss-btn" onclick="this.closest('.phpinfowp-custom-alert').remove();" title="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>" aria-label="<?php esc_attr_e('Dismiss', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-no-alt"></span></button>
+        </div>
     <?php endif; ?>
 
     <?php if ($is_free_preview): ?>

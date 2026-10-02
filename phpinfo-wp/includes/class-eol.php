@@ -69,7 +69,7 @@ class Phpinfo_WP_EOL {
         }
 
         printf(
-            '<div class="notice notice-%s is-dismissible"><p><strong>phpinfo() WP:</strong> %s</p></div>',
+            '<div class="notice notice-%s is-dismissible piwp-notice"><p><strong>phpinfo() WP:</strong> %s</p></div>',
             $type, $msg
         );
     }

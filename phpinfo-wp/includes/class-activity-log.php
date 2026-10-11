@@ -4,7 +4,7 @@ defined('ABSPATH') or die('Unauthorized Access');
 class Phpinfo_WP_Activity_Log {
 
     const DB_VERSION_OPT = 'phpinfowp_activity_log_db_ver';
-    const DB_VERSION     = '1.0.1';
+    const DB_VERSION     = '1.0.2';
     const RETENTION_OPT  = 'phpinfowp_activity_log_retention';
     const DEFAULT_RETENTION_DAYS = 60;
 
@@ -28,6 +28,12 @@ class Phpinfo_WP_Activity_Log {
         return $wpdb->prefix . 'phpinfowp_activity_log';
     }
 
+    public static function table_exists(): bool {
+        global $wpdb;
+        $table_name = self::table_name();
+        return $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name;
+    }
+
     public static function init(): void {
         self::maybe_create_table();
         self::register_hooks();
@@ -35,12 +41,20 @@ class Phpinfo_WP_Activity_Log {
     }
 
     public static function maybe_create_table(): void {
-        if (get_option(self::DB_VERSION_OPT) === self::DB_VERSION) {
+        global $wpdb;
+        $table_name = self::table_name();
+
+        static $installed = false;
+        if ($installed) {
             return;
         }
 
-        global $wpdb;
-        $table_name      = self::table_name();
+        $table_exists = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name);
+        if ($table_exists && get_option(self::DB_VERSION_OPT) === self::DB_VERSION) {
+            $installed = true;
+            return;
+        }
+
         $charset_collate = $wpdb->get_charset_collate();
 
         $sql = "CREATE TABLE {$table_name} (
@@ -68,10 +82,18 @@ class Phpinfo_WP_Activity_Log {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
-        // Clean any noisy auto-drafts / global styles logged during initial setup
-        $wpdb->query("DELETE FROM {$table_name} WHERE object_name LIKE '%Auto Draft%' OR object_name LIKE '%Global Styles%' OR object_name LIKE '%(Untitled%'");
+        // Fallback in case dbDelta did not execute or failed silently
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) !== $table_name) {
+            $wpdb->query($sql);
+        }
 
-        update_option(self::DB_VERSION_OPT, self::DB_VERSION, false);
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name) {
+            // Clean any noisy auto-drafts / global styles logged during initial setup
+            $wpdb->query("DELETE FROM {$table_name} WHERE object_name LIKE '%Auto Draft%' OR object_name LIKE '%Global Styles%' OR object_name LIKE '%(Untitled%'");
+
+            update_option(self::DB_VERSION_OPT, self::DB_VERSION, false);
+            $installed = true;
+        }
     }
 
     public static function log(
@@ -83,8 +105,14 @@ class Phpinfo_WP_Activity_Log {
         ?int $user_id = null,
         string $object_id = ''
     ): bool {
+        self::maybe_create_table();
+
         global $wpdb;
         $table_name = self::table_name();
+
+        if (!self::table_exists()) {
+            return false;
+        }
 
         if ($user_id === null) {
             $user_id = get_current_user_id();
@@ -642,6 +670,8 @@ class Phpinfo_WP_Activity_Log {
 
     // --- Querying & Pagination ---
     public static function get_logs(array $args = []): array {
+        self::maybe_create_table();
+
         global $wpdb;
         $table_name = self::table_name();
 
@@ -659,6 +689,16 @@ class Phpinfo_WP_Activity_Log {
         ];
 
         $r = wp_parse_args($args, $defaults);
+
+        if (!self::table_exists()) {
+            return [
+                'items'       => [],
+                'total'       => 0,
+                'total_pages' => 0,
+                'paged'       => max(1, (int) $r['paged']),
+                'per_page'    => max(1, (int) $r['per_page']),
+            ];
+        }
 
         $where = ['1=1'];
         $params = [];
@@ -732,8 +772,14 @@ class Phpinfo_WP_Activity_Log {
     }
 
     public static function get_category_counts(): array {
+        self::maybe_create_table();
+
         global $wpdb;
         $table_name = self::table_name();
+
+        if (!self::table_exists()) {
+            return ['all' => 0];
+        }
 
         $rows = $wpdb->get_results("SELECT category, COUNT(*) as count FROM {$table_name} GROUP BY category", ARRAY_A);
         $counts = ['all' => 0];
@@ -760,6 +806,10 @@ class Phpinfo_WP_Activity_Log {
         global $wpdb;
         $table_name = self::table_name();
 
+        if (!self::table_exists()) {
+            return 0;
+        }
+
         if ($days <= 0) {
             $days = (int) get_option(self::RETENTION_OPT, self::DEFAULT_RETENTION_DAYS);
         }
@@ -776,8 +826,14 @@ class Phpinfo_WP_Activity_Log {
             wp_die(__('Unauthorized.', 'phpinfo-wp'));
         }
 
+        self::maybe_create_table();
+
         global $wpdb;
         $table_name = self::table_name();
+
+        if (!self::table_exists()) {
+            wp_die(__('Activity log table does not exist.', 'phpinfo-wp'));
+        }
 
         $category = sanitize_text_field($_GET['category'] ?? '');
         $severity = sanitize_text_field($_GET['severity'] ?? '');

@@ -78,6 +78,9 @@ class Phpinfo_WP_Whats_New_Notice {
             '8.0.3' => [
                 'headline' => 'phpinfo() WP 8.0.3 — Server Intelligence & Security Suite',
             ],
+            '8.0.4' => [
+                'headline' => 'phpinfo() WP 8.0.4 — Server Intelligence & Security Suite',
+            ],
         ];
 
         if (!isset($catalog[PHPINFOWP_VERSION])) return;

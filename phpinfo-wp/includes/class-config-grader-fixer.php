@@ -127,6 +127,8 @@ class Phpinfo_WP_Config_Grader_Fixer {
      * Apply one or more fixes. Returns ['ok' => bool, 'applied' => [keys], 'skipped' => [...], 'error' => ?string].
      */
     public static function apply(array $keys): array {
+        $pre = apply_filters('phpinfowp_pre_autofix_apply', null, $keys);
+        if ($pre !== null) return $pre;
         if (!self::_pro()) {
             return ['ok' => false, 'error' => 'Pro license required for one-click fixes.'];
         }
@@ -367,6 +369,8 @@ class Phpinfo_WP_Config_Grader_Fixer {
     }
 
     public static function detect_overrides(): array {
+        $filtered = apply_filters('phpinfowp_detect_overrides', null);
+        if ($filtered !== null) return $filtered;
         // While a write is still propagating, ini_get() is stale by definition —
         // reporting "not taking effect" here is a false alarm. Stay quiet.
         if (self::settle_remaining() > 0) return [];
@@ -420,6 +424,8 @@ class Phpinfo_WP_Config_Grader_Fixer {
      * Selectively reverts only specific directives from the autofix block on disk.
      */
     public static function revert_keys(array $keys_to_revert): array {
+        $pre = apply_filters('phpinfowp_pre_autofix_revert_keys', null, $keys_to_revert);
+        if ($pre !== null) return $pre;
         if (!self::_pro()) return ['ok' => false, 'error' => 'Pro license required.'];
         $t = self::detect_target();
         if (!@is_writable($t['file'])) return ['ok' => false, 'error' => 'Config file not writable.'];
@@ -456,6 +462,8 @@ class Phpinfo_WP_Config_Grader_Fixer {
     }
 
     public static function revert_all(): array {
+        $pre = apply_filters('phpinfowp_pre_autofix_revert_all', null);
+        if ($pre !== null) return $pre;
         if (!self::_pro()) return ['ok' => false, 'error' => 'Pro license required.'];
         $t = self::detect_target();
         if (!@is_writable($t['file'])) return ['ok' => false, 'error' => 'Config file not writable.'];
@@ -481,6 +489,8 @@ class Phpinfo_WP_Config_Grader_Fixer {
      * Return map of directives currently written in the autofix block on disk.
      */
     public static function get_managed_directives(): array {
+        $filtered = apply_filters('phpinfowp_managed_directives', null);
+        if ($filtered !== null) return $filtered;
         $t = self::detect_target();
         if (!@file_exists($t['file'])) return [];
         return self::extract_all_configured((string) @file_get_contents($t['file']), $t['mode']);

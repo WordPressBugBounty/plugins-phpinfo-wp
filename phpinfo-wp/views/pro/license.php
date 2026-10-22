@@ -8,7 +8,8 @@ $key       = Phpinfo_WP_License::get_key();
 $message   = '';
 $msg_type  = 'success';
 
-if (isset($_POST['phpinfowp_license_action']) && check_admin_referer('phpinfowp_license_nonce')) {
+$nonce_field = isset($_POST['phpinfowp_license_nonce']) ? 'phpinfowp_license_nonce' : (isset($_POST['_wpnonce']) ? '_wpnonce' : '');
+if (isset($_POST['phpinfowp_license_action']) && $nonce_field && check_admin_referer('phpinfowp_license_nonce', $nonce_field)) {
     $action = sanitize_text_field($_POST['phpinfowp_license_action']);
 
     if ($action === 'activate' && !empty($_POST['license_key'])) {
@@ -21,9 +22,7 @@ if (isset($_POST['phpinfowp_license_action']) && check_admin_referer('phpinfowp_
             $is_locked = false;
             $key       = $submitted;
         } else {
-            if ($reason === 'v1_deprecated') {
-                $message = __('Activation failed: Legacy v1 license keys can no longer be activated. Please contact <a href="mailto:support@exeebit.com">support@exeebit.com</a> for an updated v2 key.', 'phpinfo-wp');
-            } elseif ($reason === 'site_limit_exceeded') {
+            if ($reason === 'site_limit_exceeded') {
                 $message = __('Activation failed: This license has reached its maximum site limit. Upgrade your license or deactivate another site.', 'phpinfo-wp');
             } elseif ($reason === 'revoked' || $reason === 'refunded' || $reason === 'disputed') {
                 $message = __('Activation failed: This license has been revoked or refunded. Contact <a href="mailto:support@exeebit.com">support@exeebit.com</a>.', 'phpinfo-wp');
@@ -155,15 +154,6 @@ $pillars = [
         <?php endif; ?>
     <?php endif; ?>
 
-    <?php if ($is_valid && Phpinfo_WP_License::is_legacy()): ?>
-        <div class="phpinfowp-license-alert is-warning" style="margin:0 0 20px">
-            <span class="dashicons dashicons-info"></span>
-            <div class="phpinfowp-license-alert-content">
-                <strong><?php _e('Legacy License Notice:', 'phpinfo-wp'); ?></strong>
-                <?php _e('You are using a legacy v1 license key. All Pro features remain fully active on this site. Your license key will be updated automatically and your new key will be sent to your email. No action is required on your part.', 'phpinfo-wp'); ?>
-            </div>
-        </div>
-    <?php endif; ?>
 
     <!-- License status card -->
     <div class="phpinfowp-license-card <?php echo $is_valid ? 'is-active' : 'is-inactive'; ?>">
@@ -188,6 +178,9 @@ $pillars = [
             <div class="phpinfowp-license-key-display">
                 <span class="phpinfowp-license-key-label"><?php _e('License key', 'phpinfo-wp'); ?></span>
                 <code><?php echo esc_html(substr($key, 0, 12) . str_repeat('•', 20)); ?></code>
+                <?php if (Phpinfo_WP_License::is_constant_defined()): ?>
+                    <span style="display:inline-block;margin-left:8px;padding:2px 8px;font-size:11px;font-weight:600;border-radius:4px;background:#e0f2fe;color:#0369a1;vertical-align:middle;">wp-config.php</span>
+                <?php endif; ?>
             </div>
             <?php if ($meta): ?>
                 <div class="phpinfowp-license-meta">
@@ -214,11 +207,17 @@ $pillars = [
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
-            <form id="phpinfowp-license-deactivate-form" method="post" style="margin-top:14px">
-                <?php wp_nonce_field('phpinfowp_license_nonce'); ?>
-                <input type="hidden" name="phpinfowp_license_action" value="deactivate">
-                <button type="button" class="button button-secondary" id="phpinfowp-license-deactivate-btn"><?php _e('Deactivate License', 'phpinfo-wp'); ?></button>
-            </form>
+            <?php if (Phpinfo_WP_License::is_constant_defined()): ?>
+                <p class="description" style="margin-top:14px;color:#50575e;">
+                    <?php _e('This license is defined in <code>wp-config.php</code> via <code>PHPINFOWP_LICENSE_KEY</code>. To deactivate or change it, edit your <code>wp-config.php</code> file.', 'phpinfo-wp'); ?>
+                </p>
+            <?php else: ?>
+                <form id="phpinfowp-license-deactivate-form" method="post" style="margin-top:14px">
+                    <?php wp_nonce_field('phpinfowp_license_nonce'); ?>
+                    <input type="hidden" name="phpinfowp_license_action" value="deactivate">
+                    <button type="button" class="button button-secondary" id="phpinfowp-license-deactivate-btn"><?php _e('Deactivate License', 'phpinfo-wp'); ?></button>
+                </form>
+            <?php endif; ?>
 
             <!-- License deactivation retention modal. Reuses .phpinfowp-dm CSS
                  from the Plugins-screen modal (same look). Only renders when
@@ -371,8 +370,18 @@ $pillars = [
                         method: 'POST',
                         body: data
                     })
-                    .then(function(r) { return r.json(); })
+                    .then(function(r) {
+                        if (r.status === 403 || r.status >= 500) {
+                            form.submit();
+                            return null;
+                        }
+                        return r.json().catch(function() {
+                            form.submit();
+                            return null;
+                        });
+                    })
                     .then(function(res) {
+                        if (!res) return;
                         if (res && res.success) {
                             msgBox.className = 'phpinfowp-license-alert is-success';
                             msgBox.innerHTML = '<span class="dashicons dashicons-yes-alt"></span><div class="phpinfowp-license-alert-content"><strong><?php echo esc_js(__('Success!', 'phpinfo-wp')); ?></strong> ' + (res.data.message || '<?php echo esc_js(__('License activated! Reloading...', 'phpinfo-wp')); ?>') + '</div>';
@@ -394,11 +403,7 @@ $pillars = [
                         }
                     })
                     .catch(function() {
-                        msgBox.className = 'phpinfowp-license-alert is-error';
-                        msgBox.innerHTML = '<span class="dashicons dashicons-warning"></span><div class="phpinfowp-license-alert-content"><strong><?php echo esc_js(__('Connection error', 'phpinfo-wp')); ?></strong><?php echo esc_js(__('Connection error. Please try again.', 'phpinfo-wp')); ?></div>';
-                        msgBox.style.display = 'flex';
-                        btn.disabled = false;
-                        btn.innerHTML = origText;
+                        form.submit();
                     });
                 });
             })();

@@ -101,6 +101,24 @@ foreach ($sysinfo as $k => $v) {
         </div>
     </div>
 
+    <!-- Documentation & Knowledge Base Banner -->
+    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:18px 22px; margin-top:20px; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:8px; background:#eff6ff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <span class="dashicons dashicons-book-alt" style="font-size:22px; width:22px; height:22px; color:#2563eb; line-height:1;"></span>
+            </div>
+            <div>
+                <h3 style="margin:0 0 3px; font-size:15px; font-weight:700; color:#1e293b;"><?php _e('Official Documentation & Guides', 'phpinfo-wp'); ?></h3>
+                <p style="margin:0; font-size:13px; color:#64748b; line-height:1.4;">
+                    <?php _e('Explore detailed walkthroughs, WP-CLI automation recipes, security audits, and server tuning best practices.', 'phpinfo-wp'); ?>
+                </p>
+            </div>
+        </div>
+        <a href="https://exeebit.com/phpinfo-wp/docs" target="_blank" rel="noopener noreferrer" class="button button-secondary" style="height:34px; line-height:32px; padding:0 16px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;">
+            <?php _e('Browse Documentation', 'phpinfo-wp'); ?> <span class="dashicons dashicons-external" style="font-size:15px; width:15px; height:15px; vertical-align:middle; line-height:1;"></span>
+        </a>
+    </div>
+
     <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; align-items:flex-start;">
 
         <!-- System Info Card (Visible to all users) -->

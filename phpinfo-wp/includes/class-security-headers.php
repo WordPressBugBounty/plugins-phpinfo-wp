@@ -184,7 +184,7 @@ class Phpinfo_WP_Security_Headers {
         if (!isset($result['error'])) {
             set_transient('phpinfowp_sec_headers', $result, DAY_IN_SECONDS);
         }
-        return $result;
+        return apply_filters('phpinfowp_sec_headers_scan', $result);
     }
 
     public static function get_cached(): ?array {
@@ -268,6 +268,8 @@ class Phpinfo_WP_Security_Headers {
      * Applies security headers with automatic loopback verification and rollback on error.
      */
     public static function autofix(?array $keys_to_fix = null): array {
+        $pre = apply_filters('phpinfowp_pre_sec_headers_autofix', null, $keys_to_fix);
+        if ($pre !== null) return $pre;
         if (!self::_pro()) {
             return ['ok' => false, 'error' => __('Pro license required.', 'phpinfo-wp')];
         }
@@ -342,6 +344,8 @@ class Phpinfo_WP_Security_Headers {
      * Reverts all applied security header rules.
      */
     public static function revert(): array {
+        $pre = apply_filters('phpinfowp_pre_sec_headers_revert', null);
+        if ($pre !== null) return $pre;
         if (!self::_pro()) {
             return ['ok' => false, 'error' => __('Pro license required.', 'phpinfo-wp')];
         }

@@ -17,37 +17,6 @@ class Phpinfo_WP_License {
     private const ED25519_PUB = 'IQLJxAElu4pgVtSoh1KB7aZ4GIUrmJpxaQOu0/gL7Sc=';
 
     private const KEY_V2 = 'PIWP2';
-    private const KEY_V1 = 'PIWP';
-
-    private const LEGACY_HASHES = [
-        '3f5ebdcd40421825ec3dbe7d4cd7b17ca0e522d602bb3eb97148cc9be50e5d7f',
-        'f99081ab8dd5a07aff31f46b4682ed4b9fc0206fef5c97813bbed7ff768ed711',
-        'c580df0d5b85b9d06900c6822758f7aa2c3c4a75b66917f2b8c0d4c7bbde9040',
-        'b067fa89a56cf20abb8e01c99b3fd6ad5a369aa6009e1bfab3e712a42e7d4f80',
-        '38b6e55453d3808fd7c32a9c421c3155a42dd802a3eeb9bf4106e2c7cd645e90',
-        '7b07d4d3de2d47d9b4c9c14e96b5408eec9020e07550040857bc5ad8472eb9a3',
-        '52e401e02bf8e9e2f0df17920fa8abb7748c9defd965b578dbb3b4daf474f6f6',
-        '9295077561d76890959ab4384ad5f36e651929fbd5a8f10c1163b40be5be8de4',
-        '4589ae366afb8506f74bae1c8389438b08f1716d073a0cbbd5937e655cfc24c5',
-        '8d2b34a8e8451dcd7db33ea849567e864665e9be9626e59fec8c218819edf19c',
-        '012ef14e44d3ea9daa44f1b95d26ca76645c9d202d383f76811bcea0138e96d0',
-        '72f51971ca8d267725752cb19e7a4f80b18a6bb99207b11a51392bdcd8ba0fc6',
-        '04279493a3c0f7e72503c92097c54dd4ba0023958a74ed38ae6a26b0e0e5a53a',
-        'd3e29ab425928fcb781aabeb64448c98e111c164e2d295ac2129fe998d077215',
-        'c6fdc6b4a8a38adcddfe0f27fb1405c757ba4e35fe5c618848c02907d188d677',
-        'dbf0080cd681390a08c570c7661eae9de0b749832a22599f084a0ea86fb46085',
-        'f8b146873ec4c9ad0abe88e283cdfd2d11eb9992e63aa35392d093f61b93f2e9',
-        '722529e43a68a51e4cf16a5a290e8cd40ece5f6cb74d5bc527fbc1f8dded7b68',
-        '70268431aa5594c3a3ea2589eb48e341845a3bf4ac8420392958435c362ff170',
-        'a247102b538f951aaa7795f794c9d17b0424a1065dd7531675e8848dae76788a',
-        '4c91895dd6cba6f0046cbe4ebc7cbc06cb018614317af0474a00ab46270f655b',
-        '6a15c215d92da933cfd5e32ac29de02de399579a6979f3b4ee121ad25defab32',
-        'a0e9d95c0550fff716adbf13c12a52440f322e50f964bf1964743c9669579eee',
-        '03de0b034cd26b4a26d76295876c804c85cee14d6742006b60b2bae7889a0f02',
-        'bb6610d5c9d3905880e9f97e2483424cd5c61e5bb6721940dbf2f27285cd3206',
-        '4705d243f6340a291138eaa73afd964ced10ed53fbdf87c2bb42fbc22091d32f',
-        'c4d5822acc40f8549ced81c766212f1fafa12c77ad13cb669981e2bf4c6da34b',
-    ];
 
     private static function _pub_key(): string {
         return self::ED25519_PUB;
@@ -101,7 +70,14 @@ class Phpinfo_WP_License {
 
     // --- Public API ---
 
+    public static function is_constant_defined(): bool {
+        return defined('PHPINFOWP_LICENSE_KEY') && is_string(constant('PHPINFOWP_LICENSE_KEY')) && trim(constant('PHPINFOWP_LICENSE_KEY')) !== '';
+    }
+
     public static function get_key(): string {
+        if (self::is_constant_defined()) {
+            return trim((string) constant('PHPINFOWP_LICENSE_KEY'));
+        }
         return (string) get_option(self::OPT_KEY, '');
     }
 
@@ -110,11 +86,7 @@ class Phpinfo_WP_License {
     }
 
     public static function is_legacy(?string $key = null): bool {
-        $key = $key !== null ? $key : self::get_key();
-        if (empty($key) || substr($key, 0, 5) !== self::KEY_V1 . '-') {
-            return false;
-        }
-        return in_array(hash('sha256', $key), self::LEGACY_HASHES, true);
+        return false;
     }
 
     public static function payload( ?string $key = null ): ?array {
@@ -123,7 +95,7 @@ class Phpinfo_WP_License {
 
         $parts = explode('-', $key, 3);
         if (count($parts) !== 3) return null;
-        if ($parts[0] !== self::KEY_V1 && $parts[0] !== self::KEY_V2) return null;
+        if ($parts[0] !== self::KEY_V2) return null;
 
         $raw = self::_b64url_decode($parts[1]);
         if (!$raw) return null;
@@ -165,9 +137,8 @@ class Phpinfo_WP_License {
             return false;
         }
 
-        $last_check    = (int) get_option(self::OPT_LAST_CHECK, 0);
-        $needs_upgrade = (substr(self::get_key(), 0, 5) === self::KEY_V1 . '-');
-        if ($needs_upgrade || $last_check <= 0 || $last_check > time() + HOUR_IN_SECONDS || (time() - $last_check > DAY_IN_SECONDS)) {
+        $last_check = (int) get_option(self::OPT_LAST_CHECK, 0);
+        if ($last_check <= 0 || $last_check > time() + HOUR_IN_SECONDS || (time() - $last_check > DAY_IN_SECONDS)) {
             if (!wp_next_scheduled('phpinfowp_license_ping_async')) {
                 wp_schedule_single_event(time(), 'phpinfowp_license_ping_async');
             }
@@ -242,7 +213,7 @@ class Phpinfo_WP_License {
             return false;
         }
 
-        if (substr($key, 0, 6) !== self::KEY_V2 . '-' && substr($key, 0, 5) !== self::KEY_V1 . '-') {
+        if (substr($key, 0, 6) !== self::KEY_V2 . '-') {
             $reason = 'invalid_format';
             return false;
         }
@@ -349,9 +320,7 @@ class Phpinfo_WP_License {
                 'message' => __('License activated successfully. Pro features are now unlocked.', 'phpinfo-wp'),
             ]);
         } else {
-            if ($reason === 'v1_deprecated') {
-                $msg = __('Activation failed: Legacy v1 license keys can no longer be activated. Please contact support@exeebit.com for an updated v2 key.', 'phpinfo-wp');
-            } elseif ($reason === 'active_site_conflict') {
+            if ($reason === 'active_site_conflict') {
                 $msg = __('Activation failed: This single-site license is currently active on another domain. Please deactivate it on your other website first before activating here.', 'phpinfo-wp');
             } elseif ($reason === 'domain_migration_limit_reached') {
                 $msg = __('Activation failed: This single-site license has reached its lifetime limit of 2 domains (1 site transfer allowed). Moving to an additional domain is blocked. Please upgrade to an Unlimited license to use this plugin on more sites.', 'phpinfo-wp');
@@ -454,10 +423,6 @@ class Phpinfo_WP_License {
 
         if (substr($key, 0, 6) === self::KEY_V2 . '-') {
             return self::_validate_ed25519($key);
-        }
-
-        if (substr($key, 0, 5) === self::KEY_V1 . '-') {
-            return self::is_legacy($key);
         }
 
         return false;

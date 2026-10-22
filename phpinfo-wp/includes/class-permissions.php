@@ -34,6 +34,8 @@ class Phpinfo_WP_Permissions {
     }
 
     public static function auto_fix(): array {
+        $pre = apply_filters('phpinfowp_pre_perms_auto_fix', null);
+        if ($pre !== null) return $pre;
         if (!self::_pro()) {
             return ['error' => __('Pro license required.', 'phpinfo-wp')];
         }
@@ -213,6 +215,8 @@ class Phpinfo_WP_Permissions {
     }
 
     public static function scan(bool $force_refresh = false): array {
+        $pre = apply_filters('phpinfowp_pre_perms_scan', null);
+        if ($pre !== null) return $pre;
         static $memo = null;
         if (!$force_refresh && $memo !== null) {
             return $memo;

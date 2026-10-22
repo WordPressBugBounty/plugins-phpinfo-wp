@@ -655,7 +655,7 @@ class Phpinfo_WP_Config_Grader {
         $t_info = class_exists('Phpinfo_WP_Config_Grader_Fixer') ? Phpinfo_WP_Config_Grader_Fixer::detect_target() : ['mode' => '', 'file' => ''];
 
         foreach (self::checks($ctx) as $c) {
-            $raw       = ini_get($c['key']);
+            $raw       = apply_filters('phpinfowp_grader_ini_get', ini_get($c['key']), $c['key']);
             $cur       = $raw === false ? '' : (string) $raw;
             $target    = $c['target'];
             $pass      = (bool) ($c['pass'])($cur, $target);

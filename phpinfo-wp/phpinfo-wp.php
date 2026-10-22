@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     8.0.4
+Version:     8.0.5
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com/phpinfo-wp
@@ -15,7 +15,7 @@ Domain Path: /languages
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '8.0.4');
+define('PHPINFOWP_VERSION', '8.0.5');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 define('PHPINFOWP_SLUG_PREFIX', 'piwp');
@@ -284,6 +284,8 @@ class Phpinfo_wp {
             ['piwp-admin-log',         'Admin Log',         'view_admin_log'],
             ['piwp-report',            'Audit Report',      'view_report'],
             ['piwp-alerts',            'Alerts',            'view_alerts'],
+            // Documentation fallback redirect
+            ['piwp-docs',              'Documentation',     'redirect_docs'],
         ];
         // Register every leaf page as a real child of phpinfo-wp so WP
         // natively highlights the toplevel + its submenu on every leaf
@@ -331,6 +333,7 @@ class Phpinfo_wp {
     public function view_api_monitor(): void     { require PHPINFOWP_DIR . 'views/pro/api-monitor.php'; }
     public function view_permissions(): void     { require PHPINFOWP_DIR . 'views/pro/permissions.php'; }
     public function view_support(): void         { require PHPINFOWP_DIR . 'views/pro/support.php'; }
+    public function redirect_docs(): void        { wp_redirect('https://exeebit.com/phpinfo-wp/docs'); exit; }
 
     public function admin_bar_indicator(WP_Admin_Bar $bar): void {
         Phpinfo_WP_Admin_Bar::render($bar);
@@ -777,9 +780,10 @@ FLYOUT;
             $items = [];
             foreach ($group['tabs'] as $slug => $tab) {
                 $items[] = [
-                    'url'   => admin_url('admin.php?page=' . $slug),
-                    'label' => $tab['label'],
-                    'pro'   => !empty($tab['pro']) && !$is_pro,
+                    'url'      => !empty($tab['url']) ? $tab['url'] : admin_url('admin.php?page=' . $slug),
+                    'label'    => $tab['label'],
+                    'pro'      => !empty($tab['pro']) && !$is_pro,
+                    'external' => !empty($tab['external']),
                 ];
             }
             $data[$group['slug']] = ['label' => $group['label'], 'items' => $items];
@@ -815,7 +819,13 @@ FLYOUT;
             // toplevel natively) — we just suppress them in the sidebar list.
             var visible = ['piwp','piwp-performance','piwp-audit','piwp-tools','piwp-reports','piwp-license','piwp-support'];
             root.querySelectorAll('.wp-submenu li > a').forEach(function(a) {
-                var m = (a.getAttribute('href') || '').match(/[?&]page=([\w-]+)/);
+                var href = a.getAttribute('href') || '';
+                if (href.indexOf('exeebit.com/phpinfo-wp/docs') !== -1) {
+                    a.setAttribute('target', '_blank');
+                    a.setAttribute('rel', 'noopener noreferrer');
+                    return;
+                }
+                var m = href.match(/[?&]page=([\w-]+)/);
                 if (!m) return;
                 if (visible.indexOf(m[1]) === -1) {
                     a.parentNode.style.display = 'none';
@@ -852,6 +862,10 @@ FLYOUT;
                 grp.items.forEach(function(it) {
                     var a = document.createElement('a');
                     a.href = it.url;
+                    if (it.external) {
+                        a.setAttribute('target', '_blank');
+                        a.setAttribute('rel', 'noopener noreferrer');
+                    }
                     var pm = it.url.match(/[?&]page=([\w-]+)/);
                     if (pm && pm[1] === currentPage) {
                         a.classList.add('phpinfowp-flyout-active');

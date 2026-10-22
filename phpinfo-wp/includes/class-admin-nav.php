@@ -80,9 +80,10 @@ class Phpinfo_WP_Admin_Nav {
             'support' => [
                 'label' => __('Support', 'phpinfo-wp'),
                 'slug'  => 'piwp-support',
-                'desc'  => __('Get help from our engineers', 'phpinfo-wp'),
+                'desc'  => __('Get help from our engineers and read documentation', 'phpinfo-wp'),
                 'tabs'  => [
-                    'piwp-support'          => ['label' => __('Support', 'phpinfo-wp'),           'pro' => false, 'icon' => 'dashicons-sos'],
+                    'piwp-support' => ['label' => __('Support', 'phpinfo-wp'),           'pro' => false, 'icon' => 'dashicons-sos'],
+                    'piwp-docs'    => ['label' => __('Documentation ↗', 'phpinfo-wp'),     'pro' => false, 'icon' => 'dashicons-book-alt', 'url' => 'https://exeebit.com/phpinfo-wp/docs', 'external' => true],
                 ],
             ],
         ];
@@ -134,6 +135,7 @@ class Phpinfo_WP_Admin_Nav {
         $current_slug = $current_slug ?? self::current_tab_slug() ?? sanitize_key($_GET['page'] ?? '');
         $info = self::find($current_slug);
         if (!$info || count($info['group_info']['tabs']) <= 1) return;
+        if ($info['group'] === 'support') return;
 
         self::$tabs_rendered = true;
 
@@ -144,14 +146,16 @@ class Phpinfo_WP_Admin_Nav {
         echo '<aside class="phpinfowp-side-nav" role="navigation" aria-label="' . esc_attr($group['label']) . '">';
         echo '<ul class="phpinfowp-side-nav-list">';
         foreach ($group['tabs'] as $slug => $tab) {
-            $is_active = $slug === $current_slug;
-            $url       = admin_url('admin.php?page=' . $slug);
-            $classes   = 'phpinfowp-side-nav-item' . ($is_active ? ' is-active' : '');
-            $icon      = !empty($tab['icon']) ? $tab['icon'] : 'dashicons-admin-generic';
-            $badge     = (!$is_pro && !empty($tab['pro']))
+            $is_active   = $slug === $current_slug;
+            $is_external = !empty($tab['external']);
+            $url         = !empty($tab['url']) ? $tab['url'] : admin_url('admin.php?page=' . $slug);
+            $classes     = 'phpinfowp-side-nav-item' . ($is_active ? ' is-active' : '');
+            $icon        = !empty($tab['icon']) ? $tab['icon'] : 'dashicons-admin-generic';
+            $badge       = (!$is_pro && !empty($tab['pro']))
                 ? '<span class="phpinfowp-side-nav-pro">PRO</span>'
                 : '';
-            echo '<li><a href="' . esc_url($url) . '" class="' . esc_attr($classes) . '">';
+            $target_attr = $is_external ? ' target="_blank" rel="noopener noreferrer"' : '';
+            echo '<li><a href="' . esc_url($url) . '" class="' . esc_attr($classes) . '"' . $target_attr . '>';
             echo '<span class="dashicons ' . esc_attr($icon) . ' phpinfowp-side-nav-icon" aria-hidden="true"></span>';
             echo '<span class="phpinfowp-side-nav-label-text">' . esc_html($tab['label']) . '</span>' . $badge;
             echo '</a></li>';
@@ -1698,6 +1702,7 @@ class Phpinfo_WP_Admin_Nav {
         if (!$tab) return false;
         
         $info = self::find($tab);
+        if ($info && $info['group'] === 'support') return false;
         return $info && count($info['group_info']['tabs']) > 1;
     }
 

@@ -3,7 +3,7 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.1.2
-Stable tag: 8.0.4
+Stable tag: 8.0.5
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -165,6 +165,11 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 9. Executive White-Label PDF Audit Report (Pro): Generate client-ready site audit reports with your agency logo, custom accent branding, and server health breakdown.
 
 == Changelog ==
+
+= 8.0.5 =
+* Improved: License activation resilience and compatibility across strict managed hosting environments. Special thanks to Nick Safford for reporting this.
+* Fix: Minor bug fixes and stability improvements.
+* Improved: UI enhancements and documentation navigation.
 
 = 8.0.4 =
 * Fix: Minor bug fixes and database stability improvements.

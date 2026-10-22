@@ -135,6 +135,76 @@ class Phpinfo_WP_CLI {
         }
         WP_CLI\Utils\format_items('table', $rows, ['hook', 'next_run', 'schedule', 'status']);
     }
+
+    /**
+     * Manage license from the command line.
+     *
+     * ## OPTIONS
+     *
+     * <action>
+     * : Action to perform: activate, deactivate, or status.
+     *
+     * [<key>]
+     * : The license key to activate (required for activate).
+     *
+     * ## EXAMPLES
+     *
+     *     wp phpinfowp license activate PIWP2-...
+     *     wp phpinfowp license status
+     *     wp phpinfowp license deactivate
+     */
+    public function license($args, $assoc): void {
+        $sub = strtolower($args[0] ?? 'status');
+
+        if ($sub === 'status') {
+            $valid = Phpinfo_WP_License::is_valid();
+            $tier  = Phpinfo_WP_License::is_lifetime() ? 'Lifetime' : (Phpinfo_WP_License::is_unlimited() ? 'Unlimited' : 'Single');
+            $key   = Phpinfo_WP_License::get_key();
+            WP_CLI::log('Status:   ' . ($valid ? "Active ({$tier})" : 'Inactive'));
+            if (Phpinfo_WP_License::is_constant_defined()) {
+                WP_CLI::log('Source:   wp-config.php (PHPINFOWP_LICENSE_KEY)');
+            }
+            if ($key) {
+                $payload = Phpinfo_WP_License::payload();
+                if ($payload) {
+                    WP_CLI::log('Issued:   ' . ($payload['email'] ?? '—'));
+                    WP_CLI::log('Expires:  ' . ($payload['expiry_human'] ?? '—'));
+                }
+            }
+            return;
+        }
+
+        if ($sub === 'activate') {
+            $key = trim($args[1] ?? '');
+            if (empty($key)) {
+                WP_CLI::error('Please provide a license key: wp phpinfowp license activate <key>');
+            }
+            $reason = '';
+            $ok = Phpinfo_WP_License::activate($key, $reason);
+            if ($ok) {
+                WP_CLI::success('License activated successfully. Pro features unlocked.');
+            } else {
+                WP_CLI::error("License activation failed: {$reason}");
+            }
+            return;
+        }
+
+        if ($sub === 'deactivate') {
+            if (Phpinfo_WP_License::is_constant_defined()) {
+                WP_CLI::error('License is defined in wp-config.php (PHPINFOWP_LICENSE_KEY). Remove the constant to deactivate.');
+            }
+            $key = Phpinfo_WP_License::get_key();
+            if ($key) {
+                Phpinfo_WP_License::deactivate_remote($key);
+            }
+            Phpinfo_WP_License::deactivate();
+            WP_CLI::success('License deactivated. Pro features disabled.');
+            return;
+        }
+
+        WP_CLI::error("Unknown action '{$sub}'. Use: activate, deactivate, or status.");
+    }
 }
 
 WP_CLI::add_command('phpinfowp', 'Phpinfo_WP_CLI');
+

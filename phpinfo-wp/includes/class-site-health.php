@@ -8,6 +8,10 @@ class Phpinfo_WP_Site_Health {
     }
 
     public static function add_tests(array $tests): array {
+        $tests['direct']['phpinfowp_cve_php2shell'] = [
+            'label' => __('CISA Advisory CVE-2026-109618 (php2shell) patch verification'),
+            'test'  => [__CLASS__, 'test_cve_php2shell'],
+        ];
         $tests['direct']['phpinfowp_php_eol'] = [
             'label' => __('PHP version end-of-life status'),
             'test'  => [__CLASS__, 'test_php_eol'],
@@ -36,6 +40,33 @@ class Phpinfo_WP_Site_Health {
     }
 
     // ── Individual tests ─────────────────────────────────────────────
+
+    public static function test_cve_php2shell(): array {
+        $audit = class_exists('Phpinfo_WP_CVE_Audit') ? Phpinfo_WP_CVE_Audit::audit() : [];
+        if (!empty($audit['is_vulnerable'])) {
+            return [
+                'label'       => sprintf(__('Critical: PHP %s is vulnerable to CVE-2026-109618 (php2shell)', 'phpinfo-wp'), esc_html($audit['current_version'] ?? PHP_VERSION)),
+                'status'      => 'critical',
+                'badge'       => ['label' => __('Security', 'phpinfo-wp'), 'color' => 'red'],
+                'description' => '<p>' . sprintf(
+                    __('CISA has issued an emergency advisory for unauthenticated Remote Code Execution in PHP (CVE-2026-109618). Your server running PHP %s is unpatched. Update to %s or newer immediately.', 'phpinfo-wp'),
+                    '<strong>' . esc_html($audit['current_version'] ?? PHP_VERSION) . '</strong>',
+                    '<strong>' . esc_html($audit['required_version'] ?? 'latest') . '</strong>'
+                ) . '</p>',
+                'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-cve')) . '">' . __('View Vulnerability Audit & Host Ticket', 'phpinfo-wp') . '</a>',
+                'test'        => 'phpinfowp_cve_php2shell',
+            ];
+        }
+
+        return [
+            'label'       => sprintf(__('PHP %s is patched against CVE-2026-109618 (php2shell)', 'phpinfo-wp'), esc_html(PHP_VERSION)),
+            'status'      => 'good',
+            'badge'       => ['label' => __('Security', 'phpinfo-wp'), 'color' => 'green'],
+            'description' => '<p>' . __('Your PHP runtime version meets or exceeds the secure release threshold specified in CISA Cybersecurity Advisory CVE-2026-109618.', 'phpinfo-wp') . '</p>',
+            'actions'     => '<a href="' . esc_url(admin_url('admin.php?page=piwp-cve')) . '">' . __('View Zero-Day Audit', 'phpinfo-wp') . '</a>',
+            'test'        => 'phpinfowp_cve_php2shell',
+        ];
+    }
 
     public static function test_php_eol(): array {
         $s = Phpinfo_WP_EOL::status();

@@ -1052,8 +1052,15 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
 }
 
 @keyframes phpinfowp-fadein {
-  from { opacity: 0; transform: translateY(-3px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Unified Plugin Alerts & Notice Banners */
@@ -1098,8 +1105,8 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
   line-height: 1.55;
 }
 
-.phpinfowp-custom-alert-body p + p,
-.phpinfowp-theme-alert-body p + p {
+.phpinfowp-custom-alert-body p+p,
+.phpinfowp-theme-alert-body p+p {
   margin-top: 6px;
 }
 
@@ -1111,10 +1118,12 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
   border-left: 4px solid #22c55e;
   color: #166534;
 }
+
 .phpinfowp-custom-alert.is-success .dashicons,
 .phpinfowp-theme-alert.is-success .dashicons {
   color: #16a34a;
 }
+
 .phpinfowp-custom-alert.is-success code,
 .phpinfowp-theme-alert.is-success code {
   background: rgba(22, 101, 52, 0.08) !important;
@@ -1136,10 +1145,12 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
   border-left: 4px solid #f59e0b;
   color: #92400e;
 }
+
 .phpinfowp-custom-alert.is-warning .dashicons,
 .phpinfowp-theme-alert.is-warning .dashicons {
   color: #d97706;
 }
+
 .phpinfowp-custom-alert.is-warning code,
 .phpinfowp-theme-alert.is-warning code {
   background: rgba(146, 64, 14, 0.08) !important;
@@ -1161,10 +1172,12 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
   border-left: 4px solid #ef4444;
   color: #991b1b;
 }
+
 .phpinfowp-custom-alert.is-error .dashicons,
 .phpinfowp-theme-alert.is-error .dashicons {
   color: #dc2626;
 }
+
 .phpinfowp-custom-alert.is-error code,
 .phpinfowp-theme-alert.is-error code {
   background: rgba(239, 68, 68, 0.08) !important;
@@ -1186,10 +1199,12 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
   border-left: 4px solid #777BB3;
   color: #334155;
 }
+
 .phpinfowp-custom-alert.is-info .dashicons,
 .phpinfowp-theme-alert.is-info .dashicons {
   color: #777BB3;
 }
+
 .phpinfowp-custom-alert.is-info code,
 .phpinfowp-theme-alert.is-info code {
   background: rgba(119, 123, 179, 0.1) !important;
@@ -1220,10 +1235,12 @@ body.phpinfowp-page .button.phpinfowp-btn-danger:active,
   color: inherit;
   opacity: 0.7;
 }
+
 .phpinfowp-alert-dismiss-btn:hover {
   opacity: 1;
   background: rgba(0, 0, 0, 0.06);
 }
+
 .phpinfowp-alert-dismiss-btn .dashicons {
   font-size: 18px;
   width: 18px;
@@ -4652,7 +4669,6 @@ a.phpinfowp-cg-chip-php:hover {
   line-height: 1.5;
 }
 
-/* ---------- EOL Pro upsell footer ---------- */
 .phpinfowp-eol-upsell {
   margin-top: 28px;
   padding: 22px 24px;
@@ -4765,7 +4781,6 @@ a.phpinfowp-cg-chip-php:hover {
   word-break: break-all;
 }
 
-/* ---------- Plugins-screen deactivate retention modal ---------- */
 .phpinfowp-dm {
   display: none;
   position: fixed;
@@ -6165,6 +6180,7 @@ body.piwp-admin-page .notice.notice-success,
   border-left-color: #22c55e !important;
   color: #166534 !important;
 }
+
 body.phpinfowp-page .notice.notice-warning,
 body.piwp-admin-page .notice.notice-warning,
 .notice.notice-warning.piwp-notice {
@@ -6173,6 +6189,7 @@ body.piwp-admin-page .notice.notice-warning,
   border-left-color: #f59e0b !important;
   color: #92400e !important;
 }
+
 body.phpinfowp-page .notice.notice-error,
 body.piwp-admin-page .notice.notice-error,
 .notice.notice-error.piwp-notice {
@@ -6181,6 +6198,7 @@ body.piwp-admin-page .notice.notice-error,
   border-left-color: #ef4444 !important;
   color: #991b1b !important;
 }
+
 body.phpinfowp-page .notice.notice-info,
 body.piwp-admin-page .notice.notice-info,
 .notice.notice-info.piwp-notice {
@@ -6347,7 +6365,10 @@ body.piwp-admin-page .notice.notice-info,
 .phpinfowp-toolbar input[type="search"],
 .phpinfowp-toolbar input[type="number"],
 .phpinfowp-toolbar input[type="email"],
-.phpinfowp-toolbar input[type="url"] {
+.phpinfowp-toolbar input[type="url"],
+.phpinfowp-ext-page select,
+.phpinfowp-ext-page input[type="text"],
+.phpinfowp-ext-page input[type="search"] {
   border-radius: 8px !important;
   border: 1px solid #cbd5e1 !important;
   height: 36px !important;
@@ -6360,15 +6381,22 @@ body.piwp-admin-page .notice.notice-info,
   transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
+#phpinfowp-ext-search,
+#phpinfowp-log-search {
+  padding-right: 32px !important;
+}
+
 .phpinfowp-pro-page select,
 #phpinfo-info select,
-.phpinfowp-toolbar select {
+.phpinfowp-toolbar select,
+.phpinfowp-ext-page select {
   padding-right: 32px !important;
 }
 
 .phpinfowp-pro-page textarea,
 #phpinfo-info textarea,
-.phpinfowp-toolbar textarea {
+.phpinfowp-toolbar textarea,
+.phpinfowp-ext-page textarea {
   border-radius: 8px !important;
   border: 1px solid #cbd5e1 !important;
   padding: 8px 12px !important;
@@ -6400,7 +6428,10 @@ body.piwp-admin-page .notice.notice-info,
 .phpinfowp-toolbar input[type="number"]:focus,
 .phpinfowp-toolbar input[type="email"]:focus,
 .phpinfowp-toolbar input[type="url"]:focus,
-.phpinfowp-toolbar textarea:focus {
+.phpinfowp-toolbar textarea:focus,
+.phpinfowp-ext-page select:focus,
+.phpinfowp-ext-page input[type="text"]:focus,
+.phpinfowp-ext-page input[type="search"]:focus {
   border-color: #6366f1 !important;
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
   outline: none !important;

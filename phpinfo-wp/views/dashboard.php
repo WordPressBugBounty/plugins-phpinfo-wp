@@ -84,6 +84,9 @@ $eol_status = $eol['status'] ?? 'ok';
 $eol_badge_class = $eol_status === 'eol' ? 'badge-danger' : ($eol_status === 'warning' ? 'badge-warning' : 'badge-success');
 $eol_badge_text  = $eol_status === 'eol' ? __('EOL (Unsupported)', 'phpinfo-wp') : ($eol_status === 'warning' ? sprintf(__('EOL in %dd', 'phpinfo-wp'), (int)$eol['days']) : __('Supported ✓', 'phpinfo-wp'));
 
+// 3b. CVE & Zero-Day Threat Audit (php2shell / CVE-2026-109618)
+$cve_audit = class_exists('Phpinfo_WP_CVE_Audit') ? Phpinfo_WP_CVE_Audit::audit() : [];
+
 // 4. Server Specs
 $web_server = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
 if (stripos($web_server, 'litespeed') !== false) {
@@ -147,6 +150,18 @@ $cron_disabled = !empty($cron_summary['disabled']);
 
 // 8. Triage & Recommendations Engine (Real Issues from Live Checks)
 $triage_items = [];
+
+// Priority 0: Critical Zero-Day CVE Alert (php2shell)
+if (!empty($cve_audit['is_vulnerable'])) {
+    $triage_items[] = [
+        'type'     => 'danger',
+        'icon'     => 'dashicons-shield-alt',
+        'title'    => sprintf(__('Critical CVE: PHP %s Unpatched (php2shell)', 'phpinfo-wp'), esc_html($cve_audit['current_version'])),
+        'desc'     => sprintf(__('Vulnerable to unauthenticated RCE under %s. Update to %s+ immediately.', 'phpinfo-wp'), esc_html($cve_audit['sapi_label']), esc_html($cve_audit['required_version'])),
+        'link'     => admin_url('admin.php?page=piwp-cve'),
+        'link_lbl' => __('Fix Ticket', 'phpinfo-wp'),
+    ];
+}
 
 // Check A: Failing Directives from Config Grader
 if (!empty($full_grader['checks'])) {
@@ -263,7 +278,6 @@ if ($today_errs > 0 && count($triage_items) < 3) {
     ];
 }
 
-// Check G: Server Audit Cap Advisory — Pro only
 if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
     $triage_items[] = [
         'type'     => 'warning',
@@ -279,9 +293,15 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
 <div class="phpinfowp-pro-page phpinfowp-dashboard">
 
     <!-- 1. HERO HEADER -->
-    <div class="phpinfowp-dash-topbar">
-        <div>
-            <div class="phpinfowp-dash-live-badge">
+    <div class="phpinfowp-dash-topbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:16px;">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <h1 class="phpinfowp-dash-title" style="margin:0; display:inline-flex; align-items:center; gap:8px; font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.02em;">
+                <?php _e('Server Intelligence & Health Command', 'phpinfo-wp'); ?>
+                <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Real-time PHP environment, database efficiency, security verification, and system diagnostic overview.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>">
+                    <span class="dashicons dashicons-info-outline"></span>
+                </span>
+            </h1>
+            <div class="phpinfowp-dash-live-badge" style="margin:0; display:inline-flex; align-items:center; gap:8px; vertical-align:middle;">
                 <span class="phpinfowp-pulse-dot"></span>
                 <?php _e('Live Server Telemetry', 'phpinfo-wp'); ?>
                 <?php if (!$is_pro): ?>
@@ -290,8 +310,6 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
                     <span class="phpinfowp-plan-pill pro-active"><?php _e('Pro Active', 'phpinfo-wp'); ?></span>
                 <?php endif; ?>
             </div>
-            <h1 class="phpinfowp-dash-title"><?php _e('Server Intelligence & Health Command', 'phpinfo-wp'); ?></h1>
-            <p class="phpinfowp-dash-subtitle"><?php _e('Real-time PHP environment, database efficiency, security verification, and system diagnostic overview.', 'phpinfo-wp'); ?></p>
         </div>
         <div class="phpinfowp-dash-actions">
             <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-viewer')); ?>" class="button button-secondary phpinfowp-btn-glow">
@@ -309,6 +327,37 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- 1b. ZERO-DAY EMERGENCY THREAT BANNER -->
+    <?php if (!empty($cve_audit['is_vulnerable'])): ?>
+    <div class="phpinfowp-cve-threat-banner" style="margin-bottom:20px; border-radius:12px; border:1px solid #f87171; background:#fef2f2; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; box-shadow:0 1px 3px rgba(220,38,38,0.1);">
+        <div style="display:flex; align-items:flex-start; gap:14px; max-width:760px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:#fee2e2; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <span class="dashicons dashicons-shield-alt" style="font-size:24px; width:24px; height:24px; color:#dc2626;"></span>
+            </div>
+            <div>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+                    <span style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; padding:2px 7px; border-radius:4px; background:#dc2626; color:#fff;">
+                        <?php _e('Security Alert', 'phpinfo-wp'); ?>
+                    </span>
+                    <strong style="font-size:14px; color:#991b1b;"><?php _e('Action Recommended: Critical PHP Vulnerability', 'phpinfo-wp'); ?></strong>
+                </div>
+                <p style="margin:0; font-size:13px; color:#4b5563; line-height:1.5;">
+                    <?php printf(
+                        __('Your server is running PHP %1$s. Security authorities urge updating to %2$s or newer to keep your site safe from remote attacks.', 'phpinfo-wp'),
+                        '<strong>' . esc_html($cve_audit['current_version']) . '</strong>',
+                        '<strong>' . esc_html($cve_audit['required_version']) . '</strong>'
+                    ); ?>
+                </p>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <a href="<?php echo esc_url(admin_url('admin.php?page=piwp-cve')); ?>" class="button button-primary" style="background:#dc2626; border-color:#b91c1c; font-weight:700; height:34px; line-height:32px; padding:0 16px;">
+                <?php _e('View Fix &amp; Host Ticket &rarr;', 'phpinfo-wp'); ?>
+            </a>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- 2. SYSTEM SPECS RIBBON (Free for all users) -->
     <div class="phpinfowp-specs-ribbon">
@@ -346,10 +395,8 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
         </div>
     </div>
 
-    <!-- 3. COMMAND CENTER HERO GRID (Score + Triage) -->
     <div class="phpinfowp-command-grid">
         
-        <!-- Hero Scorecard -->
         <div class="phpinfowp-command-card phpinfowp-hero-score">
             <div class="phpinfowp-hero-header">
                 <div>
@@ -367,7 +414,6 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
                 ?>
                 <?php if ($show_dual): ?>
                     <?php if ($is_pro): ?>
-                        <!-- DUAL TRACK: Site Controllable + Server Reality (Pro) -->
                         <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px;">
                             <!-- Track 1: Site Controllable -->
                             <div>
@@ -412,7 +458,6 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
                             </div>
                         </div>
 
-                        <!-- Informational Callout (Pro) -->
                         <div style="font-size:11.5px; color:#92400e; background:#fffbeb; border:1px solid #fef3c7; border-radius:6px; padding:8px 12px; margin-top:10px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
                             <span>
                                 <strong><?php printf(__('Overall %s* (%d/100)', 'phpinfo-wp'), esc_html($grade_eff), (int)$score_eff); ?>:</strong>
@@ -427,7 +472,6 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
                             </a>
                         </div>
                     <?php else: ?>
-                        <!-- LOCKED: Pro-only dual-track audit (Free Plan) -->
                         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:18px 16px; text-align:center; position:relative; overflow:hidden;">
                             <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(99,102,241,0.03) 10px, rgba(99,102,241,0.03) 20px);"></div>
                             <div style="position:relative; z-index:1;">
@@ -582,10 +626,8 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
 
     </div>
 
-    <!-- 4. VITAL TELEMETRY 4-CARD GRID (Clean Free vs Pro Gating) -->
     <div class="phpinfowp-telemetry-grid">
         
-        <!-- Card 1: Memory & Resource Engine (FREE) -->
         <div class="phpinfowp-telemetry-card">
             <div class="phpinfowp-tel-head">
                 <div>
@@ -633,7 +675,6 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
             </div>
         </div>
 
-        <!-- Card 2: Database & Autoload Footprint (PRO Gated) -->
         <div class="phpinfowp-telemetry-card">
             <div class="phpinfowp-tel-head">
                 <div>
@@ -695,7 +736,6 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
             </div>
         </div>
 
-        <!-- Card 3: Outbound API & Latency Monitor (PRO Feature) -->
         <div class="phpinfowp-telemetry-card">
             <div class="phpinfowp-tel-head">
                 <div>
@@ -764,7 +804,6 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
             </div>
         </div>
 
-        <!-- Card 4: Background Tasks & WP-Cron (PRO Gated) -->
         <div class="phpinfowp-telemetry-card">
             <div class="phpinfowp-tel-head">
                 <div>
@@ -827,25 +866,7 @@ if ($is_pro && empty($triage_items) && $is_capped && (int)$locked_n > 0) {
 
     </div>
 
-    <!-- 5. PRO FOOTER UPSELL BANNER (Only shown when not Pro) -->
-    <?php if (!$is_pro): ?>
-        <div class="phpinfowp-dash-pro-banner">
-            <div class="phpinfowp-dpb-left">
-                <div class="phpinfowp-dpb-icon">
-                    <span class="dashicons dashicons-awards"></span>
-                </div>
-                <div>
-                    <h3 class="phpinfowp-dpb-title"><?php _e('Unlock Full Server Intelligence & Auto-Fixing with phpinfo() WP Pro', 'phpinfo-wp'); ?></h3>
-                    <p class="phpinfowp-dpb-desc"><?php _e('Get instant 1-click directive auto-fixing, live outbound HTTP latency monitoring, runtime security headers injection, and client-ready audit reports.', 'phpinfo-wp'); ?></p>
-                </div>
-            </div>
-            <div class="phpinfowp-dpb-right">
-                <a href="https://exeebit.com/phpinfo-wp#pricing" target="_blank" rel="noopener" class="button button-primary phpinfowp-dpb-btn">
-                    <?php _e('Upgrade to Pro &rarr;', 'phpinfo-wp'); ?>
-                </a>
-            </div>
-        </div>
-    <?php endif; ?>
+
 
 </div>
 

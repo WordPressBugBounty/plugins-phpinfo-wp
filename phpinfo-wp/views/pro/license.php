@@ -155,7 +155,6 @@ $pillars = [
     <?php endif; ?>
 
 
-    <!-- License status card -->
     <div class="phpinfowp-license-card <?php echo $is_valid ? 'is-active' : 'is-inactive'; ?>">
         <div class="phpinfowp-license-status">
             <?php if ($is_valid): ?>
@@ -219,9 +218,6 @@ $pillars = [
                 </form>
             <?php endif; ?>
 
-            <!-- License deactivation retention modal. Reuses .phpinfowp-dm CSS
-                 from the Plugins-screen modal (same look). Only renders when
-                 a Pro license is active. -->
             <div id="phpinfowp-license-dm" class="phpinfowp-dm" aria-hidden="true" role="dialog" aria-labelledby="phpinfowp-license-dm-title">
                 <div class="phpinfowp-dm-backdrop"></div>
                 <div class="phpinfowp-dm-dialog" role="document">

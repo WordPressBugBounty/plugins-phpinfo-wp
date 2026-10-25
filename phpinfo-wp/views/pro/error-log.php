@@ -47,64 +47,72 @@ $search         = sanitize_text_field($_GET['log_search'] ?? '');
 ?>
 
 <div class="phpinfowp-pro-page">
-    <div class="phpinfowp-page-header">
-        <div>
-            <h1>
+    <div class="phpinfowp-page-header" style="display:flex; flex-direction:column; align-items:stretch; gap:4px; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+            <h1 style="display:flex; align-items:center; gap:10px; margin:0; font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.02em;">
                 <?php _e('PHP Error Log', 'phpinfo-wp'); ?>
                 <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span>
                 <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Browse, live stream, filter, and clear your PHP error log — without FTP, SSH, or host cPanels.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
             </h1>
-            <?php if ($path): 
-                $today_breakdown = class_exists('Phpinfo_WP_Error_Log') ? Phpinfo_WP_Error_Log::today_breakdown($path) : null;
-            ?>
-                <div style="margin:4px 0 0; font-size:12px; color:#64748b; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                    <span><?php printf(__('Active log: %s &middot; %s', 'phpinfo-wp'), '<code style="font-size:11px; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">' . esc_html(Phpinfo_WP_Error_Log::mask_path($path)) . '</code>', '<strong>' . esc_html($size) . '</strong>'); ?></span>
-                    <?php if ($today_breakdown): ?>
-                        <?php if ($today_breakdown['total_errors'] > 0): ?>
-                            <span style="background:#fee2e2; color:#991b1b; padding:1px 8px; border-radius:10px; font-weight:700; font-size:11px;">
-                                🚨 <?php echo (int) $today_breakdown['total_errors']; ?> <?php echo _n('error today', 'errors today', $today_breakdown['total_errors'], 'phpinfo-wp'); ?>
-                            </span>
-                        <?php elseif ($today_breakdown['info'] > 0): ?>
-                            <span style="background:#f0fdf4; color:#166534; padding:1px 8px; border-radius:10px; font-weight:600; font-size:11px;">
-                                ✓ 0 errors today &middot; <?php echo (int) $today_breakdown['info']; ?> info <?php echo _n('log', 'logs', $today_breakdown['info'], 'phpinfo-wp'); ?>
-                            </span>
+
+            <?php if ($path && $is_pro): ?>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <div style="position:relative; width:220px;">
+                        <input type="text" id="phpinfowp-log-search" placeholder="<?php echo esc_attr__('Filter lines…', 'phpinfo-wp'); ?>"
+                               value="<?php echo esc_attr($search); ?>"
+                               oninput="phpinfowpFilterLog(this.value)"
+                               style="width:100%; height:36px; line-height:34px; padding:0 30px 0 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; color:#0f172a; background:#ffffff; box-shadow:0 1px 2px rgba(0,0,0,0.04); outline:none; box-sizing:border-box;" autocomplete="off">
+                        <button type="button" onclick="var s=document.getElementById('phpinfowp-log-search');if(s){s.value='';phpinfowpFilterLog('');this.style.display='none';}"
+                                style="<?php echo $search ? 'display:block;' : 'display:none;'; ?>position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:16px;line-height:1;padding:2px;"
+                                id="phpinfowp-log-clear" title="<?php esc_attr_e('Clear search', 'phpinfo-wp'); ?>">&times;</button>
+                    </div>
+                    <form method="post" style="margin:0;">
+                        <?php wp_nonce_field('phpinfowp_log_nonce'); ?>
+                        <?php if ($is_logging_on): ?>
+                            <input type="hidden" name="phpinfowp_log_action" value="disable">
+                            <button type="submit" class="button button-secondary" style="height:36px; line-height:34px; border-radius:6px; font-weight:600; font-size:13px;">
+                                <?php _e('Disable WP Logging', 'phpinfo-wp'); ?>
+                            </button>
                         <?php else: ?>
-                            <span style="background:#f0fdf4; color:#166534; padding:1px 8px; border-radius:10px; font-weight:600; font-size:11px;">
-                                ✓ 0 errors today
-                            </span>
+                            <input type="hidden" name="phpinfowp_log_action" value="enable">
+                            <button type="submit" class="button button-primary" style="background:#6366f1; border-color:#6366f1; height:36px; line-height:34px; border-radius:6px; font-weight:600; font-size:13px;">
+                                <?php _e('Enable WP Logging', 'phpinfo-wp'); ?>
+                            </button>
                         <?php endif; ?>
-                    <?php endif; ?>
+                    </form>
+                    <form method="post" style="margin:0;"
+                          data-confirm="<?php esc_attr_e('Clear the entire error log file? This cannot be undone.', 'phpinfo-wp'); ?>"
+                          data-confirm-title="<?php esc_attr_e('Clear Error Log', 'phpinfo-wp'); ?>"
+                          data-confirm-btn="<?php esc_attr_e('Clear Log File', 'phpinfo-wp'); ?>">
+                        <?php wp_nonce_field('phpinfowp_log_nonce'); ?>
+                        <input type="hidden" name="phpinfowp_log_action" value="clear">
+                        <input type="hidden" name="clear_stream" value="<?php echo esc_attr($active_key); ?>">
+                        <button type="submit" class="button button-secondary" style="height:36px; line-height:34px; border-radius:6px; font-weight:600; font-size:13px;"><?php _e('Clear Log', 'phpinfo-wp'); ?></button>
+                    </form>
                 </div>
             <?php endif; ?>
         </div>
-        <?php if ($path && $is_pro): ?>
-            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                <input type="text" id="phpinfowp-log-search" placeholder="<?php echo esc_attr__('Filter lines...', 'phpinfo-wp'); ?>"
-                       value="<?php echo esc_attr($search); ?>" class="regular-text" style="max-width:240px; margin:0;"
-                       oninput="phpinfowpFilterLog(this.value)">
-                <form method="post" style="margin:0;">
-                    <?php wp_nonce_field('phpinfowp_log_nonce'); ?>
-                    <?php if ($is_logging_on): ?>
-                        <input type="hidden" name="phpinfowp_log_action" value="disable">
-                        <button type="submit" class="button button-secondary" style="height:32px; line-height:30px;">
-                            <?php _e('Disable WP Logging', 'phpinfo-wp'); ?>
-                        </button>
+
+        <?php if ($path): 
+            $today_breakdown = class_exists('Phpinfo_WP_Error_Log') ? Phpinfo_WP_Error_Log::today_breakdown($path) : null;
+        ?>
+            <div style="margin:0; font-size:12px; color:#64748b; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <span><?php printf(__('Active log: %s &middot; %s', 'phpinfo-wp'), '<code style="font-size:11px; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">' . esc_html(Phpinfo_WP_Error_Log::mask_path($path)) . '</code>', '<strong>' . esc_html($size) . '</strong>'); ?></span>
+                <?php if ($today_breakdown): ?>
+                    <?php if ($today_breakdown['total_errors'] > 0): ?>
+                        <span style="background:#fee2e2; color:#991b1b; padding:1px 8px; border-radius:10px; font-weight:700; font-size:11px;">
+                            🚨 <?php echo (int) $today_breakdown['total_errors']; ?> <?php echo _n('error today', 'errors today', $today_breakdown['total_errors'], 'phpinfo-wp'); ?>
+                        </span>
+                    <?php elseif ($today_breakdown['info'] > 0): ?>
+                        <span style="background:#f0fdf4; color:#166534; padding:1px 8px; border-radius:10px; font-weight:600; font-size:11px;">
+                            ✓ 0 errors today &middot; <?php echo (int) $today_breakdown['info']; ?> info <?php echo _n('log', 'logs', $today_breakdown['info'], 'phpinfo-wp'); ?>
+                        </span>
                     <?php else: ?>
-                        <input type="hidden" name="phpinfowp_log_action" value="enable">
-                        <button type="submit" class="button button-primary" style="background:#6366f1; border-color:#6366f1; height:32px; line-height:30px; font-weight:600;">
-                            <?php _e('Enable WP Logging', 'phpinfo-wp'); ?>
-                        </button>
+                        <span style="background:#f0fdf4; color:#166534; padding:1px 8px; border-radius:10px; font-weight:600; font-size:11px;">
+                            ✓ 0 errors today
+                        </span>
                     <?php endif; ?>
-                </form>
-                <form method="post" style="margin:0;"
-                      data-confirm="<?php esc_attr_e('Clear the entire error log file? This cannot be undone.', 'phpinfo-wp'); ?>"
-                      data-confirm-title="<?php esc_attr_e('Clear Error Log', 'phpinfo-wp'); ?>"
-                      data-confirm-btn="<?php esc_attr_e('Clear Log File', 'phpinfo-wp'); ?>">
-                    <?php wp_nonce_field('phpinfowp_log_nonce'); ?>
-                    <input type="hidden" name="phpinfowp_log_action" value="clear">
-                    <input type="hidden" name="clear_stream" value="<?php echo esc_attr($active_key); ?>">
-                    <button type="submit" class="button button-secondary"><?php _e('Clear Log', 'phpinfo-wp'); ?></button>
-                </form>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
     </div>
@@ -253,10 +261,8 @@ $search         = sanitize_text_field($_GET['log_search'] ?? '');
     <?php else: ?>
 
         <?php if ($is_free_preview): ?>
-            <!-- Free preview: contextual preview cards + centered upgrade card -->
             <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:12px; min-height:380px; display:flex; align-items:center; justify-content:center;">
                 
-                <!-- Background contextual preview cards (Terminal style) -->
                 <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.65; filter:blur(0.5px); display:flex; flex-direction:column; gap:8px;">
                     <?php
                     $preview_lines = [];
@@ -300,7 +306,6 @@ $search         = sanitize_text_field($_GET['log_search'] ?? '');
                 <!-- Gradient fade-out overlay -->
                 <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(248,250,252,0.3) 0%, rgba(248,250,252,0.94) 38%, #f8fafc 100%); pointer-events:none;"></div>
 
-                <!-- Floating Upgrade Card -->
                 <div style="position:relative; z-index:2; width:100%; max-width:540px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.09); text-align:center; margin:16px auto;">
                     <span class="dashicons dashicons-media-text" style="font-size:36px; width:36px; height:36px; color:#6366f1; display:inline-block; margin-bottom:10px;"></span>
                     <h3 style="margin:0 0 8px; font-size:19px; font-weight:700; color:#0f172a;"><?php _e('Live PHP Error Log Viewer Locked', 'phpinfo-wp'); ?></h3>
@@ -347,6 +352,8 @@ $search         = sanitize_text_field($_GET['log_search'] ?? '');
 
             <script>
             function phpinfowpFilterLog(q) {
+                var clr = document.getElementById('phpinfowp-log-clear');
+                if (clr) clr.style.display = q ? 'block' : 'none';
                 q = q.toLowerCase();
                 document.querySelectorAll('#phpinfowp-log-viewer .log-line').forEach(function(el) {
                     el.style.display = (!q || el.dataset.line.includes(q)) ? '' : 'none';

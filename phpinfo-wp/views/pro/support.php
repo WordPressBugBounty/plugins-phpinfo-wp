@@ -121,7 +121,6 @@ foreach ($sysinfo as $k => $v) {
 
     <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; align-items:flex-start;">
 
-        <!-- System Info Card (Visible to all users) -->
         <div style="flex:1; min-width:320px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:24px; display:flex; flex-direction:column;">
             <h3 style="margin-top:0; font-size:18px; color:#1d2327;"><span class="dashicons dashicons-desktop" style="vertical-align:middle; color:#777BB3;"></span> <?php _e('System Information', 'phpinfo-wp'); ?></h3>
             <p style="color:#475569; font-size:14px; line-height:1.6; margin-bottom:14px;">
@@ -136,7 +135,6 @@ foreach ($sysinfo as $k => $v) {
         </div>
 
         <?php if ($is_free_preview): ?>
-            <!-- Free preview: Instant 1-Click Fixes + Priority Ticket Portal Locked -->
             <div style="flex:1.2; min-width:340px; display:flex; flex-direction:column; gap:20px;">
 
                 <!-- Instant Self-Fixes vs Waiting -->
@@ -189,7 +187,6 @@ foreach ($sysinfo as $k => $v) {
 
         <?php else: ?>
 
-            <!-- Pro User Support Options Card -->
             <div style="flex:1.2; min-width:340px; display:flex; flex-direction:column; gap:20px;">
                 
                 <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:24px;">
@@ -203,7 +200,6 @@ foreach ($sysinfo as $k => $v) {
                 </div>
 
                 <?php if (!$is_unlimited): ?>
-                <!-- Single Site -> Unlimited / Agency Upsell -->
                 <div style="background:linear-gradient(135deg, #f8f8fc 0%, #eff0f9 100%); border:1px solid #d8daeb; border-radius:8px; padding:22px;">
                     <span style="background:#777BB3; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:3px; text-transform:uppercase; letter-spacing:.4px;"><?php _e('Agency & Client Sites', 'phpinfo-wp'); ?></span>
                     <h3 style="margin:8px 0 6px; font-size:16px; color:#1d2327;"><?php _e('Upgrade to Unlimited & White-Label Reports', 'phpinfo-wp'); ?></h3>

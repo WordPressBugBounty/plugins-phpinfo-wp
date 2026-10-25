@@ -6,7 +6,9 @@ defined('ABSPATH') or die('Unauthorized Access');
  */
 class Phpinfo_WP_Whats_New_Notice {
 
-    const META_KEY = 'phpinfowp_dismissed_notice';
+    const META_KEY      = 'phpinfowp_dismissed_notice';
+    const META_KEY_TIME = 'phpinfowp_dismissed_notice_time';
+    const SNOOZE_SECONDS = 604800; // 7 days
 
     public static function register(): void {
         add_action('admin_notices',  [self::class, 'render']);
@@ -18,6 +20,7 @@ class Phpinfo_WP_Whats_New_Notice {
         check_ajax_referer('phpinfowp_dismiss_notice', 'nonce');
         if (current_user_can('manage_options')) {
             update_user_meta(get_current_user_id(), self::META_KEY, PHPINFOWP_VERSION);
+            update_user_meta(get_current_user_id(), self::META_KEY_TIME, time());
             wp_send_json_success();
         }
         wp_send_json_error();
@@ -30,6 +33,7 @@ class Phpinfo_WP_Whats_New_Notice {
             wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'phpinfowp_dismiss_notice')
         ) {
             update_user_meta(get_current_user_id(), self::META_KEY, PHPINFOWP_VERSION);
+            update_user_meta(get_current_user_id(), self::META_KEY_TIME, time());
             wp_safe_redirect(remove_query_arg(['phpinfowp_dismiss_notice', '_wpnonce']));
             exit;
         }
@@ -38,15 +42,17 @@ class Phpinfo_WP_Whats_New_Notice {
     public static function render(): void {
         if (!current_user_can('manage_options')) return;
 
-        // Never show sales or upgrade notices to Pro users.
         if (class_exists('Phpinfo_WP_License') && Phpinfo_WP_License::is_valid()) {
             return;
         }
 
-        $dismissed = get_user_meta(get_current_user_id(), self::META_KEY, true);
-        if ($dismissed === PHPINFOWP_VERSION) return;
+        // 7-day snooze cooldown: if dismissed recently, don't show yet. Resurfaces after 7 days.
+        $dismissed_time = (int) get_user_meta(get_current_user_id(), self::META_KEY_TIME, true);
+        if ($dismissed_time && (time() - $dismissed_time) < self::SNOOZE_SECONDS) {
+            return;
+        }
 
-        // Only show notices for versions we've written copy for.
+        // Version catalog with headline copy
         $catalog = [
             '7.2.4' => [
                 'headline' => 'phpinfo() WP 7.2 is here - Web Server Snippets, API Monitor & more.',
@@ -81,16 +87,21 @@ class Phpinfo_WP_Whats_New_Notice {
             '8.0.4' => [
                 'headline' => 'phpinfo() WP 8.0.4 — Server Intelligence & Security Suite',
             ],
+            '8.0.5' => [
+                'headline' => 'phpinfo() WP 8.0.5 — Zero-Day Security & Server Intelligence',
+            ],
+            '8.0.6' => [
+                'headline' => 'phpinfo() WP 8.0.6 — Server Intelligence & Security Suite',
+            ],
         ];
 
-        if (!isset($catalog[PHPINFOWP_VERSION])) return;
-
-        $notice      = $catalog[PHPINFOWP_VERSION];
+        $notice = $catalog[PHPINFOWP_VERSION] ?? [
+            'headline' => 'phpinfo() WP ' . PHPINFOWP_VERSION . ' — Server Intelligence & Security Suite',
+        ];
         $dismiss_url = wp_nonce_url(
             add_query_arg('phpinfowp_dismiss_notice', '1'),
             'phpinfowp_dismiss_notice'
         );
-        // Pull real site data + Pro v8.0 features to drive conversions.
         $urgency_txt = '';
 
         // 1. Live Memory Analysis
@@ -127,8 +138,23 @@ class Phpinfo_WP_Whats_New_Notice {
         $fails  = (int) ($grader['fails'] ?? 0);
         $grade  = $grader['grade'] ?? '';
 
+        // 8. Zero-Day CVE Vulnerability Check
+        $cve_audit   = class_exists('Phpinfo_WP_CVE_Audit') ? Phpinfo_WP_CVE_Audit::audit() : [];
+        $is_cve_vuln = !empty($cve_audit['is_vulnerable']);
+
         // Select the most pressing real issue on the site
-        if ($mem_limit_bytes > 0 && $mem_pct >= 65) {
+        if ($is_cve_vuln) {
+            // Case 0: Critical Zero-Day CVE Alert (Highest Priority)
+            $badge_text = sprintf(__('v%s · CVE Alert', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION));
+            $site_msg   = sprintf(
+                /* translators: 1: version, 2: required version */
+                __('🚨 <strong>Critical Zero-Day Advisory (CVE-2026-109618):</strong> Your server runs PHP %1$s, which is vulnerable to unauthenticated remote code execution. Patch %2$s+ is required. Pro audits all attack vectors, auto-disables weaponized upload buffers, and generates your host patch ticket.', 'phpinfo-wp'),
+                esc_html($cve_audit['current_version']),
+                esc_html($cve_audit['required_version'])
+            );
+            $cta_label = __('Audit & Protect with Pro →', 'phpinfo-wp');
+
+        } elseif ($mem_limit_bytes > 0 && $mem_pct >= 65) {
             // Case 1: High RAM utilization (e.g. 89MB of 128MB)
             $badge_text = sprintf(__('v%s · %d%% RAM Peak', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION), $mem_pct);
             $site_msg   = sprintf(
@@ -213,7 +239,7 @@ class Phpinfo_WP_Whats_New_Notice {
         } else {
             // Case 9: Pre-Update Risk Sentinel (Never generic "running cleanly")
             $badge_text = sprintf(__('v%s · Pre-Update Sentinel', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION));
-            $site_msg   = __('🛡️ <strong>WordPress 7.1.2 Pre-Update Sentinel:</strong> Prevent white-screen crashes before updating core or plugins. Simulate updates with <strong>Update Guard</strong>, scan for abandoned plugins, and generate <strong>White-Label PDF Reports</strong>.', 'phpinfo-wp');
+            $site_msg   = __('🛡️ <strong>WordPress 7.1.3 Pre-Update Sentinel:</strong> Prevent white-screen crashes before updating core or plugins. Simulate updates with <strong>Update Guard</strong>, scan for abandoned plugins, and generate <strong>White-Label PDF Reports</strong>.', 'phpinfo-wp');
             $cta_label  = __('Audit Before Updating with Pro →', 'phpinfo-wp');
         }
 

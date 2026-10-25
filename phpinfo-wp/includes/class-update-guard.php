@@ -240,7 +240,6 @@ class Phpinfo_WP_Update_Guard {
             ];
         }
 
-        // --- Pro signals ---
         if ($is_pro) {
             // 5. Changelog risk keywords (negation-filtered)
             $changelog_signals = self::parse_changelog_risk($slug);
@@ -487,7 +486,6 @@ class Phpinfo_WP_Update_Guard {
             }
         }
 
-        // Pro signals for themes
         if ($is_pro) {
             $changelog_signals = self::parse_changelog_risk_theme($slug);
             $signals = array_merge($signals, $changelog_signals);

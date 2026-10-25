@@ -27,7 +27,6 @@ function phpinfowp_render_feature_lock(array $args = []): void {
             border-radius: 6px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         ">
-            <!-- Icon + lock badge -->
             <div style="position:relative;display:inline-block;margin-bottom:20px;">
                 <span class="dashicons <?php echo esc_attr($icon); ?>"
                       style="font-size:48px;width:48px;height:48px;color:#777BB3;opacity:.9;"></span>

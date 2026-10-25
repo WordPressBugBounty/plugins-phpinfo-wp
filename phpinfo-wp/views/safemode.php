@@ -176,7 +176,7 @@ $active_plugins = (array) get_option('active_plugins', []);
     }
     </style>
 
-    <div class="phpinfowp-page-header">
+    <div class="phpinfowp-page-header" style="margin-bottom:12px;">
         <div>
             <h1>
                 <?php _e('Troubleshooting Mode', 'phpinfo-wp'); ?>
@@ -301,7 +301,7 @@ $active_plugins = (array) get_option('active_plugins', []);
             <?php wp_nonce_field('phpinfowp_safemode_start_nonce'); ?>
             <input type="hidden" name="phpinfowp_safemode_start" value="1">
 
-            <h2 class="phpinfowp-section-heading"><?php _e('Pick what to disable', 'phpinfo-wp'); ?></h2>
+            <h2 class="phpinfowp-section-heading" style="margin-top:0;"><?php _e('Pick what to disable', 'phpinfo-wp'); ?></h2>
 
             <div style="margin:8px 0 16px">
                 <label style="display:flex;align-items:center;gap:8px;font-weight:600; font-size:13px; color:#1e293b; cursor:pointer;">
@@ -347,7 +347,6 @@ $active_plugins = (array) get_option('active_plugins', []);
                 </tbody>
             </table>
 
-            <!-- Theme Card -->
             <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:20px; margin-bottom:20px; box-shadow:0 1px 2px rgba(0,0,0,0.01); max-width:780px;">
                 <h2 style="margin:0 0 10px; font-size:15px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:6px;">
                     <span class="dashicons dashicons-admin-appearance" style="color:#777BB3; font-size:18px; width:18px; height:18px;"></span>

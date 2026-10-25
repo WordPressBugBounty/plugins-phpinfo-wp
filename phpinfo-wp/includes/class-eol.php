@@ -74,7 +74,6 @@ class Phpinfo_WP_EOL {
         );
     }
 
-    // Full EOL timeline table — free feature; drives urgency for Pro upsell
     public static function timeline(): array {
         $now = time();
         $out = [];

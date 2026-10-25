@@ -89,10 +89,8 @@ $s = Phpinfo_WP_Object_Cache::status();
         </div>
     <?php else: ?>
 
-        <!-- Hit rate & Status Cards (Visible to all users) -->
         <div class="phpinfowp-opcache-grid">
             
-            <!-- Card 1: Hit Rate & Efficiency -->
             <div class="phpinfowp-opcache-card">
                 <div>
                     <div class="phpinfowp-opcache-card-head">
@@ -133,7 +131,6 @@ $s = Phpinfo_WP_Object_Cache::status();
                 </div>
             </div>
 
-            <!-- Card 2: Memory Usage -->
             <div class="phpinfowp-opcache-card">
                 <div>
                     <div class="phpinfowp-opcache-card-head">
@@ -169,7 +166,6 @@ $s = Phpinfo_WP_Object_Cache::status();
                 </div>
             </div>
 
-            <!-- Card 3: Keys & Evictions -->
             <div class="phpinfowp-opcache-card">
                 <div>
                     <div class="phpinfowp-opcache-card-head">
@@ -204,10 +200,8 @@ $s = Phpinfo_WP_Object_Cache::status();
         </div>
 
         <?php if ($is_free_preview): ?>
-            <!-- Free preview: contextual preview cards + centered upgrade card -->
             <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:12px; min-height:380px; display:flex; align-items:center; justify-content:center;">
                 
-                <!-- Background contextual preview cards -->
                 <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.65; filter:blur(0.5px); display:flex; flex-direction:column; gap:10px;">
                     
                     <?php
@@ -268,7 +262,6 @@ $s = Phpinfo_WP_Object_Cache::status();
                 <!-- Gradient fade-out overlay -->
                 <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(248,250,252,0.3) 0%, rgba(248,250,252,0.94) 38%, #f8fafc 100%); pointer-events:none;"></div>
 
-                <!-- Floating Upgrade Card -->
                 <div style="position:relative; z-index:2; width:100%; max-width:540px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.09); text-align:center; margin:16px auto;">
                     <span class="dashicons dashicons-database" style="font-size:36px; width:36px; height:36px; color:#6366f1; display:inline-block; margin-bottom:10px;"></span>
                     <h3 style="margin:0 0 8px; font-size:19px; font-weight:700; color:#0f172a;"><?php _e('Object Cache Management Locked', 'phpinfo-wp'); ?></h3>

@@ -402,6 +402,18 @@ class Phpinfo_WP_Report {
     ): array {
         $out = [];
 
+        // CVE & Zero-Day Threat Audit (php2shell / CVE-2026-109618)
+        if (class_exists('Phpinfo_WP_CVE_Audit')) {
+            $cve_data = Phpinfo_WP_CVE_Audit::audit();
+            if (!empty($cve_data['is_vulnerable'])) {
+                $out[] = self::issue('critical', 'Security',
+                    sprintf('Vulnerable to CVE-2026-109618: PHP %s Unpatched (php2shell)', $cve_data['current_version']),
+                    sprintf('CISA Cybersecurity Advisory warning: Your PHP runtime (%s under %s) is unpatched against unauthenticated Remote Code Execution.', $cve_data['current_version'], $cve_data['sapi_label']),
+                    sprintf('Update PHP runtime to %s or newer immediately. In phpinfo() WP open Vulnerability Scanner to generate a pre-formatted host fix ticket.', $cve_data['required_version'])
+                );
+            }
+        }
+
         // PHP EOL
         if (($eol['status'] ?? '') === 'eol') {
             $out[] = self::issue('critical', 'Compatibility',

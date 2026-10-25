@@ -45,16 +45,16 @@ $row = function($title, $ok, $value, $warning = null) {
 
 <div class="phpinfowp-pro-page">
 
-    <div class="phpinfowp-page-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+    <div class="phpinfowp-page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
         <div>
-            <h1 style="display:flex; align-items:center; gap:8px; margin:0; font-size:22px; font-weight:700; color:#0f172a;">
+            <h1 style="display:flex; align-items:center; gap:10px; margin:0; font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.02em;">
                 <?php _e('Mail Deliverability & DNS', 'phpinfo-wp'); ?>
                 <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span>
                 <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('SPF, DKIM, DMARC, MX records, and contact form mail routing deliverability diagnostic.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
             </h1>
         </div>
         <?php if ($is_pro): ?>
-            <div class="phpinfowp-compat-controls" style="margin:0; gap:8px; display:flex; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px; margin:0;">
                 <button type="button" id="phpinfowp-mail-recheck-btn" class="button <?php echo !$has_data ? 'button-primary' : 'button-secondary'; ?>" style="<?php echo !$has_data ? 'background:#6366f1; border-color:#6366f1; color:#fff;' : ''; ?> height:36px; line-height:34px; border-radius:6px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
                     <span class="dashicons dashicons-update" style="font-size:16px; width:16px; height:16px; margin-top:2px;"></span>
                     <span><?php echo $has_data ? __('Re-check DNS & Deliverability', 'phpinfo-wp') : __('Run Deliverability Audit', 'phpinfo-wp'); ?></span>
@@ -65,10 +65,8 @@ $row = function($title, $ok, $value, $warning = null) {
 
     <div id="phpinfowp-mail-result-area">
         <?php if ($is_free_preview): ?>
-            <!-- Free preview: contextual preview cards + centered upgrade card -->
             <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:12px; min-height:380px; display:flex; align-items:center; justify-content:center;">
                 
-                <!-- Background contextual preview cards -->
                 <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.65; filter:blur(0.5px); display:flex; flex-direction:column; gap:10px;">
                     
                 <?php
@@ -142,7 +140,6 @@ $row = function($title, $ok, $value, $warning = null) {
                 <!-- Gradient fade-out overlay -->
                 <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(248,250,252,0.3) 0%, rgba(248,250,252,0.94) 38%, #f8fafc 100%); pointer-events:none;"></div>
 
-                <!-- Floating Upgrade Card -->
                 <div style="position:relative; z-index:2; width:100%; max-width:540px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.09); text-align:center; margin:16px auto;">
                     <span class="dashicons dashicons-email-alt" style="font-size:36px; width:36px; height:36px; color:#6366f1; display:inline-block; margin-bottom:10px;"></span>
                     <h3 style="margin:0 0 8px; font-size:19px; font-weight:700; color:#0f172a;"><?php _e('Mail Deliverability & DNS Diagnostics Locked', 'phpinfo-wp'); ?></h3>
@@ -188,7 +185,6 @@ $row = function($title, $ok, $value, $warning = null) {
 
         <?php else: ?>
 
-            <!-- Sender Overview Card -->
             <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:18px 22px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.02); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
                 <div>
                     <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;"><?php _e('Sender Domain & Transport', 'phpinfo-wp'); ?></div>
@@ -300,7 +296,6 @@ $row = function($title, $ok, $value, $warning = null) {
                 </div>
             </div>
 
-            <!-- Send Test Email Card -->
             <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:20px 24px; box-shadow:0 1px 3px rgba(0,0,0,0.02); max-width:600px;">
                 <h2 style="margin:0 0 4px; font-size:16px; font-weight:700; color:#0f172a;"><?php _e('Live Email Dispatch Test', 'phpinfo-wp'); ?></h2>
                 <p style="margin:0 0 16px; font-size:13px; color:#64748b;"><?php _e('Sends an asynchronous probe to verify whether WordPress can successfully deliver email through your configured transport.', 'phpinfo-wp'); ?></p>

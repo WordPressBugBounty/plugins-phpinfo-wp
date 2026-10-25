@@ -46,7 +46,6 @@ $wpdb->query(
         OR option_name LIKE '\\_transient\\_timeout\\_phpinfowp\\_%'"
 );
 
-// 4. Drop snapshots table (Pro feature).
 $table = $wpdb->prefix . 'phpinfowp_snapshots';
 $wpdb->query("DROP TABLE IF EXISTS {$table}");
 

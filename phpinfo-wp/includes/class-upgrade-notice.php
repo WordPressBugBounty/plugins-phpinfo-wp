@@ -1,15 +1,6 @@
 <?php
 defined('ABSPATH') or die('Unauthorized Access');
 
-// Plugins-screen upgrade notice. WordPress shows the stock
-// "There is a new version available. View details or update now."
-// line; this hook appends a marketing block underneath it that
-// explains what's actually new in the upcoming release — same UX
-// pattern Elementor, WooCommerce, and Yoast use to make people
-// actually click Update.
-//
-// To refresh the copy each release, edit highlights_for() below.
-
 class Phpinfo_WP_Upgrade_Notice {
 
     public static function register(): void {
@@ -20,18 +11,10 @@ class Phpinfo_WP_Upgrade_Notice {
         );
     }
 
-    // $plugin_data — current installed plugin headers.
-    // $response    — WP_Plugin_Update object with ->new_version, ->url, etc.
     public static function render(array $plugin_data, object $response): void {
         $new_version = isset($response->new_version) ? (string) $response->new_version : '';
         $highlights  = self::highlights_for($new_version);
         if (!$highlights) return;
-
-        // The hook output is injected inside the stock <p> WP wraps the
-        // "View details / update now" sentence in. Close that <p> so our
-        // block sits as a sibling, then reopen one so WP's closing tag
-        // stays balanced. Without this dance the markup nests badly and
-        // breaks the row layout under the default admin theme.
         ?>
         </p>
         <div class="phpinfowp-upgrade-callout" style="

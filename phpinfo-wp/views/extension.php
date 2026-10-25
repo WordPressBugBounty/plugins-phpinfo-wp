@@ -34,13 +34,13 @@ sort($missing);
         &nbsp;&middot;&nbsp; PHP <?php echo esc_html(PHP_VERSION); ?>
       </p>
     </div>
-    <div style="position:relative">
+    <div style="position:relative; width:240px; max-width:100%;">
       <input type="text" id="phpinfowp-ext-search" placeholder="<?php echo esc_attr__('Filter extensions…', 'phpinfo-wp'); ?>"
-             class="regular-text" autocomplete="off" oninput="phpinfowpExtFilter(this.value)"
-             style="padding-right:30px">
+             autocomplete="off" oninput="phpinfowpExtFilter(this.value)"
+             style="width:100%; height:36px; line-height:34px; padding:0 30px 0 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; color:#0f172a; background:#ffffff; box-shadow:0 1px 2px rgba(0,0,0,0.04); outline:none; box-sizing:border-box;">
       <button type="button" onclick="document.getElementById('phpinfowp-ext-search').value='';phpinfowpExtFilter('')"
-              style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:16px"
-              id="phpinfowp-ext-clear">&times;</button>
+              style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:16px;line-height:1;padding:2px;"
+              id="phpinfowp-ext-clear" title="<?php esc_attr_e('Clear search', 'phpinfo-wp'); ?>">&times;</button>
     </div>
   </div>
 

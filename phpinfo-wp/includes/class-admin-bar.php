@@ -123,10 +123,8 @@ class Phpinfo_WP_Admin_Bar {
         ob_start();
         ?>
         <div class="phpinfowp-adminbar-hud" onclick="event.stopPropagation();">
-            <!-- 1. Header: Dual Telemetry Inline -->
             <div class="phpinfowp-hud-section phpinfowp-hud-header">
                 <div class="phpinfowp-hud-header-top">
-                    <!-- Server Telemetry -->
                     <div class="phpinfowp-hud-telem-pair">
                         <span class="phpinfowp-hud-dot <?php echo esc_attr($status['overall']); ?>"></span>
                         <span class="phpinfowp-brand-text">Server Telemetry:</span>
@@ -148,7 +146,6 @@ class Phpinfo_WP_Admin_Bar {
                     </div>
                     <!-- Divider -->
                     <span class="phpinfowp-hud-telem-div">|</span>
-                    <!-- Site Telemetry (Site Controllable) -->
                     <div class="phpinfowp-hud-telem-pair">
                         <span class="phpinfowp-brand-text">Site:</span>
                         <?php if ($status['is_pro']): ?>
@@ -174,7 +171,6 @@ class Phpinfo_WP_Admin_Bar {
                 </div>
             </div>
 
-            <!-- 2. Live Request Telemetry (2x2 Grid) -->
             <div class="phpinfowp-hud-grid">
                 <!-- Cell 1: Render Speed -->
                 <div class="phpinfowp-hud-cell">
@@ -316,7 +312,6 @@ class Phpinfo_WP_Admin_Bar {
                 <?php endif; ?>
             </div>
 
-            <!-- 6. Footer: Sentinel Status or Pro Upgrade Teaser -->
             <div class="phpinfowp-hud-footer">
                 <?php if ($status['is_pro']): ?>
                     <div class="phpinfowp-hud-pro-pill">
@@ -1038,7 +1033,6 @@ class Phpinfo_WP_Admin_Bar {
             ];
         }
 
-        // --- Pro Signals ---
         $opcache = null;
         if ($is_pro) {
             // SSL

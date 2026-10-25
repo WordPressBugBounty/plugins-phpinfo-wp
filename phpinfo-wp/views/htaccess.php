@@ -773,7 +773,6 @@ Phpinfo_wp::thankyou();
 
   </div> <!-- / .phpinfowp-htaccess-layout -->
 
-  <!-- Full-Width Snippet Library Block Below -->
   <div class="phpinfowp-snippets-section" style="margin-top: 36px;">
       <h1 style="margin-bottom:30px;"><?php _e('Web Server Snippet Library', 'phpinfo-wp'); ?></h1>
       
@@ -861,7 +860,6 @@ Phpinfo_wp::thankyou();
       </div>
       <?php endif; ?>
 
-      <!-- 2x2 Snippets Grid -->
       <div class="phpinfowp-snippets">
           <?php 
           $is_pro = Phpinfo_WP_License::is_valid();

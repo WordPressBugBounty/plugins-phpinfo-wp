@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     8.0.5
+Version:     8.0.6
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com/phpinfo-wp
@@ -15,13 +15,14 @@ Domain Path: /languages
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '8.0.5');
+define('PHPINFOWP_VERSION', '8.0.6');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 define('PHPINFOWP_SLUG_PREFIX', 'piwp');
 
 require_once PHPINFOWP_DIR . 'includes/class-license.php';
 require_once PHPINFOWP_DIR . 'includes/class-eol.php';
+require_once PHPINFOWP_DIR . 'includes/class-cve-audit.php';
 require_once PHPINFOWP_DIR . 'includes/class-security-headers.php';
 require_once PHPINFOWP_DIR . 'includes/class-snapshots.php';
 require_once PHPINFOWP_DIR . 'includes/class-error-log.php';
@@ -84,7 +85,6 @@ class Phpinfo_wp {
         // (Audit) in the WP submenu — the actual leaf <li> is CSS-hidden, so
         // without this nothing in the submenu appears active.
         add_filter('submenu_file',                [$this, 'fix_submenu_file']);
-        // Inject Elementor-style flyout panels into the WP admin sidebar so
         // hovering Audit/Tools/Reports reveals all their leaf pages. Loaded
         // on every admin page because users hover from anywhere in admin.
         add_action('admin_footer',                [$this, 'render_sidebar_flyouts']);
@@ -115,6 +115,7 @@ class Phpinfo_wp {
         Phpinfo_WP_Mail_Check::register();
         Phpinfo_WP_Report::register();
         Phpinfo_WP_Whats_New_Notice::register();
+        Phpinfo_WP_CVE_Audit::register();
 
         // Auto-render the tab bar above every grouped page (priority 5 so
         // it sits at the top of the .wrap before any other admin notices).
@@ -127,6 +128,7 @@ class Phpinfo_wp {
         add_action('init', [$this, 'load_textdomain']);
         add_action('admin_init', [$this, 'admin_init_migrations']);
         add_action('admin_init', [$this, 'redirect_group_landings']);
+        add_action('admin_init', [$this, 'maybe_redirect_on_activation']);
         add_filter('admin_footer_text', [$this, 'custom_admin_footer_text']);
         add_action('in_plugin_update_message-' . plugin_basename(__FILE__), [$this, 'show_update_notice'], 10, 2);
     }
@@ -187,6 +189,29 @@ class Phpinfo_wp {
             wp_safe_redirect(admin_url('admin.php?page=' . $redirects[$page]));
             exit;
         }
+    }
+
+    public function maybe_redirect_on_activation(): void {
+        if (!get_transient('phpinfowp_activation_redirect')) {
+            return;
+        }
+
+        delete_transient('phpinfowp_activation_redirect');
+
+        // Guardrails: Never redirect on bulk actions, CLI, cron, AJAX, or multisite network activations
+        if (
+            !is_admin() ||
+            !current_user_can('manage_options') ||
+            wp_doing_ajax() ||
+            wp_doing_cron() ||
+            (defined('WP_CLI') && WP_CLI) ||
+            isset($_GET['activate-multi'])
+        ) {
+            return;
+        }
+
+        wp_safe_redirect(admin_url('admin.php?page=piwp'));
+        exit;
     }
 
 
@@ -260,6 +285,7 @@ class Phpinfo_wp {
             // Audit group
             ['piwp-config-grader',     'Config Grader',     'view_config_grader'],
             ['piwp-eol',               'PHP EOL',           'view_eol'],
+            ['piwp-cve',               'Vulnerability Scanner','view_cve_audit'],
             ['piwp-compat',            'PHP Compatibility', 'view_compat'],
             ['piwp-update-audit',      'Update Guard',      'view_update_audit'],
             ['piwp-security-headers',  'Security Headers',  'view_security_headers'],
@@ -315,6 +341,7 @@ class Phpinfo_wp {
 
     // --- Pro views ---
     public function view_eol(): void             { require PHPINFOWP_DIR . 'views/pro/eol.php'; }
+    public function view_cve_audit(): void       { require PHPINFOWP_DIR . 'views/pro/cve-audit.php'; }
     public function view_security_headers(): void{ require PHPINFOWP_DIR . 'views/pro/security-headers.php'; }
     public function view_snapshots(): void       { require PHPINFOWP_DIR . 'views/pro/snapshots.php'; }
     public function view_error_log(): void       { require PHPINFOWP_DIR . 'views/pro/error-log.php'; }
@@ -542,7 +569,6 @@ class Phpinfo_wp {
                 <?php endif; ?>
 
             <?php else:
-                // Data-driven upsell — speak to what's actually broken on THIS site
                 $upsell_lines = [];
                 if ($eol['status'] === 'eol') {
                     $upsell_lines[] = sprintf('PHP %s reached end-of-life on %s. Pro scans every plugin for compatibility before you upgrade.', esc_html($eol['minor']), esc_html($eol['eol']));
@@ -1042,6 +1068,7 @@ FLYOUT;
 
     public function activate(): void {
         flush_rewrite_rules();
+        set_transient('phpinfowp_activation_redirect', true, 60);
         Phpinfo_WP_Snapshots::install_table();
         Phpinfo_WP_Activity_Log::maybe_create_table();
         Phpinfo_WP_License::schedule_remote_check_event();

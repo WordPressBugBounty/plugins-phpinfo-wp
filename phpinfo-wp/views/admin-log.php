@@ -107,7 +107,7 @@ $nonce = wp_create_nonce('phpinfowp_activity_log_nonce');
             ], admin_url('admin.php'));
         ?>
             <a href="<?php echo esc_url($tab_url); ?>" 
-               style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; transition:all 0.15s ease; <?php echo $is_active ? 'background:#6366f1; color:#fff;' : 'background:#fff; color:#475569; border:1px solid #e2e8f0;'; ?>">
+               style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; transition:all 0.15s ease; <?php echo $is_active ? 'background:#777BB3; color:#fff;' : 'background:#fff; color:#475569; border:1px solid #e2e8f0;'; ?>">
                 <span class="dashicons <?php echo esc_attr($cat_meta['icon']); ?>" style="font-size:15px; width:15px; height:15px; line-height:15px; <?php echo $is_active ? 'color:#fff;' : 'color:#64748b;'; ?>"></span>
                 <?php echo esc_html($cat_meta['label']); ?>
                 <span style="font-size:11px; padding:1px 6px; border-radius:10px; <?php echo $is_active ? 'background:rgba(255,255,255,0.25); color:#fff;' : 'background:#f1f5f9; color:#475569;'; ?>">
@@ -141,7 +141,7 @@ $nonce = wp_create_nonce('phpinfowp_activity_log_nonce');
             <input type="date" name="date_to" value="<?php echo esc_attr($date_to); ?>" style="height:34px; padding:0 10px; border-radius:6px; border:1px solid #d8dae5; color-scheme:light; font-size:13px; color:#1e293b; background:#fff;" title="<?php esc_attr_e('To Date', 'phpinfo-wp'); ?>">
         </div>
 
-        <button type="submit" class="button button-primary" style="height:34px; background:#6366f1; border-color:#6366f1; color:#fff; font-weight:600; padding:0 16px; border-radius:6px;">
+        <button type="submit" class="button button-primary" style="height:34px; background:#777BB3; border-color:#777BB3; color:#fff; font-weight:600; padding:0 16px; border-radius:6px;">
             <?php _e('Filter', 'phpinfo-wp'); ?>
         </button>
 
@@ -153,12 +153,9 @@ $nonce = wp_create_nonce('phpinfowp_activity_log_nonce');
     </form>
     <?php endif; ?>
 
-    <!-- Activity Log Feed or Pro Lock -->
     <?php if ($is_free_preview): ?>
-        <!-- Free preview: contextual preview cards + centered upgrade card -->
         <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:12px; min-height:380px; display:flex; align-items:center; justify-content:center;">
             
-            <!-- Background contextual preview cards -->
             <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.65; filter:blur(0.5px); display:flex; flex-direction:column; gap:10px;">
                 
                 <!-- Preview Row 1 -->
@@ -217,7 +214,6 @@ $nonce = wp_create_nonce('phpinfowp_activity_log_nonce');
             <!-- Gradient fade-out overlay -->
             <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(248,250,252,0.3) 0%, rgba(248,250,252,0.94) 38%, #f8fafc 100%); pointer-events:none;"></div>
 
-            <!-- Floating Upgrade Card -->
             <div style="position:relative; z-index:2; width:100%; max-width:540px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.09); text-align:center; margin:16px auto;">
                 <span class="dashicons dashicons-shield" style="font-size:36px; width:36px; height:36px; color:#6366f1; display:inline-block; margin-bottom:10px;"></span>
                 <h3 style="margin:0 0 8px; font-size:19px; font-weight:700; color:#0f172a;"><?php _e('WordPress Admin Audit Log Locked', 'phpinfo-wp'); ?></h3>

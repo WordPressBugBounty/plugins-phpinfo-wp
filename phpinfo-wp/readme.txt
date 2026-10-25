@@ -2,8 +2,8 @@
 Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
-Tested up to: 7.1.2
-Stable tag: 8.0.5
+Tested up to: 7.1.3
+Stable tag: 8.0.6
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -165,6 +165,13 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 9. Executive White-Label PDF Audit Report (Pro): Generate client-ready site audit reports with your agency logo, custom accent branding, and server health breakdown.
 
 == Changelog ==
+
+= 8.0.6 =
+* New: Server Security & Vulnerability Scanner: Automatically detects critical server security holes and provides 1-click fixes, plus ready-to-send support tickets for your hosting provider.
+* Compatibility: Confirmed full compatibility with WordPress 7.1.3.
+* Improved: Fast search and filtering to easily find server extensions, settings, and logs.
+* Improved: Cleaner design, uniform page spacing, and refined styling across all admin screens.
+* Fix: General stability improvements and minor bug fixes.
 
 = 8.0.5 =
 * Improved: License activation resilience and compatibility across strict managed hosting environments. Special thanks to Nick Safford for reporting this.

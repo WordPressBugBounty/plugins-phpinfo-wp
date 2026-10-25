@@ -35,6 +35,7 @@ class Phpinfo_WP_Admin_Nav {
                 'desc'  => __('Read-only health checks across PHP, config, security, and infrastructure', 'phpinfo-wp'),
                 'tabs'  => [
                     'piwp-eol'              => ['label' => __('PHP EOL', 'phpinfo-wp'),           'pro' => false, 'icon' => 'dashicons-calendar-alt'],
+                    'piwp-cve'              => ['label' => __('Vulnerability Scanner', 'phpinfo-wp'),'pro' => false, 'icon' => 'dashicons-shield-alt'],
                     'piwp-compat'           => ['label' => __('PHP Compatibility', 'phpinfo-wp'), 'pro' => false, 'icon' => 'dashicons-yes-alt'],
                     'piwp-update-audit'     => ['label' => __('Update Guard', 'phpinfo-wp'),      'pro' => false, 'icon' => 'dashicons-shield'],
                     'piwp-permissions'      => ['label' => __('Permissions Audit', 'phpinfo-wp'), 'pro' => true,  'icon' => 'dashicons-admin-network'],
@@ -276,7 +277,7 @@ class Phpinfo_WP_Admin_Nav {
             $transients = $db_cache['transients'] ?? ['total' => 0, 'expired' => 0];
 
             $status_color = ['ok' => '#00a32a', 'warning' => '#dba617', 'fail' => '#d63638', 'eol' => '#d63638', 'unknown' => '#888'];
-            $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL', 'eol' => 'END OF LIFE', 'unknown' => 'UNKNOWN'];
+            $status_label = ['ok' => 'HEALTHY', 'warning' => 'WARNING', 'fail' => 'CRITICAL', 'eol' => 'EOL', 'unknown' => 'UNKNOWN'];
 
             $srv_color = $status_color[$server['status'] ?? 'unknown'] ?? '#888';
             $srv_label = $status_label[$server['status'] ?? 'unknown'] ?? 'UNKNOWN';
@@ -291,7 +292,7 @@ class Phpinfo_WP_Admin_Nav {
                         <div style="font-size:16px; font-weight:800; color:#0f172a; line-height:1.2;">
                             <?php echo esc_html($server['engine'] ?? 'Database'); ?> <?php echo esc_html($server['version'] ?? ''); ?>
                         </div>
-                        <span class="phpinfowp-dbh-badge" style="background:<?php echo $is_pro ? esc_attr($srv_color) : '#64748b'; ?>; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.4px;">
+                        <span class="phpinfowp-dbh-badge" style="background:<?php echo $is_pro ? esc_attr($srv_color) : '#64748b'; ?>; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.4px; white-space:nowrap; flex-shrink:0;">
                             <?php echo $is_pro ? esc_html($srv_label) : __('PRO', 'phpinfo-wp'); ?>
                         </span>
                     </div>
@@ -510,6 +511,61 @@ class Phpinfo_WP_Admin_Nav {
                             <?php printf(__('EOL date not found for PHP %s.', 'phpinfo-wp'), esc_html($current['minor'] ?? '')); ?>
                         </p>
                     <?php endif; ?>
+                </div>
+            </div>
+            <?php
+        } elseif ($current_slug === 'piwp-cve' && class_exists('Phpinfo_WP_CVE_Audit')) {
+            $audit = Phpinfo_WP_CVE_Audit::audit();
+            $is_vuln = !empty($audit['is_vulnerable']);
+            $has_upload = !empty($audit['upload_progress_enabled']);
+            $has_shell = !empty($audit['open_shell_funcs']);
+
+            $threat_label = $is_vuln ? __('ATTENTION', 'phpinfo-wp') : ($has_upload ? __('ACTIVE', 'phpinfo-wp') : __('SAFE', 'phpinfo-wp'));
+            $threat_color = $is_vuln ? '#dc2626' : ($has_upload ? '#ea580c' : '#15803d');
+            ?>
+            <div class="phpinfowp-side-score-card" style="padding:16px 14px; border:1px solid #d8dae5; box-shadow:0 2px 5px rgba(0,0,0,0.04);">
+                <div style="margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <div style="font-size:15px; font-weight:800; color:#0f172a; line-height:1.2;">
+                            <?php _e('Security Audit', 'phpinfo-wp'); ?>
+                        </div>
+                        <span class="phpinfowp-dbh-badge" style="background:<?php echo esc_attr($threat_color); ?>; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.4px; white-space:nowrap; flex-shrink:0;">
+                            <?php echo esc_html($threat_label); ?>
+                        </span>
+                    </div>
+                    <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
+                        <?php printf(__('PHP %s Security Check', 'phpinfo-wp'), esc_html($audit['current_version'])); ?>
+                    </div>
+                </div>
+
+                <div style="font-size:13px; line-height:1.9; border-top:1px solid #e2e8f0; padding-top:10px; display:flex; flex-direction:column; gap:4px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <span style="color:#334155; font-weight:600; white-space:nowrap;"><?php _e('PHP Version:', 'phpinfo-wp'); ?></span>
+                        <span style="color:<?php echo $is_vuln ? '#dc2626' : '#15803d'; ?>; font-weight:800; font-size:13px; white-space:nowrap; text-align:right;">
+                            <?php echo esc_html($audit['current_version']); ?> <?php echo $is_vuln ? '<span style="font-size:10px; font-weight:700; background:#fee2e2; color:#b91c1c; padding:1px 5px; border-radius:3px; margin-left:2px;">' . __('Update', 'phpinfo-wp') . '</span>' : '✓'; ?>
+                        </span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <span style="color:#334155; font-weight:600; white-space:nowrap;"><?php _e('Safe Version:', 'phpinfo-wp'); ?></span>
+                        <span style="color:#15803d; font-weight:700; font-size:13px; white-space:nowrap; text-align:right;">
+                            <?php echo esc_html($audit['required_version']); ?>+
+                        </span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <span style="color:#334155; font-weight:600; white-space:nowrap;"><?php _e('Upload Buffer:', 'phpinfo-wp'); ?></span>
+                        <span style="color:<?php echo $has_upload ? '#ea580c' : '#15803d'; ?>; font-weight:700; font-size:13px; white-space:nowrap; text-align:right;">
+                            <?php echo $has_upload ? __('Active', 'phpinfo-wp') : __('Protected ✓', 'phpinfo-wp'); ?>
+                        </span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <span style="color:#334155; font-weight:600; white-space:nowrap;"><?php _e('Commands:', 'phpinfo-wp'); ?></span>
+                        <span style="color:<?php echo $has_shell ? '#b91c1c' : '#15803d'; ?>; font-weight:700; font-size:13px; white-space:nowrap; text-align:right;">
+                            <?php echo $has_shell ? sprintf(__('%d Exposed', 'phpinfo-wp'), count($audit['open_shell_funcs'])) : __('Protected ✓', 'phpinfo-wp'); ?>
+                        </span>
+                    </div>
                 </div>
             </div>
             <?php
@@ -1245,8 +1301,8 @@ class Phpinfo_WP_Admin_Nav {
                         <div style="font-size:16px; font-weight:800; color:#0f172a; line-height:1.2;">
                             <?php _e('Config Snapshots', 'phpinfo-wp'); ?>
                         </div>
-                        <span class="phpinfowp-dbh-badge" style="background:<?php echo $is_pro ? '#15803d' : '#64748b'; ?>; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.4px;">
-                            <?php echo $is_pro ? __('AUTO-BACKUP', 'phpinfo-wp') : __('PRO', 'phpinfo-wp'); ?>
+                        <span class="phpinfowp-dbh-badge" style="background:<?php echo $is_pro ? '#15803d' : '#64748b'; ?>; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.4px; white-space:nowrap; flex-shrink:0;">
+                            <?php echo $is_pro ? __('ACTIVE', 'phpinfo-wp') : __('PRO', 'phpinfo-wp'); ?>
                         </span>
                     </div>
                     <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
@@ -1304,7 +1360,7 @@ class Phpinfo_WP_Admin_Nav {
             $is_pro = Phpinfo_WP_License::is_valid();
             $cron_summary = Phpinfo_WP_Cron_Monitor::summary();
             $has_issues = $is_pro && (!empty($cron_summary['overdue']) || !empty($cron_summary['orphan']) || !empty($cron_summary['disabled']));
-            $cron_status = !$is_pro ? __('PRO', 'phpinfo-wp') : (!empty($cron_summary['disabled']) ? __('WP_CRON DISABLED', 'phpinfo-wp') : ($has_issues ? __('ATTENTION NEEDED', 'phpinfo-wp') : __('HEALTHY', 'phpinfo-wp')));
+            $cron_status = !$is_pro ? __('PRO', 'phpinfo-wp') : (!empty($cron_summary['disabled']) ? __('DISABLED', 'phpinfo-wp') : ($has_issues ? __('ATTENTION', 'phpinfo-wp') : __('HEALTHY', 'phpinfo-wp')));
             $status_color = !$is_pro ? '#64748b' : (!empty($cron_summary['disabled']) || !empty($cron_summary['overdue']) ? '#b91c1c' : (!empty($cron_summary['orphan']) ? '#b45309' : '#15803d'));
             ?>
             <div class="phpinfowp-side-score-card" style="padding:16px 14px; border:1px solid #d8dae5; box-shadow:0 2px 5px rgba(0,0,0,0.04);">
@@ -1313,7 +1369,7 @@ class Phpinfo_WP_Admin_Nav {
                         <div style="font-size:16px; font-weight:800; color:#0f172a; line-height:1.2;">
                             <?php _e('WP-Cron Monitor', 'phpinfo-wp'); ?>
                         </div>
-                        <span class="phpinfowp-dbh-badge" style="background:<?php echo esc_attr($status_color); ?>; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.4px;">
+                        <span class="phpinfowp-dbh-badge" style="background:<?php echo esc_attr($status_color); ?>; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.4px; white-space:nowrap; flex-shrink:0;">
                             <?php echo $is_pro ? esc_html(strtoupper($cron_status)) : __('PRO', 'phpinfo-wp'); ?>
                         </span>
                     </div>
@@ -1726,6 +1782,7 @@ class Phpinfo_WP_Admin_Nav {
         $map = [
             'piwp-config-grader'    => 'views/pro/config-grader.php',
             'piwp-eol'              => 'views/pro/eol.php',
+            'piwp-cve'              => 'views/pro/cve-audit.php',
             'piwp-compat'           => 'views/pro/compat.php',
             'piwp-security-headers' => 'views/pro/security-headers.php',
             'piwp-ssl'              => 'views/pro/ssl.php',

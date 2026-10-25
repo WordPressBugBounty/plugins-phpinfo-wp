@@ -352,7 +352,7 @@ class Phpinfo_WP_Compat {
             return [
                 'tier'        => 'incompatible',
                 'badge_color' => '#b91c1c',
-                'badge_text'  => sprintf(_n('%d BREAKING', '%d BREAKING', $total_removed, 'phpinfo-wp'), $total_removed),
+                'badge_text'  => sprintf(_n('%d BREAK', '%d BREAKS', $total_removed, 'phpinfo-wp'), $total_removed),
                 'plugin_color'=> '#b91c1c',
                 'title'       => sprintf(__('Breaking incompatibilities detected on PHP %s', 'phpinfo-wp'), esc_html($result['target'] ?? '')),
             ];
@@ -362,7 +362,7 @@ class Phpinfo_WP_Compat {
             return [
                 'tier'        => 'deprecated',
                 'badge_color' => '#b45309',
-                'badge_text'  => sprintf(_n('%d DEPRECATED', '%d DEPRECATED', $total_deprecated, 'phpinfo-wp'), $total_deprecated),
+                'badge_text'  => sprintf(_n('%d DEPR', '%d DEPR', $total_deprecated, 'phpinfo-wp'), $total_deprecated),
                 'plugin_color'=> '#b45309',
                 'title'       => sprintf(__('Deprecation notices only — safe to upgrade to PHP %s', 'phpinfo-wp'), esc_html($result['target'] ?? '')),
             ];

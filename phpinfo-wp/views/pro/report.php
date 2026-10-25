@@ -54,15 +54,15 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
 
 
 
-    <div class="phpinfowp-page-header no-print">
+    <div class="phpinfowp-page-header no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
         <div>
-            <h1>
+            <h1 style="display:flex; align-items:center; gap:10px; margin:0; font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.02em;">
                 <?php _e('Audit Report', 'phpinfo-wp'); ?>
                 <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span>
                 <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('A single-page comprehensive server health audit report — print to PDF or export for clients.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
             </h1>
         </div>
-        <div>
+        <div style="display:flex; align-items:center; gap:8px;">
             <?php if ($is_free_preview): ?>
                 <button type="button" class="button" disabled style="opacity: 0.6; cursor: not-allowed;">
                     <span class="dashicons dashicons-lock" style="vertical-align:middle"></span> <?php _e('White-label', 'phpinfo-wp'); ?>
@@ -500,10 +500,8 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                 ];
             }
             ?>
-            <!-- Free preview: dynamic preview cards + centered upgrade card -->
             <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:12px; min-height:380px; display:flex; align-items:center; justify-content:center;">
 
-                <!-- Background dynamic preview cards -->
                 <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.65; filter:blur(0.5px); display:flex; flex-direction:column; gap:10px;">
                     <?php foreach ($preview_items as $item): ?>
                         <div style="background:#fff; border:1px solid #e2e8f0; border-left:4px solid <?php echo esc_attr($item['border']); ?>; border-radius:8px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
@@ -519,7 +517,6 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
                 <!-- Gradient fade-out overlay -->
                 <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(248,250,252,0.3) 0%, rgba(248,250,252,0.94) 38%, #f8fafc 100%); pointer-events:none;"></div>
 
-                <!-- Floating Upgrade Card -->
                 <div style="position:relative; z-index:2; width:100%; max-width:540px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.09); text-align:center; margin:16px auto;">
                     <span class="dashicons dashicons-lock" style="font-size:36px; width:36px; height:36px; color:#6366f1; display:inline-block; margin-bottom:10px;"></span>
                     <h3 style="margin:0 0 8px; font-size:19px; font-weight:700; color:#0f172a;"><?php _e('Full Diagnostics & Action Items Locked', 'phpinfo-wp'); ?></h3>
@@ -600,7 +597,6 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
         <p class="phpinfowp-report-h-sub"><?php _e('The site is in good health with no critical vulnerabilities or urgent misconfigurations detected.', 'phpinfo-wp'); ?></p>
         <?php endif; ?>
 
-        <!-- Snapshot grid with verdict pills + plain-English captions -->
         <h3 class="phpinfowp-report-h"><?php _e('Snapshot', 'phpinfo-wp'); ?></h3>
         <div class="phpinfowp-report-grid">
             <div class="phpinfowp-report-stat">
@@ -1047,7 +1043,6 @@ $brand_tag  = $is_unlimited && $b['enabled'] && $b['tagline'] ? esc_html($b['tag
             <?php endif; ?>
         <?php endif; ?>
 
-        <!-- Database Architecture & Meta Bloat -->
         <?php if (!empty($r['db_bloat'])):
             $dbb = $r['db_bloat'];
             $ratio_v = $dbb['ratio'] > 80 ? 'critical' : ($dbb['ratio'] > 40 ? 'warn' : 'ok');

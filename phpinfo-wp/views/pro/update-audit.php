@@ -250,7 +250,6 @@ $inplace_verdict_meta = [
             <div id="phpinfowp-ug-result-area">
                 <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:12px; min-height:380px; display:flex; align-items:center; justify-content:center;">
                     
-                    <!-- Preview Cards (1-2 visible sample/real cards with subtle blur) -->
                     <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:10px; opacity:0.65; filter:blur(0.5px); display:flex; flex-direction:column; gap:12px;">
                         
                         <?php foreach ($preview_items as $p_item): 
@@ -285,7 +284,6 @@ $inplace_verdict_meta = [
                     <!-- Gradient fade-out overlay -->
                     <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(248,250,252,0.3) 0%, rgba(248,250,252,0.94) 38%, #f8fafc 100%); pointer-events:none;"></div>
 
-                    <!-- Floating Upgrade Card -->
                     <div style="position:relative; z-index:2; width:100%; max-width:540px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.09); text-align:center; margin:16px auto;">
                         <span class="dashicons dashicons-shield" style="font-size:36px; width:36px; height:36px; color:#6366f1; display:inline-block; margin-bottom:10px;"></span>
                         <h3 style="margin:0 0 8px; font-size:19px; font-weight:700; color:#0f172a;"><?php _e('Plugins & Themes Update Guard Locked', 'phpinfo-wp'); ?></h3>
@@ -321,7 +319,7 @@ $inplace_verdict_meta = [
                         <?php printf(__('Scans %d pending plugin and theme update(s) before you apply them. Runs in the background — you can safely leave anytime.', 'phpinfo-wp'), (int) $pending_count); ?>
                     </p>
                 </div>
-                <form id="phpinfowp-ug-form" method="post" class="phpinfowp-compat-controls" style="margin:0;gap:8px">
+                <form id="phpinfowp-ug-form" method="post" style="display:flex; align-items:center; gap:8px; margin:0;">
                     <?php wp_nonce_field('phpinfowp_ug_nonce'); ?>
                     <button type="submit" id="phpinfowp-ug-scan-btn" name="phpinfowp_ug_scan" value="1" class="button button-primary" <?php echo $is_bg_running ? 'disabled' : ''; ?>>
                         <span class="dashicons <?php echo $is_bg_running ? 'dashicons-update phpinfowp-spin' : 'dashicons-search'; ?>" style="vertical-align:middle;margin-top:-2px"></span>
@@ -472,7 +470,7 @@ $inplace_verdict_meta = [
                     </p>
                 <?php endif; ?>
             </div>
-            <form id="phpinfowp-ua-form" method="post" class="phpinfowp-compat-controls" style="margin:0;gap:8px">
+            <form id="phpinfowp-ua-form" method="post" style="display:flex; align-items:center; gap:8px; margin:0;">
                 <?php wp_nonce_field('phpinfowp_ua_nonce'); ?>
                 <label style="display:flex;align-items:center;gap:6px">
                     <span style="font-size:13px;font-weight:600"><?php _e('Target Core:', 'phpinfo-wp'); ?></span>
@@ -679,7 +677,7 @@ $inplace_verdict_meta = [
                     <?php _e('Automated health checks (HTTP loopback, error logs, WP-Cron) captured after updates.', 'phpinfo-wp'); ?>
                 </p>
             </div>
-            <form id="phpinfowp-uh-form-main" method="post" class="phpinfowp-compat-controls" style="margin:0;gap:8px">
+            <form id="phpinfowp-uh-form-main" method="post" style="display:flex; align-items:center; gap:8px; margin:0;">
                 <?php wp_nonce_field('phpinfowp_uh_nonce'); ?>
                 <button type="submit" id="phpinfowp-uh-check-btn-main" name="phpinfowp_uh_health_check" value="1" class="button button-primary">
                     <span class="dashicons dashicons-heart" style="vertical-align:middle;margin-top:-2px"></span>

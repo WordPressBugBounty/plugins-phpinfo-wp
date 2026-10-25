@@ -835,7 +835,6 @@ class Phpinfo_WP_Update_Audit {
 
         // Free users get a soft nudge — only on the Updates screen, never on
         // the main Dashboard (that would nag on every login). The live verdict
-        // banner and the Dashboard placement are the Pro perk.
         if (!self::_pro()) {
             if ($base !== 'update-core') return;
             printf(

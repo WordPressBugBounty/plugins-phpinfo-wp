@@ -45,16 +45,16 @@ $paged_extra_domains = array_slice($extra_domains, ($ssl_paged - 1) * $ssl_per_p
 ?>
 
 <div class="phpinfowp-pro-page">
-    <div class="phpinfowp-page-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+    <div class="phpinfowp-page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
         <div>
-            <h1 style="display:flex; align-items:center; gap:8px; margin:0; font-size:22px; font-weight:700; color:#0f172a;">
+            <h1 style="display:flex; align-items:center; gap:10px; margin:0; font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.02em;">
                 <?php _e('SSL Certificate & HTTPS Health', 'phpinfo-wp'); ?>
                 <span class="phpinfowp-pro-badge"><?php _e('PRO', 'phpinfo-wp'); ?></span>
                 <span class="piwp-page-info" data-tooltip="<?php esc_attr_e('Cryptographic audit, certificate expiration tracking, HTTPS redirection verification, and mixed content scanner.', 'phpinfo-wp'); ?>" tabindex="0" aria-label="<?php esc_attr_e('About this page', 'phpinfo-wp'); ?>"><span class="dashicons dashicons-info-outline"></span></span>
             </h1>
         </div>
         <?php if ($is_pro): ?>
-            <div class="phpinfowp-compat-controls" style="margin:0; gap:8px; display:flex; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px; margin:0;">
                 <button type="button" id="phpinfowp-ssl-recheck-btn" class="button <?php echo !$has_data ? 'button-primary' : 'button-secondary'; ?>" style="<?php echo !$has_data ? 'background:#6366f1; border-color:#6366f1; color:#fff;' : ''; ?> height:36px; line-height:34px; border-radius:6px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
                     <span class="dashicons dashicons-update" style="font-size:16px; width:16px; height:16px; margin-top:2px;"></span>
                     <span><?php echo $has_data ? __('Re-check SSL & HTTPS', 'phpinfo-wp') : __('Run SSL & HTTPS Audit', 'phpinfo-wp'); ?></span>
@@ -65,10 +65,8 @@ $paged_extra_domains = array_slice($extra_domains, ($ssl_paged - 1) * $ssl_per_p
 
     <div id="phpinfowp-ssl-result-area">
         <?php if ($is_free_preview): ?>
-            <!-- Free preview: contextual preview cards + centered upgrade card -->
             <div style="position:relative; margin-top:16px; overflow:hidden; border-radius:12px; min-height:380px; display:flex; align-items:center; justify-content:center;">
                 
-                <!-- Background contextual preview cards -->
                 <div style="position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; user-select:none; padding:12px; opacity:0.65; filter:blur(0.5px); display:flex; flex-direction:column; gap:10px;">
                     
                     <?php
@@ -130,7 +128,6 @@ $paged_extra_domains = array_slice($extra_domains, ($ssl_paged - 1) * $ssl_per_p
                 <!-- Gradient fade-out overlay -->
                 <div style="position:absolute; top:0; bottom:0; left:0; right:0; background:linear-gradient(to bottom, rgba(248,250,252,0.3) 0%, rgba(248,250,252,0.94) 38%, #f8fafc 100%); pointer-events:none;"></div>
 
-                <!-- Floating Upgrade Card -->
                 <div style="position:relative; z-index:2; width:100%; max-width:540px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.09); text-align:center; margin:16px auto;">
                     <span class="dashicons dashicons-lock" style="font-size:36px; width:36px; height:36px; color:#6366f1; display:inline-block; margin-bottom:10px;"></span>
                     <h3 style="margin:0 0 8px; font-size:19px; font-weight:700; color:#0f172a;"><?php _e('HTTPS Security & Protocol Audit Locked', 'phpinfo-wp'); ?></h3>
@@ -185,7 +182,6 @@ $paged_extra_domains = array_slice($extra_domains, ($ssl_paged - 1) * $ssl_per_p
         <?php else: ?>
 
             <?php if ($health): ?>
-                <!-- SECTION 1: HTTPS & PROTOCOL HEALTH MATRIX -->
                 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-top:20px;">
                     <!-- HTTP Auto-Redirect -->
                     <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
@@ -468,7 +464,6 @@ $paged_extra_domains = array_slice($extra_domains, ($ssl_paged - 1) * $ssl_per_p
             <?php endif; ?>
         </div>
 
-        <!-- SECTION 5: MONITOR ADDITIONAL DOMAINS BLOCK -->
         <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.03); max-width:640px; margin-top:24px;">
             <h2 style="margin:0 0 6px; font-size:16px; font-weight:700; color:#0f172a;"><?php _e('Monitor Additional Domains', 'phpinfo-wp'); ?></h2>
             <p style="font-size:13px; color:#64748b; margin:0 0 14px; line-height:1.5;">
@@ -490,7 +485,6 @@ $paged_extra_domains = array_slice($extra_domains, ($ssl_paged - 1) * $ssl_per_p
             </form>
         </div>
         <?php else: ?>
-        <!-- LOCKED: ADDITIONAL DOMAIN MONITORING (UNLIMITED & LIFETIME EXCLUSIVE) -->
         <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:28px 32px; margin-top:24px; box-shadow:0 1px 3px rgba(0,0,0,0.03); position:relative; overflow:hidden;">
             <div style="position:absolute; top:0; left:0; width:4px; height:100%; background:linear-gradient(180deg, #6366f1 0%, #a855f7 100%);"></div>
             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px;">

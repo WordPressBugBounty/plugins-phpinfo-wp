@@ -11,7 +11,6 @@ class Phpinfo_WP_Config_Grader_Fixer {
     const MARK_RE_END   = '[#;] END phpinfo-wp-autofix';
 
     // Transient holding the timestamp until which a just-written change is
-    // still "propagating" — see settle_remaining() / detect_overrides().
     const OPT_SETTLE        = 'phpinfowp_autofix_settle_until';
     const OPT_SETTLE_NOTICE = 'phpinfowp_autofix_settle_notice';
 
@@ -51,11 +50,12 @@ class Phpinfo_WP_Config_Grader_Fixer {
             'max_file_uploads'          => ['value' => '20',                'requires_php_ini' => false],
 
             // ── Security ──
-            'display_errors'            => ['value' => '0',                 'requires_php_ini' => false],
-            'log_errors'                => ['value' => '1',                 'requires_php_ini' => false],
-            'session.cookie_httponly'   => ['value' => '1',                 'requires_php_ini' => false],
-            'session.use_strict_mode'   => ['value' => '1',                 'requires_php_ini' => false],
-            'session.cookie_secure'     => ['value' => $is_https ? '1' : '0', 'requires_php_ini' => false],
+            'display_errors'                 => ['value' => '0',                 'requires_php_ini' => false],
+            'log_errors'                     => ['value' => '1',                 'requires_php_ini' => false],
+            'session.cookie_httponly'        => ['value' => '1',                 'requires_php_ini' => false],
+            'session.use_strict_mode'        => ['value' => '1',                 'requires_php_ini' => false],
+            'session.cookie_secure'          => ['value' => $is_https ? '1' : '0', 'requires_php_ini' => false],
+            'session.upload_progress.enabled'=> ['value' => '0',                 'requires_php_ini' => false],
 
             // ── Filesystem & misc ──
             'date.timezone'             => ['value' => date_default_timezone_get() ?: 'UTC', 'requires_php_ini' => false],
@@ -371,7 +371,6 @@ class Phpinfo_WP_Config_Grader_Fixer {
     public static function detect_overrides(): array {
         $filtered = apply_filters('phpinfowp_detect_overrides', null);
         if ($filtered !== null) return $filtered;
-        // While a write is still propagating, ini_get() is stale by definition —
         // reporting "not taking effect" here is a false alarm. Stay quiet.
         if (self::settle_remaining() > 0) return [];
 
@@ -537,8 +536,14 @@ class Phpinfo_WP_Config_Grader_Fixer {
             $line = trim($line);
             if ($line === '' || strncmp($line, '#', strlen('#')) === 0 || strncmp($line, ';', strlen(';')) === 0) continue;
             if ($mode === 'htaccess') {
-                if (preg_match('/^php_value\s+([^\s]+)\s+(.+)$/', $line, $mm)) {
-                    $out[$mm[1]] = trim($mm[2], "\"' ");
+                if (preg_match('/^(?:php_value|php_flag)\s+([^\s]+)\s+(.+)$/i', $line, $mm)) {
+                    $val = trim($mm[2], "\"' ");
+                    if (strcasecmp($val, 'off') === 0) {
+                        $val = '0';
+                    } elseif (strcasecmp($val, 'on') === 0) {
+                        $val = '1';
+                    }
+                    $out[$mm[1]] = $val;
                 }
             } else {
                 if (preg_match('/^([^=\s]+)\s*=\s*(.+)$/', $line, $mm)) {
@@ -561,7 +566,19 @@ class Phpinfo_WP_Config_Grader_Fixer {
         $c     = $mode === 'htaccess' ? '#' : ';';
         $lines = [self::mark_begin($mode), "$c Managed by phpinfo() WP — auto-fix. Edit via the Config Grader page."];
         if ($mode === 'htaccess') {
-            foreach ($pairs as $k => $v) $lines[] = "php_value {$k} \"{$v}\"";
+            $booleans = [
+                'display_errors', 'log_errors', 'session.cookie_httponly',
+                'session.use_strict_mode', 'session.cookie_secure',
+                'session.upload_progress.enabled'
+            ];
+            foreach ($pairs as $k => $v) {
+                if (in_array($k, $booleans, true)) {
+                    $flag = in_array(strtolower((string)$v), ['0', 'off', 'false', 'no'], true) ? 'Off' : 'On';
+                    $lines[] = "php_flag {$k} {$flag}";
+                } else {
+                    $lines[] = "php_value {$k} \"{$v}\"";
+                }
+            }
         } else {
             foreach ($pairs as $k => $v) $lines[] = "{$k} = {$v}";
         }

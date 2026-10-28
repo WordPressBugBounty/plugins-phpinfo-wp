@@ -23,13 +23,13 @@ class Phpinfo_WP_API_Monitor {
     }
 
     public static function mark_start($args, $url) {
-        // Record the start time. We use the URL as the key.
+        if (!is_string($url) || empty($url)) return $args;
         self::$starts[$url] = microtime(true);
         return $args;
     }
 
-    public static function mark_end($response, $context, $class, $parsed_args, $url): void {
-        if (!isset(self::$starts[$url])) return;
+    public static function mark_end($response, $context = null, $class = null, $parsed_args = null, $url = null): void {
+        if (!is_string($url) || !isset(self::$starts[$url])) return;
 
         $duration = microtime(true) - self::$starts[$url];
         unset(self::$starts[$url]);
@@ -40,7 +40,7 @@ class Phpinfo_WP_API_Monitor {
         $is_error = is_wp_error($response);
         $status   = !$is_error ? wp_remote_retrieve_response_code($response) : 0;
 
-        self::record_stat($host, $duration, $is_error, $status);
+        self::record_stat($host, $duration, $is_error, (int) $status);
     }
 
     private static function record_stat(string $host, float $duration, bool $is_error, int $status): void {

@@ -25,7 +25,7 @@ class Phpinfo_WP_License {
     private static function _cache_secret(string $key = ''): string {
         $salt = defined('AUTH_KEY') ? AUTH_KEY : (defined('SECURE_AUTH_KEY') ? SECURE_AUTH_KEY : 'phpinfowp_fallback_salt');
         if ($key === '') {
-            $key = (string) get_option(self::OPT_KEY, '');
+            $key = self::get_key();
         }
         return hash('sha256', $salt . 'phpinfowp_cache_v2_' . $key, true);
     }
@@ -114,6 +114,7 @@ class Phpinfo_WP_License {
             'days_left'    => $days_left,
             'expiry_human' => $is_life ? 'Lifetime' : date_i18n(get_option('date_format'), $exp),
             'is_lifetime'  => $is_life,
+            'tier'         => (string) ($p['tier'] ?? ''),
         ];
     }
 
@@ -263,33 +264,41 @@ class Phpinfo_WP_License {
     }
 
     public static function cron_ping(): void {
-        $key = self::get_key();
-        if (!$key) return;
+        try {
+            $key = self::get_key();
+            if (!$key) return;
 
-        $check = self::check_remote($key);
+            $check = self::check_remote($key);
 
-        if ($check['status'] === 'valid') {
-            update_option(self::OPT_FAILS, 0, false);
-            delete_option(self::OPT_LOCKED);
-            delete_option(self::OPT_REVOKE_REASON);
-            update_option(self::OPT_LAST_CHECK, time(), false);
-            if (!empty($check['tier'])) {
-                update_option(self::OPT_TIER, sanitize_text_field($check['tier']), false);
+            if ($check['status'] === 'valid') {
+                update_option(self::OPT_FAILS, 0, false);
+                delete_option(self::OPT_LOCKED);
+                delete_option(self::OPT_REVOKE_REASON);
+                update_option(self::OPT_LAST_CHECK, time(), false);
+                if (!empty($check['tier'])) {
+                    update_option(self::OPT_TIER, sanitize_text_field($check['tier']), false);
+                }
+                self::_cache_write(true);
+                return;
             }
-            self::_cache_write(true);
-            return;
-        }
 
-        if ($check['status'] === 'invalid') {
-            self::lock_revoked((string) ($check['reason'] ?? 'revoked'));
-            return;
-        }
+            if ($check['status'] === 'invalid') {
+                self::lock_revoked((string) ($check['reason'] ?? 'revoked'));
+                return;
+            }
 
-        $fails = (int) get_option(self::OPT_FAILS, 0) + 1;
-        update_option(self::OPT_FAILS, $fails, false);
-        if ($fails >= self::MAX_FAILS) {
-            self::lock_revoked('unreachable');
-        }
+            // Remote server unreachable or network error: record check timestamp so we don't spam background pings
+            update_option(self::OPT_LAST_CHECK, time(), false);
+
+            $fails = (int) get_option(self::OPT_FAILS, 0) + 1;
+            update_option(self::OPT_FAILS, $fails, false);
+
+            // Never lock a paying customer out just because network is down if their cryptographic token has not expired
+            $p = self::payload($key);
+            if ($p && !empty($p['exp']) && $p['exp'] < time()) {
+                self::lock_revoked('expired');
+            }
+        } catch (\Throwable $e) {}
     }
 
     // --- Remote verification ---
@@ -467,8 +476,16 @@ class Phpinfo_WP_License {
 
         $key_url = trim((string) $p['url']);
         if ($key_url !== '*') {
-            $site = rtrim(strtolower(get_site_url()), '/');
-            if ($site !== rtrim(strtolower($key_url), '/')) return false;
+            $clean_key = preg_replace('#^www\.#i', '', preg_replace('#^https?://#i', '', rtrim(strtolower($key_url), '/')));
+
+            $site_url   = rtrim(strtolower(get_site_url()), '/');
+            $home_url   = function_exists('get_home_url') ? rtrim(strtolower(get_home_url()), '/') : '';
+            $clean_site = preg_replace('#^www\.#i', '', preg_replace('#^https?://#i', '', $site_url));
+            $clean_home = $home_url ? preg_replace('#^www\.#i', '', preg_replace('#^https?://#i', '', $home_url)) : '';
+
+            if ($clean_key !== $clean_site && ($clean_home === '' || $clean_key !== $clean_home)) {
+                return false;
+            }
         }
 
         return true;

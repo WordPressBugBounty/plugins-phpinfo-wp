@@ -3,7 +3,7 @@ Contributors: exeebit
 Tags: site health, health check, php compatibility, troubleshooting, phpinfo
 Requires at least: 5.9
 Tested up to: 7.1.3
-Stable tag: 8.0.6
+Stable tag: 8.0.7
 Requires PHP: 7.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -166,12 +166,16 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 
 == Changelog ==
 
+= 8.0.7 =
+* Improved: Enhanced license verification reliability and offline support.
+* Improved: General performance, stability improvements, and bug fixes.
+
 = 8.0.6 =
-* New: Server Security & Vulnerability Scanner: Automatically detects critical server security holes and provides 1-click fixes, plus ready-to-send support tickets for your hosting provider.
+* New: Server Security & Vulnerability Scanner — Automatically detects critical server vulnerabilities and provides easy fixes and hosting support guides.
 * Compatibility: Confirmed full compatibility with WordPress 7.1.3.
-* Improved: Fast search and filtering to easily find server extensions, settings, and logs.
-* Improved: Cleaner design, uniform page spacing, and refined styling across all admin screens.
-* Fix: General stability improvements and minor bug fixes.
+* Improved: Faster search and navigation across server tools and logs.
+* Improved: Cleaner design and refined styling across all screens.
+* Fix: General stability improvements and bug fixes.
 
 = 8.0.5 =
 * Improved: License activation resilience and compatibility across strict managed hosting environments. Special thanks to Nick Safford for reporting this.
@@ -184,51 +188,50 @@ Yes. Unlike scanners that rely on PHP_CodeSniffer or the `exec()` function, our 
 
 = 8.0.3 =
 * Compatibility: Confirmed full compatibility with WordPress 7.1.2.
-* Fix: Resolved false-positive rollback errors during 1-Click server optimizations.
-* Improved: UX enhancements and prioritized orphan hook visibility in WP Cron Monitor.
-* Improved: General stability and safety check reliability.
+* Fix: Addressed an issue with server optimization settings.
+* Improved: User interface enhancements and scheduled task monitoring.
+* Improved: General performance and reliability improvements.
 
 = 8.0.2 =
 * Fix: Minor bug fixes.
 * Improved: UI enhancements.
 
 = 8.0.1 =
-* Fix: Resolved fatal TypeError in admin footer text filter when third-party plugins or themes return null or non-string values.
-* Hardened: Added safe type casting across admin body class, script async, and update footer filter callbacks.
+* Fix: Resolved an issue causing display errors with certain themes and plugins.
+* Improved: General stability and safety improvements.
 
 = 8.0.0 =
-* New: Server Overview Dashboard — Live look at peak RAM usage, memory limits, database autoload size, and OPcache health right inside wp-admin.
-* New: Admin Security Activity Log — Track logins, failed login attempts (with real IP detection behind Cloudflare and proxies), plugin/theme changes, and settings updates. Includes automatic log cleanup and 1-click CSV export.
-* New: Smarter PHP Compatibility Scanner — Scan plugins and themes for compatibility up to PHP 8.4 without false alarms from old fallback code.
-* New: Autoload Bloat & MySQL Index Scanner — Quickly check your database for oversized autoloaded options and missing table indexes that cause slow queries.
-* New: Plain-English AI Explanations — Failing server checks now include instant, easy-to-understand explanations of what went wrong and how to fix it.
-* Improved: 1-Click Server Directive Fixes now intelligently detect your server environment (.htaccess or .user.ini) and automatically roll back if anything goes wrong.
-* Improved: Cleaner screens by hiding distracting third-party plugin notices on phpinfo() WP diagnostic pages.
-* Improved: Security Headers audit now makes it much easier to spot and fix missing protections like CSP, HSTS, and X-Frame-Options.
+* New: Server Overview Dashboard — See key server metrics and health at a glance.
+* New: Activity Log — Keep track of important admin actions and site updates.
+* New: Compatibility Scanner — Check plugins and themes for compatibility before updating.
+* New: Database Health — Identify performance bottlenecks and keep your database clean.
+* New: Plain-English Guidance — Helpful, easy-to-understand explanations for server recommendations.
+* Improved: Server optimizations are now safer and more reliable.
+* Improved: Cleaner administrative screens with fewer distractions.
+* Improved: Enhanced security checks and recommendations.
 * Compatibility: Confirmed full compatibility with WordPress 7.1.1.
 
 = 7.2.7 =
-* Improved: Update Guard now checks plugins and themes for breaking changes before you update, and runs health diagnostics 60 seconds after updating to make sure your site is still running smoothly.
-* Fix: Renamed admin URL parameters to prevent false-positive blocks from security firewalls and LiteSpeed rules. Special thanks to Simon Richards for reporting this.
-* Improved: License activation now validates instantly without reloading the page.
-* Improved: Made technical diagnostics and support tools accessible with live server signals.
-* Fix: Corrected button alignment and error log line wrapping across admin screens.
+* Improved: Safer update checks and automatic health diagnostics.
+* Fix: Improved compatibility with security firewalls and server configurations. Special thanks to Simon Richards for reporting this.
+* Improved: Instant license activation without page reloads.
+* Improved: General user interface and formatting improvements.
 
 = 7.2.6 =
 * Compatibility: Confirmed compatibility with WordPress 7.1.
 
 = 7.2.5 =
-* Improved: Added advance reminder for the Single Site price update to $39/year.
-* Improved: Upgrade prompts now highlight your site's actual server issues so you know exactly what Pro fixes.
+* Improved: Clearer pricing and upgrade details.
+* Improved: Helpful recommendations tailored to your site.
 * Improved: Visual polish across dashboard and feature screens.
 
 = 7.2.4 =
-* New: Added translation files for French, German, Spanish, Italian, and Dutch.
-* Improved: Cleaner PHP end-of-life status badges and HTTP security header checks.
+* New: Added support for French, German, Spanish, Italian, and Dutch languages.
+* Improved: Visual enhancements to server status and security checks.
 
 = 7.2.3 =
-* Improved: Updated Single Site tier limits (1 Outbound API Monitor, 3 Config Snapshots, branded PDF reports). Existing license holders retain unlimited access.
-* Improved: Layout alignment and mobile responsiveness across the landing page.
+* Improved: Plan features and limits updated.
+* Improved: Layout alignment and mobile responsiveness.
 
 == Upgrade Notice ==
 

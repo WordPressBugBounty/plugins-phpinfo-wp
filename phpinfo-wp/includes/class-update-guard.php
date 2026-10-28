@@ -6,8 +6,9 @@ defined('ABSPATH') or die('Unauthorized Access');
  */
 class Phpinfo_WP_Update_Guard {
 
+    const ENGINE_VERSION   = 4;
     const OPT_RESULT       = 'phpinfowp_update_guard_result';
-    const TRANSIENT_DETAIL = 'phpinfowp_ug_detail_v3_';  // + md5(slug)
+    const TRANSIENT_DETAIL = 'phpinfowp_ug_detail_v4_';  // + md5(slug)
     const META_TTL         = 12 * HOUR_IN_SECONDS;
     const MAX_CHANGELOG    = 8000;  // max bytes of changelog to parse
 
@@ -16,6 +17,8 @@ class Phpinfo_WP_Update_Guard {
         'fix', 'fixed', 'fixes', 'resolv', 'resolved', 'resolves', 'patch', 'patched',
         'addressed', 'corrected', 'prevent', 'prevents', 'prevented', 'no longer',
         'eliminated', 'eliminates', 'stopped', 'squash', 'squashed', 'workaround',
+        'repair', 'repaired', 'repairs', 'mitigate', 'mitigated', 'mitigates',
+        'degrade', 'degrades', 'gracefully', 'handling', 'handled', 'defend',
     ];
 
     /** Words/phrases indicating a genuine forward-looking risk or breaking condition. */
@@ -108,6 +111,7 @@ class Phpinfo_WP_Update_Guard {
             'duration'    => round(microtime(true) - $started, 2),
             'scanned_at'  => time(),
             'is_pro'      => $is_pro,
+            'engine_ver'  => self::ENGINE_VERSION,
         ];
 
         update_option(self::OPT_RESULT, $result, false);
@@ -117,7 +121,7 @@ class Phpinfo_WP_Update_Guard {
     /** Get cached scan result. */
     public static function get_result(): ?array {
         $r = get_option(self::OPT_RESULT, null);
-        return is_array($r) ? $r : null;
+        return (is_array($r) && ($r['engine_ver'] ?? 0) === self::ENGINE_VERSION) ? $r : null;
     }
 
     /** Clear cached result. */
@@ -390,10 +394,13 @@ class Phpinfo_WP_Update_Guard {
             // Stability Dampener: 100% clean history dampens weak heuristic notes
             if ($stability === 100 && !$hard_caution) {
                 $verdict = 'safe';
+                $mitigation_suffix = ' — ' . __('(Mitigated: 100% site track record)', 'phpinfo-wp');
                 foreach ($signals as &$sig) {
                     if ($sig['severity'] === 'caution') {
                         $sig['severity'] = 'info';
-                        $sig['label'] .= ' — ' . __('(Mitigated: 100% site track record)', 'phpinfo-wp');
+                        if (strpos($sig['label'], 'Mitigated') === false) {
+                            $sig['label'] .= $mitigation_suffix;
+                        }
                     }
                 }
                 unset($sig);
@@ -588,10 +595,13 @@ class Phpinfo_WP_Update_Guard {
         } elseif ($has_caution) {
             if ($stability === 100 && !$hard_caution) {
                 $verdict = 'safe';
+                $mitigation_suffix = ' — ' . __('(Mitigated: 100% site track record)', 'phpinfo-wp');
                 foreach ($signals as &$sig) {
                     if ($sig['severity'] === 'caution') {
                         $sig['severity'] = 'info';
-                        $sig['label'] .= ' — ' . __('(Mitigated: 100% site track record)', 'phpinfo-wp');
+                        if (strpos($sig['label'], 'Mitigated') === false) {
+                            $sig['label'] .= $mitigation_suffix;
+                        }
                     }
                 }
                 unset($sig);
@@ -622,7 +632,7 @@ class Phpinfo_WP_Update_Guard {
      * risk keywords. Returns an array of signal entries.
      */
     private static function parse_changelog_risk(string $slug): array {
-        $cached = get_transient(self::TRANSIENT_DETAIL . md5('cl_v3:' . $slug));
+        $cached = get_transient(self::TRANSIENT_DETAIL . md5('cl_v4:' . $slug));
         if (is_array($cached)) return $cached;
 
         $url = 'https://api.wordpress.org/plugins/info/1.2/?action=plugin_information'
@@ -640,13 +650,13 @@ class Phpinfo_WP_Update_Guard {
             }
         }
 
-        set_transient(self::TRANSIENT_DETAIL . md5('cl_v3:' . $slug), $signals, self::META_TTL);
+        set_transient(self::TRANSIENT_DETAIL . md5('cl_v4:' . $slug), $signals, self::META_TTL);
         return $signals;
     }
 
     /** Theme changelog from WP.org. */
     private static function parse_changelog_risk_theme(string $slug): array {
-        $cached = get_transient(self::TRANSIENT_DETAIL . md5('tcl_v3:' . $slug));
+        $cached = get_transient(self::TRANSIENT_DETAIL . md5('tcl_v4:' . $slug));
         if (is_array($cached)) return $cached;
 
         $url = 'https://api.wordpress.org/themes/info/1.2/?action=theme_information'
@@ -664,91 +674,206 @@ class Phpinfo_WP_Update_Guard {
             }
         }
 
-        set_transient(self::TRANSIENT_DETAIL . md5('tcl_v3:' . $slug), $signals, self::META_TTL);
+        set_transient(self::TRANSIENT_DETAIL . md5('tcl_v4:' . $slug), $signals, self::META_TTL);
         return $signals;
     }
 
     /**
-     * Parse a changelog HTML string for genuine risk conditions using sentence
-     * splitting, routine phrase discard, and 6-word negation lookback.
+     * Parse a changelog HTML/text string for genuine risk conditions using
+     * structured entry extraction, abbreviation-safe tokenization, fix-intent
+     * filtering, and single-signal deduplication.
      */
     private static function scan_changelog_text(string $html): array {
-        $text = wp_strip_all_tags($html);
-        $text = substr($text, 0, self::MAX_CHANGELOG);
-
-        // Isolate the latest version section (up to the second version header)
-        if (preg_match('/^(.*?)(?:=\s*\d+\.\d+)/s', $text, $m, 0, 10)) {
-            $latest_section = substr($text, 0, strpos($text, $m[0], 10) ?: strlen($text));
-        } else {
-            $latest_section = substr($text, 0, 2000);
+        if (empty($html)) {
+            return [];
         }
 
-        // Split into sentences using punctuation or line breaks to avoid cross-sentence bleed
-        $sentences = preg_split('/(?<=[.!?\n\r])\s+/', $latest_section, -1, PREG_SPLIT_NO_EMPTY);
+        // 1. Isolate the latest version section (between 1st and 2nd version header)
+        $latest_section = self::isolate_latest_changelog_section($html);
+        if (empty($latest_section)) {
+            $latest_section = substr($html, 0, 4000);
+        }
+
+        // 2. Extract structured entries (<li> tags or markdown/newline bullets)
+        $entries = self::extract_changelog_entries($latest_section);
+        if (empty($entries)) {
+            return [];
+        }
+
         $signals = [];
-        $found = [];
+        $seen_labels = [];
 
-        foreach ($sentences as $sentence) {
-            $sentence = trim($sentence);
-            if (strlen($sentence) < 4) continue;
-            $lower = strtolower($sentence);
+        foreach ($entries as $entry) {
+            $clean_entry = trim(html_entity_decode(wp_strip_all_tags($entry), ENT_QUOTES, 'UTF-8'));
+            if (strlen($clean_entry) < 6) {
+                continue;
+            }
 
-            // 1. Routine maintenance phrases are discarded completely
+            // Discard routine maintenance phrases
+            $entry_lower = strtolower($clean_entry);
             foreach (self::DISCARD_PHRASES as $phrase) {
-                if (strpos($lower, $phrase) !== false) {
-                    continue 2; // skip to next sentence
+                if (strpos($entry_lower, $phrase) !== false) {
+                    continue 2;
                 }
             }
 
-            // 2. Scan for risk keywords
-            foreach (self::RISK_KEYWORDS as $kw) {
-                $kw_pos = strpos($lower, $kw);
-                if ($kw_pos === false || isset($found[$kw])) {
+            // 3. Top-Level Fix Intent: If the entry begins with a fix indicator,
+            // it is by definition resolving an issue, NOT introducing breaking risk.
+            if (preg_match('/^(?:[\*\-•\s]*)(?:\[|\()?(?:fix|fixed|fixes|bug\s*fix|bugfix|hotfix|patch|patched|resolved|resolves|repair|repaired|repairs|security\s*fix|prevented)(?:\]|\))?[\s:\-–—]/i', $clean_entry)) {
+                continue;
+            }
+
+            // 4. Tokenize entry into sentences while protecting abbreviations (e.g., i.e., vs., version numbers)
+            $sentences = self::split_sentences_safe($clean_entry);
+
+            foreach ($sentences as $sentence) {
+                $sentence = trim($sentence);
+                if (strlen($sentence) < 6) {
                     continue;
                 }
+                $lower = strtolower($sentence);
 
-                // Extract up to 6 words immediately preceding the keyword on the same sentence
-                $before_text = substr($lower, 0, $kw_pos);
-                $words_before = preg_split('/\s+/', trim($before_text));
-                $window = implode(' ', array_slice($words_before, -6));
-
-                // 3. If lookback window contains a fix signal, this is a bug fix (good news!), not a risk
-                $is_fix = false;
-                foreach (self::FIX_SIGNALS as $fix_sig) {
-                    if (strpos($window, $fix_sig) !== false) {
-                        $is_fix = true;
-                        break;
+                // Scan for risk keywords
+                foreach (self::RISK_KEYWORDS as $kw) {
+                    $kw_pos = strpos($lower, $kw);
+                    if ($kw_pos === false) {
+                        continue;
                     }
-                }
-                if ($is_fix) {
-                    continue; // Discard: bug fix mention
-                }
 
-                // 4. Require genuine forward-looking risk framing
-                $is_risk = false;
-                foreach (self::RISK_SIGNALS as $risk_sig) {
-                    if (strpos($lower, $risk_sig) !== false) {
-                        $is_risk = true;
-                        break;
+                    // Lookback: check entire text before keyword for fix indicators
+                    $before_text = substr($lower, 0, $kw_pos);
+                    $is_fix = false;
+                    foreach (self::FIX_SIGNALS as $fix_sig) {
+                        if (strpos($before_text, $fix_sig) !== false) {
+                            $is_fix = true;
+                            break;
+                        }
                     }
-                }
+                    if ($is_fix) {
+                        continue; // Discard: bug fix mention
+                    }
 
-                if ($is_risk) {
-                    $found[$kw] = true;
-                    $signals[] = [
-                        'type'     => 'changelog_risk',
-                        'severity' => 'caution',
-                        'label'    => sprintf(
+                    // Check trailing context up to 120 chars after keyword for resolution verbs
+                    $after_text = substr($lower, $kw_pos + strlen($kw), 120);
+                    if (preg_match('/^\s+(?:is|was|were|has\s+been|now|are)?\s*(?:fixed|resolved|prevented|addressed|eliminated|mitigated|avoided|handled|degrades?\s+gracefully)/i', $after_text)) {
+                        continue; // E.g. "fatal error is now resolved"
+                    }
+
+                    // Require genuine forward-looking risk framing
+                    $is_risk = false;
+                    foreach (self::RISK_SIGNALS as $risk_sig) {
+                        if (strpos($lower, $risk_sig) !== false) {
+                            $is_risk = true;
+                            break;
+                        }
+                    }
+
+                    if ($is_risk) {
+                        $label = sprintf(
                             __('Changelog note: "%s"', 'phpinfo-wp'),
                             wp_trim_words($sentence, 14, '...')
-                        ),
-                        'detail'   => $kw,
-                    ];
+                        );
+                        $dedup_key = md5($label);
+                        if (!isset($seen_labels[$dedup_key])) {
+                            $seen_labels[$dedup_key] = true;
+                            $signals[] = [
+                                'type'     => 'changelog_risk',
+                                'severity' => 'caution',
+                                'label'    => $label,
+                                'detail'   => $kw,
+                            ];
+                        }
+                        // Break after first matched risk keyword in this sentence!
+                        break;
+                    }
                 }
             }
         }
 
         return $signals;
+    }
+
+    /**
+     * Isolate the latest version section in changelog HTML or Markdown.
+     */
+    private static function isolate_latest_changelog_section(string $html): string {
+        $html = substr($html, 0, self::MAX_CHANGELOG);
+
+        // HTML headings (<h4>1.4.1</h4>, <h3>...</h3>, <h2>...</h2>)
+        if (preg_match_all('/<h[2-4][^>]*>.*?<\/h[2-4]>/is', $html, $matches, PREG_OFFSET_CAPTURE)) {
+            if (count($matches[0]) >= 2) {
+                $start = $matches[0][0][1];
+                $end   = $matches[0][1][1];
+                return substr($html, $start, $end - $start);
+            }
+            if (count($matches[0]) === 1) {
+                return substr($html, $matches[0][0][1], 3000);
+            }
+        }
+
+        // Markdown / Text headers (= 1.4.1 = or ## 1.4.1)
+        if (preg_match_all('/(?:^|\n)\s*(?:=\s*v?[\d\.]+\s*=|##+\s*v?[\d\.]+)/i', $html, $matches, PREG_OFFSET_CAPTURE)) {
+            if (count($matches[0]) >= 2) {
+                $start = $matches[0][0][1];
+                $end   = $matches[0][1][1];
+                return substr($html, $start, $end - $start);
+            }
+            if (count($matches[0]) === 1) {
+                return substr($html, $matches[0][0][1], 3000);
+            }
+        }
+
+        return substr($html, 0, 3000);
+    }
+
+    /**
+     * Extract structured list entries from a changelog section.
+     */
+    private static function extract_changelog_entries(string $section): array {
+        if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $section, $li_m)) {
+            $entries = array_filter(array_map('trim', $li_m[1]));
+            if (!empty($entries)) {
+                return array_values($entries);
+            }
+        }
+
+        // Fallback: Markdown bullets or line items
+        $plain = wp_strip_all_tags($section);
+        $lines = preg_split('/(?:^|\n)\s*[*•\-]\s+|\r?\n\r?\n/', $plain, -1, PREG_SPLIT_NO_EMPTY);
+        return array_values(array_filter(array_map('trim', $lines)));
+    }
+
+    /**
+     * Tokenize text into sentences while safeguarding abbreviations (e.g., i.e., vs.)
+     * and parenthetical clauses from being severed.
+     */
+    private static function split_sentences_safe(string $text): array {
+        // 1. Mask dots inside parentheses so parenthetical remarks are never bisected
+        $masked = preg_replace_callback('/\([^)]+\)/', function($m) {
+            return str_replace('.', '___DOT___', $m[0]);
+        }, $text);
+
+        // 2. Mask common abbreviations and numeric version decimals
+        $replacements = [
+            '/\b([eE])\.([gG])\.?/u'                           => '$1___DOT___$2___DOT___',
+            '/\b([iI])\.([eE])\.?/u'                           => '$1___DOT___$2___DOT___',
+            '/\b(etc|vs|approx|dept|fig|inc|jr|sr|no|vol)\./iu' => '$1___DOT___',
+            '/(\d+)\.(\d+)/u'                                  => '$1___DOT___$2',
+        ];
+
+        foreach ($replacements as $pattern => $sub) {
+            $masked = preg_replace($pattern, $sub, $masked);
+        }
+
+        // 3. Split on sentence boundaries (punctuation followed by space and uppercase or newline)
+        $parts = preg_split('/(?<=[.!?])\s+(?=[A-Z0-9])|\r?\n+/', $masked, -1, PREG_SPLIT_NO_EMPTY);
+        if (!$parts) {
+            $parts = [$masked];
+        }
+
+        return array_map(function($p) {
+            return str_replace('___DOT___', '.', $p);
+        }, $parts);
     }
 
     // -------------------------------------------------------------------------
@@ -1144,12 +1269,34 @@ class Phpinfo_WP_Update_Guard {
         echo '<span class="dashicons ' . esc_attr($icon) . '" style="font-size:15px;width:15px;height:15px;vertical-align:text-top;margin-right:4px;"></span>';
         echo '<strong>' . esc_html($guard_label) . '</strong>';
 
-        if (!empty($signals)) {
-            echo ' — ';
-            $labels = array_column($signals, 'label');
-            echo esc_html(implode(' | ', array_slice($labels, 0, 2)));
+        if ($verdict === 'safe') {
+            // Under Safe, display positive environment reassurance and routine lifecycle info
+            $safe_labels = [];
+            foreach ($signals as $s) {
+                if (in_array($s['type'] ?? '', ['sprint_cycle', 'matured_release'], true)) {
+                    $safe_labels[] = $s['label'];
+                }
+            }
+            $safe_labels = array_values(array_unique($safe_labels));
+            if (!empty($safe_labels)) {
+                echo ' — ' . esc_html(implode(' | ', array_slice($safe_labels, 0, 2)));
+            } else {
+                echo ' — ' . esc_html__('Environment compatible. Pre-flight backup snapshot enabled.', 'phpinfo-wp');
+            }
         } else {
-            echo ' — ' . esc_html__('Environment compatible. Pre-flight backup snapshot enabled.', 'phpinfo-wp');
+            // Under Caution / Risky, only display active caution or risky warning labels, deduplicated
+            $warn_labels = [];
+            foreach ($signals as $s) {
+                if (in_array($s['severity'] ?? '', ['caution', 'risky'], true)) {
+                    $warn_labels[] = $s['label'];
+                }
+            }
+            $warn_labels = array_values(array_unique($warn_labels));
+            if (!empty($warn_labels)) {
+                echo ' — ' . esc_html(implode(' | ', array_slice($warn_labels, 0, 2)));
+            } else {
+                echo ' — ' . esc_html__('Review compatibility details before updating.', 'phpinfo-wp');
+            }
         }
 
         $audit_url = admin_url('admin.php?page=piwp-update-audit');

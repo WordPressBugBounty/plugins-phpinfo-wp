@@ -42,56 +42,74 @@ class Phpinfo_WP_Activity_Log {
 
     public static function maybe_create_table(): void {
         global $wpdb;
-        $table_name = self::table_name();
+        if (!$wpdb) {
+            return;
+        }
 
         static $installed = false;
         if ($installed) {
             return;
         }
 
-        $table_exists = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name);
-        if ($table_exists && get_option(self::DB_VERSION_OPT) === self::DB_VERSION) {
+        // Fast path: if the DB version option is already recorded, don't execute any SQL on hot path!
+        if (get_option(self::DB_VERSION_OPT) === self::DB_VERSION) {
             $installed = true;
             return;
         }
 
-        $charset_collate = $wpdb->get_charset_collate();
+        try {
+            $table_name = self::table_name();
+            $table_exists = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name);
+            if ($table_exists) {
+                update_option(self::DB_VERSION_OPT, self::DB_VERSION, false);
+                $installed = true;
+                return;
+            }
 
-        $sql = "CREATE TABLE {$table_name} (
-            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            created_at datetime NOT NULL,
-            user_id bigint(20) unsigned DEFAULT NULL,
-            user_login varchar(60) NOT NULL DEFAULT '',
-            user_role varchar(50) NOT NULL DEFAULT '',
-            ip_address varchar(45) NOT NULL DEFAULT '',
-            user_agent varchar(255) NOT NULL DEFAULT '',
-            category varchar(30) NOT NULL DEFAULT 'general',
-            action varchar(50) NOT NULL DEFAULT '',
-            object_id varchar(100) NOT NULL DEFAULT '',
-            object_name varchar(255) NOT NULL DEFAULT '',
-            severity varchar(20) NOT NULL DEFAULT 'info',
-            details longtext DEFAULT NULL,
-            PRIMARY KEY  (id),
-            KEY created_at (created_at),
-            KEY category (category),
-            KEY action (action),
-            KEY severity (severity),
-            KEY user_login (user_login)
-        ) {$charset_collate};";
+            $charset_collate = $wpdb->get_charset_collate();
 
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        dbDelta($sql);
+            $sql = "CREATE TABLE {$table_name} (
+                id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                created_at datetime NOT NULL,
+                user_id bigint(20) unsigned DEFAULT NULL,
+                user_login varchar(60) NOT NULL DEFAULT '',
+                user_role varchar(50) NOT NULL DEFAULT '',
+                ip_address varchar(45) NOT NULL DEFAULT '',
+                user_agent varchar(255) NOT NULL DEFAULT '',
+                category varchar(30) NOT NULL DEFAULT 'general',
+                action varchar(50) NOT NULL DEFAULT '',
+                object_id varchar(100) NOT NULL DEFAULT '',
+                object_name varchar(255) NOT NULL DEFAULT '',
+                severity varchar(20) NOT NULL DEFAULT 'info',
+                details longtext DEFAULT NULL,
+                PRIMARY KEY  (id),
+                KEY created_at (created_at),
+                KEY category (category),
+                KEY action (action),
+                KEY severity (severity),
+                KEY user_login (user_login)
+            ) {$charset_collate};";
 
-        // Fallback in case dbDelta did not execute or failed silently
-        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) !== $table_name) {
-            $wpdb->query($sql);
-        }
+            if (file_exists(ABSPATH . 'wp-admin/includes/upgrade.php')) {
+                require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+                if (function_exists('dbDelta')) {
+                    dbDelta($sql);
+                }
+            }
 
-        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name) {
-            // Clean any noisy auto-drafts / global styles logged during initial setup
-            $wpdb->query("DELETE FROM {$table_name} WHERE object_name LIKE '%Auto Draft%' OR object_name LIKE '%Global Styles%' OR object_name LIKE '%(Untitled%'");
+            // Fallback in case dbDelta did not execute or failed silently
+            if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) !== $table_name) {
+                $wpdb->query($sql);
+            }
 
-            update_option(self::DB_VERSION_OPT, self::DB_VERSION, false);
+            if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name) {
+                // Clean any noisy auto-drafts / global styles logged during initial setup
+                $wpdb->query("DELETE FROM {$table_name} WHERE object_name LIKE '%Auto Draft%' OR object_name LIKE '%Global Styles%' OR object_name LIKE '%(Untitled%'");
+
+                update_option(self::DB_VERSION_OPT, self::DB_VERSION, false);
+                $installed = true;
+            }
+        } catch (\Throwable $e) {
             $installed = true;
         }
     }
@@ -105,57 +123,64 @@ class Phpinfo_WP_Activity_Log {
         ?int $user_id = null,
         string $object_id = ''
     ): bool {
-        self::maybe_create_table();
+        try {
+            self::maybe_create_table();
 
-        global $wpdb;
-        $table_name = self::table_name();
+            global $wpdb;
+            if (!$wpdb) {
+                return false;
+            }
+            $table_name = self::table_name();
 
-        if (!self::table_exists()) {
+            if (!self::table_exists()) {
+                return false;
+            }
+
+            if ($user_id === null) {
+                $user_id = get_current_user_id();
+            }
+
+            $user_login = '';
+            $user_role  = '';
+
+            if ($user_id > 0) {
+                $u = get_userdata($user_id);
+                if ($u) {
+                    $user_login = $u->user_login;
+                    $user_role  = !empty($u->roles) ? (string) reset($u->roles) : '';
+                }
+            } elseif (!empty($details['attempted_login'])) {
+                $user_login = (string) $details['attempted_login'];
+            }
+
+            $ip_address = self::get_client_ip();
+            $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? substr(sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 0, 255) : '';
+
+            $json_details = !empty($details) ? wp_json_encode($details) : null;
+
+            $inserted = $wpdb->insert(
+                $table_name,
+                [
+                    'created_at'  => current_time('mysql', 1), // UTC time
+                    'user_id'     => $user_id ?: null,
+                    'user_login'  => substr($user_login, 0, 60),
+                    'user_role'   => substr($user_role, 0, 50),
+                    'ip_address'  => substr($ip_address, 0, 45),
+                    'user_agent'  => $user_agent,
+                    'category'    => substr($category, 0, 30),
+                    'action'      => substr($action, 0, 50),
+                    'object_id'   => substr($object_id, 0, 100),
+                    'object_name' => substr($object_name, 0, 255),
+                    'severity'    => in_array($severity, ['info', 'warning', 'critical'], true) ? $severity : 'info',
+                    'details'     => $json_details,
+                ],
+                ['%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
+            );
+
+            return $inserted !== false;
+        } catch (\Throwable $e) {
             return false;
         }
-
-        if ($user_id === null) {
-            $user_id = get_current_user_id();
-        }
-
-        $user_login = '';
-        $user_role  = '';
-
-        if ($user_id > 0) {
-            $u = get_userdata($user_id);
-            if ($u) {
-                $user_login = $u->user_login;
-                $user_role  = !empty($u->roles) ? (string) reset($u->roles) : '';
-            }
-        } elseif (!empty($details['attempted_login'])) {
-            $user_login = (string) $details['attempted_login'];
-        }
-
-        $ip_address = self::get_client_ip();
-        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? substr(sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 0, 255) : '';
-
-        $json_details = !empty($details) ? wp_json_encode($details) : null;
-
-        $inserted = $wpdb->insert(
-            $table_name,
-            [
-                'created_at'  => current_time('mysql', 1), // UTC time
-                'user_id'     => $user_id ?: null,
-                'user_login'  => substr($user_login, 0, 60),
-                'user_role'   => substr($user_role, 0, 50),
-                'ip_address'  => substr($ip_address, 0, 45),
-                'user_agent'  => $user_agent,
-                'category'    => substr($category, 0, 30),
-                'action'      => substr($action, 0, 50),
-                'object_id'   => substr($object_id, 0, 100),
-                'object_name' => substr($object_name, 0, 255),
-                'severity'    => in_array($severity, ['info', 'warning', 'critical'], true) ? $severity : 'info',
-                'details'     => $json_details,
-            ],
-            ['%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
-        );
-
-        return $inserted !== false;
     }
 
     private static function get_client_ip(): string {
@@ -228,14 +253,16 @@ class Phpinfo_WP_Activity_Log {
     }
 
     // --- Authentication Listeners ---
-    public static function on_wp_login(string $user_login, WP_User $user): void {
+    public static function on_wp_login(string $user_login, $user = null): void {
+        $roles = ($user instanceof WP_User) ? (array) $user->roles : [];
+        $uid   = ($user instanceof WP_User) ? $user->ID : get_current_user_id();
         self::log(
             'auth',
             'login_success',
             sprintf(__('User "%s" logged in', 'phpinfo-wp'), $user_login),
-            ['roles' => (array) $user->roles],
+            ['roles' => $roles],
             'info',
-            $user->ID
+            $uid
         );
     }
 
@@ -268,7 +295,10 @@ class Phpinfo_WP_Activity_Log {
 
     // --- Plugins & Themes Listeners ---
     public static function on_plugin_activated(string $plugin, bool $network_wide = false): void {
-        $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $plugin, false, false);
+        if (!function_exists('get_plugin_data') && file_exists(ABSPATH . 'wp-admin/includes/plugin.php')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        $plugin_data = function_exists('get_plugin_data') ? get_plugin_data(WP_PLUGIN_DIR . '/' . $plugin, false, false) : [];
         $name        = !empty($plugin_data['Name']) ? $plugin_data['Name'] : $plugin;
 
         self::log(
@@ -285,7 +315,10 @@ class Phpinfo_WP_Activity_Log {
     }
 
     public static function on_plugin_deactivated(string $plugin, bool $network_wide = false): void {
-        $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $plugin, false, false);
+        if (!function_exists('get_plugin_data') && file_exists(ABSPATH . 'wp-admin/includes/plugin.php')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        $plugin_data = function_exists('get_plugin_data') ? get_plugin_data(WP_PLUGIN_DIR . '/' . $plugin, false, false) : [];
         $name        = !empty($plugin_data['Name']) ? $plugin_data['Name'] : $plugin;
 
         self::log(
@@ -311,14 +344,15 @@ class Phpinfo_WP_Activity_Log {
         );
     }
 
-    public static function on_switch_theme(string $new_name, WP_Theme $new_theme, $old_theme = null): void {
+    public static function on_switch_theme(string $new_name, $new_theme = null, $old_theme = null): void {
+        $ver = ($new_theme instanceof WP_Theme) ? $new_theme->get('Version') : '';
         self::log(
             'themes',
             'theme_switched',
             sprintf(__('Switched active theme to "%s"', 'phpinfo-wp'), $new_name),
             [
                 'new_theme' => $new_name,
-                'version'   => $new_theme->get('Version'),
+                'version'   => $ver,
             ],
             'info'
         );
@@ -352,9 +386,12 @@ class Phpinfo_WP_Activity_Log {
                 }
                 self::log('plugins', 'plugin_installed', sprintf(__('Installed plugin "%s"', 'phpinfo-wp'), $name), ['plugin' => $name], 'info');
             } elseif ($action === 'update') {
+                if (!function_exists('get_plugin_data') && file_exists(ABSPATH . 'wp-admin/includes/plugin.php')) {
+                    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+                }
                 $plugins = $hook_extra['plugins'] ?? [];
                 foreach ($plugins as $p) {
-                    $plugin_data = file_exists(WP_PLUGIN_DIR . '/' . $p) ? get_plugin_data(WP_PLUGIN_DIR . '/' . $p, false, false) : [];
+                    $plugin_data = (function_exists('get_plugin_data') && file_exists(WP_PLUGIN_DIR . '/' . $p)) ? get_plugin_data(WP_PLUGIN_DIR . '/' . $p, false, false) : [];
                     $p_name = !empty($plugin_data['Name']) ? $plugin_data['Name'] : $p;
                     self::log('plugins', 'plugin_updated', sprintf(__('Updated plugin "%s"', 'phpinfo-wp'), $p_name), ['plugin' => $p], 'info');
                 }
@@ -445,20 +482,21 @@ class Phpinfo_WP_Activity_Log {
         self::log('posts', 'term_created', sprintf(__('Created %1$s "%2$s"', 'phpinfo-wp'), $tax_label, $term->name), ['term_id' => $term_id, 'taxonomy' => $taxonomy], 'info');
     }
 
-    public static function on_delete_term(int $term_id, int $tt_id, string $taxonomy, $deleted_term, array $object_ids = []): void {
+    public static function on_delete_term($term_id, $tt_id = 0, $taxonomy = '', $deleted_term = null, $object_ids = []): void {
         if ($taxonomy === 'nav_menu') return;
         $name = is_object($deleted_term) && isset($deleted_term->name) ? $deleted_term->name : "ID #$term_id";
-        $tax_obj = get_taxonomy($taxonomy);
-        $tax_label = $tax_obj ? $tax_obj->labels->singular_name : $taxonomy;
-        self::log('posts', 'term_deleted', sprintf(__('Deleted %1$s "%2$s"', 'phpinfo-wp'), $tax_label, $name), ['term_id' => $term_id, 'taxonomy' => $taxonomy], 'warning');
+        $tax_obj = !empty($taxonomy) ? get_taxonomy($taxonomy) : null;
+        $tax_label = $tax_obj ? $tax_obj->labels->singular_name : ($taxonomy ?: 'term');
+        self::log('posts', 'term_deleted', sprintf(__('Deleted %1$s "%2$s"', 'phpinfo-wp'), $tax_label, $name), ['term_id' => (int) $term_id, 'taxonomy' => $taxonomy], 'warning');
     }
 
     // --- Comments Listeners ---
-    public static function on_insert_comment(int $comment_id, WP_Comment $comment): void {
+    public static function on_insert_comment($comment_id, $comment = null): void {
+        if (!($comment instanceof WP_Comment)) return;
         $post = get_post($comment->comment_post_ID);
         $post_title = $post ? $post->post_title : "Post #{$comment->comment_post_ID}";
         $author = $comment->comment_author ?: __('Anonymous', 'phpinfo-wp');
-        self::log('posts', 'comment_added', sprintf(__('Comment submitted by "%1$s" on "%2$s"', 'phpinfo-wp'), $author, $post_title), ['comment_id' => $comment_id], 'info');
+        self::log('posts', 'comment_added', sprintf(__('Comment submitted by "%1$s" on "%2$s"', 'phpinfo-wp'), $author, $post_title), ['comment_id' => (int) $comment_id], 'info');
     }
 
     public static function on_transition_comment_status(string $new_status, string $old_status, $comment): void {

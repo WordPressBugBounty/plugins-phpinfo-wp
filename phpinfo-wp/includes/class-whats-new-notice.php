@@ -93,6 +93,9 @@ class Phpinfo_WP_Whats_New_Notice {
             '8.0.6' => [
                 'headline' => 'phpinfo() WP 8.0.6 — Server Intelligence & Security Suite',
             ],
+            '8.0.7' => [
+                'headline' => 'phpinfo() WP 8.0.7 — Server Intelligence & Security Suite',
+            ],
         ];
 
         $notice = $catalog[PHPINFOWP_VERSION] ?? [
@@ -138,23 +141,8 @@ class Phpinfo_WP_Whats_New_Notice {
         $fails  = (int) ($grader['fails'] ?? 0);
         $grade  = $grader['grade'] ?? '';
 
-        // 8. Zero-Day CVE Vulnerability Check
-        $cve_audit   = class_exists('Phpinfo_WP_CVE_Audit') ? Phpinfo_WP_CVE_Audit::audit() : [];
-        $is_cve_vuln = !empty($cve_audit['is_vulnerable']);
-
         // Select the most pressing real issue on the site
-        if ($is_cve_vuln) {
-            // Case 0: Critical Zero-Day CVE Alert (Highest Priority)
-            $badge_text = sprintf(__('v%s · CVE Alert', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION));
-            $site_msg   = sprintf(
-                /* translators: 1: version, 2: required version */
-                __('🚨 <strong>Critical Zero-Day Advisory (CVE-2026-109618):</strong> Your server runs PHP %1$s, which is vulnerable to unauthenticated remote code execution. Patch %2$s+ is required. Pro audits all attack vectors, auto-disables weaponized upload buffers, and generates your host patch ticket.', 'phpinfo-wp'),
-                esc_html($cve_audit['current_version']),
-                esc_html($cve_audit['required_version'])
-            );
-            $cta_label = __('Audit & Protect with Pro →', 'phpinfo-wp');
-
-        } elseif ($mem_limit_bytes > 0 && $mem_pct >= 65) {
+        if ($mem_limit_bytes > 0 && $mem_pct >= 65) {
             // Case 1: High RAM utilization (e.g. 89MB of 128MB)
             $badge_text = sprintf(__('v%s · %d%% RAM Peak', 'phpinfo-wp'), esc_html(PHPINFOWP_VERSION), $mem_pct);
             $site_msg   = sprintf(

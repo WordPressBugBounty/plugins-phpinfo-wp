@@ -312,6 +312,8 @@ class Phpinfo_WP_Alerts {
     // Weekly cron — strictly for reporting
     public static function cron_weekly(): void {
         if (!self::_pro()) return;
-        self::send_weekly_digest();
+        try {
+            self::send_weekly_digest();
+        } catch (\Throwable $e) {}
     }
 }

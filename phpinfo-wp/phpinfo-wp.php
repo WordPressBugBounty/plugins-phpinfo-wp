@@ -3,7 +3,7 @@
 Plugin Name: phpinfo() WP
 Plugin URI:  https://exeebit.com/phpinfo-wp
 Description: WordPress server health audit — PHP EOL timeline, config grader, security headers, SSL monitor, OPcache, error log, audit reports for clients. Free phpinfo viewer & .htaccess editor included.
-Version:     8.0.6
+Version:     8.0.7
 Requires PHP: 7.3
 Author:      Exeebit
 Author URI:  https://exeebit.com/phpinfo-wp
@@ -15,10 +15,19 @@ Domain Path: /languages
 
 defined('ABSPATH') or die('Unauthorized Access');
 
-define('PHPINFOWP_VERSION', '8.0.6');
+define('PHPINFOWP_VERSION', '8.0.7');
 define('PHPINFOWP_DIR',     plugin_dir_path(__FILE__));
 define('PHPINFOWP_URL',     plugin_dir_url(__FILE__));
 define('PHPINFOWP_SLUG_PREFIX', 'piwp');
+// Runtime Engine Safety Gate: halt before loading modern PHP 7.3+ class files
+if (version_compare(PHP_VERSION, '7.3', '<')) {
+    add_action('admin_notices', function() {
+        echo '<div class="notice notice-error"><p>' .
+            sprintf(esc_html__('phpinfo() WP requires PHP 7.3 or higher. Your server is running PHP %s.', 'phpinfo-wp'), esc_html(PHP_VERSION)) .
+            '</p></div>';
+    });
+    return;
+}
 
 require_once PHPINFOWP_DIR . 'includes/class-license.php';
 require_once PHPINFOWP_DIR . 'includes/class-eol.php';
@@ -982,6 +991,7 @@ FLYOUT;
         // Re-register our own plugin notices
         add_action('admin_notices', ['Phpinfo_WP_Admin_Nav', 'auto_render'], 5);
         add_action('admin_notices', ['Phpinfo_WP_Whats_New_Notice', 'render'], 10);
+        add_action('admin_notices', ['Phpinfo_WP_CVE_Audit', 'admin_notice'], 10);
         add_action('admin_notices', ['Phpinfo_WP_Update_History', 'maybe_show_health_alert'], 10);
         add_action('admin_notices', [$this, 'eol_admin_notice'], 10);
     }
